@@ -9,7 +9,7 @@ import {
   BarChart2,
   Target,
   Settings,
-  HeadphonesIcon,
+  Headphones,
   Upload,
   Users,
   Activity,
@@ -45,7 +45,7 @@ export default function MainLayout() {
       title: "APP",
       links: [
         { name: "Settings", icon: Settings, path: "/settings" },
-        { name: "Support", icon: HeadphonesIcon, path: "/support" },
+        { name: "Support", icon: Headphones, path: "/support" },
       ],
     },
   ];

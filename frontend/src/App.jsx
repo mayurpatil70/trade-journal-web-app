@@ -1,94 +1,60 @@
 // frontend/src/App.jsx
-import {
-  BrowserRouter,
-  Routes,
-  Route,
-  Navigate,
-  Outlet,
-  useSearchParams,
-} from "react-router-dom";
-import { useEffect } from "react";
-import DashboardLayout from "./layouts/DashboardLayout";
-import Login from "./pages/Login";
-import Verify from "./pages/Verify";
-import DiscordGate from "./pages/DiscordGate";
-import Dashboard from "./pages/Dashboard";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
-// Bulletproof Route Guard
-const ProtectedRoute = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const userId = localStorage.getItem("userId");
+// Pages
+import Login from "./pages/Login.jsx";
+import Verify from "./pages/Verify.jsx";
+import DiscordGate from "./pages/DiscordGate.jsx";
+import EconomicCalendar from "./pages/EconomicCalendar.jsx";
 
-  const isVerifiedQuery = searchParams.get("verified") === "true";
-  const isVerifiedLocal = localStorage.getItem("discordVerified") === "true";
+// Layout - THIS IMPORT PREVENTS THE CRASH
+import MainLayout from "./layouts/MainLayout.jsx";
 
-  useEffect(() => {
-    // If backend redirected with success flag, lock it in storage
-    if (isVerifiedQuery && !isVerifiedLocal) {
-      localStorage.setItem("discordVerified", "true");
-      // Clean the URL without causing a page reload
-      setSearchParams({});
-    }
-  }, [isVerifiedQuery, isVerifiedLocal, setSearchParams]);
+// Temporary placeholder for pages we are building next
+const Placeholder = ({ title }) => (
+  <div className="flex items-center justify-center h-full text-gray-400">
+    <h2 className="text-2xl font-bold">{title} - Coming Soon</h2>
+  </div>
+);
 
-  // Evaluate the final verification status
-  const finalVerifiedStatus = isVerifiedQuery || isVerifiedLocal;
-
-  // Security Gates
-  if (!userId) {
-    return <Navigate to="/login" replace />;
-  }
-
-  if (!finalVerifiedStatus) {
-    return <Navigate to="/link-discord" replace />;
-  }
-
-  return <Outlet />;
-};
-
-export default function App() {
+function App() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* Public Authentication Routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/verify" element={<Verify />} />
         <Route path="/link-discord" element={<DiscordGate />} />
 
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        {/* Protected Dashboard Routes (Wrapped in the Sidebar Layout) */}
+        <Route path="/" element={<MainLayout />}>
+          {/* Automatically redirect the base URL to /dashboard */}
+          <Route index element={<Navigate to="/dashboard" replace />} />
 
-        <Route element={<ProtectedRoute />}>
-          <Route element={<DashboardLayout />}>
-            <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="dashboard" element={<Placeholder title="Dashboard" />} />
+          <Route path="trades" element={<Placeholder title="Trade Log" />} />
+          <Route
+            path="calendar"
+            element={<Placeholder title="Trading Calendar" />}
+          />
 
-            <Route element={<MainLayout />}>
-              <Route element={<EconomicCalendar />} path="/news" />
-            </Route>
+          {/* Our New News Route */}
+          <Route path="news" element={<EconomicCalendar />} />
 
-            <Route
-              path="/trades"
-              element={
-                <div className="p-8 text-white">
-                  Trade Log Content Goes Here
-                </div>
-              }
-            />
-            <Route
-              path="/calendar"
-              element={
-                <div className="p-8 text-white">Calendar Content Goes Here</div>
-              }
-            />
-            <Route
-              path="/analytics"
-              element={
-                <div className="p-8 text-white">
-                  Analytics Content Goes Here
-                </div>
-              }
-            />
-          </Route>
+          <Route path="gallery" element={<Placeholder title="Gallery" />} />
+          <Route path="analytics" element={<Placeholder title="Analytics" />} />
+          <Route
+            path="strategies"
+            element={<Placeholder title="Strategies" />}
+          />
+          <Route path="import" element={<Placeholder title="Import Data" />} />
+          <Route path="accounts" element={<Placeholder title="Accounts" />} />
+          <Route path="settings" element={<Placeholder title="Settings" />} />
+          <Route path="support" element={<Placeholder title="Support" />} />
         </Route>
       </Routes>
     </BrowserRouter>
   );
 }
+
+export default App;
