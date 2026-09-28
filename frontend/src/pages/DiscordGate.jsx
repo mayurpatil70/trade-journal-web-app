@@ -21,9 +21,10 @@ export default function DiscordGate() {
       );
       return;
     }
-    const redirectUri = encodeURIComponent(
-      "http://localhost:3000/api/discord/callback",
-    );
+    // Get the API URL dynamically, defaulting to localhost for local dev
+    const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
+    const redirectUri = encodeURIComponent(`${apiUrl}/api/discord/callback`);
+
     window.location.href = `https://discord.com/api/oauth2/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=identify%20guilds&state=${userId}`;
   };
 

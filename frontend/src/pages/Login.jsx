@@ -40,9 +40,9 @@ export default function Login() {
             <Sparkles className="w-8 h-8 text-journalEmerald" />
           </div>
           <h1 className="text-4xl font-extrabold tracking-tight mb-3">
-            <span className="text-white">F</span>
+            <span className="text-white">Forex Notes</span>
             <span className="bg-gradient-to-r from-journalEmerald to-emerald-300 bg-clip-text text-transparent uppercase ml-1">
-              Journal
+              Discipline today <br /> Freedom tomorrow
             </span>
           </h1>
           <p className="text-gray-400 text-sm font-medium">
@@ -57,7 +57,8 @@ export default function Login() {
               Check your inbox
             </h3>
             <p className="text-gray-400 text-sm leading-relaxed">
-              We've sent a secure magic link to <br />
+              We've sent a secure link to join our discord community and verify
+              your <br />
               <span className="font-semibold text-white">{email}</span>
             </p>
           </div>
