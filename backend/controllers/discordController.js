@@ -10,15 +10,17 @@ const supabase = createClient(
 export const handleDiscordCallback = async (req, res) => {
   const { code, state, error } = req.query;
 
+  // Dynamically grab the frontend URL (defaults to localhost for local development)
+  const clientUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+
   if (error || !code || !state) {
     console.error("Discord Auth Cancelled or Missing Params");
-    return res.redirect("http://localhost:5173/link-discord?error=auth_failed");
+    return res.redirect(`${clientUrl}/link-discord?error=auth_failed`);
   }
 
   const userId = state;
 
   try {
-    // 1. Get Discord Token
     const tokenResponse = await axios.post(
       "https://discord.com/api/oauth2/token",
       new URLSearchParams({
@@ -33,7 +35,6 @@ export const handleDiscordCallback = async (req, res) => {
 
     const { access_token } = tokenResponse.data;
 
-    // 2. Fetch User's Servers
     const guildsResponse = await axios.get(
       "https://discord.com/api/users/@me/guilds",
       {
@@ -42,8 +43,6 @@ export const handleDiscordCallback = async (req, res) => {
     );
 
     const targetGuildId = process.env.DISCORD_GUILD_ID.trim();
-
-    // 3. Check for Server Membership
     const isMember = guildsResponse.data.some(
       (guild) => guild.id === targetGuildId,
     );
@@ -63,23 +62,17 @@ export const handleDiscordCallback = async (req, res) => {
         throw new Error("Database update failed");
       }
 
-      // Safe Redirect to Dashboard
-      return res.redirect("http://localhost:5173/dashboard?verified=true");
+      // Safe Redirect to your live Vercel Dashboard
+      return res.redirect(`${clientUrl}/dashboard?verified=true`);
     } else {
-      console.warn(
-        `Blocked: User is NOT in the server. Expected Guild ID: ${targetGuildId}`,
-      );
-      return res.redirect(
-        "http://localhost:5173/link-discord?error=not_in_server",
-      );
+      console.warn(`Blocked: User is NOT in the server.`);
+      return res.redirect(`${clientUrl}/link-discord?error=not_in_server`);
     }
   } catch (err) {
     console.error(
       "Complete Discord Auth Error:",
       err.response?.data || err.message,
     );
-    return res.redirect(
-      "http://localhost:5173/link-discord?error=server_error",
-    );
+    return res.redirect(`${clientUrl}/link-discord?error=server_error`);
   }
 };
