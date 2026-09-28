@@ -143,16 +143,15 @@ export default function AddTrade() {
   const labelClass =
     "text-[10px] font-bold text-gray-600 dark:text-gray-400 uppercase tracking-widest";
 
-  // TEXT CENTER APPLIED: Added `text-center` and `[text-align-last:center]` to perfectly center all single-line inputs and dropdown menus.
+  // UNIFORM STYLE: Applied to date, time, numbers, text inputs, and dropdowns. Forces exact blue text color and centering across all browsers/devices.
   const inputClass =
-    "appearance-none box-border w-full min-h-[52px] block bg-gray-50 dark:bg-[#0b131d] border border-gray-300 dark:border-[#1f2c3b] rounded-[2px] px-4 py-3 !text-gray-900 dark:!text-white focus:border-[#2f8df4] focus:ring-1 focus:ring-[#2f8df4] outline-none transition-all placeholder-gray-400 dark:placeholder-gray-500 text-sm shadow-sm text-center [text-align-last:center] font-medium";
+    "appearance-none box-border w-full min-h-[52px] block bg-gray-50 dark:bg-[#0b131d] border border-gray-300 dark:border-[#1f2c3b] rounded-[2px] px-4 py-3 !text-[#2f8df4] [-webkit-text-fill-color:#2f8df4] font-bold focus:border-[#2f8df4] focus:ring-1 focus:ring-[#2f8df4] outline-none transition-all placeholder-gray-400 dark:placeholder-gray-500 text-sm shadow-sm text-center [text-align-last:center]";
 
-  // TEXT LEFT APPLIED: Textareas for paragraphs remain explicitly left-aligned.
   const textareaClass =
-    "appearance-none box-border w-full min-h-[100px] block bg-gray-50 dark:bg-[#0b131d] border border-gray-300 dark:border-[#1f2c3b] rounded-[2px] px-4 py-3 !text-gray-900 dark:!text-white focus:border-[#2f8df4] focus:ring-1 focus:ring-[#2f8df4] outline-none transition-all placeholder-gray-400 dark:placeholder-gray-500 text-sm shadow-sm resize-y text-left font-medium";
+    "appearance-none box-border w-full min-h-[100px] block bg-gray-50 dark:bg-[#0b131d] border border-gray-300 dark:border-[#1f2c3b] rounded-[2px] px-4 py-3 !text-[#2f8df4] [-webkit-text-fill-color:#2f8df4] font-bold focus:border-[#2f8df4] focus:ring-1 focus:ring-[#2f8df4] outline-none transition-all placeholder-gray-400 dark:placeholder-gray-500 text-sm shadow-sm resize-y text-left";
 
   const optionClass =
-    "bg-white !text-gray-900 dark:bg-[#0b131d] dark:!text-white font-medium text-center";
+    "bg-white !text-[#2f8df4] [-webkit-text-fill-color:#2f8df4] dark:bg-[#0b131d] font-bold text-center";
   const headerIconClass =
     "w-10 h-10 md:w-12 md:h-12 rounded-[2px] bg-[#2f8df4]/10 flex items-center justify-center border border-[#2f8df4]/20 shrink-0";
   const imageLabels = ["Before Entry", "Entry", "Exit"];
@@ -226,7 +225,7 @@ export default function AddTrade() {
                     </option>
                   ))}
                 </select>
-                <ChevronDown className="absolute right-4 w-4 h-4 text-gray-500 pointer-events-none" />
+                <ChevronDown className="absolute right-4 w-4 h-4 text-[#2f8df4] pointer-events-none" />
               </div>
             </div>
 
@@ -246,7 +245,7 @@ export default function AddTrade() {
                     SHORT
                   </option>
                 </select>
-                <ChevronDown className="absolute right-4 w-4 h-4 text-gray-500 pointer-events-none" />
+                <ChevronDown className="absolute right-4 w-4 h-4 text-[#2f8df4] pointer-events-none" />
               </div>
             </div>
 
@@ -272,7 +271,7 @@ export default function AddTrade() {
                     Other
                   </option>
                 </select>
-                <ChevronDown className="absolute right-4 w-4 h-4 text-gray-500 pointer-events-none" />
+                <ChevronDown className="absolute right-4 w-4 h-4 text-[#2f8df4] pointer-events-none" />
               </div>
             </div>
 
@@ -291,7 +290,7 @@ export default function AddTrade() {
                     </option>
                   ))}
                 </select>
-                <ChevronDown className="absolute right-4 w-4 h-4 text-gray-500 pointer-events-none" />
+                <ChevronDown className="absolute right-4 w-4 h-4 text-[#2f8df4] pointer-events-none" />
               </div>
             </div>
 
@@ -366,7 +365,7 @@ export default function AddTrade() {
                     BREAK-EVEN
                   </option>
                 </select>
-                <ChevronDown className="absolute right-4 w-4 h-4 text-gray-500 pointer-events-none" />
+                <ChevronDown className="absolute right-4 w-4 h-4 text-[#2f8df4] pointer-events-none" />
               </div>
             </div>
 
@@ -440,7 +439,7 @@ export default function AddTrade() {
                     </option>
                   ))}
                 </select>
-                <ChevronDown className="absolute right-4 w-4 h-4 text-gray-500 pointer-events-none" />
+                <ChevronDown className="absolute right-4 w-4 h-4 text-[#2f8df4] pointer-events-none" />
               </div>
             </div>
             <div className={inputContainerClass}>
@@ -461,7 +460,7 @@ export default function AddTrade() {
                     </option>
                   ))}
                 </select>
-                <ChevronDown className="absolute right-4 w-4 h-4 text-gray-500 pointer-events-none" />
+                <ChevronDown className="absolute right-4 w-4 h-4 text-[#2f8df4] pointer-events-none" />
               </div>
             </div>
           </div>
@@ -495,7 +494,7 @@ export default function AddTrade() {
                   Yes
                 </option>
               </select>
-              <ChevronDown className="absolute right-4 w-4 h-4 text-gray-500 pointer-events-none" />
+              <ChevronDown className="absolute right-4 w-4 h-4 text-[#2f8df4] pointer-events-none" />
             </div>
           </div>
         </div>
@@ -529,7 +528,7 @@ export default function AddTrade() {
                   </>
                 ) : (
                   <>
-                    <ImageIcon className="w-8 h-8 md:w-10 md:h-10 text-gray-400 dark:text-gray-600 group-hover:text-[#21d4a3] transition-colors mb-3 md:mb-4" />
+                    <ImageIcon className="w-8 h-8 md:w-10 md:h-10 text-[#2f8df4] opacity-70 group-hover:opacity-100 transition-opacity mb-3 md:mb-4" />
                     <p className="text-sm md:text-base font-bold text-gray-700 dark:text-gray-300 mb-1">
                       {label}
                     </p>
@@ -554,7 +553,7 @@ export default function AddTrade() {
           <button
             type="button"
             onClick={() => navigate("/trades")}
-            className="w-full sm:w-auto px-8 py-3.5 md:py-4 rounded-[2px] font-bold text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5 transition-colors flex items-center justify-center gap-2 border border-transparent dark:border-transparent"
+            className="w-full sm:w-auto px-8 py-3.5 md:py-4 rounded-[2px] font-bold text-[#2f8df4] bg-white dark:bg-[#121418] border border-[#2f8df4]/30 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors flex items-center justify-center gap-2"
             disabled={isSubmitting}
           >
             <X className="w-5 h-5" /> Cancel
