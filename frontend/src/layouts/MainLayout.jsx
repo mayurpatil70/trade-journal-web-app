@@ -24,67 +24,67 @@ export default function MainLayout() {
   const navLinks = [
     {
       name: "Dashboard",
-      icon: LayoutDashboard,
+      // icon: LayoutDashboard,
       path: "/dashboard",
       iconColor: "text-[#5b8cff]",
     },
     {
       name: "Add Trade",
-      icon: PlusCircle,
+      // icon: PlusCircle,
       path: "/add-trade",
       iconColor: "text-[#21d4a3]",
     },
     {
       name: "Economic Calendar",
-      icon: Globe,
+      // icon: Globe,
       path: "/news",
       iconColor: "text-[#ffb84d]",
     },
     {
       name: "Past Trades",
-      icon: List,
+      // icon: List,
       path: "/trades",
       iconColor: "text-[#a78bfa]",
     },
     {
       name: "Calendar",
-      icon: Calendar,
+      // icon: Calendar,
       path: "/calendar",
       iconColor: "text-[#22d3ee]",
     },
     {
       name: "Journal History",
-      icon: BookOpen,
+      // icon: BookOpen,
       path: "/history",
       iconColor: "text-[#f472b6]",
     },
     {
-      name: "Imports",
-      icon: Upload,
+      name: "Import",
+      // icon: Upload,
       path: "/import",
       iconColor: "text-[#fb7185]",
     },
     {
       name: "Accounts",
-      icon: Users,
+      // icon: Users,
       path: "/accounts",
       iconColor: "text-[#94a3b8]",
     },
     {
-      name: "Profile & Settings",
-      icon: Settings,
+      name: "Settings",
+      // icon: Settings,
       path: "/settings",
       iconColor: "text-[#6366f1]",
     },
     {
       name: "Customize",
-      icon: Palette,
+      // icon: Palette,
       path: "/customize",
       iconColor: "text-[#10b981]",
     },
     {
       name: "Support",
-      icon: Headphones,
+      // icon: Headphones,
       path: "/support",
       iconColor: "text-[#f59e0b]",
     },
@@ -158,10 +158,10 @@ export default function MainLayout() {
           {/* Logo & Title */}
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 bg-gradient-to-br from-[#2f8df4] to-[#6d54ff] rounded-[2px] flex items-center justify-center font-bold text-white shadow-md">
-              TJ
+              💸💲🧠
             </div>
             <h1 className="text-base font-bold text-gray-900 dark:text-white tracking-tight leading-tight">
-              Trade Journey
+              ForexNotes
             </h1>
           </div>
         </div>
@@ -190,10 +190,10 @@ export default function MainLayout() {
             <div className="p-4 flex items-center justify-between border-b border-gray-200 dark:border-white/5">
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 bg-gradient-to-br from-[#2f8df4] to-[#6d54ff] rounded-[2px] flex items-center justify-center font-black text-white shadow-md text-xs">
-                  TJ
+                  💸💲🧠
                 </div>
                 <h1 className="text-sm font-bold text-gray-900 dark:text-white tracking-tight">
-                  Trade Journey
+                  ForexNotes
                 </h1>
               </div>
               <button
@@ -216,10 +216,10 @@ export default function MainLayout() {
           </div>
           <div>
             <h1 className="text-sm font-bold text-gray-900 dark:text-white tracking-tight leading-tight">
-              Trade Journey
+              ForexNotes
             </h1>
             <p className="text-[9px] text-gray-500 dark:text-gray-400 uppercase tracking-widest mt-0.5">
-              Private Journal
+              AI Integrated Journal - by Trader , For Traders
             </p>
           </div>
         </div>
