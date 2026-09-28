@@ -22,15 +22,30 @@ export const requestLogin = async (req, res) => {
         { onConflict: "email" },
       );
 
+    // if (dbError) throw new Error(dbError.message);
+
+    // const magicLink = `http://localhost:5173/verify?token=${token}&email=${email}`;
+
+    // // Updated to use your verified domain
+    // const { error: emailError } = await resend.emails.send({
+    //   from: "forexnotes.in <auth@nationalsteell.com>",
+    //   to: email,
+    //   subject: "Verify - ForexNotes.in Login and Join our Discord Server",
+    //   html: `<p>Click <a href="${magicLink}">here</a> to access your trading journal.</p>`,
+    // });
+
+    // backend/controllers/authController.js
+
     if (dbError) throw new Error(dbError.message);
 
-    const magicLink = `http://localhost:5173/verify?token=${token}&email=${email}`;
+    // Dynamically choose the URL based on your .env file
+    const clientUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+    const magicLink = `${clientUrl}/verify?token=${token}&email=${email}`;
 
-    // Updated to use your verified domain
     const { error: emailError } = await resend.emails.send({
-      from: "forexnotes.in <auth@nationalsteell.com>",
+      from: "ForexNotes <auth@nationalsteell.com>",
       to: email,
-      subject: "Verify - ForexNotes.in Login and Join our Discord Server",
+      subject: "ForexNotes - Secure Login",
       html: `<p>Click <a href="${magicLink}">here</a> to access your trading journal.</p>`,
     });
 
