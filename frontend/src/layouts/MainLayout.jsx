@@ -167,22 +167,22 @@ export default function MainLayout() {
         </div>
 
         {/* Optional Right Action (e.g., Quick Add) */}
-        <button
+        {/* <button
           onClick={() => navigate("/add-trade")}
           className="w-8 h-8 rounded-[2px] bg-[#2f8df4] text-white flex items-center justify-center shadow-md hover:bg-[#2376e8]"
         >
           <PlusCircle className="w-4 h-4" />
-        </button>
+        </button> */}
       </header>
 
       {/* MOBILE DROPDOWN MENU (Drawer) */}
-      {/* {isMobileMenuOpen && (
-        <div className="md:hidden fixed inset-0 z-50 flex"> */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden fixed inset-0 z-50 flex">
           {/* Backdrop overlay */}
-          {/* <div
+          <div
             className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
             onClick={() => setIsMobileMenuOpen(false)}
-          ></div> */}
+          ></div>
 
           {/* Sidebar Drawer */}
           <div className="relative w-[280px] max-w-[80%] h-full bg-white dark:bg-[#091019] border-r border-gray-200 dark:border-[#1f2c3b] flex flex-col shadow-2xl animate-in slide-in-from-left duration-200">
