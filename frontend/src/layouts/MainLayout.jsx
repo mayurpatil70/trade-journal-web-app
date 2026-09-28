@@ -154,10 +154,10 @@ export default function MainLayout() {
           </div>
           <div>
             <h1 className="text-sm font-bold text-white tracking-tight leading-tight">
-              Trade Journey
+              Forex Notes
             </h1>
             <p className="text-[9px] text-gray-500 uppercase tracking-widest">
-              Private Journal
+              AI Integrated Journal - by Trader, for Traders.
             </p>
           </div>
         </div>

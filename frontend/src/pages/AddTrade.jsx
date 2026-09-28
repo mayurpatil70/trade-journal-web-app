@@ -21,8 +21,8 @@ export default function AddTrade() {
 
   const assets = [
     "XAUUSD",
-    "NAS100",
-    "GER40",
+    "BTCUSD",
+    "ETHUSD",
     "US30",
     "EURUSD",
     "GBPUSD",
@@ -30,18 +30,23 @@ export default function AddTrade() {
     "AUDUSD",
     "USDCAD",
     "EURJPY",
-    "BTCUSD",
-    "ETHUSD",
+    "NAS100",
+    "GER40",
     "SILVER",
     "USOIL",
   ];
   const setups = [
     "FVG",
-    "SMT",
+    "SMC",
+    "ICT",
     "Liquidity Sweep",
     "Order Block",
     "Breakout",
     "Pullback",
+    "Trend Continuation",
+    "Reversal",
+    "buy-side Liquidity",
+    "sell-side Liquidity",
     "Other",
   ];
   const emotions = [
@@ -69,9 +74,9 @@ export default function AddTrade() {
       minute: "2-digit",
     }),
     asset: "XAUUSD",
-    direction: "LONG",
-    session: "London",
-    setup: "FVG",
+    direction: "",
+    session: "",
+    setup: "",
     entry: "",
     sl: "",
     tp: "",
@@ -116,12 +121,10 @@ export default function AddTrade() {
       const submitData = new FormData();
       submitData.append("userId", userId);
 
-      // Append all text data
       Object.keys(formData).forEach((key) => {
         submitData.append(key, formData[key]);
       });
 
-      // Append images
       images.forEach((img) => {
         if (img) submitData.append("images", img);
       });
@@ -140,39 +143,50 @@ export default function AddTrade() {
     }
   };
 
-  const inputClass =
-    "w-full bg-[#1a1d24] border border-white/5 rounded-xl px-4 py-3 text-white focus:border-[#6366f1] focus:ring-1 focus:ring-[#6366f1] outline-none transition-all placeholder-gray-600 text-sm";
+  // Highly specific classes implementing 2px radius, large padding, and Light/Dark mode compatibility
+  const cardClass =
+    "bg-white dark:bg-[#121418] border border-gray-200 dark:border-white/5 rounded-[2px] p-8 md:p-10 shadow-xl mb-10";
+  const inputContainerClass = "flex flex-col gap-2";
   const labelClass =
-    "block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1";
+    "text-[10px] font-bold text-gray-600 dark:text-gray-400 uppercase tracking-widest";
+  const inputClass =
+    "w-full bg-gray-50 dark:bg-[#1a1d24] border border-gray-300 dark:border-gray-700 rounded-[2px] px-5 py-4 text-gray-900 dark:text-white focus:border-[#2f8df4] dark:focus:border-[#2f8df4] focus:ring-1 focus:ring-[#2f8df4] outline-none transition-all placeholder-gray-400 dark:placeholder-gray-600 text-sm shadow-sm";
+  const headerIconClass =
+    "w-12 h-12 rounded-[2px] bg-[#2f8df4]/10 flex items-center justify-center border border-[#2f8df4]/20 shrink-0";
   const imageLabels = ["Before Entry", "Entry", "Exit"];
 
   return (
     <div
-      className="w-full max-w-6xl mx-auto font-sans pb-12"
+      className="w-full max-w-6xl mx-auto font-sans pb-16 px-4 md:px-8 mt-8"
       style={{ fontFamily: "'Inter', sans-serif" }}
     >
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#2f8df4]/10 flex items-center justify-center border border-[#2f8df4]/20">
-            <TrendingUp className="w-5 h-5 text-[#2f8df4]" />
-          </div>
-          Log New Trade
-        </h1>
-        <p className="text-sm text-gray-500 mt-2 ml-14">
-          Record your setup, execution, psychology, and lessons.
-        </p>
+      {/* Page Header */}
+      <div className="mb-12 flex items-center gap-4">
+        <div className={headerIconClass}>
+          <TrendingUp className="w-6 h-6 text-[#2f8df4]" />
+        </div>
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white tracking-tight mb-2">
+            Log New Trade
+          </h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            Record your setup, execution, psychology, and lessons in detail.
+          </p>
+        </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-10">
         {/* SECTION 1: Execution Details */}
-        <div className="bg-[#121418] border border-white/5 rounded-2xl p-6 md:p-8 shadow-xl">
-          <div className="flex items-center gap-2 mb-6 pb-4 border-b border-white/5">
-            <Target className="w-5 h-5 text-[#6366f1]" />
-            <h2 className="text-lg font-bold text-white">Execution Details</h2>
+        <div className={cardClass}>
+          <div className="flex items-center gap-3 mb-8 pb-6 border-b border-gray-200 dark:border-white/5">
+            <Target className="w-6 h-6 text-[#2f8df4]" />
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+              Execution Details
+            </h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className={inputContainerClass}>
               <label className={labelClass}>Trade Date</label>
               <div className="relative">
                 <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
@@ -181,12 +195,13 @@ export default function AddTrade() {
                   name="date"
                   value={formData.date}
                   onChange={handleChange}
-                  className={`${inputClass} pl-10`}
+                  className={`${inputClass} pl-11`}
                   required
                 />
               </div>
             </div>
-            <div>
+
+            <div className={inputContainerClass}>
               <label className={labelClass}>Trade Time</label>
               <div className="relative">
                 <Clock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
@@ -195,12 +210,13 @@ export default function AddTrade() {
                   name="time"
                   value={formData.time}
                   onChange={handleChange}
-                  className={`${inputClass} pl-10`}
+                  className={`${inputClass} pl-11`}
                   required
                 />
               </div>
             </div>
-            <div>
+
+            <div className={inputContainerClass}>
               <label className={labelClass}>Asset / Pair</label>
               <select
                 name="asset"
@@ -216,7 +232,7 @@ export default function AddTrade() {
               </select>
             </div>
 
-            <div>
+            <div className={inputContainerClass}>
               <label className={labelClass}>Direction</label>
               <select
                 name="direction"
@@ -228,7 +244,8 @@ export default function AddTrade() {
                 <option value="SHORT">SHORT</option>
               </select>
             </div>
-            <div>
+
+            <div className={inputContainerClass}>
               <label className={labelClass}>Session</label>
               <select
                 name="session"
@@ -242,7 +259,8 @@ export default function AddTrade() {
                 <option value="Other">Other</option>
               </select>
             </div>
-            <div>
+
+            <div className={inputContainerClass}>
               <label className={labelClass}>Setup Type</label>
               <select
                 name="setup"
@@ -258,7 +276,7 @@ export default function AddTrade() {
               </select>
             </div>
 
-            <div>
+            <div className={inputContainerClass}>
               <label className={labelClass}>Entry Price</label>
               <input
                 type="number"
@@ -270,7 +288,8 @@ export default function AddTrade() {
                 className={inputClass}
               />
             </div>
-            <div>
+
+            <div className={inputContainerClass}>
               <label className={labelClass}>Stop Loss</label>
               <input
                 type="number"
@@ -282,7 +301,8 @@ export default function AddTrade() {
                 className={inputClass}
               />
             </div>
-            <div>
+
+            <div className={inputContainerClass}>
               <label className={labelClass}>Take Profit</label>
               <input
                 type="number"
@@ -295,7 +315,7 @@ export default function AddTrade() {
               />
             </div>
 
-            <div>
+            <div className={inputContainerClass}>
               <label className={labelClass}>Risk %</label>
               <input
                 type="number"
@@ -307,7 +327,8 @@ export default function AddTrade() {
                 className={inputClass}
               />
             </div>
-            <div>
+
+            <div className={inputContainerClass}>
               <label className={labelClass}>Trade Result</label>
               <select
                 name="result"
@@ -318,9 +339,12 @@ export default function AddTrade() {
                 <option value="win">WIN</option>
                 <option value="loss">LOSS</option>
                 <option value="be">BREAK-EVEN</option>
+                <option value="ctc">CTC</option>
+                <option value="trail">Trail-sl-CTC</option>
               </select>
             </div>
-            <div>
+
+            <div className={inputContainerClass}>
               <label className={labelClass}>Net R Multiple</label>
               <input
                 type="number"
@@ -333,22 +357,23 @@ export default function AddTrade() {
               />
             </div>
 
-            <div className="lg:col-span-3">
+            <div className={`lg:col-span-3 ${inputContainerClass}`}>
               <label className={labelClass}>Trade Reason / Analysis</label>
               <textarea
                 name="reason"
-                rows="3"
+                rows="4"
                 placeholder="Why did I take this trade?"
                 value={formData.reason}
                 onChange={handleChange}
                 className={inputClass}
               ></textarea>
             </div>
-            <div className="lg:col-span-3">
+
+            <div className={`lg:col-span-3 ${inputContainerClass}`}>
               <label className={labelClass}>Lesson / Mistake</label>
               <textarea
                 name="lesson"
-                rows="2"
+                rows="3"
                 placeholder="What will I do better next time?"
                 value={formData.lesson}
                 onChange={handleChange}
@@ -359,21 +384,21 @@ export default function AddTrade() {
         </div>
 
         {/* SECTION 2: Psychology */}
-        <div className="bg-[#121418] border border-white/5 rounded-2xl p-6 md:p-8 shadow-xl bg-gradient-to-br from-[#121418] to-[#161922]">
-          <div className="flex items-center justify-between mb-6 pb-4 border-b border-white/5">
-            <div className="flex items-center gap-2">
-              <Brain className="w-5 h-5 text-[#f472b6]" />
-              <h2 className="text-lg font-bold text-white">
+        <div className={cardClass}>
+          <div className="flex items-center justify-between mb-8 pb-6 border-b border-gray-200 dark:border-white/5">
+            <div className="flex items-center gap-3">
+              <Brain className="w-6 h-6 text-[#f472b6]" />
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">
                 Psychology Tracker
               </h2>
             </div>
-            <span className="text-[10px] bg-white/5 text-gray-400 px-2 py-1 rounded font-bold tracking-widest uppercase">
+            <span className="text-[10px] bg-gray-100 dark:bg-white/5 text-gray-500 dark:text-gray-400 px-3 py-1.5 rounded-[2px] font-bold tracking-widest uppercase border border-gray-200 dark:border-white/5">
               Crucial
             </span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            <div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+            <div className={inputContainerClass}>
               <label className={labelClass}>Emotion Before Trade</label>
               <select
                 name="emotionBefore"
@@ -389,7 +414,7 @@ export default function AddTrade() {
                 ))}
               </select>
             </div>
-            <div>
+            <div className={inputContainerClass}>
               <label className={labelClass}>Emotion After Trade</label>
               <select
                 name="emotionAfter"
@@ -406,26 +431,28 @@ export default function AddTrade() {
               </select>
             </div>
           </div>
-          <div>
+
+          <div className={inputContainerClass}>
             <label className={labelClass}>Psychology Note</label>
             <textarea
               name="psychNote"
-              rows="2"
+              rows="3"
               placeholder="What was going through my mind during the trade?"
               value={formData.psychNote}
               onChange={handleChange}
               className={inputClass}
             ></textarea>
           </div>
-          <div className="mt-6 flex items-center gap-3">
-            <label className={labelClass + " !mb-0"}>
+
+          <div className="mt-8 pt-8 border-t border-gray-200 dark:border-white/5 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+            <label className={labelClass}>
               Did you break any trading rules?
             </label>
             <select
               name="ruleBreak"
               value={formData.ruleBreak}
               onChange={handleChange}
-              className="bg-[#1a1d24] border border-white/10 rounded-lg px-3 py-1.5 text-white text-sm outline-none"
+              className="bg-gray-50 dark:bg-[#1a1d24] border border-gray-300 dark:border-gray-700 rounded-[2px] px-5 py-3 text-gray-900 dark:text-white text-sm outline-none shadow-sm min-w-[150px]"
             >
               <option value="no">No</option>
               <option value="yes">Yes</option>
@@ -434,37 +461,39 @@ export default function AddTrade() {
         </div>
 
         {/* SECTION 3: Chart Uploads */}
-        <div className="bg-[#121418] border border-white/5 rounded-2xl p-6 md:p-8 shadow-xl">
-          <div className="flex items-center justify-between mb-6 pb-4 border-b border-white/5">
-            <div className="flex items-center gap-2">
-              <ImageIcon className="w-5 h-5 text-[#21d4a3]" />
-              <h2 className="text-lg font-bold text-white">
+        <div className={cardClass}>
+          <div className="flex items-center justify-between mb-8 pb-6 border-b border-gray-200 dark:border-white/5">
+            <div className="flex items-center gap-3">
+              <ImageIcon className="w-6 h-6 text-[#21d4a3]" />
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">
                 Chart Screenshots
               </h2>
             </div>
-            <span className="text-[10px] bg-white/5 text-gray-400 px-2 py-1 rounded font-bold tracking-widest uppercase">
+            <span className="text-[10px] bg-gray-100 dark:bg-white/5 text-gray-500 dark:text-gray-400 px-3 py-1.5 rounded-[2px] font-bold tracking-widest uppercase border border-gray-200 dark:border-white/5">
               Optional
             </span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {imageLabels.map((label, idx) => (
               <label
                 key={idx}
-                className="border-2 border-dashed border-white/10 rounded-xl p-6 flex flex-col items-center justify-center text-center hover:bg-white/[0.02] hover:border-white/20 transition-colors cursor-pointer group h-32"
+                className="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-[2px] p-8 flex flex-col items-center justify-center text-center hover:bg-gray-50 dark:hover:bg-white/[0.02] hover:border-gray-400 dark:hover:border-white/20 transition-all cursor-pointer group min-h-[160px]"
               >
                 {images[idx] ? (
                   <>
-                    <CheckCircle className="w-8 h-8 text-[#21d4a3] mb-3" />
-                    <p className="text-xs font-bold text-[#21d4a3] truncate w-full px-4">
+                    <CheckCircle className="w-10 h-10 text-[#21d4a3] mb-4" />
+                    <p className="text-sm font-bold text-[#21d4a3] truncate w-full px-4">
                       {images[idx].name}
                     </p>
                   </>
                 ) : (
                   <>
-                    <ImageIcon className="w-8 h-8 text-gray-600 group-hover:text-[#21d4a3] transition-colors mb-3" />
-                    <p className="text-sm font-bold text-gray-300">{label}</p>
-                    <p className="text-[10px] text-gray-500 mt-1 uppercase tracking-widest">
+                    <ImageIcon className="w-10 h-10 text-gray-400 dark:text-gray-600 group-hover:text-[#21d4a3] transition-colors mb-4" />
+                    <p className="text-base font-bold text-gray-700 dark:text-gray-300 mb-1">
+                      {label}
+                    </p>
+                    <p className="text-[10px] text-gray-500 uppercase tracking-widest">
                       Click to upload
                     </p>
                   </>
@@ -481,28 +510,28 @@ export default function AddTrade() {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center justify-end gap-4 pt-4">
+        <div className="flex flex-col sm:flex-row items-center justify-end gap-5 pt-6">
           <button
             type="button"
             onClick={() => navigate("/trades")}
-            className="px-6 py-3.5 rounded-xl font-bold text-gray-400 hover:text-white hover:bg-white/5 transition-colors flex items-center gap-2"
+            className="w-full sm:w-auto px-8 py-4 rounded-[2px] font-bold text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5 transition-colors flex items-center justify-center gap-2 border border-transparent dark:border-transparent"
             disabled={isSubmitting}
           >
-            <X className="w-4 h-4" /> Cancel
+            <X className="w-5 h-5" /> Cancel
           </button>
 
           <button
             type="submit"
             disabled={isSubmitting}
-            className="px-8 py-3.5 rounded-xl font-bold text-white bg-gradient-to-r from-[#2f8df4] to-[#6d54ff] hover:shadow-[0_0_20px_rgba(47,141,244,0.4)] transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full sm:w-auto px-10 py-4 rounded-[2px] font-bold text-white bg-[#2f8df4] hover:bg-[#2376e8] shadow-lg hover:shadow-[0_0_20px_rgba(47,141,244,0.3)] transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSubmitting ? (
               <>
-                <Loader2 className="w-4 h-4 animate-spin" /> Uploading...
+                <Loader2 className="w-5 h-5 animate-spin" /> Uploading Data...
               </>
             ) : (
               <>
-                <Save className="w-4 h-4" /> Save Trade
+                <Save className="w-5 h-5" /> Save Trade
               </>
             )}
           </button>
