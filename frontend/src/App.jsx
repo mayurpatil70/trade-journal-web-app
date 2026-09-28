@@ -7,21 +7,18 @@ import Verify from "./pages/Verify.jsx";
 import DiscordGate from "./pages/DiscordGate.jsx";
 import EconomicCalendar from "./pages/EconomicCalendar.jsx";
 import AddTrade from "./pages/AddTrade.jsx";
-import PastTrades from "./pages/PastTrades.jsx"; // <-- NEW IMPORT
+import PastTrades from "./pages/PastTrades.jsx";
+import Dashboard from "./pages/Dashboard.jsx";
+import PerformanceCalendar from "./pages/PerformanceCalendar.jsx";
+import JournalHistory from "./pages/JournalHistory.jsx";
+import Imports from "./pages/Imports.jsx";
+import PropAccounts from "./pages/PropAccounts.jsx";
+import Settings from "./pages/Settings.jsx";
+import Customize from "./pages/Customize.jsx";
+import Support from "./pages/Support.jsx"; // <-- NEW IMPORT
 
 // Layout
 import MainLayout from "./layouts/MainLayout.jsx";
-
-const Placeholder = ({ title }) => (
-  <div className="flex items-center justify-center h-full min-h-[400px] text-gray-400 p-8">
-    <div className="bg-[#121418] border border-white/5 rounded-2xl p-10 text-center shadow-xl">
-      <h2 className="text-2xl font-bold text-white mb-2">{title}</h2>
-      <p className="text-sm text-gray-500">
-        This module is currently in development.
-      </p>
-    </div>
-  </div>
-);
 
 function App() {
   return (
@@ -33,41 +30,19 @@ function App() {
 
         <Route path="/" element={<MainLayout />}>
           <Route index element={<Navigate to="/dashboard" replace />} />
-          <Route path="dashboard" element={<Placeholder title="Dashboard" />} />
+          <Route path="dashboard" element={<Dashboard />} />
           <Route path="add-trade" element={<AddTrade />} />
           <Route path="news" element={<EconomicCalendar />} />
-
-          {/* Past Trades (Built!) */}
           <Route path="trades" element={<PastTrades />} />
+          <Route path="calendar" element={<PerformanceCalendar />} />
+          <Route path="history" element={<JournalHistory />} />
+          <Route path="import" element={<Imports />} />
+          <Route path="accounts" element={<PropAccounts />} />
+          <Route path="settings" element={<Settings />} />
+          <Route path="customize" element={<Customize />} />
 
-          <Route
-            path="calendar"
-            element={<Placeholder title="Performance Calendar" />}
-          />
-          <Route
-            path="history"
-            element={<Placeholder title="Journal History" />}
-          />
-          <Route
-            path="import"
-            element={<Placeholder title="AI Import & Insights" />}
-          />
-          <Route
-            path="accounts"
-            element={<Placeholder title="Prop Firm Accounts" />}
-          />
-          <Route
-            path="settings"
-            element={<Placeholder title="Profile & Settings" />}
-          />
-          <Route
-            path="customize"
-            element={<Placeholder title="Customize Theme" />}
-          />
-          <Route
-            path="support"
-            element={<Placeholder title="Support Helpdesk" />}
-          />
+          {/* Support Helpdesk (Built!) */}
+          <Route path="support" element={<Support />} />
         </Route>
       </Routes>
     </BrowserRouter>
