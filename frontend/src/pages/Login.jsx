@@ -1,6 +1,7 @@
 // frontend/src/pages/Login.jsx
 import { useState } from "react";
 import axios from "axios";
+import api from "../api/axios";
 import { Mail, ArrowRight, Loader2 } from "lucide-react";
 
 export default function Login() {
@@ -22,7 +23,7 @@ export default function Login() {
 
     try {
       // Connects to your Node.js backend
-      await axios.post("http://localhost:3000/api/auth/login", { email });
+      await api.post("/api/auth/login", { email });
       setStatus("success");
     } catch (error) {
       setStatus("error");
