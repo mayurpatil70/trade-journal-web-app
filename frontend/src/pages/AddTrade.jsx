@@ -21,8 +21,8 @@ export default function AddTrade() {
 
   const assets = [
     "XAUUSD",
-    "BTCUSD",
-    "ETHUSD",
+    "NAS100",
+    "GER40",
     "US30",
     "EURUSD",
     "GBPUSD",
@@ -30,23 +30,18 @@ export default function AddTrade() {
     "AUDUSD",
     "USDCAD",
     "EURJPY",
-    "NAS100",
-    "GER40",
+    "BTCUSD",
+    "ETHUSD",
     "SILVER",
     "USOIL",
   ];
   const setups = [
     "FVG",
-    "SMC",
-    "ICT",
+    "SMT",
     "Liquidity Sweep",
     "Order Block",
     "Breakout",
     "Pullback",
-    "Trend Continuation",
-    "Reversal",
-    "buy-side Liquidity",
-    "sell-side Liquidity",
     "Other",
   ];
   const emotions = [
@@ -74,9 +69,9 @@ export default function AddTrade() {
       minute: "2-digit",
     }),
     asset: "XAUUSD",
-    direction: "",
-    session: "",
-    setup: "",
+    direction: "LONG",
+    session: "London",
+    setup: "FVG",
     entry: "",
     sl: "",
     tp: "",
@@ -143,39 +138,46 @@ export default function AddTrade() {
     }
   };
 
-  // Highly specific classes implementing 2px radius, large padding, and Light/Dark mode compatibility
   const cardClass =
-    "bg-white dark:bg-[#121418] border border-gray-200 dark:border-white/5 rounded-[2px] p-8 md:p-10 shadow-xl mb-10";
-  const inputContainerClass = "flex flex-col gap-2";
+    "bg-white dark:bg-[#121418] border border-gray-200 dark:border-white/5 rounded-[2px] p-6 md:p-10 shadow-xl mb-10";
+  const inputContainerClass = "flex flex-col gap-2 w-full";
   const labelClass =
     "text-[10px] font-bold text-gray-600 dark:text-gray-400 uppercase tracking-widest";
+
+  // STRICT CONTRAST: Background matches theme, Text is perfectly opposite (!text-black dark:!text-white)
   const inputClass =
-    "w-full bg-gray-50 dark:bg-[#1a1d24] border border-gray-300 dark:border-gray-700 rounded-[2px] px-5 py-4 text-gray-900 dark:text-white focus:border-[#2f8df4] dark:focus:border-[#2f8df4] focus:ring-1 focus:ring-[#2f8df4] outline-none transition-all placeholder-gray-400 dark:placeholder-gray-600 text-sm shadow-sm";
+    "w-full min-h-[52px] block bg-gray-50 dark:bg-[#0b131d] border border-gray-300 dark:border-[#1f2c3b] rounded-[2px] !px-4 !py-3 !text-black dark:!text-white focus:border-[#2f8df4] focus:ring-1 focus:ring-[#2f8df4] outline-none transition-all placeholder-gray-400 dark:placeholder-gray-500 text-sm shadow-sm";
+  const textareaClass =
+    "w-full min-h-[100px] block bg-gray-50 dark:bg-[#0b131d] border border-gray-300 dark:border-[#1f2c3b] rounded-[2px] !px-4 !py-3 !text-black dark:!text-white focus:border-[#2f8df4] focus:ring-1 focus:ring-[#2f8df4] outline-none transition-all placeholder-gray-400 dark:placeholder-gray-500 text-sm shadow-sm resize-y";
+
+  // Dropdown items strictly enforce the opposite text color rule
+  const optionClass =
+    "bg-white !text-black dark:bg-[#0b131d] dark:!text-white font-medium";
+
   const headerIconClass =
     "w-12 h-12 rounded-[2px] bg-[#2f8df4]/10 flex items-center justify-center border border-[#2f8df4]/20 shrink-0";
   const imageLabels = ["Before Entry", "Entry", "Exit"];
 
   return (
     <div
-      className="w-full max-w-6xl mx-auto font-sans pb-16 px-4 md:px-8 mt-8"
+      className="w-full max-w-6xl mx-auto font-sans pb-16 px-4 md:px-8 mt-6 md:mt-8"
       style={{ fontFamily: "'Inter', sans-serif" }}
     >
-      {/* Page Header */}
-      <div className="mb-12 flex items-center gap-4">
+      <div className="mb-10 md:mb-12 flex items-center gap-4">
         <div className={headerIconClass}>
           <TrendingUp className="w-6 h-6 text-[#2f8df4]" />
         </div>
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white tracking-tight mb-2">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white tracking-tight mb-1 md:mb-2">
             Log New Trade
           </h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
+          <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400">
             Record your setup, execution, psychology, and lessons in detail.
           </p>
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-10">
+      <form onSubmit={handleSubmit} className="space-y-8 md:space-y-10">
         {/* SECTION 1: Execution Details */}
         <div className={cardClass}>
           <div className="flex items-center gap-3 mb-8 pb-6 border-b border-gray-200 dark:border-white/5">
@@ -185,17 +187,17 @@ export default function AddTrade() {
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
             <div className={inputContainerClass}>
               <label className={labelClass}>Trade Date</label>
-              <div className="relative">
-                <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+              <div className="relative w-full">
+                <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
                 <input
                   type="date"
                   name="date"
                   value={formData.date}
                   onChange={handleChange}
-                  className={`${inputClass} pl-11`}
+                  className={`${inputClass} !pl-11 dark:[color-scheme:dark]`}
                   required
                 />
               </div>
@@ -203,14 +205,14 @@ export default function AddTrade() {
 
             <div className={inputContainerClass}>
               <label className={labelClass}>Trade Time</label>
-              <div className="relative">
-                <Clock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+              <div className="relative w-full">
+                <Clock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
                 <input
                   type="time"
                   name="time"
                   value={formData.time}
                   onChange={handleChange}
-                  className={`${inputClass} pl-11`}
+                  className={`${inputClass} !pl-11 dark:[color-scheme:dark]`}
                   required
                 />
               </div>
@@ -225,7 +227,7 @@ export default function AddTrade() {
                 className={inputClass}
               >
                 {assets.map((a) => (
-                  <option key={a} value={a}>
+                  <option key={a} value={a} className={optionClass}>
                     {a}
                   </option>
                 ))}
@@ -240,8 +242,12 @@ export default function AddTrade() {
                 onChange={handleChange}
                 className={inputClass}
               >
-                <option value="LONG">LONG</option>
-                <option value="SHORT">SHORT</option>
+                <option value="LONG" className={optionClass}>
+                  LONG
+                </option>
+                <option value="SHORT" className={optionClass}>
+                  SHORT
+                </option>
               </select>
             </div>
 
@@ -253,10 +259,18 @@ export default function AddTrade() {
                 onChange={handleChange}
                 className={inputClass}
               >
-                <option value="London">London</option>
-                <option value="New York">New York</option>
-                <option value="Asian">Asian</option>
-                <option value="Other">Other</option>
+                <option value="London" className={optionClass}>
+                  London
+                </option>
+                <option value="New York" className={optionClass}>
+                  New York
+                </option>
+                <option value="Asian" className={optionClass}>
+                  Asian
+                </option>
+                <option value="Other" className={optionClass}>
+                  Other
+                </option>
               </select>
             </div>
 
@@ -269,7 +283,7 @@ export default function AddTrade() {
                 className={inputClass}
               >
                 {setups.map((s) => (
-                  <option key={s} value={s}>
+                  <option key={s} value={s} className={optionClass}>
                     {s}
                   </option>
                 ))}
@@ -336,11 +350,15 @@ export default function AddTrade() {
                 onChange={handleChange}
                 className={inputClass}
               >
-                <option value="win">WIN</option>
-                <option value="loss">LOSS</option>
-                <option value="be">BREAK-EVEN</option>
-                <option value="ctc">CTC</option>
-                <option value="trail">Trail-sl-CTC</option>
+                <option value="win" className={optionClass}>
+                  WIN
+                </option>
+                <option value="loss" className={optionClass}>
+                  LOSS
+                </option>
+                <option value="be" className={optionClass}>
+                  BREAK-EVEN
+                </option>
               </select>
             </div>
 
@@ -361,11 +379,10 @@ export default function AddTrade() {
               <label className={labelClass}>Trade Reason / Analysis</label>
               <textarea
                 name="reason"
-                rows="4"
                 placeholder="Why did I take this trade?"
                 value={formData.reason}
                 onChange={handleChange}
-                className={inputClass}
+                className={textareaClass}
               ></textarea>
             </div>
 
@@ -373,11 +390,10 @@ export default function AddTrade() {
               <label className={labelClass}>Lesson / Mistake</label>
               <textarea
                 name="lesson"
-                rows="3"
                 placeholder="What will I do better next time?"
                 value={formData.lesson}
                 onChange={handleChange}
-                className={inputClass}
+                className={textareaClass}
               ></textarea>
             </div>
           </div>
@@ -397,7 +413,7 @@ export default function AddTrade() {
             </span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 mb-8">
             <div className={inputContainerClass}>
               <label className={labelClass}>Emotion Before Trade</label>
               <select
@@ -406,9 +422,11 @@ export default function AddTrade() {
                 onChange={handleChange}
                 className={inputClass}
               >
-                <option value="">Select emotion...</option>
+                <option value="" className={optionClass}>
+                  Select emotion...
+                </option>
                 {emotions.map((e) => (
-                  <option key={e} value={e}>
+                  <option key={e} value={e} className={optionClass}>
                     {e}
                   </option>
                 ))}
@@ -422,9 +440,11 @@ export default function AddTrade() {
                 onChange={handleChange}
                 className={inputClass}
               >
-                <option value="">Select emotion...</option>
+                <option value="" className={optionClass}>
+                  Select emotion...
+                </option>
                 {emotions.map((e) => (
-                  <option key={e} value={e}>
+                  <option key={e} value={e} className={optionClass}>
                     {e}
                   </option>
                 ))}
@@ -436,11 +456,10 @@ export default function AddTrade() {
             <label className={labelClass}>Psychology Note</label>
             <textarea
               name="psychNote"
-              rows="3"
               placeholder="What was going through my mind during the trade?"
               value={formData.psychNote}
               onChange={handleChange}
-              className={inputClass}
+              className={textareaClass}
             ></textarea>
           </div>
 
@@ -452,10 +471,14 @@ export default function AddTrade() {
               name="ruleBreak"
               value={formData.ruleBreak}
               onChange={handleChange}
-              className="bg-gray-50 dark:bg-[#1a1d24] border border-gray-300 dark:border-gray-700 rounded-[2px] px-5 py-3 text-gray-900 dark:text-white text-sm outline-none shadow-sm min-w-[150px]"
+              className={`w-full sm:w-auto min-h-[52px] bg-gray-50 dark:bg-[#0b131d] border border-gray-300 dark:border-[#1f2c3b] rounded-[2px] !px-4 !py-3 !text-black dark:!text-white focus:border-[#2f8df4] focus:ring-1 focus:ring-[#2f8df4] text-sm outline-none shadow-sm min-w-[150px]`}
             >
-              <option value="no">No</option>
-              <option value="yes">Yes</option>
+              <option value="no" className={optionClass}>
+                No
+              </option>
+              <option value="yes" className={optionClass}>
+                Yes
+              </option>
             </select>
           </div>
         </div>
@@ -474,11 +497,11 @@ export default function AddTrade() {
             </span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
             {imageLabels.map((label, idx) => (
               <label
                 key={idx}
-                className="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-[2px] p-8 flex flex-col items-center justify-center text-center hover:bg-gray-50 dark:hover:bg-white/[0.02] hover:border-gray-400 dark:hover:border-white/20 transition-all cursor-pointer group min-h-[160px]"
+                className="border-2 border-dashed border-gray-300 dark:border-[#1f2c3b] rounded-[2px] p-8 flex flex-col items-center justify-center text-center hover:bg-gray-50 dark:hover:bg-white/[0.02] hover:border-[#2f8df4] dark:hover:border-[#2f8df4] transition-all cursor-pointer group min-h-[160px]"
               >
                 {images[idx] ? (
                   <>
@@ -510,7 +533,7 @@ export default function AddTrade() {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row items-center justify-end gap-5 pt-6">
+        <div className="flex flex-col sm:flex-row items-center justify-end gap-5 pt-4">
           <button
             type="button"
             onClick={() => navigate("/trades")}

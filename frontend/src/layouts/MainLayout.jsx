@@ -162,7 +162,7 @@ export default function MainLayout() {
 
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 bg-gradient-to-br from-[#2f8df4] to-[#6d54ff] rounded-[2px] flex items-center justify-center font-bold text-white shadow-md">
-              💸💲🧠
+              💲🧠
             </div>
             <h1 className="text-base font-bold text-gray-900 dark:text-white tracking-tight leading-tight">
               Forex Notes
@@ -182,7 +182,7 @@ export default function MainLayout() {
             <div className="p-4 flex items-center justify-between border-b border-gray-200 dark:border-white/5">
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 bg-gradient-to-br from-[#2f8df4] to-[#6d54ff] rounded-[2px] flex items-center justify-center font-black text-white shadow-md text-xs">
-                  💸💲🧠
+                  💲🧠
                 </div>
                 <h1 className="text-sm font-bold text-gray-900 dark:text-white tracking-tight">
                   Forex Notes
@@ -204,7 +204,7 @@ export default function MainLayout() {
       <aside className="hidden md:flex w-[260px] flex-col bg-white dark:bg-[#091019] border-r border-gray-200 dark:border-[#1f2c3b] sticky top-0 h-screen shrink-0 transition-colors duration-200">
         <div className="p-6 flex items-center gap-3 border-b border-gray-200 dark:border-white/5">
           <div className="w-9 h-9 bg-gradient-to-br from-[#2f8df4] to-[#6d54ff] rounded-[2px] flex items-center justify-center font-black text-white shadow-lg text-sm">
-            💸💲🧠
+            💲🧠
           </div>
           <div>
             <h1 className="text-sm font-bold text-gray-900 dark:text-white tracking-tight leading-tight">
