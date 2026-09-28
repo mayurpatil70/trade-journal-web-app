@@ -3,16 +3,15 @@ import express from "express";
 import cors from "cors";
 import "dotenv/config";
 
-// Import your route files
 import authRoutes from "./routes/authRoutes.js";
 import discordRoutes from "./routes/discordRoutes.js";
 import newsRoutes from "./routes/newsRoutes.js";
-import aiRoutes from "./routes/aiRoutes.js"; // <-- NEW
+import aiRoutes from "./routes/aiRoutes.js";
+import tradeRoutes from "./routes/tradeRoutes.js"; // <-- NEW
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Allow local frontend AND your Vercel frontend URL
 const allowedOrigins = [
   "http://localhost:5173",
   "https://forexnotes.vercel.app",
@@ -36,16 +35,13 @@ app.use(
 
 app.use(express.json());
 
-// Mount the API routes
 app.use("/api/auth", authRoutes);
 app.use("/api/discord", discordRoutes);
 app.use("/api/news", newsRoutes);
-app.use("/api/ai", aiRoutes); // <-- NEW
+app.use("/api/ai", aiRoutes);
+app.use("/api/trades", tradeRoutes); // <-- NEW
 
-app.get("/", (req, res) => {
-  res.json({ message: "Forex Notes API is running!" });
-});
-
-app.listen(PORT, () => {
-  console.log(`Backend API actively running on http://localhost:${PORT}`);
-});
+app.get("/", (req, res) =>
+  res.json({ message: "Forex Notes API is running!" }),
+);
+app.listen(PORT, () => console.log(`API running on http://localhost:${PORT}`));

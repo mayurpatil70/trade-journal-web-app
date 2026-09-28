@@ -60,7 +60,7 @@ export default function MainLayout() {
       iconColor: "text-[#f472b6]",
     },
     {
-      name: "Imports",
+      name: "Import",
       icon: Upload,
       path: "/import",
       iconColor: "text-[#fb7185]",
@@ -72,7 +72,7 @@ export default function MainLayout() {
       iconColor: "text-[#94a3b8]",
     },
     {
-      name: "Profile & Settings",
+      name: "Settings",
       icon: Settings,
       path: "/settings",
       iconColor: "text-[#6366f1]",
@@ -188,10 +188,10 @@ export default function MainLayout() {
           </div>
           <div>
             <h1 className="text-sm font-bold text-white tracking-tight leading-tight">
-              Trade Journey
+              Forex Notes
             </h1>
             <p className="text-[9px] text-gray-500 uppercase tracking-widest">
-              Private Journal
+              AI integrated journal - by Trader, for Traders.
             </p>
           </div>
         </div>
