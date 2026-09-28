@@ -3,9 +3,10 @@ import express from "express";
 import cors from "cors";
 import "dotenv/config";
 
-// Import your route files (Make sure you have these set up in a routes folder!)
+// Import your route files
 import authRoutes from "./routes/authRoutes.js";
 import discordRoutes from "./routes/discordRoutes.js";
+import newsRoutes from "./routes/newsRoutes.js"; // <-- NEW
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -37,13 +38,14 @@ app.use(express.json());
 // Mount the API routes
 app.use("/api/auth", authRoutes);
 app.use("/api/discord", discordRoutes);
+app.use("/api/news", newsRoutes); // <-- NEW
 
-// Health check route so you can verify the server is up in your browser
+// Health check route
 app.get("/", (req, res) => {
-  res.json({ message: "F Journal API is running!" });
+  res.json({ message: "Forex Notes API is running!" });
 });
 
-// THIS IS THE MISSING PIECE: Keep the server alive and listening
+// Keep the server alive and listening
 app.listen(PORT, () => {
   console.log(`Backend API actively running on http://localhost:${PORT}`);
 });

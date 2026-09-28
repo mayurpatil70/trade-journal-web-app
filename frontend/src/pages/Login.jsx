@@ -1,7 +1,7 @@
 // frontend/src/pages/Login.jsx
 import { useState } from "react";
-import api from "../api/axios"; // Import the custom client
-import { Mail, ArrowRight, Loader2, Sparkles } from "lucide-react";
+import api from "../api/axios";
+import { ArrowRight, Activity } from "lucide-react"; // Using Activity as a placeholder HD logo
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -11,107 +11,86 @@ export default function Login() {
   const handleLogin = async (e) => {
     e.preventDefault();
     if (!email) return;
-
     setStatus("loading");
     setErrorMessage("");
 
     try {
-      // Uses the centralized API configuration
       await api.post("/api/auth/login", { email });
       setStatus("success");
     } catch (error) {
-      console.error("Login Error Details:", error);
       setStatus("error");
       setErrorMessage(
-        error.response?.data?.error ||
-          "Failed to send login link. Please ensure your backend is running.",
+        error.response?.data?.error || "Failed to send login link.",
       );
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#0d0f11] relative overflow-hidden flex flex-col justify-center items-center p-4">
-      <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 brightness-100 contrast-150"></div>
-      <div className="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] bg-journalEmerald/10 rounded-full blur-[120px]"></div>
-
-      <div className="w-full max-w-md bg-white/[0.02] backdrop-blur-2xl border border-white/[0.05] rounded-3xl shadow-2xl p-10 relative z-10">
-        <div className="text-center mb-10">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white/[0.03] border border-white/[0.05] mb-6 shadow-inner">
-            <Sparkles className="w-8 h-8 text-journalEmerald" />
+    <div className="min-h-screen bg-[#0a0a0a] flex flex-col justify-center items-center p-4 font-sans text-white">
+      <div className="w-full max-w-[400px]">
+        {/* Logo & Branding */}
+        <div className="flex flex-col items-center mb-10">
+          <div className="w-12 h-12 bg-[#6366f1] rounded-full flex items-center justify-center mb-4 shadow-[0_0_20px_rgba(99,102,241,0.4)]">
+            <Activity className="w-6 h-6 text-white" />
           </div>
-          <h1 className="text-4xl font-extrabold tracking-tight mb-3">
-            <span className="text-white">Forex Notes</span>
-            <span className="bg-gradient-to-r from-journalEmerald to-emerald-300 bg-clip-text text-transparent uppercase ml-1">
-              Discipline today <br /> Freedom tomorrow
-            </span>
+          <h1 className="text-3xl font-bold tracking-tight mb-2">
+            Forex Notes
           </h1>
-          <p className="text-gray-400 text-sm font-medium">
-            Track, review, and master your edge.
+          <p className="text-xs font-semibold tracking-[0.2em] text-gray-400 uppercase text-center">
+            Discipline Today.
+            <br />
+            Freedom Tomorrow.
           </p>
         </div>
 
         {status === "success" ? (
-          <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-2xl p-8 text-center transform transition-all animate-in fade-in zoom-in duration-500">
-            <Mail className="w-12 h-12 text-emerald-400 mx-auto mb-5 drop-shadow-[0_0_15px_rgba(16,185,129,0.5)]" />
-            <h3 className="text-xl font-bold text-white mb-2">
-              Check your inbox
-            </h3>
-            <p className="text-gray-400 text-sm leading-relaxed">
-              We've sent a secure link to join our discord community and verify
-              your <br />
-              <span className="font-semibold text-white">{email}</span>
+          <div className="bg-white/5 border border-white/10 rounded-2xl p-6 text-center animate-in fade-in">
+            <h3 className="text-lg font-semibold mb-2">Check your inbox</h3>
+            <p className="text-gray-400 text-sm">
+              We sent a secure link to{" "}
+              <span className="text-white font-medium">{email}</span>
             </p>
           </div>
         ) : (
-          <form onSubmit={handleLogin} className="space-y-6">
-            <div className="group">
-              <label
-                htmlFor="email"
-                className="block text-xs font-semibold tracking-wider text-gray-500 uppercase mb-2 ml-1"
-              >
-                Email Address
-              </label>
-              <div className="relative transition-all duration-300 group-focus-within:drop-shadow-[0_0_15px_rgba(16,185,129,0.2)]">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5 text-gray-500 group-focus-within:text-journalEmerald transition-colors" />
-                </div>
+          <div className="animate-in fade-in zoom-in-95 duration-300">
+            <h2 className="text-2xl font-semibold mb-2">Sign in or register</h2>
+            <p className="text-gray-400 text-sm mb-6">
+              Enter your email to receive a secure, passwordless verification
+              code.
+            </p>
+
+            <form onSubmit={handleLogin} className="space-y-4">
+              <div>
+                <label className="block text-xs text-gray-400 mb-1.5 ml-1">
+                  Email Address
+                </label>
                 <input
                   type="email"
-                  id="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="block w-full pl-12 pr-4 py-4 bg-white/[0.03] border border-white/[0.05] rounded-xl text-white placeholder-gray-600 focus:outline-none focus:border-journalEmerald/50 focus:bg-white/[0.05] transition-all duration-300"
-                  placeholder="trader@example.com"
+                  className="w-full px-4 py-3.5 bg-[#171717] border border-[#262626] rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-[#6366f1] transition-colors"
+                  placeholder="you@example.com"
                   required
                   disabled={status === "loading"}
                 />
               </div>
-            </div>
 
-            {status === "error" && (
-              <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-sm px-4 py-3 rounded-xl text-center">
-                {errorMessage}
-              </div>
-            )}
-
-            <button
-              type="submit"
-              disabled={status === "loading"}
-              className="w-full group relative flex justify-center items-center gap-3 py-4 px-4 rounded-xl text-sm font-bold text-white bg-journalEmerald/10 border border-journalEmerald/30 hover:bg-journalEmerald hover:text-journalDark focus:outline-none disabled:opacity-50 transition-all duration-300 hover:shadow-[0_0_25px_rgba(16,185,129,0.4)] hover:-translate-y-0.5"
-            >
-              {status === "loading" ? (
-                <>
-                  <Loader2 className="animate-spin h-5 w-5" />
-                  Generating Link...
-                </>
-              ) : (
-                <>
-                  Continue with Email
-                  <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                </>
+              {status === "error" && (
+                <p className="text-red-400 text-sm text-center">
+                  {errorMessage}
+                </p>
               )}
-            </button>
-          </form>
+
+              <button
+                type="submit"
+                disabled={status === "loading"}
+                className="w-full py-3.5 px-4 bg-[#6366f1] hover:bg-[#4f46e5] text-white font-medium rounded-xl transition-all flex justify-center items-center gap-2 disabled:opacity-50"
+              >
+                {status === "loading" ? "Sending..." : "Send Verification Code"}
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </form>
+          </div>
         )}
       </div>
     </div>

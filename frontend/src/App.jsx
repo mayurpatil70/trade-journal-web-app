@@ -59,6 +59,11 @@ export default function App() {
         <Route element={<ProtectedRoute />}>
           <Route element={<DashboardLayout />}>
             <Route path="/dashboard" element={<Dashboard />} />
+
+            <Route element={<MainLayout />}>
+              <Route element={<EconomicCalendar />} path="/news" />
+            </Route>
+
             <Route
               path="/trades"
               element={
