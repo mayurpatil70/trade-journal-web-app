@@ -1,6 +1,6 @@
 // frontend/src/layouts/MainLayout.jsx
 import { useState } from "react";
-import { Outlet, NavLink } from "react-router-dom";
+import { Outlet, NavLink, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
   PlusCircle,
@@ -13,15 +13,14 @@ import {
   Settings,
   Palette,
   Headphones,
-  Activity,
   Menu,
   X,
 } from "lucide-react";
 
 export default function MainLayout() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
-  // Your exact requested structure with CSS-inspired icon colors
   const navLinks = [
     {
       name: "Dashboard",
@@ -60,7 +59,7 @@ export default function MainLayout() {
       iconColor: "text-[#f472b6]",
     },
     {
-      name: "Import",
+      name: "Imports",
       icon: Upload,
       path: "/import",
       iconColor: "text-[#fb7185]",
@@ -72,7 +71,7 @@ export default function MainLayout() {
       iconColor: "text-[#94a3b8]",
     },
     {
-      name: "Settings",
+      name: "Profile & Settings",
       icon: Settings,
       path: "/settings",
       iconColor: "text-[#6366f1]",
@@ -93,34 +92,33 @@ export default function MainLayout() {
 
   const SidebarContent = () => (
     <>
-      <div className="flex-1 overflow-y-auto px-4 py-6 space-y-1.5 scrollbar-hide">
+      <div className="flex-1 overflow-y-auto px-3 py-4 space-y-1 scrollbar-hide">
         {navLinks.map((link, idx) => (
           <NavLink
             key={idx}
             to={link.path}
             onClick={() => setIsMobileMenuOpen(false)}
             className={({ isActive }) =>
-              `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all group relative ${
+              `flex items-center gap-3 px-3 py-2.5 rounded-[2px] text-sm font-medium transition-all group relative ${
                 isActive
-                  ? "bg-white/10 text-white shadow-sm"
-                  : "text-gray-400 hover:text-gray-200 hover:bg-white/5 hover:translate-x-1"
+                  ? "bg-gray-100 dark:bg-[#1a1d24] text-gray-900 dark:text-white shadow-sm"
+                  : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5"
               }`
             }
           >
-            {/* Active Indicator Line (From your CSS) */}
             {({ isActive }) => (
               <>
                 {isActive && (
                   <div
-                    className={`absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-r-md bg-current opacity-90 ${link.iconColor}`}
+                    className={`absolute left-0 top-1.5 bottom-1.5 w-1 rounded-r-[2px] bg-current opacity-100 ${link.iconColor}`}
                   ></div>
                 )}
                 <div
-                  className={`w-7 h-7 rounded-lg flex items-center justify-center transition-all bg-white/5 shadow-inner group-hover:shadow-[0_0_15px_rgba(255,255,255,0.1)] ${isActive ? "bg-white/10 shadow-[0_0_15px_rgba(255,255,255,0.15)]" : ""}`}
+                  className={`w-7 h-7 rounded-[2px] flex items-center justify-center transition-all bg-white dark:bg-white/5 shadow-sm group-hover:shadow-md ${isActive ? "bg-white dark:bg-white/10" : ""}`}
                 >
                   <link.icon className={`w-4 h-4 ${link.iconColor}`} />
                 </div>
-                <span>{link.name}</span>
+                <span className="truncate">{link.name}</span>
               </>
             )}
           </NavLink>
@@ -128,12 +126,12 @@ export default function MainLayout() {
       </div>
 
       {/* Footer Caption */}
-      <div className="p-4 border-t border-white/5">
-        <div className="bg-[#1a1d24] p-4 rounded-xl border border-white/5 text-center shadow-inner">
-          <p className="text-[9px] font-bold text-[#6366f1] mb-1 tracking-widest uppercase">
+      <div className="p-4 border-t border-gray-200 dark:border-white/5">
+        <div className="bg-gray-50 dark:bg-[#1a1d24] p-4 rounded-[2px] border border-gray-200 dark:border-white/5 text-center shadow-inner">
+          <p className="text-[9px] font-bold text-[#2f8df4] mb-1 tracking-widest uppercase">
             Discipline Today.
           </p>
-          <p className="text-[9px] font-bold text-[#6366f1] tracking-widest uppercase">
+          <p className="text-[9px] font-bold text-[#2f8df4] tracking-widest uppercase">
             Freedom Tomorrow.
           </p>
         </div>
@@ -143,55 +141,85 @@ export default function MainLayout() {
 
   return (
     <div
-      className="min-h-screen bg-[#0a0a0a] text-gray-200 flex flex-col md:flex-row"
+      className="min-h-screen bg-white dark:bg-[#0a0a0a] text-gray-900 dark:text-gray-200 flex flex-col md:flex-row transition-colors duration-200"
       style={{ fontFamily: "'Inter', sans-serif" }}
     >
       {/* MOBILE TOP NAVBAR (Sticky) */}
-      <header className="md:hidden sticky top-0 z-50 bg-[#121418] border-b border-white/10 px-4 py-4 flex items-center justify-between">
+      <header className="md:hidden sticky top-0 z-50 bg-white dark:bg-[#121418] border-b border-gray-200 dark:border-white/10 px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-gradient-to-br from-[#2f8df4] to-[#6d54ff] rounded-lg flex items-center justify-center font-bold text-white shadow-lg">
-            TJ
-          </div>
-          <div>
-            <h1 className="text-sm font-bold text-white tracking-tight leading-tight">
-              Forex Notes
+          {/* Hamburger Menu on the FAR LEFT */}
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="p-1.5 -ml-1.5 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/10 rounded-[2px] transition-colors"
+          >
+            <Menu className="w-6 h-6" />
+          </button>
+
+          {/* Logo & Title */}
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 bg-gradient-to-br from-[#2f8df4] to-[#6d54ff] rounded-[2px] flex items-center justify-center font-bold text-white shadow-md">
+              TJ
+            </div>
+            <h1 className="text-base font-bold text-gray-900 dark:text-white tracking-tight leading-tight">
+              Trade Journey
             </h1>
-            <p className="text-[9px] text-gray-500 uppercase tracking-widest">
-              AI Integrated Journal - by Trader, for Traders.
-            </p>
           </div>
         </div>
+
+        {/* Optional Right Action (e.g., Quick Add) */}
         <button
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className="p-2 text-gray-400 hover:text-white bg-white/5 rounded-lg"
+          onClick={() => navigate("/add-trade")}
+          className="w-8 h-8 rounded-[2px] bg-[#2f8df4] text-white flex items-center justify-center shadow-md hover:bg-[#2376e8]"
         >
-          {isMobileMenuOpen ? (
-            <X className="w-5 h-5" />
-          ) : (
-            <Menu className="w-5 h-5" />
-          )}
+          <PlusCircle className="w-4 h-4" />
         </button>
       </header>
 
-      {/* MOBILE DROPDOWN MENU */}
+      {/* MOBILE DROPDOWN MENU (Drawer) */}
       {isMobileMenuOpen && (
-        <div className="md:hidden fixed inset-0 top-[73px] z-40 bg-[#121418] flex flex-col border-t border-white/5">
-          <SidebarContent />
+        <div className="md:hidden fixed inset-0 z-50 flex">
+          {/* Backdrop overlay */}
+          <div
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
+            onClick={() => setIsMobileMenuOpen(false)}
+          ></div>
+
+          {/* Sidebar Drawer */}
+          <div className="relative w-[280px] max-w-[80%] h-full bg-white dark:bg-[#091019] border-r border-gray-200 dark:border-[#1f2c3b] flex flex-col shadow-2xl animate-in slide-in-from-left duration-200">
+            {/* Drawer Header with Close Button matching screenshot */}
+            <div className="p-4 flex items-center justify-between border-b border-gray-200 dark:border-white/5">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-gradient-to-br from-[#2f8df4] to-[#6d54ff] rounded-[2px] flex items-center justify-center font-black text-white shadow-md text-xs">
+                  TJ
+                </div>
+                <h1 className="text-sm font-bold text-gray-900 dark:text-white tracking-tight">
+                  Trade Journey
+                </h1>
+              </div>
+              <button
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="p-1.5 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/10 rounded-[2px] transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <SidebarContent />
+          </div>
         </div>
       )}
 
       {/* DESKTOP SIDEBAR (Vertical Left) */}
-      <aside className="hidden md:flex w-[260px] flex-col bg-[#091019] border-r border-[#1f2c3b] sticky top-0 h-screen shrink-0">
-        <div className="p-6 flex items-center gap-3 border-b border-white/5">
-          <div className="w-9 h-9 bg-gradient-to-br from-[#2f8df4] to-[#6d54ff] rounded-xl flex items-center justify-center font-black text-white shadow-lg text-sm">
+      <aside className="hidden md:flex w-[260px] flex-col bg-white dark:bg-[#091019] border-r border-gray-200 dark:border-[#1f2c3b] sticky top-0 h-screen shrink-0 transition-colors duration-200">
+        <div className="p-6 flex items-center gap-3 border-b border-gray-200 dark:border-white/5">
+          <div className="w-9 h-9 bg-gradient-to-br from-[#2f8df4] to-[#6d54ff] rounded-[2px] flex items-center justify-center font-black text-white shadow-lg text-sm">
             TJ
           </div>
           <div>
-            <h1 className="text-sm font-bold text-white tracking-tight leading-tight">
-              Forex Notes
+            <h1 className="text-sm font-bold text-gray-900 dark:text-white tracking-tight leading-tight">
+              Trade Journey
             </h1>
-            <p className="text-[9px] text-gray-500 uppercase tracking-widest">
-              AI integrated journal - by Trader, for Traders.
+            <p className="text-[9px] text-gray-500 dark:text-gray-400 uppercase tracking-widest mt-0.5">
+              Private Journal
             </p>
           </div>
         </div>
@@ -199,29 +227,35 @@ export default function MainLayout() {
       </aside>
 
       {/* MAIN DASHBOARD CONTENT AREA */}
-      <main className="flex-1 flex flex-col min-h-[calc(100vh-73px)] md:h-screen md:overflow-hidden">
+      <main className="flex-1 flex flex-col min-h-[calc(100vh-56px)] md:h-screen md:overflow-hidden bg-gray-50 dark:bg-[#0a0a0a]">
         {/* Top Header Actions (Desktop only) */}
-        <header className="hidden md:flex h-20 border-b border-white/5 bg-[#0a0a0a] items-center justify-between px-8 shrink-0">
-          <div className="flex items-center bg-[#121418] rounded-xl px-4 py-2.5 w-72 border border-white/10 focus-within:border-[#6366f1] transition-colors">
-            <span className="text-sm text-gray-500">
+        <header className="hidden md:flex h-20 border-b border-gray-200 dark:border-white/5 bg-white dark:bg-[#0a0a0a] items-center justify-between px-8 shrink-0 transition-colors duration-200">
+          <div className="flex items-center bg-gray-50 dark:bg-[#121418] rounded-[2px] px-4 py-2.5 w-72 border border-gray-200 dark:border-white/10 focus-within:border-[#2f8df4] transition-colors shadow-sm">
+            <span className="text-sm text-gray-500 dark:text-gray-400">
               Search trades, accounts...
             </span>
           </div>
           <div className="flex items-center gap-4">
-            <button className="px-5 py-2.5 text-sm font-semibold border border-white/10 bg-[#111b27] text-white rounded-xl hover:bg-white/10 transition-colors">
-              ⚡ Quick Add
+            <button
+              onClick={() => navigate("/add-trade")}
+              className="px-5 py-2.5 text-sm font-semibold border border-gray-200 dark:border-white/10 bg-white dark:bg-[#111b27] text-gray-900 dark:text-white rounded-[2px] hover:bg-gray-50 dark:hover:bg-white/10 transition-colors shadow-sm flex items-center gap-2"
+            >
+              <PlusCircle className="w-4 h-4 text-[#21d4a3]" /> Quick Add
             </button>
-            <button className="px-5 py-2.5 text-sm font-semibold bg-[#2f8df4] text-white rounded-xl hover:bg-[#2376e8] transition-colors shadow-lg">
+            <button
+              onClick={() => navigate("/add-trade")}
+              className="px-5 py-2.5 text-sm font-bold bg-[#2f8df4] text-white rounded-[2px] hover:bg-[#2376e8] transition-colors shadow-md"
+            >
               ＋ Add Trade
             </button>
-            <div className="w-10 h-10 rounded-xl border border-white/10 bg-[#111b27] flex items-center justify-center font-bold text-gray-300">
+            <div className="w-10 h-10 rounded-[2px] border border-gray-200 dark:border-white/10 bg-gray-100 dark:bg-[#111b27] flex items-center justify-center font-bold text-gray-600 dark:text-gray-300 shadow-sm cursor-pointer hover:bg-gray-200 dark:hover:bg-white/10 transition-colors">
               MP
             </div>
           </div>
         </header>
 
         {/* Dynamic Route Content */}
-        <div className="flex-1 md:overflow-y-auto bg-[#0a0a0a]">
+        <div className="flex-1 md:overflow-y-auto">
           <Outlet />
         </div>
       </main>
