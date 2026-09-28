@@ -4,7 +4,6 @@ import { Outlet, NavLink, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
   PlusCircle,
-  Globe,
   List,
   Calendar,
   BookOpen,
@@ -97,7 +96,7 @@ export default function MainLayout() {
       <div className="flex-1 overflow-y-auto px-3 py-4 space-y-1 scrollbar-hide">
         {navLinks.map((link, idx) => {
           // CRITICAL FIX: Capitalizing the variable name and adding a fallback prevents React Error 130
-          const Icon = link.icon;
+          // const Icon = link.icon ? link.icon : LayoutDashboard; // Fallback to a default icon if not provided
 
           return (
             <NavLink
@@ -123,7 +122,7 @@ export default function MainLayout() {
                     className={`w-7 h-7 rounded-[2px] flex items-center justify-center transition-all bg-white dark:bg-white/5 shadow-sm group-hover:shadow-md ${isActive ? "bg-white dark:bg-white/10" : ""}`}
                   >
                     {/* Render using the safe Capitalized variable */}
-                    <Icon className={`w-4 h-4 ${link.iconColor}`} />
+                    {/* <Icon className={`w-4 h-4 ${link.iconColor}`} /> */}
                   </div>
                   <span className="truncate">{link.name}</span>
                 </>
