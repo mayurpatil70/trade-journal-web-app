@@ -64,7 +64,7 @@ export default function Login() {
             </h2>
             <p className="text-gray-400 text-sm mb-8 px-4">
               Enter your email to receive a secure, passwordless verification
-              code.
+              link. No password required.
             </p>
 
             <form

@@ -4,26 +4,38 @@ import { XMLParser } from "fast-xml-parser";
 
 export const getEconomicNews = async (req, res) => {
   try {
-    // Forex Factory's official free XML feed
+    // Add standard browser headers to bypass Cloudflare protection
     const response = await axios.get(
       "https://nfs.faireconomy.media/ff_calendar_thisweek.xml",
+      {
+        headers: {
+          "User-Agent":
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+          Accept: "application/xml, text/xml, */*; q=0.01",
+          "Accept-Language": "en-US,en;q=0.9",
+        },
+        timeout: 10000,
+      },
     );
 
     const parser = new XMLParser();
     const jObj = parser.parse(response.data);
 
-    // The feed returns an object with a 'weeklyevents' root containing an array of 'event'
     let events = jObj.weeklyevents?.event || [];
 
-    // Filter out weekend bank holidays or empty data if necessary, and sort by date/time
+    // fast-xml-parser returns a single object instead of an array if there's only 1 event. Normalize it:
+    if (!Array.isArray(events)) {
+      events = [events];
+    }
+
     res.status(200).json({ success: true, data: events });
   } catch (error) {
-    console.error("Error fetching Forex Factory data:", error.message);
+    console.error("Forex Factory fetch error:", error.message);
     res
       .status(500)
       .json({
         success: false,
-        error: "Failed to fetch economic calendar data",
+        error: "Failed to fetch calendar data from provider.",
       });
   }
 };

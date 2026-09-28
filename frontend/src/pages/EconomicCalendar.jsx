@@ -1,7 +1,7 @@
 // frontend/src/pages/EconomicCalendar.jsx
 import { useEffect, useState } from "react";
 import api from "../api/axios";
-import { Globe, AlertTriangle, Loader2, Calendar } from "lucide-react";
+import { Loader2, AlertTriangle, Folder, BarChart } from "lucide-react";
 
 export default function EconomicCalendar() {
   const [news, setNews] = useState([]);
@@ -20,48 +20,66 @@ export default function EconomicCalendar() {
         setLoading(false);
       }
     };
-
     fetchNews();
   }, []);
 
   const getImpactColor = (impact) => {
-    switch (impact?.toLowerCase()) {
-      case "high":
-        return "bg-red-500/20 text-red-500 border-red-500/30";
-      case "medium":
-        return "bg-orange-500/20 text-orange-500 border-orange-500/30";
-      case "low":
-        return "bg-yellow-500/20 text-yellow-500 border-yellow-500/30";
-      default:
-        return "bg-gray-500/20 text-gray-400 border-gray-500/30";
-    }
+    const imp = impact?.toLowerCase() || "";
+    if (imp.includes("high")) return "bg-[#ff0000]"; // FF Red
+    if (imp.includes("medium")) return "bg-[#ff8c00]"; // FF Orange
+    if (imp.includes("low")) return "bg-[#ffd700]"; // FF Yellow
+    return "bg-gray-400"; // FF Non-Economic
   };
 
+  const formatFFDate = (dateString) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    if (isNaN(date)) return dateString;
+    return date.toLocaleDateString("en-US", {
+      weekday: "short",
+      month: "short",
+      day: "numeric",
+    });
+  };
+
+  // Tracking grouping variables just like Forex Factory
+  let lastDate = null;
+  let lastTime = null;
+
   return (
-    <div className="max-w-6xl mx-auto font-sans">
-      {/* Header */}
-      <div className="flex items-center gap-3 mb-8">
-        <div className="w-10 h-10 bg-white/5 border border-white/10 rounded-xl flex items-center justify-center shadow-inner">
-          <Globe className="w-5 h-5 text-gray-300" />
-        </div>
+    <div
+      className="max-w-6xl mx-auto w-full"
+      style={{ fontFamily: "'Inter', sans-serif" }}
+    >
+      {/* Header matching FF style */}
+      <div className="flex items-center justify-between mb-6 border-b border-white/10 pb-4">
         <div>
           <h1 className="text-2xl font-bold text-white tracking-tight">
-            Economic Calendar
+            Calendar
           </h1>
-          <p className="text-sm text-gray-400">
-            Live high-impact events and monetary policy updates.
-          </p>
+          <p className="text-sm text-gray-400">Live feed via Forex Factory</p>
+        </div>
+        <div className="flex gap-4 text-xs font-medium text-gray-400">
+          <div className="flex items-center gap-1.5">
+            <span className="w-2.5 h-2.5 bg-[#ff0000] inline-block"></span> High
+            Impact
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className="w-2.5 h-2.5 bg-[#ff8c00] inline-block"></span>{" "}
+            Medium Impact
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className="w-2.5 h-2.5 bg-[#ffd700] inline-block"></span> Low
+            Impact
+          </div>
         </div>
       </div>
 
-      {/* Main Content Area */}
-      <div className="bg-[#121418] border border-white/5 rounded-2xl overflow-hidden shadow-2xl">
+      <div className="bg-[#121418] border border-white/10 rounded-lg overflow-hidden shadow-xl">
         {loading ? (
           <div className="flex flex-col items-center justify-center h-64">
-            <Loader2 className="w-8 h-8 text-emerald-500 animate-spin mb-4" />
-            <p className="text-gray-400 text-sm">
-              Syncing with Forex Factory...
-            </p>
+            <Loader2 className="w-8 h-8 text-[#6366f1] animate-spin mb-4" />
+            <p className="text-gray-400 text-sm">Fetching live data...</p>
           </div>
         ) : error ? (
           <div className="flex flex-col items-center justify-center h-64 text-red-400">
@@ -70,65 +88,89 @@ export default function EconomicCalendar() {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+            <table className="w-full text-left border-collapse min-w-[800px]">
               <thead>
-                <tr className="bg-white/[0.02] border-b border-white/5 text-[10px] uppercase tracking-wider text-gray-500 font-bold">
-                  <th className="p-4 pl-6 font-semibold">Date & Time</th>
-                  <th className="p-4 font-semibold">Currency</th>
-                  <th className="p-4 font-semibold">Impact</th>
-                  <th className="p-4 font-semibold">Event</th>
-                  <th className="p-4 font-semibold text-right">Actual</th>
-                  <th className="p-4 font-semibold text-right">Forecast</th>
-                  <th className="p-4 pr-6 font-semibold text-right">
-                    Previous
-                  </th>
+                <tr className="bg-[#1a1d24] text-[11px] uppercase tracking-wider text-gray-400 font-semibold border-b border-white/10">
+                  <th className="py-2.5 px-4 w-[120px]">Date</th>
+                  <th className="py-2.5 px-4 w-[100px]">Time</th>
+                  <th className="py-2.5 px-4 w-[60px]">Cur</th>
+                  <th className="py-2.5 px-4 w-[60px]">Imp</th>
+                  <th className="py-2.5 px-4">Event</th>
+                  <th className="py-2.5 px-4 w-[40px]">Detail</th>
+                  <th className="py-2.5 px-4 w-[80px] text-right">Actual</th>
+                  <th className="py-2.5 px-4 w-[80px] text-right">Forecast</th>
+                  <th className="py-2.5 px-4 w-[80px] text-right">Previous</th>
+                  <th className="py-2.5 px-4 w-[40px]">Graph</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
-                {news.map((item, index) => (
-                  <tr
-                    key={index}
-                    className="hover:bg-white/[0.02] transition-colors group"
-                  >
-                    <td className="p-4 pl-6 whitespace-nowrap">
-                      <div className="flex items-center gap-2">
-                        <Calendar className="w-4 h-4 text-gray-500 group-hover:text-gray-300 transition-colors" />
-                        <div>
-                          <p className="text-sm font-medium text-gray-200">
-                            {item.date}
-                          </p>
-                          <p className="text-xs text-gray-500">{item.time}</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="p-4">
-                      <div className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-white/5 border border-white/10 text-xs font-bold text-gray-300">
+                {news.map((item, index) => {
+                  const formattedDate = formatFFDate(item.date);
+                  const showDate = formattedDate !== lastDate;
+                  const showTime = item.time !== lastTime || showDate;
+
+                  lastDate = formattedDate;
+                  lastTime = item.time;
+
+                  return (
+                    <tr
+                      key={index}
+                      className="hover:bg-white/[0.02] text-[13px] text-gray-300 transition-colors group"
+                    >
+                      {/* Date Column (Grouped) */}
+                      <td className="py-2 px-4 font-semibold text-gray-200">
+                        {showDate ? formattedDate : ""}
+                      </td>
+
+                      {/* Time Column (Grouped) */}
+                      <td className="py-2 px-4 text-gray-400">
+                        {showTime ? item.time || "All Day" : ""}
+                      </td>
+
+                      {/* Currency */}
+                      <td className="py-2 px-4 font-bold text-gray-200">
                         {item.country}
-                      </div>
-                    </td>
-                    <td className="p-4">
-                      <span
-                        className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${getImpactColor(item.impact)}`}
-                      >
-                        {item.impact}
-                      </span>
-                    </td>
-                    <td className="p-4">
-                      <p className="text-sm font-medium text-gray-200">
+                      </td>
+
+                      {/* Impact Block */}
+                      <td className="py-2 px-4">
+                        <div
+                          className={`w-4 h-4 rounded-sm flex items-center justify-center ${getImpactColor(item.impact)}`}
+                        ></div>
+                      </td>
+
+                      {/* Event Name */}
+                      <td className="py-2 px-4 font-medium text-white">
                         {item.title}
-                      </p>
-                    </td>
-                    <td className="p-4 text-right text-sm font-medium text-emerald-400">
-                      {item.actual || "-"}
-                    </td>
-                    <td className="p-4 text-right text-sm text-gray-400">
-                      {item.forecast || "-"}
-                    </td>
-                    <td className="p-4 pr-6 text-right text-sm text-gray-500">
-                      {item.previous || "-"}
-                    </td>
-                  </tr>
-                ))}
+                      </td>
+
+                      {/* Detail Icon */}
+                      <td className="py-2 px-4">
+                        <Folder className="w-4 h-4 text-gray-500 cursor-pointer hover:text-gray-300" />
+                      </td>
+
+                      {/* Actual */}
+                      <td className="py-2 px-4 text-right font-semibold">
+                        {item.actual || ""}
+                      </td>
+
+                      {/* Forecast */}
+                      <td className="py-2 px-4 text-right text-gray-400">
+                        {item.forecast || ""}
+                      </td>
+
+                      {/* Previous */}
+                      <td className="py-2 px-4 text-right text-gray-500">
+                        {item.previous || ""}
+                      </td>
+
+                      {/* Graph Icon */}
+                      <td className="py-2 px-4">
+                        <BarChart className="w-4 h-4 text-gray-600 cursor-pointer hover:text-gray-400" />
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
