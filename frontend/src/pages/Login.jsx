@@ -73,12 +73,20 @@ export default function Login() {
         ) : (
           <div className="w-full animate-in fade-in duration-300">
             <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
-              Sign in or register
+              Sign Up or Register
             </h2>
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-8 px-2 leading-relaxed">
-              Enter your email to receive a secure, passwordless verification
-              link. No password required.
+              We respect your privacy and will never share your email with third
+              parties. By signing up, you agree to our{" "}
+              <a href="/terms" className="text-blue-500 hover:underline">
+                Terms of Service and Privacy Policy
+              </a>{" "}
+              and{" "}
+              <a href="/privacy" className="text-blue-500 hover:underline">
+                Privacy Policy
+              </a>
             </p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-4 px-2 leading-relaxed"></p>
 
             <form
               onSubmit={handleLogin}

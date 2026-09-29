@@ -1,51 +1,57 @@
 // frontend/src/pages/Verify.jsx
 import { useEffect, useState, useRef } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
-import api from "../api/axios"; // <-- Updated: Now uses your live Render URL
-import { Loader2, XCircle, CheckCircle } from "lucide-react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import api from "../api/axios";
+import { Loader2, CheckCircle, AlertTriangle, ArrowRight } from "lucide-react";
 
 export default function Verify() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState(false);
-  const hasAttempted = useRef(false);
+
+  const [status, setStatus] = useState("authenticating"); // 'authenticating' | 'success' | 'error'
+  const [errorMsg, setErrorMsg] = useState("");
+
+  // This ref prevents React Strict Mode from firing the one-time-use token twice
+  const hasAttemptedVerification = useRef(false);
 
   useEffect(() => {
+    const token = searchParams.get("token");
+
+    if (!token) {
+      setStatus("error");
+      setErrorMsg(
+        "No verification token found in the URL. Please request a new login link.",
+      );
+      return;
+    }
+
+    if (hasAttemptedVerification.current) return;
+    hasAttemptedVerification.current = true;
+
     const verifyToken = async () => {
-      if (hasAttempted.current) return;
-      hasAttempted.current = true;
-
-      const email = searchParams.get("email");
-      const token = searchParams.get("token");
-
-      if (!email || !token) {
-        setError("Missing verification credentials in the URL.");
-        return;
-      }
-
       try {
-        // <-- Updated: Uses dynamic API route instead of hardcoded localhost
-        const response = await api.post("/api/auth/verify", { email, token });
+        // Adjust this endpoint if your backend uses a different route (e.g., /api/auth/verify-magic-link)
+        const response = await api.post("/api/auth/verify", { token });
 
-        localStorage.setItem("userId", response.data.userId);
-        setSuccess(true);
+        // Ensure your backend returns the user ID and token
+        const userId =
+          response.data.userId || response.data.user?.id || response.data.id;
+        const authToken = response.data.token;
 
+        if (userId) localStorage.setItem("userId", userId);
+        if (authToken) localStorage.setItem("token", authToken);
+
+        setStatus("success");
+
+        // Redirect to Discord gate after a brief success message
         setTimeout(() => {
-          if (response.data.discordVerified) {
-            localStorage.setItem("discordVerified", "true");
-            navigate("/dashboard");
-          } else {
-            localStorage.setItem("discordVerified", "false");
-            navigate("/link-discord");
-          }
+          navigate("/link-discord");
         }, 1500);
-      } catch (err) {
-        console.error("Full Verification Error:", err);
-        setError(
-          err.response?.data?.error ||
-            err.message ||
-            "Verification failed. The server may be unreachable.",
+      } catch (error) {
+        setStatus("error");
+        setErrorMsg(
+          error.response?.data?.error ||
+            "Verification link is invalid or has expired.",
         );
       }
     };
@@ -54,45 +60,52 @@ export default function Verify() {
   }, [searchParams, navigate]);
 
   return (
-    <div className="min-h-screen bg-[#0d0f11] relative overflow-hidden flex flex-col justify-center items-center p-4">
-      {/* Background Glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-journalEmerald/5 rounded-full blur-[100px] pointer-events-none"></div>
-
-      <div className="w-full max-w-md bg-white/[0.02] backdrop-blur-xl border border-white/[0.05] rounded-2xl shadow-2xl p-10 text-center relative z-10 transition-all duration-500">
-        {error ? (
-          <div className="animate-in fade-in zoom-in duration-300">
-            <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-6 shadow-[0_0_30px_rgba(239,68,68,0.2)]">
-              <XCircle className="w-10 h-10 text-red-500" />
-            </div>
-            <h2 className="text-2xl font-bold text-white mb-3">Link Invalid</h2>
-            <p className="text-gray-400 text-sm mb-8">{error}</p>
-            <button
-              onClick={() => navigate("/login")}
-              className="w-full py-3 px-4 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-xl transition-all duration-300 hover:shadow-lg"
-            >
-              Request New Link
-            </button>
-          </div>
-        ) : success ? (
-          <div className="animate-in fade-in zoom-in duration-300">
-            <div className="w-20 h-20 bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto mb-6 shadow-[0_0_30px_rgba(16,185,129,0.2)]">
-              <CheckCircle className="w-10 h-10 text-journalEmerald" />
-            </div>
-            <h2 className="text-2xl font-bold text-white mb-2">Verified!</h2>
-            <p className="text-gray-400 text-sm">
-              Redirecting to your journal...
+    <div
+      className="min-h-screen bg-gray-50 dark:bg-[#0a0a0a] text-gray-900 dark:text-gray-200 flex items-center justify-center p-4 sm:p-6 transition-colors duration-200"
+      style={{ fontFamily: "'Inter', sans-serif" }}
+    >
+      <div className="w-full max-w-md bg-white dark:bg-[#121418] border border-gray-200 dark:border-white/5 rounded-[2px] p-8 sm:p-10 shadow-xl flex flex-col items-center text-center">
+        {status === "authenticating" && (
+          <div className="flex flex-col items-center animate-in fade-in duration-300">
+            <Loader2 className="w-12 h-12 text-[#2f8df4] animate-spin mb-6" />
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+              Authenticating...
+            </h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Verifying your secure magic link.
             </p>
           </div>
-        ) : (
-          <div className="flex flex-col items-center">
-            <div className="relative w-20 h-20 mb-6 flex items-center justify-center">
-              <div className="absolute inset-0 border-t-2 border-journalEmerald rounded-full animate-spin"></div>
-              <Loader2 className="w-8 h-8 text-journalEmerald animate-pulse" />
-            </div>
-            <h2 className="text-xl font-bold text-white mb-2 tracking-wide">
-              Authenticating
+        )}
+
+        {status === "success" && (
+          <div className="flex flex-col items-center animate-in fade-in zoom-in-95 duration-300">
+            <CheckCircle className="w-12 h-12 text-emerald-500 mb-6" />
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+              Login Successful!
             </h2>
-            <p className="text-gray-500 text-sm">Securing your connection...</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Redirecting you to the next step...
+            </p>
+          </div>
+        )}
+
+        {status === "error" && (
+          <div className="flex flex-col items-center w-full animate-in fade-in zoom-in-95 duration-300">
+            <div className="w-14 h-14 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-[2px] flex items-center justify-center mb-6">
+              <AlertTriangle className="w-7 h-7 text-red-500" />
+            </div>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+              Authentication Failed
+            </h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-8 leading-relaxed">
+              {errorMsg}
+            </p>
+            <button
+              onClick={() => navigate("/login")}
+              className="w-full py-4 px-6 bg-[#2f8df4] hover:bg-[#2376e8] text-white font-bold rounded-[2px] shadow-lg transition-all flex justify-center items-center gap-2 text-sm"
+            >
+              Back to Login <ArrowRight className="w-4 h-4" />
+            </button>
           </div>
         )}
       </div>
