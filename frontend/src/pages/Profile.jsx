@@ -3,11 +3,27 @@ import {
   User,
   Lock,
   UploadCloud,
-  CheckCircle,
   MessageSquare,
-  Instagram,
   ShieldCheck,
 } from "lucide-react";
+
+// Custom SVG to prevent Vercel build errors with older lucide-react versions
+const InstagramIcon = ({ className }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    <rect width="20" height="20" x="2" y="2" rx="5" ry="5"></rect>
+    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+    <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"></line>
+  </svg>
+);
 
 export default function Profile() {
   const inputClass =
@@ -163,7 +179,7 @@ export default function Profile() {
         {/* Community & Socials */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <a
-            href="https://discord.gg/Ajaw3AjfWE"
+            href="https://discord.gg/YOUR_INVITE_CODE"
             target="_blank"
             rel="noopener noreferrer"
             className="bg-[#5865F2] hover:bg-[#4752C4] p-6 rounded-[2px] shadow-sm flex items-center justify-between transition-colors group"
@@ -191,7 +207,7 @@ export default function Profile() {
               </h3>
               <p className="text-xs text-white/80">@forexnotes.in</p>
             </div>
-            <Instagram className="w-6 h-6 text-white group-hover:scale-110 transition-transform" />
+            <InstagramIcon className="w-6 h-6 text-white group-hover:scale-110 transition-transform" />
           </a>
         </div>
       </div>
