@@ -17,6 +17,7 @@ import {
   LogOut,
   Activity,
   ChevronDown,
+  BrainCircuit, // <-- NEW: Imported BrainCircuit for Trader Problems
 } from "lucide-react";
 
 export default function MainLayout() {
@@ -121,6 +122,12 @@ export default function MainLayout() {
               <NavItem to="/news" icon={Globe} label="Economic Calendar" />
               <NavItem to="/accounts" icon={Users} label="Accounts" />
               <NavItem to="/import" icon={Upload} label="Import Trades" />
+              {/* NEW: Trader Problems Navigation Link */}
+              <NavItem
+                to="/problems"
+                icon={BrainCircuit}
+                label="Trader Problems"
+              />
             </div>
           </div>
 

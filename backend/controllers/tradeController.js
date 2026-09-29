@@ -43,6 +43,16 @@ export const createTrade = async (req, res) => {
       }
     }
 
+    // Parse executions if they exist (usually sent as JSON string in FormData)
+    let parsedExecutions = [];
+    if (tradeData.executions) {
+      try {
+        parsedExecutions = JSON.parse(tradeData.executions);
+      } catch (e) {
+        console.error("Failed to parse executions:", e);
+      }
+    }
+
     const insertData = {
       user_id: userId,
       date: tradeData.date,
@@ -63,7 +73,12 @@ export const createTrade = async (req, res) => {
       emotion_before: tradeData.emotionBefore,
       emotion_after: tradeData.emotionAfter,
       psych_note: tradeData.psychNote,
+      // Maintain old images array for backwards compatibility
       images: imageUrls,
+      // NEW FIELDS for Phase 3 Tools:
+      before_image: imageUrls[0] || null, // First image is assumed to be 'Before'
+      after_image: imageUrls[1] || null, // Second image is assumed to be 'After'
+      executions: parsedExecutions, // Array of partial exits
     };
 
     const { data, error } = await supabase

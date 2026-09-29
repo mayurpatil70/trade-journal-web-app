@@ -1,5 +1,5 @@
 // frontend/src/pages/Settings.jsx
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Settings as SettingsIcon,
   Trash2,
@@ -14,6 +14,23 @@ import api from "../api/axios";
 export default function Settings() {
   const [exporting, setExporting] = useState("");
   const [deleting, setDeleting] = useState(false);
+
+  // Theme State Management
+  const [theme, setTheme] = useState(localStorage.getItem("theme") || "dark");
+
+  // Apply theme class to the HTML root element
+  useEffect(() => {
+    if (theme === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, [theme]);
+
+  const handleThemeChange = (newTheme) => {
+    setTheme(newTheme);
+    localStorage.setItem("theme", newTheme);
+  };
 
   const handleExport = async (format) => {
     const userId = localStorage.getItem("userId");
@@ -97,16 +114,44 @@ export default function Settings() {
             Choose how Trade Journey looks. Your preference is saved locally.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="p-4 border border-[#2f8df4] bg-[#2f8df4]/5 rounded-[2px] cursor-pointer flex items-center justify-between">
+            {/* Dark Mode Button */}
+            <div
+              onClick={() => handleThemeChange("dark")}
+              className={`p-4 border rounded-[2px] cursor-pointer flex items-center justify-between transition-all ${
+                theme === "dark"
+                  ? "border-[#2f8df4] bg-[#2f8df4]/5"
+                  : "border-gray-200 dark:border-white/5 opacity-60 hover:opacity-100"
+              }`}
+            >
               <span className="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                <Moon className="w-4 h-4 text-[#2f8df4]" /> Dark Mode
+                <Moon
+                  className={`w-4 h-4 ${theme === "dark" ? "text-[#2f8df4]" : ""}`}
+                />{" "}
+                Dark Mode
               </span>
-              <span className="text-xs text-[#2f8df4] font-bold">Active</span>
+              {theme === "dark" && (
+                <span className="text-xs text-[#2f8df4] font-bold">Active</span>
+              )}
             </div>
-            <div className="p-4 border border-gray-200 dark:border-white/5 rounded-[2px] cursor-pointer flex items-center justify-between opacity-60">
+
+            {/* Light Mode Button */}
+            <div
+              onClick={() => handleThemeChange("light")}
+              className={`p-4 border rounded-[2px] cursor-pointer flex items-center justify-between transition-all ${
+                theme === "light"
+                  ? "border-[#2f8df4] bg-[#2f8df4]/5"
+                  : "border-gray-200 dark:border-white/5 opacity-60 hover:opacity-100"
+              }`}
+            >
               <span className="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                <Sun className="w-4 h-4" /> Light Mode
+                <Sun
+                  className={`w-4 h-4 ${theme === "light" ? "text-[#2f8df4]" : ""}`}
+                />{" "}
+                Light Mode
               </span>
+              {theme === "light" && (
+                <span className="text-xs text-[#2f8df4] font-bold">Active</span>
+              )}
             </div>
           </div>
         </div>

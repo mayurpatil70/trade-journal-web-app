@@ -85,7 +85,9 @@ export default function AddTrade() {
     psychNote: "",
   });
 
-  const [images, setImages] = useState([null, null, null]);
+  // UPDATED: Exactly 2 slots for Hindsight Slider compatibility
+  const [images, setImages] = useState([null, null]);
+  const imageLabels = ["Before (Entry Chart)", "After (Exit Chart)"];
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -119,6 +121,7 @@ export default function AddTrade() {
         submitData.append(key, formData[key]);
       });
 
+      // Appends images in order (0 = Before, 1 = After)
       images.forEach((img) => {
         if (img) submitData.append("images", img);
       });
@@ -143,7 +146,6 @@ export default function AddTrade() {
   const labelClass =
     "text-[10px] font-bold text-gray-600 dark:text-gray-400 uppercase tracking-widest";
 
-  // UNIFORM STYLE: Applied to date, time, numbers, text inputs, and dropdowns. Forces exact blue text color and centering across all browsers/devices.
   const inputClass =
     "appearance-none box-border w-full min-h-[52px] block bg-gray-50 dark:bg-[#0b131d] border border-gray-300 dark:border-[#1f2c3b] rounded-[2px] px-4 py-3 !text-[#2f8df4] [-webkit-text-fill-color:#2f8df4] font-bold focus:border-[#2f8df4] focus:ring-1 focus:ring-[#2f8df4] outline-none transition-all placeholder-gray-400 dark:placeholder-gray-500 text-sm shadow-sm text-center [text-align-last:center]";
 
@@ -154,7 +156,6 @@ export default function AddTrade() {
     "bg-white !text-[#2f8df4] [-webkit-text-fill-color:#2f8df4] dark:bg-[#0b131d] font-bold text-center";
   const headerIconClass =
     "w-10 h-10 md:w-12 md:h-12 rounded-[2px] bg-[#2f8df4]/10 flex items-center justify-center border border-[#2f8df4]/20 shrink-0";
-  const imageLabels = ["Before Entry", "Entry", "Exit"];
 
   return (
     <div
@@ -509,11 +510,11 @@ export default function AddTrade() {
               </h2>
             </div>
             <span className="text-[10px] bg-gray-100 dark:bg-white/5 text-gray-500 dark:text-gray-400 px-3 py-1.5 rounded-[2px] font-bold tracking-widest uppercase border border-gray-200 dark:border-white/5">
-              Optional
+              Hindsight Slider
             </span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
             {imageLabels.map((label, idx) => (
               <label
                 key={idx}
