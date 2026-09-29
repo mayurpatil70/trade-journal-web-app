@@ -8,7 +8,9 @@ import {
   Send,
   Loader2,
   CheckCircle,
+  Globe,
 } from "lucide-react";
+import api from "../api/axios";
 
 export default function Support() {
   const navigate = useNavigate();
@@ -21,20 +23,39 @@ export default function Support() {
   });
 
   useEffect(() => {
-    const userId = localStorage.getItem("userId");
+    const userId =
+      localStorage.getItem("userId") || localStorage.getItem("userEmail");
     if (!userId) navigate("/login");
   }, [navigate]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!ticket.subject || !ticket.message) return;
+
     setLoading(true);
-    setTimeout(() => {
+    const userId =
+      localStorage.getItem("userEmail") ||
+      localStorage.getItem("userId") ||
+      "Unknown User";
+
+    try {
+      // Sends ticket data to your backend Discord webhook route
+      await api.post("/api/support/ticket", {
+        userId,
+        subject: ticket.subject,
+        category: ticket.category,
+        message: ticket.message,
+      });
+
       setLoading(false);
       setSent(true);
       setTicket({ subject: "", category: "Technical Issue", message: "" });
       setTimeout(() => setSent(false), 4000);
-    }, 800);
+    } catch (error) {
+      console.error("Support submission error:", error);
+      alert("Failed to submit support ticket. Please try again.");
+      setLoading(false);
+    }
   };
 
   const inputClass =
@@ -71,7 +92,7 @@ export default function Support() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
         {/* Submit Ticket Form (Takes 2 cols) */}
         <div className="lg:col-span-2 bg-white dark:bg-[#121418] border border-gray-200 dark:border-white/5 rounded-[2px] p-6 md:p-8 shadow-sm">
           <h2 className="text-base font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2 pb-4 border-b border-gray-100 dark:border-white/5">
@@ -196,11 +217,55 @@ export default function Support() {
             <p className="text-[10px] font-bold text-[#2f8df4] uppercase tracking-widest mb-1">
               Community Discord
             </p>
-            <p className="text-xs text-gray-500">
+            <a
+              href="https://discord.gg/Ajaw3AjfWE"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs text-gray-500 hover:text-[#2f8df4] transition-colors underline block"
+            >
               Need immediate peer help? Join our official trader community chat.
-            </p>
+            </a>
           </div>
         </div>
+      </div>
+
+      {/* Social Cards at Bottom */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+        <a
+          href="https://discord.gg/Ajaw3AjfWE"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="bg-[#5865F2] hover:bg-[#4752C4] transition-colors rounded-[2px] p-6 flex flex-col justify-center shadow-sm cursor-pointer group"
+        >
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-base font-bold text-white flex items-center gap-2">
+              Forex Notes Discord
+            </h3>
+            <div className="w-8 h-8 bg-white/10 rounded-[2px] flex items-center justify-center group-hover:scale-110 transition-transform">
+              <MessageSquare className="w-4 h-4 text-white" />
+            </div>
+          </div>
+          <p className="text-xs text-white/80 font-medium">
+            Join our trading community
+          </p>
+        </a>
+
+        <a
+          href="https://instagram.com/forexnotes.in"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="bg-gradient-to-tr from-[#fd5949] to-[#d6249f] hover:opacity-90 transition-opacity rounded-[2px] p-6 flex flex-col justify-center shadow-sm cursor-pointer group"
+        >
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-base font-bold text-white flex items-center gap-2">
+              Follow on Instagram
+            </h3>
+            <div className="w-8 h-8 bg-white/20 rounded-[2px] flex items-center justify-center group-hover:scale-110 transition-transform">
+              <Globe className="w-4 h-4 text-white" />
+            </div>
+          </div>
+          <p className="text-xs text-white/80 font-medium">@forexnotes.in</p>
+        </a>
       </div>
     </div>
   );

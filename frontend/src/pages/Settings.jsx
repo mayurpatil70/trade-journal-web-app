@@ -4,8 +4,6 @@ import {
   Settings as SettingsIcon,
   Trash2,
   Download,
-  Moon,
-  Sun,
   AlertTriangle,
   Loader2,
   BookOpen,
@@ -18,12 +16,14 @@ import api from "../api/axios";
 export default function Settings() {
   const [exporting, setExporting] = useState("");
   const [deleting, setDeleting] = useState(false);
-  const [theme, setTheme] = useState(localStorage.getItem("theme") || "dark");
-
   const [historyTrades, setHistoryTrades] = useState([]);
   const [loadingHistory, setLoadingHistory] = useState(true);
 
   useEffect(() => {
+    // Enforce dark mode permanently on mount
+    document.documentElement.classList.add("dark");
+    localStorage.setItem("theme", "dark");
+
     const fetchHistory = async () => {
       const userId =
         localStorage.getItem("userId") || localStorage.getItem("userEmail");
@@ -41,16 +41,6 @@ export default function Settings() {
     };
     fetchHistory();
   }, []);
-
-  const handleThemeChange = (newTheme) => {
-    setTheme(newTheme);
-    localStorage.setItem("theme", newTheme);
-    if (newTheme === "dark") {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-  };
 
   const handleExport = async (format) => {
     const userId =
@@ -118,61 +108,12 @@ export default function Settings() {
             Settings & History
           </h1>
           <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400">
-            Manage appearance, exports, and review your journal logs.
+            Manage data exports and review your journal logs.
           </p>
         </div>
       </div>
 
       <div className="space-y-8">
-        {/* Appearance */}
-        <div className="bg-white dark:bg-[#121418] border border-gray-200 dark:border-white/5 rounded-[2px] p-6 md:p-8 shadow-sm">
-          <h2 className="text-base font-bold text-gray-900 dark:text-white mb-4">
-            Appearance
-          </h2>
-          <p className="text-xs text-gray-500 mb-6">
-            Choose how Trade Journey looks. Your preference is saved locally.
-          </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div
-              onClick={() => handleThemeChange("dark")}
-              className={`p-4 border rounded-[2px] cursor-pointer flex items-center justify-between transition-all ${
-                theme === "dark"
-                  ? "border-[#2f8df4] bg-[#2f8df4]/5"
-                  : "border-gray-200 dark:border-white/5 opacity-60 hover:opacity-100"
-              }`}
-            >
-              <span className="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                <Moon
-                  className={`w-4 h-4 ${theme === "dark" ? "text-[#2f8df4]" : ""}`}
-                />{" "}
-                Dark Mode
-              </span>
-              {theme === "dark" && (
-                <span className="text-xs text-[#2f8df4] font-bold">Active</span>
-              )}
-            </div>
-
-            <div
-              onClick={() => handleThemeChange("light")}
-              className={`p-4 border rounded-[2px] cursor-pointer flex items-center justify-between transition-all ${
-                theme === "light"
-                  ? "border-[#2f8df4] bg-[#2f8df4]/5"
-                  : "border-gray-200 dark:border-white/5 opacity-60 hover:opacity-100"
-              }`}
-            >
-              <span className="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                <Sun
-                  className={`w-4 h-4 ${theme === "light" ? "text-[#2f8df4]" : ""}`}
-                />{" "}
-                Light Mode
-              </span>
-              {theme === "light" && (
-                <span className="text-xs text-[#2f8df4] font-bold">Active</span>
-              )}
-            </div>
-          </div>
-        </div>
-
         {/* Danger Zone */}
         <div className="bg-white dark:bg-[#121418] border border-red-500/20 rounded-[2px] p-6 md:p-8 shadow-sm">
           <h2 className="text-base font-bold text-red-500 mb-2 flex items-center gap-2">
@@ -196,7 +137,7 @@ export default function Settings() {
           </button>
         </div>
 
-        {/* INTEGRATED: Journal History Logs */}
+        {/* Journal History Logs */}
         <div className="bg-white dark:bg-[#121418] border border-gray-200 dark:border-white/5 rounded-[2px] p-6 md:p-8 shadow-sm">
           <h2 className="text-base font-bold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
             <BookOpen className="w-5 h-5 text-[#2f8df4]" /> Journal History Logs
@@ -284,7 +225,7 @@ export default function Settings() {
           </div>
         </div>
 
-        {/* Export Data (Moved to bottom) */}
+        {/* Export Data (At the bottom) */}
         <div className="bg-white dark:bg-[#121418] border border-gray-200 dark:border-white/5 rounded-[2px] p-6 md:p-8 shadow-sm">
           <h2 className="text-base font-bold text-gray-900 dark:text-white mb-2">
             Export Journal Data

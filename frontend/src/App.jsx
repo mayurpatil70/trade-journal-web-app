@@ -8,7 +8,6 @@ import {
   Outlet,
 } from "react-router-dom";
 
-// Core Pages
 import Login from "./pages/Login.jsx";
 import Verify from "./pages/Verify.jsx";
 import DiscordGate from "./pages/DiscordGate.jsx";
@@ -24,11 +23,9 @@ import Profile from "./pages/Profile.jsx";
 import Support from "./pages/Support.jsx";
 import DiscordCallback from "./pages/DiscordCallback";
 
-// Layouts & Global
 import MainLayout from "./layouts/MainLayout.jsx";
 import PreTradeGate from "./components/PreTradeGate.jsx";
 
-// Trader Problems Hub Components
 import TraderProblemsLayout from "./pages/TraderProblems/Layout.jsx";
 import EdgeFinder from "./pages/TraderProblems/EdgeFinder.jsx";
 import PropFirm from "./pages/TraderProblems/PropFirm.jsx";
@@ -43,15 +40,9 @@ const ProtectedRoute = () => {
 };
 
 function App() {
-  // GLOBAL THEME INITIALIZATION
-  // This ensures light/dark mode persists across all routes and hard refreshes
   useEffect(() => {
-    const theme = localStorage.getItem("theme") || "dark";
-    if (theme === "dark") {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
+    document.documentElement.classList.add("dark");
+    localStorage.setItem("theme", "dark");
   }, []);
 
   return (
@@ -88,7 +79,6 @@ function App() {
         </Route>
       </Routes>
 
-      {/* Global Floating AI Coach */}
       <PreTradeGate />
     </BrowserRouter>
   );

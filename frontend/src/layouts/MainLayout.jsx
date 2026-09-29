@@ -181,17 +181,18 @@ export default function MainLayout() {
               App
             </p>
             <div className="space-y-1">
-              <NavItem
-                to="/profile"
-                icon={User}
-                label="Profile"
-                currentPath={location.pathname}
-                onClick={closeMenu}
-              />
+              // Inside the 'App' navigation section of MainLayout.jsx:
               <NavItem
                 to="/settings"
                 icon={Settings}
                 label="Settings"
+                currentPath={location.pathname}
+                onClick={closeMenu}
+              />
+              <NavItem
+                to="/support"
+                icon={Headphones}
+                label="Support"
                 currentPath={location.pathname}
                 onClick={closeMenu}
               />
@@ -207,7 +208,7 @@ export default function MainLayout() {
                 onClick={closeMenu}
                 className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
               >
-                <User className="w-4 h-4" /> My Profile
+                <User className="w-4 h-4" /> Profile
               </Link>
               <button
                 onClick={handleLogout}
