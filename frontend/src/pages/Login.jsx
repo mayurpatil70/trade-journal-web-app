@@ -71,20 +71,8 @@ export default function Login() {
               Sign in or register
             </h2>
             <p className="text-sm text-gray-400 mb-8 px-2 leading-relaxed">
-              Enter your email to receive a secure, <br /> passwordless
-              verification link.
-              <br />
               We respect your privacy and will never share your email with third
               parties. By signing in, you agree to our{" "}
-              <a
-                href="/terms"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-400 hover:text-blue-300 underline"
-              >
-                Terms of Service
-              </a>
-              and{" "}
               <a
                 href="/privacy"
                 target="_blank"
@@ -93,7 +81,6 @@ export default function Login() {
               >
                 Privacy Policy
               </a>
-              .
             </p>
 
             <form

@@ -13,13 +13,13 @@ export default function Verify() {
   const isVerifying = useRef(false);
 
   useEffect(() => {
+    // 1. Extract BOTH token and email from the URL
     const token = searchParams.get("token");
+    const email = searchParams.get("email");
 
-    if (!token) {
+    if (!token || !email) {
       setStatus("error");
-      setErrorMsg(
-        "No verification token found in the URL. Please request a new login link.",
-      );
+      setErrorMsg("Invalid verification link. Missing token or email.");
       return;
     }
 
@@ -28,7 +28,8 @@ export default function Verify() {
 
     const verifyToken = async () => {
       try {
-        const response = await api.post("/api/auth/verify", { token });
+        // 2. Send BOTH parameters to your backend to fix the 401 Unauthorized error
+        const response = await api.post("/api/auth/verify", { token, email });
 
         const userId =
           response.data.userId || response.data.user?.id || response.data.id;
@@ -39,6 +40,7 @@ export default function Verify() {
 
         setStatus("success");
 
+        // 3. Redirect to Discord Gateway on success
         setTimeout(() => {
           navigate("/link-discord");
         }, 1500);
