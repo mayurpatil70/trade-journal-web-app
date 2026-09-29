@@ -6,7 +6,7 @@ import {
   Send,
   CheckCircle,
   Loader2,
-  Instagram,
+  Globe,
 } from "lucide-react";
 import api from "../api/axios";
 
@@ -31,7 +31,6 @@ export default function Profile() {
   const saveProfile = async (e) => {
     e.preventDefault();
     setSaving(true);
-    // Simulate save or call real API
     setTimeout(() => {
       setSaving(false);
       alert("Profile updated successfully!");
@@ -190,7 +189,7 @@ export default function Profile() {
                 Follow on Instagram
               </h3>
               <div className="w-8 h-8 bg-white/20 rounded-[2px] flex items-center justify-center group-hover:scale-110 transition-transform">
-                <Instagram className="w-4 h-4 text-white" />
+                <Globe className="w-4 h-4 text-white" />
               </div>
             </div>
             <p className="text-xs text-white/80 font-medium">@forexnotes.in</p>
