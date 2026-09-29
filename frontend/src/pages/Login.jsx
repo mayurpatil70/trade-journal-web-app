@@ -31,26 +31,21 @@ export default function Login() {
     }
   };
 
-  // Standardized UI input styling matching the rest of the application
-  const inputClass =
-    "appearance-none box-border w-full min-h-[52px] block bg-gray-50 dark:bg-[#0b131d] border border-gray-300 dark:border-[#1f2c3b] rounded-[2px] px-4 py-3 !text-gray-900 dark:!text-white font-bold focus:border-[#2f8df4] focus:ring-1 focus:ring-[#2f8df4] outline-none text-sm text-center [text-align-last:center] shadow-sm transition-all";
-
   return (
     <div
-      className="min-h-screen bg-gray-50 dark:bg-[#0a0a0a] text-gray-900 dark:text-gray-200 flex items-center justify-center p-4 sm:p-6 transition-colors duration-200"
+      className="min-h-screen bg-[#020202] text-white flex items-center justify-center p-6"
       style={{ fontFamily: "'Inter', sans-serif" }}
     >
-      {/* Centered Card Container */}
-      <div className="w-full max-w-md bg-white dark:bg-[#121418] border border-gray-200 dark:border-white/5 rounded-[2px] p-8 sm:p-10 shadow-xl flex flex-col items-center text-center">
+      <div className="w-full max-w-md bg-[#121418] border border-white/5 rounded-2xl p-8 sm:p-10 shadow-2xl flex flex-col items-center text-center">
         {/* Logo & Branding */}
         <div className="flex flex-col items-center mb-8">
-          <div className="w-14 h-14 bg-[#2f8df4] rounded-[2px] flex items-center justify-center mb-5 shadow-lg">
+          <div className="w-14 h-14 bg-[#6366f1] rounded-full flex items-center justify-center mb-5 shadow-[0_0_30px_rgba(99,102,241,0.3)]">
             <Activity className="w-7 h-7 text-white" />
           </div>
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white mb-2">
+          <h1 className="text-3xl font-bold tracking-tight text-white mb-2">
             Forex Notes
           </h1>
-          <p className="text-[10px] font-bold tracking-[0.25em] text-[#2f8df4] uppercase">
+          <p className="text-[10px] font-bold tracking-[0.25em] text-gray-500 uppercase">
             Discipline Today.
             <br />
             Freedom Tomorrow.
@@ -58,49 +53,62 @@ export default function Login() {
         </div>
 
         {status === "success" ? (
-          <div className="w-full bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 rounded-[2px] p-6 text-center animate-in fade-in duration-300">
+          <div className="w-full bg-[#1a1d24] border border-white/5 rounded-2xl p-6 text-center animate-in fade-in duration-300">
             <CheckCircle className="w-8 h-8 text-emerald-500 mx-auto mb-3" />
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
+            <h3 className="text-lg font-bold text-white mb-2">
               Check your inbox
             </h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+            <p className="text-sm text-gray-400">
               We sent a secure link to <br />
-              <span className="text-gray-900 dark:text-white font-bold mt-1 inline-block">
+              <span className="text-white font-bold mt-1 inline-block">
                 {email}
               </span>
             </p>
           </div>
         ) : (
           <div className="w-full animate-in fade-in duration-300">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
-              Sign Up or Register
+            <h2 className="text-xl font-bold text-white mb-2">
+              Sign in or register
             </h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-8 px-2 leading-relaxed">
+            <p className="text-sm text-gray-400 mb-8 px-2 leading-relaxed">
+              Enter your email to receive a secure, <br /> passwordless
+              verification link.
+              <br />
               We respect your privacy and will never share your email with third
-              parties. By signing up, you agree to our{" "}
-              <a href="/terms" className="text-blue-500 hover:underline">
-                Terms of Service and Privacy Policy
-              </a>{" "}
+              parties. By signing in, you agree to our{" "}
+              <a
+                href="/terms"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-400 hover:text-blue-300 underline"
+              >
+                Terms of Service
+              </a>
               and{" "}
-              <a href="/privacy" className="text-blue-500 hover:underline">
+              <a
+                href="/privacy"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-400 hover:text-blue-300 underline"
+              >
                 Privacy Policy
               </a>
+              .
             </p>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-4 px-2 leading-relaxed"></p>
 
             <form
               onSubmit={handleLogin}
               className="space-y-5 w-full flex flex-col items-center"
             >
               <div className="w-full text-left">
-                <label className="text-[10px] font-bold text-gray-600 dark:text-gray-400 uppercase tracking-widest block mb-2 text-center">
+                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-2 ml-1">
                   Email Address
                 </label>
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className={inputClass}
+                  className="w-full px-5 py-4 bg-[#1a1b20] border border-white/10 rounded-2xl text-white placeholder-gray-600 focus:outline-none focus:border-[#6366f1] focus:ring-1 focus:ring-[#6366f1] transition-all"
                   placeholder="you@example.com"
                   required
                   disabled={status === "loading"}
@@ -108,7 +116,7 @@ export default function Login() {
               </div>
 
               {status === "error" && (
-                <div className="w-full flex items-center justify-center gap-2 p-3 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-[2px] text-red-600 dark:text-red-400 text-xs font-bold">
+                <div className="w-full flex items-center justify-center gap-2 p-3 bg-red-500/10 border border-red-500/20 rounded-2xl text-red-400 text-xs font-bold">
                   <AlertTriangle className="w-4 h-4 shrink-0" />
                   <span>{errorMessage}</span>
                 </div>
@@ -117,7 +125,7 @@ export default function Login() {
               <button
                 type="submit"
                 disabled={status === "loading"}
-                className="w-full py-4 px-6 bg-[#2f8df4] hover:bg-[#2376e8] text-white font-bold rounded-[2px] shadow-lg transition-all flex justify-center items-center gap-2 disabled:opacity-50 text-sm mt-2"
+                className="w-full py-4 px-6 bg-[#6366f1] hover:bg-[#4f46e5] active:bg-[#4338ca] text-white font-bold rounded-2xl shadow-[0_0_20px_rgba(99,102,241,0.2)] transition-all flex justify-center items-center gap-2 disabled:opacity-50 text-sm mt-2"
               >
                 {status === "loading" ? (
                   <>
