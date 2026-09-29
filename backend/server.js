@@ -1,20 +1,15 @@
 // backend/server.js
+import "dotenv/config"; // <--- MUST BE LINE 1 before any route or controller imports
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
-
-// Load environment variables
-dotenv.config();
 
 // Import Routes
 import discordRoutes from "./routes/discordRoutes.js";
 import kycRoutes from "./routes/kycRoutes.js";
 import exportRoutes from "./routes/exportRoutes.js";
-// (Assuming you have other route imports like authRoutes, tradeRoutes, etc. here)
 
 const app = express();
 
-// Middleware
 app.use(
   cors({
     origin: ["http://localhost:5173", "https://forexnotes.vercel.app"],
@@ -26,10 +21,9 @@ app.use(express.urlencoded({ extended: true }));
 
 // Mount Routes
 app.use("/api/discord", discordRoutes);
-app.use("/api/auth", kycRoutes); // Mounts KYC upload route -> /api/auth/kyc
-app.use("/api/trades", exportRoutes); // Mounts Export trade data route -> /api/trades/export
+app.use("/api/auth", kycRoutes);
+app.use("/api/trades", exportRoutes);
 
-// Health Check Endpoint
 app.get("/", (req, res) => {
   res
     .status(200)

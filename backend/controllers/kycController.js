@@ -3,7 +3,7 @@ import { v2 as cloudinary } from "cloudinary";
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
-  process.env.SUPABASE_KEY
+  process.env.SUPABASE_KEY,
 );
 
 export const uploadKycDocuments = async (req, res) => {
@@ -12,7 +12,12 @@ export const uploadKycDocuments = async (req, res) => {
     const files = req.files; // Expected array from multer (Front & Back)
 
     if (!userId || !files || files.length < 2) {
-      return res.status(400).json({ error: "User ID and both document sides (Front and Back) are required." });
+      return res
+        .status(400)
+        .json({
+          error:
+            "User ID and both document sides (Front and Back) are required.",
+        });
     }
 
     // Helper to upload buffer to Cloudinary
@@ -23,7 +28,7 @@ export const uploadKycDocuments = async (req, res) => {
           (error, result) => {
             if (error) reject(error);
             else resolve(result.secure_url);
-          }
+          },
         );
         stream.end(fileBuffer);
       });
@@ -38,20 +43,20 @@ export const uploadKycDocuments = async (req, res) => {
       .update({
         kyc_front_url: frontUrl,
         kyc_back_url: backUrl,
-        kyc_status: "pending"
+        kyc_status: "pending",
       })
       .eq("id", userId);
 
     if (dbError) throw dbError;
 
-    return.status(200).json({
+    return res.status(200).json({
       success: true,
       message: "KYC documents uploaded successfully.",
       frontUrl,
-      backUrl
+      backUrl,
     });
   } catch (error) {
     console.error("KYC Upload Error:", error);
-    return.status(500).json({ error: "Failed to process KYC upload." });
+    return res.status(500).json({ error: "Failed to process KYC upload." });
   }
 };
