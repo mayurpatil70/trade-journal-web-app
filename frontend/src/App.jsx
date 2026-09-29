@@ -21,6 +21,7 @@ import PropAccounts from "./pages/PropAccounts.jsx";
 import Settings from "./pages/Settings.jsx";
 import Profile from "./pages/Profile.jsx"; // <-- New Profile Import
 import Support from "./pages/Support.jsx";
+import DiscordCallback from "./pages/DiscordCallback";
 
 import MainLayout from "./layouts/MainLayout.jsx";
 
