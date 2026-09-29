@@ -40,6 +40,7 @@ function App() {
 
         <Route element={<ProtectedRoute />}>
           <Route path="/link-discord" element={<DiscordGate />} />
+          <Route path="/discord/callback" element={<DiscordCallback />} />
 
           <Route path="/" element={<MainLayout />}>
             <Route index element={<Navigate to="/dashboard" replace />} />

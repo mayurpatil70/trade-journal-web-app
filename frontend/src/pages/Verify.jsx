@@ -38,6 +38,9 @@ export default function Verify() {
         if (userId) localStorage.setItem("userId", userId);
         if (authToken) localStorage.setItem("token", authToken);
 
+        // NEW: Save the email for the Sidebar profile badge!
+        localStorage.setItem("userEmail", email);
+
         setStatus("success");
 
         // 3. Redirect to Discord Gateway on success

@@ -20,7 +20,7 @@ export default function Settings() {
 
   const toggleTheme = (mode) => {
     setThemeMode(mode);
-    if (mode === "dark" || mode === "midnight" || mode === "oled") {
+    if (mode === "dark") {
       document.documentElement.classList.add("dark");
       localStorage.setItem("theme", "dark");
     } else {
@@ -70,22 +70,11 @@ export default function Settings() {
             </p>
 
             <button
-              onClick={() => toggleTheme("midnight")}
-              className={themeOptionClass("midnight")}
-            >
-              <h3 className="text-sm font-bold text-gray-900 dark:text-white">
-                Midnight
-              </h3>
-              <p className="text-xs text-gray-500">
-                Deep blue-black trading terminal
-              </p>
-            </button>
-            <button
               onClick={() => toggleTheme("dark")}
               className={themeOptionClass("dark")}
             >
               <h3 className="text-sm font-bold text-gray-900 dark:text-white">
-                Dark
+                Dark Mode
               </h3>
               <p className="text-xs text-gray-500">Classic dark workspace</p>
             </button>
@@ -94,20 +83,9 @@ export default function Settings() {
               className={themeOptionClass("light")}
             >
               <h3 className="text-sm font-bold text-gray-900 dark:text-white">
-                Light
+                Light Mode
               </h3>
               <p className="text-xs text-gray-500">Clean light workspace</p>
-            </button>
-            <button
-              onClick={() => toggleTheme("oled")}
-              className={themeOptionClass("oled")}
-            >
-              <h3 className="text-sm font-bold text-gray-900 dark:text-white">
-                OLED
-              </h3>
-              <p className="text-xs text-gray-500">
-                Pure black, high-contrast mode
-              </p>
             </button>
           </div>
 

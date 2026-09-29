@@ -1,20 +1,17 @@
 // backend/controllers/tradeController.js
 import { v2 as cloudinary } from "cloudinary";
-import { createClient } from "@supabase/supabase-js";
+import { Parser } from "json2csv";
+import ExcelJS from "exceljs";
+import { Document, Packer, Paragraph, TextRun } from "docx";
+import PDFDocument from "pdfkit";
+import { supabase } from "../config/supabase.js";
 
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_KEY,
-);
-
-// Configure Cloudinary
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// Helper function to upload image buffer to Cloudinary
 const uploadToCloudinary = (buffer) => {
   return new Promise((resolve, reject) => {
     const stream = cloudinary.uploader.upload_stream(
@@ -38,7 +35,6 @@ export const createTrade = async (req, res) => {
         .json({ success: false, error: "Unauthorized: Missing User ID" });
     }
 
-    // Process Images if they exist
     const imageUrls = [];
     if (req.files && req.files.length > 0) {
       for (const file of req.files) {
@@ -47,7 +43,6 @@ export const createTrade = async (req, res) => {
       }
     }
 
-    // Prepare data for Supabase
     const insertData = {
       user_id: userId,
       date: tradeData.date,
@@ -85,8 +80,6 @@ export const createTrade = async (req, res) => {
   }
 };
 
-// Add this below your existing createTrade function in backend/controllers/tradeController.js
-
 export const getTrades = async (req, res) => {
   try {
     const { userId } = req.query;
@@ -97,7 +90,6 @@ export const getTrades = async (req, res) => {
         .json({ success: false, error: "Unauthorized: Missing User ID" });
     }
 
-    // Fetch trades from Supabase, newest first
     const { data, error } = await supabase
       .from("trades")
       .select("*")
@@ -111,5 +103,170 @@ export const getTrades = async (req, res) => {
   } catch (error) {
     console.error("Fetch Trades Error:", error);
     res.status(500).json({ success: false, error: "Failed to fetch trades." });
+  }
+};
+
+export const deleteAllTrades = async (req, res) => {
+  try {
+    const { userId } = req.query;
+
+    if (!userId) {
+      return res
+        .status(401)
+        .json({ success: false, error: "Unauthorized: Missing User ID" });
+    }
+
+    const { error } = await supabase
+      .from("trades")
+      .delete()
+      .eq("user_id", userId);
+
+    if (error) throw error;
+
+    res
+      .status(200)
+      .json({ success: true, message: "All trades deleted successfully." });
+  } catch (error) {
+    console.error("Delete Trades Error:", error);
+    res.status(500).json({ success: false, error: "Failed to delete trades." });
+  }
+};
+
+export const exportTrades = async (req, res) => {
+  try {
+    const { userId, format } = req.query;
+
+    if (!userId) {
+      return res
+        .status(401)
+        .json({ success: false, error: "Unauthorized: Missing User ID" });
+    }
+
+    const { data: trades, error } = await supabase
+      .from("trades")
+      .select(
+        "date, time, asset, direction, session, setup, result, r_multiple, entry, sl, tp",
+      )
+      .eq("user_id", userId)
+      .order("date", { ascending: false })
+      .order("time", { ascending: false });
+
+    if (error) throw error;
+
+    if (!trades || trades.length === 0) {
+      return res
+        .status(404)
+        .json({ success: false, error: "No trades found to export." });
+    }
+
+    if (format === "csv") {
+      const parser = new Parser();
+      const csv = parser.parse(trades);
+      res.header("Content-Type", "text/csv");
+      res.attachment("Trade_Journey_Export.csv");
+      return res.send(csv);
+    }
+
+    if (format === "excel") {
+      const workbook = new ExcelJS.Workbook();
+      const worksheet = workbook.addWorksheet("My Trades");
+
+      worksheet.columns = [
+        { header: "Date", key: "date", width: 12 },
+        { header: "Time", key: "time", width: 10 },
+        { header: "Asset", key: "asset", width: 12 },
+        { header: "Direction", key: "direction", width: 10 },
+        { header: "Session", key: "session", width: 12 },
+        { header: "Setup", key: "setup", width: 16 },
+        { header: "Result", key: "result", width: 10 },
+        { header: "R-Multiple", key: "r_multiple", width: 12 },
+        { header: "Entry", key: "entry", width: 12 },
+        { header: "SL", key: "sl", width: 12 },
+        { header: "TP", key: "tp", width: 12 },
+      ];
+
+      trades.forEach((trade) => worksheet.addRow(trade));
+      res.header(
+        "Content-Type",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      );
+      res.attachment("Trade_Journey_Export.xlsx");
+      await workbook.xlsx.write(res);
+      return res.end();
+    }
+
+    if (format === "doc") {
+      const rows = trades.map(
+        (t) =>
+          new Paragraph({
+            children: [
+              new TextRun({
+                text: `${t.date} ${t.time || ""} | ${t.asset} | ${t.direction || ""} | Setup: ${t.setup || "N/A"} | Result: ${t.result || "N/A"} | R: ${t.r_multiple ?? "N/A"}`,
+                font: "Arial",
+              }),
+            ],
+          }),
+      );
+
+      const doc = new Document({
+        sections: [
+          {
+            children: [
+              new Paragraph({
+                children: [
+                  new TextRun({
+                    text: "Trade Journey Export",
+                    bold: true,
+                    size: 28,
+                  }),
+                ],
+              }),
+              ...rows,
+            ],
+          },
+        ],
+      });
+
+      const buffer = await Packer.toBuffer(doc);
+      res.header(
+        "Content-Type",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      );
+      res.attachment("Trade_Journey_Export.docx");
+      return res.send(buffer);
+    }
+
+    if (format === "pdf") {
+      const doc = new PDFDocument({ margin: 40, size: "A4" });
+      res.header("Content-Type", "application/pdf");
+      res.attachment("Trade_Journey_Export.pdf");
+
+      doc.pipe(res);
+      doc
+        .fontSize(20)
+        .text("Trade Journey Export", { align: "center" })
+        .moveDown();
+
+      trades.forEach((t) => {
+        doc
+          .fontSize(11)
+          .text(
+            `${t.date} ${t.time || ""} | ${t.asset} | ${t.direction || ""} | Setup: ${t.setup || "N/A"} | Result: ${t.result || "N/A"} | R: ${t.r_multiple ?? "N/A"}`,
+          );
+        doc.moveDown(0.4);
+      });
+
+      doc.end();
+      return;
+    }
+
+    return res
+      .status(400)
+      .json({ success: false, error: "Unsupported export format." });
+  } catch (error) {
+    console.error("Export Error:", error);
+    res
+      .status(500)
+      .json({ success: false, error: "Failed to generate export file." });
   }
 };

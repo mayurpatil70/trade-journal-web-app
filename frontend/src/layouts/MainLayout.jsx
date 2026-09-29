@@ -15,7 +15,6 @@ import {
   Menu,
   X,
   LogOut,
-  User,
   Activity,
   ChevronDown,
 } from "lucide-react";
@@ -29,6 +28,7 @@ export default function MainLayout() {
   const handleLogout = () => {
     localStorage.removeItem("userId");
     localStorage.removeItem("token");
+    localStorage.removeItem("userEmail");
     navigate("/login");
   };
 
@@ -82,7 +82,9 @@ export default function MainLayout() {
 
       {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-30 w-64 bg-white dark:bg-[#121418] border-r border-gray-200 dark:border-white/5 transform transition-transform duration-300 ease-in-out flex flex-col ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"} md:relative md:translate-x-0`}
+        className={`fixed inset-y-0 left-0 z-30 w-64 bg-white dark:bg-[#121418] border-r border-gray-200 dark:border-white/5 transform transition-transform duration-300 ease-in-out flex flex-col ${
+          isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
+        } md:relative md:translate-x-0`}
       >
         {/* Logo */}
         <div className="h-16 flex items-center gap-3 px-6 border-b border-gray-200 dark:border-white/5 shrink-0 hidden md:flex">
@@ -157,20 +159,28 @@ export default function MainLayout() {
             onClick={() => setIsProfileOpen(!isProfileOpen)}
             className="flex items-center justify-between p-3 rounded-[2px] bg-gray-50 dark:bg-[#0b131d] border border-gray-200 dark:border-[#1f2c3b] cursor-pointer hover:border-[#2f8df4] transition-colors"
           >
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-[#2f8df4] text-white flex items-center justify-center font-bold text-xs">
-                MP
+            <div className="flex items-center gap-3 overflow-hidden">
+              <div className="w-8 h-8 rounded-full bg-[#2f8df4] text-white flex items-center justify-center font-bold text-xs shrink-0">
+                {localStorage.getItem("userEmail")
+                  ? localStorage.getItem("userEmail").charAt(0).toUpperCase()
+                  : "U"}
               </div>
-              <div>
-                <p className="text-sm font-bold text-gray-900 dark:text-white leading-tight">
-                  Mayur Patil
+              <div className="overflow-hidden">
+                <p className="text-sm font-bold text-gray-900 dark:text-white leading-tight truncate max-w-[120px]">
+                  {localStorage.getItem("userEmail") || "User"}
                 </p>
-                <p className="text-[10px] text-emerald-500 font-bold uppercase tracking-widest">
-                  Pro Plan
-                </p>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation(); // Prevents opening the profile menu
+                    alert("Pro Plan features are coming soon! Stay tuned.");
+                  }}
+                  className="text-[10px] text-emerald-500 font-bold uppercase tracking-widest hover:text-emerald-400 transition-colors text-left"
+                >
+                  Subsciription
+                </button>
               </div>
             </div>
-            <ChevronDown className="w-4 h-4 text-gray-400" />
+            <ChevronDown className="w-4 h-4 text-gray-400 shrink-0" />
           </div>
         </div>
       </aside>

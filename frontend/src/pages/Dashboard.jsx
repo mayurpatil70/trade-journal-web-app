@@ -1,3 +1,4 @@
+// frontend/src/pages/Dashboard.jsx
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
@@ -5,30 +6,12 @@ import {
   LayoutDashboard,
   TrendingUp,
   Target,
+  Calendar,
   PlusCircle,
   ChevronRight,
   Loader2,
-  Calendar,
-  BookOpen
+  Globe,
 } from "lucide-react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -56,7 +39,6 @@ export default function Dashboard() {
     fetchTrades();
   }, [navigate]);
 
-  // Calculations
   const totalTrades = trades.length;
   const wins = trades.filter((t) => t.result?.toLowerCase() === "win").length;
   const losses = trades.filter(
@@ -72,174 +54,217 @@ export default function Dashboard() {
   );
   const winRate = totalTrades > 0 ? (wins / totalTrades) * 100 : 0;
 
-  const getResultBadge = (result) => {
+  const getResultPill = (result) => {
     const res = result?.toLowerCase();
     if (res === "win")
-      return <Badge className="bg-emerald-500/15 text-emerald-600 hover:bg-emerald-500/25 dark:text-emerald-400">WIN</Badge>;
+      return "bg-[#e6f4ea] dark:bg-[#0d3429] text-[#137333] dark:text-[#36d99d] border-[#137333]/30 dark:border-[#36d99d]/30";
     if (res === "loss")
-      return <Badge className="bg-destructive/15 text-destructive hover:bg-destructive/25 dark:text-red-400">LOSS</Badge>;
-    return <Badge className="bg-amber-500/15 text-amber-600 hover:bg-amber-500/25 dark:text-amber-400">BE</Badge>;
+      return "bg-[#fce8e6] dark:bg-[#35151c] text-[#c5221f] dark:text-[#ff7c89] border-[#c5221f]/30 dark:border-[#ff7c89]/30";
+    return "bg-[#fef7e0] dark:bg-[#34280e] text-[#b06000] dark:text-[#f5c65d] border-[#b06000]/30 dark:border-[#f5c65d]/30";
   };
 
   return (
-    <div className="w-full max-w-7xl mx-auto space-y-8 font-sans">
+    <div
+      className="w-full max-w-7xl mx-auto font-sans pb-16 px-4 md:px-8 mt-6 md:mt-8 box-border"
+      style={{ fontFamily: "'Inter', sans-serif" }}
+    >
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-card p-6 rounded-2xl shadow-sm border border-border">
+      <div className="mb-8 md:mb-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
-            <LayoutDashboard className="w-6 h-6" />
+          <div className="w-10 h-10 md:w-12 md:h-12 rounded-[2px] bg-[#2f8df4]/10 flex items-center justify-center border border-[#2f8df4]/20 shrink-0">
+            <LayoutDashboard className="w-5 h-5 md:w-6 md:h-6 text-[#2f8df4]" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold tracking-tight mb-1">
+            <h1 className="text-xl md:text-3xl font-bold text-gray-900 dark:text-white tracking-tight mb-1">
               Dashboard
             </h1>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400">
               Overview of your trading performance and recent activity.
             </p>
           </div>
         </div>
-        <Button onClick={() => navigate("/add-trade")} className="gap-2 rounded-xl h-12 px-6">
-          <PlusCircle className="w-5 h-5" /> Add Trade
-        </Button>
+        <button
+          onClick={() => navigate("/add-trade")}
+          className="px-6 py-3 bg-[#2f8df4] hover:bg-[#2376e8] text-white font-bold rounded-[2px] transition-all shadow-md text-sm flex items-center justify-center gap-2"
+        >
+          <PlusCircle className="w-4 h-4" /> Add Trade
+        </button>
       </div>
 
       {loading ? (
-        <Card className="flex flex-col items-center justify-center h-64 shadow-sm border-border">
-          <Loader2 className="w-8 h-8 text-primary animate-spin mb-4" />
-          <p className="text-muted-foreground text-sm font-medium">
+        <div className="flex flex-col items-center justify-center h-64 bg-white dark:bg-[#121418] border border-gray-200 dark:border-white/5 rounded-[2px]">
+          <Loader2 className="w-8 h-8 text-[#2f8df4] animate-spin mb-3" />
+          <p className="text-gray-500 dark:text-gray-400 text-sm font-medium">
             Loading statistics...
           </p>
-        </Card>
+        </div>
       ) : (
         <>
-          {/* Stat Cards Grid */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-            <Card className="shadow-sm rounded-2xl border-border bg-gradient-to-br from-card to-card/50">
-              <CardHeader className="pb-2">
-                <CardDescription className="font-semibold uppercase tracking-wider text-xs">Total Trades</CardDescription>
-                <CardTitle className="text-4xl">{totalTrades}</CardTitle>
-              </CardHeader>
-            </Card>
+          {/* Stat Cards Grid - Explicitly forced white bg in light mode */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
+            <div className="bg-white dark:bg-[#121418] border border-gray-200 dark:border-white/5 rounded-[2px] p-5 md:p-6 shadow-sm">
+              <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-2">
+                Total Trades
+              </span>
+              <span className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
+                {totalTrades}
+              </span>
+            </div>
 
-            <Card className="shadow-sm rounded-2xl border-border bg-gradient-to-br from-card to-card/50">
-              <CardHeader className="pb-2">
-                <CardDescription className="font-semibold uppercase tracking-wider text-xs">Net R-Multiple</CardDescription>
-                <CardTitle className={`text-4xl ${netR >= 0 ? "text-emerald-500" : "text-destructive"}`}>
-                  {netR >= 0 ? "+" : ""}
-                  {netR.toFixed(2)}R
-                </CardTitle>
-              </CardHeader>
-            </Card>
+            <div className="bg-white dark:bg-[#121418] border border-gray-200 dark:border-white/5 rounded-[2px] p-5 md:p-6 shadow-sm">
+              <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-2">
+                Net R-Multiple
+              </span>
+              <span
+                className={`text-2xl md:text-3xl font-bold ${netR >= 0 ? "text-emerald-600 dark:text-emerald-500" : "text-red-600 dark:text-red-500"}`}
+              >
+                {netR >= 0 ? "+" : ""}
+                {netR.toFixed(2)}R
+              </span>
+            </div>
 
-            <Card className="shadow-sm rounded-2xl border-border bg-gradient-to-br from-card to-card/50">
-              <CardHeader className="pb-2">
-                <CardDescription className="font-semibold uppercase tracking-wider text-xs">Win Rate</CardDescription>
-                <CardTitle className="text-4xl">{winRate.toFixed(1)}%</CardTitle>
-              </CardHeader>
-            </Card>
+            <div className="bg-white dark:bg-[#121418] border border-gray-200 dark:border-white/5 rounded-[2px] p-5 md:p-6 shadow-sm">
+              <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-2">
+                Win Rate
+              </span>
+              <span className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
+                {winRate.toFixed(1)}%
+              </span>
+            </div>
 
-            <Card className="shadow-sm rounded-2xl border-border bg-gradient-to-br from-card to-card/50">
-              <CardHeader className="pb-2">
-                <CardDescription className="font-semibold uppercase tracking-wider text-xs">W / L / BE</CardDescription>
-                <CardTitle className="text-4xl">{wins} / {losses} / {breakEvens}</CardTitle>
-              </CardHeader>
-            </Card>
+            <div className="bg-white dark:bg-[#121418] border border-gray-200 dark:border-white/5 rounded-[2px] p-5 md:p-6 shadow-sm">
+              <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-2">
+                W / L / BE
+              </span>
+              <span className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
+                {wins} / {losses} / {breakEvens}
+              </span>
+            </div>
           </div>
 
-          {/* Recent Trades & Quick Actions Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Recent Trades Table */}
-            <Card className="lg:col-span-2 shadow-sm rounded-2xl border-border flex flex-col">
-              <CardHeader className="flex flex-row items-center justify-between pb-2 border-b border-border/50">
-                <div className="flex items-center gap-2">
-                  <Target className="w-5 h-5 text-primary" />
-                  <CardTitle className="text-lg">Recent Trades</CardTitle>
-                </div>
-                <Button variant="ghost" size="sm" onClick={() => navigate("/trades")} className="text-primary hover:text-primary hover:bg-primary/10 gap-1 rounded-lg">
+            <div className="lg:col-span-2 bg-white dark:bg-[#121418] border border-gray-200 dark:border-white/5 rounded-[2px] p-6 shadow-sm">
+              <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-200 dark:border-white/5">
+                <h3 className="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                  <Target className="w-5 h-5 text-[#2f8df4]" /> Recent Trades
+                </h3>
+                <button
+                  onClick={() => navigate("/trades")}
+                  className="text-xs font-bold text-[#2f8df4] hover:underline flex items-center gap-1"
+                >
                   View All <ChevronRight className="w-4 h-4" />
-                </Button>
-              </CardHeader>
-              <CardContent className="p-0 flex-1">
-                {trades.length === 0 ? (
-                  <div className="py-12 text-center text-muted-foreground text-sm">
-                    No trades recorded yet. Click "Add Trade" to start your journal!
-                  </div>
-                ) : (
-                  <Table>
-                    <TableHeader className="bg-muted/30">
-                      <TableRow className="hover:bg-transparent">
-                        <TableHead className="font-semibold">Date</TableHead>
-                        <TableHead className="font-semibold">Asset</TableHead>
-                        <TableHead className="font-semibold">Setup</TableHead>
-                        <TableHead className="font-semibold">Result</TableHead>
-                        <TableHead className="font-semibold text-right">R</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
+                </button>
+              </div>
+
+              {trades.length === 0 ? (
+                <div className="py-12 text-center text-gray-500 text-sm">
+                  No trades recorded yet. Click "Add Trade" to start your
+                  journal!
+                </div>
+              ) : (
+                <div className="overflow-x-auto scrollbar-hide">
+                  <table className="w-full text-left border-collapse whitespace-nowrap">
+                    <thead>
+                      <tr className="text-[10px] text-gray-500 uppercase tracking-widest border-b border-gray-200 dark:border-white/5">
+                        <th className="pb-3 px-3 font-bold">Date</th>
+                        <th className="pb-3 px-3 font-bold">Asset</th>
+                        <th className="pb-3 px-3 font-bold">Setup</th>
+                        <th className="pb-3 px-3 font-bold">Result</th>
+                        <th className="pb-3 px-3 font-bold text-right">R</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100 dark:divide-white/5">
                       {trades.slice(0, 5).map((t, i) => {
                         const r = parseFloat(t.r_multiple || 0);
                         return (
-                          <TableRow
+                          <tr
                             key={i}
                             onClick={() => navigate("/trades")}
-                            className="cursor-pointer transition-colors hover:bg-muted/50"
+                            className="hover:bg-gray-50 dark:hover:bg-white/[0.02] cursor-pointer transition-colors"
                           >
-                            <TableCell className="text-muted-foreground font-medium">{t.date}</TableCell>
-                            <TableCell className="font-bold">{t.asset}</TableCell>
-                            <TableCell className="text-muted-foreground">{t.setup}</TableCell>
-                            <TableCell>{getResultBadge(t.result)}</TableCell>
-                            <TableCell className={`text-right font-bold ${r >= 0 ? "text-emerald-500" : "text-destructive"}`}>
+                            <td className="py-3 px-3 text-xs text-gray-600 dark:text-gray-300 font-medium">
+                              {t.date}
+                            </td>
+                            <td className="py-3 px-3 text-xs font-bold text-gray-900 dark:text-white">
+                              {t.asset}
+                            </td>
+                            <td className="py-3 px-3 text-xs text-gray-600 dark:text-gray-300">
+                              {t.setup}
+                            </td>
+                            <td className="py-3 px-3">
+                              <span
+                                className={`px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest rounded-[2px] border ${getResultPill(t.result)}`}
+                              >
+                                {t.result}
+                              </span>
+                            </td>
+                            <td
+                              className={`py-3 px-3 text-right text-xs font-bold ${r >= 0 ? "text-emerald-600 dark:text-emerald-500" : "text-red-600 dark:text-red-500"}`}
+                            >
                               {r >= 0 ? "+" : ""}
                               {r.toFixed(2)}R
-                            </TableCell>
-                          </TableRow>
+                            </td>
+                          </tr>
                         );
                       })}
-                    </TableBody>
-                  </Table>
-                )}
-              </CardContent>
-            </Card>
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
 
             {/* Quick Actions Panel */}
-            <Card className="shadow-sm rounded-2xl border-border flex flex-col justify-between overflow-hidden">
-              <CardHeader className="pb-4 border-b border-border/50">
-                <CardTitle className="text-lg">Quick Actions</CardTitle>
-              </CardHeader>
-              <CardContent className="p-4 space-y-3">
-                <Button variant="outline" className="w-full justify-between h-14 rounded-xl border-border/50 hover:bg-muted/50 shadow-sm" onClick={() => navigate("/add-trade")}>
-                  <div className="flex items-center gap-3">
-                    <PlusCircle className="w-5 h-5 text-primary" />
-                    <span>Record New Trade</span>
-                  </div>
-                  <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                </Button>
-                <Button variant="outline" className="w-full justify-between h-14 rounded-xl border-border/50 hover:bg-muted/50 shadow-sm" onClick={() => navigate("/calendar")}>
-                  <div className="flex items-center gap-3">
-                    <Calendar className="w-5 h-5 text-primary" />
-                    <span>Economic Calendar</span>
-                  </div>
-                  <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                </Button>
-                <Button variant="outline" className="w-full justify-between h-14 rounded-xl border-border/50 hover:bg-muted/50 shadow-sm" onClick={() => navigate("/trades")}>
-                  <div className="flex items-center gap-3">
-                    <BookOpen className="w-5 h-5 text-primary" />
-                    <span>View Past Trades</span>
-                  </div>
-                  <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                </Button>
-              </CardContent>
+            <div className="bg-white dark:bg-[#121418] border border-gray-200 dark:border-white/5 rounded-[2px] p-6 shadow-sm flex flex-col justify-between">
+              <div>
+                <h3 className="text-base font-bold text-gray-900 dark:text-white mb-6 pb-4 border-b border-gray-200 dark:border-white/5">
+                  Quick Actions
+                </h3>
+                <div className="space-y-3">
+                  <button
+                    onClick={() => navigate("/add-trade")}
+                    className="w-full p-4 rounded-[2px] bg-gray-50 dark:bg-[#1a1d24] hover:bg-gray-100 dark:hover:bg-white/5 border border-gray-200 dark:border-white/5 text-left font-bold text-sm text-gray-900 dark:text-white flex items-center justify-between transition-colors"
+                  >
+                    <span className="flex items-center gap-2">
+                      <PlusCircle className="w-4 h-4 text-[#2f8df4]" /> Record
+                      New Trade
+                    </span>
+                    <ChevronRight className="w-4 h-4 text-gray-400" />
+                  </button>
+                  {/* Fixed Route to /news */}
+                  <button
+                    onClick={() => navigate("/news")}
+                    className="w-full p-4 rounded-[2px] bg-gray-50 dark:bg-[#1a1d24] hover:bg-gray-100 dark:hover:bg-white/5 border border-gray-200 dark:border-white/5 text-left font-bold text-sm text-gray-900 dark:text-white flex items-center justify-between transition-colors"
+                  >
+                    <span className="flex items-center gap-2">
+                      <Globe className="w-4 h-4 text-[#ffb84d]" /> Economic
+                      Calendar
+                    </span>
+                    <ChevronRight className="w-4 h-4 text-gray-400" />
+                  </button>
+                  <button
+                    onClick={() => navigate("/trades")}
+                    className="w-full p-4 rounded-[2px] bg-gray-50 dark:bg-[#1a1d24] hover:bg-gray-100 dark:hover:bg-white/5 border border-gray-200 dark:border-white/5 text-left font-bold text-sm text-gray-900 dark:text-white flex items-center justify-between transition-colors"
+                  >
+                    <span className="flex items-center gap-2">
+                      <List className="w-4 h-4 text-[#21d4a3]" /> View Past
+                      Trades
+                    </span>
+                    <ChevronRight className="w-4 h-4 text-gray-400" />
+                  </button>
+                </div>
+              </div>
 
-              <div className="p-4 bg-primary/5 border-t border-border/50">
-                <p className="text-[10px] font-bold text-primary uppercase tracking-widest mb-1">
+              <div className="mt-8 p-4 bg-gray-50 dark:bg-[#1a1d24] border border-gray-200 dark:border-white/5 rounded-[2px]">
+                <p className="text-[10px] font-bold text-[#2f8df4] uppercase tracking-widest mb-1">
                   Pro Tip
                 </p>
-                <p className="text-xs text-muted-foreground leading-relaxed">
+                <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
                   Consistent journaling with psychology tracking leads to
                   sustainable edge. Log your emotional state every time!
                 </p>
               </div>
-            </Card>
+            </div>
           </div>
         </>
       )}

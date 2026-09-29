@@ -14,7 +14,6 @@ export const generateNewsInsight = async (req, res) => {
         .json({ success: false, error: "Event data is required." });
     }
 
-    // Construct the prompt for Gemini
     const prompt = `
       You are an elite institutional forex trader and macroeconomic analyst. 
       Analyze the following economic calendar event and provide a short, punchy directional insight (max 3-4 sentences).
@@ -33,7 +32,6 @@ export const generateNewsInsight = async (req, res) => {
       Keep the tone highly professional, objective, and data-driven. Do not give financial advice. Format the response nicely.
     `;
 
-    // Call the gemini-2.5-flash model
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
       contents: prompt,
@@ -45,5 +43,52 @@ export const generateNewsInsight = async (req, res) => {
     res
       .status(500)
       .json({ success: false, error: "Failed to generate AI analysis." });
+  }
+};
+
+// NEW: Vision API for Chart Images
+export const analyzeChart = async (req, res) => {
+  try {
+    // 1. Verify Multer successfully caught the image file
+    if (!req.file) {
+      return res.status(400).json({ error: "No image file provided." });
+    }
+
+    // 2. Extract buffer and mimeType for Gemini
+    const base64Image = req.file.buffer.toString("base64");
+    const mimeType = req.file.mimetype;
+
+    // 3. Construct the Technical Analysis Prompt
+    const prompt = `
+      You are an expert institutional technical analyst. 
+      Review this trading chart screenshot and provide a structured technical breakdown.
+      Identify the following if visible:
+      1. Overall Trend (Bullish, Bearish, or Ranging)
+      2. Key Support/Resistance levels or Supply/Demand zones
+      3. Notable Chart Patterns or Candlestick formations
+      4. A brief, objective summary of what the price action suggests.
+      
+      Keep it highly professional, concise, and do not give direct financial advice. Format it beautifully with line breaks.
+    `;
+
+    // 4. Send to Gemini (gemini-2.5-flash natively supports vision/images)
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: [
+        prompt,
+        {
+          inlineData: {
+            data: base64Image,
+            mimeType: mimeType,
+          },
+        },
+      ],
+    });
+
+    // 5. Return the insight to the React frontend
+    res.status(200).json({ success: true, insight: response.text });
+  } catch (error) {
+    console.error("Gemini Vision Error:", error);
+    res.status(500).json({ error: "Failed to analyze chart image." });
   }
 };

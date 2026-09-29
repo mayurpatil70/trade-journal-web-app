@@ -1,13 +1,16 @@
 // frontend/src/pages/Profile.jsx
+import { useState } from "react";
 import {
   User,
   Lock,
   UploadCloud,
   MessageSquare,
   ShieldCheck,
+  CheckCircle,
+  Loader2,
 } from "lucide-react";
+import api from "../api/axios";
 
-// Custom SVG to prevent Vercel build errors with older lucide-react versions
 const InstagramIcon = ({ className }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -26,8 +29,38 @@ const InstagramIcon = ({ className }) => (
 );
 
 export default function Profile() {
+  const [aadhaarFront, setAadhaarFront] = useState(null);
+  const [aadhaarBack, setAadhaarBack] = useState(null);
+  const [isUploading, setIsUploading] = useState(false);
+
+  const handleKycUpload = async () => {
+    if (!aadhaarFront || !aadhaarBack) {
+      return alert("Please upload both the Front and Back of your document.");
+    }
+
+    setIsUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("userId", localStorage.getItem("userId"));
+      formData.append("documents", aadhaarFront);
+      formData.append("documents", aadhaarBack);
+
+      // You will need to create this route in your backend later to save to Cloudinary
+      await api.post("/api/auth/kyc", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      alert("KYC Documents submitted successfully for verification.");
+    } catch (error) {
+      console.error(error);
+      alert("Upload failed. Ensure backend /api/auth/kyc route is configured.");
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   const inputClass =
-    "appearance-none box-border w-full min-h-[52px] block bg-gray-50 dark:bg-[#0b131d] border border-gray-300 dark:border-[#1f2c3b] rounded-[2px] px-4 py-3 !text-[#2f8df4] [-webkit-text-fill-color:#2f8df4] font-bold focus:border-[#2f8df4] outline-none text-sm text-center [text-align-last:center]";
+    "appearance-none box-border w-full min-h-[52px] block bg-gray-50 dark:bg-[#0b131d] border border-gray-300 dark:border-[#1f2c3b] rounded-[2px] px-4 py-3 !text-[#2f8df4] [-webkit-text-fill-color:#2f8df4] font-bold focus:border-[#2f8df4] outline-none text-sm text-center [text-align-last:center] placeholder-gray-400";
 
   return (
     <div
@@ -61,7 +94,7 @@ export default function Profile() {
               </label>
               <input
                 type="text"
-                defaultValue="Mayur Patil"
+                placeholder="Enter full name"
                 className={inputClass}
               />
             </div>
@@ -71,7 +104,7 @@ export default function Profile() {
               </label>
               <input
                 type="text"
-                defaultValue="mayurtrades"
+                placeholder="Choose a username"
                 className={inputClass}
               />
             </div>
@@ -81,7 +114,7 @@ export default function Profile() {
               </label>
               <input
                 type="email"
-                defaultValue="mayur@example.com"
+                defaultValue={localStorage.getItem("userEmail") || ""}
                 className={inputClass}
                 disabled
               />
@@ -90,65 +123,17 @@ export default function Profile() {
               <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-1">
                 Mobile Number
               </label>
-              <input
-                type="tel"
-                placeholder="+91 9876543210"
-                className={inputClass}
-              />
+              <input type="tel" placeholder="+91" className={inputClass} />
             </div>
           </div>
           <div className="mt-6 flex justify-end">
-            <button className="px-8 py-3 bg-[#2f8df4] hover:bg-[#2376e8] text-white font-bold rounded-[2px] text-sm">
+            <button className="px-8 py-3 bg-[#2f8df4] hover:bg-[#2376e8] text-white font-bold rounded-[2px] text-sm shadow-sm transition-colors">
               Save Profile
             </button>
           </div>
         </div>
 
-        {/* Security / Password Reset */}
-        <div className="bg-white dark:bg-[#121418] border border-gray-200 dark:border-white/5 rounded-[2px] p-6 md:p-8 shadow-sm">
-          <h2 className="text-base font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2 pb-4 border-b border-gray-100 dark:border-white/5">
-            <Lock className="w-5 h-5 text-[#f59e0b]" /> Password Reset
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div>
-              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-1">
-                Current Password
-              </label>
-              <input
-                type="password"
-                placeholder="••••••••"
-                className={inputClass}
-              />
-            </div>
-            <div>
-              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-1">
-                New Password
-              </label>
-              <input
-                type="password"
-                placeholder="••••••••"
-                className={inputClass}
-              />
-            </div>
-            <div>
-              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-1">
-                Confirm Password
-              </label>
-              <input
-                type="password"
-                placeholder="••••••••"
-                className={inputClass}
-              />
-            </div>
-          </div>
-          <div className="mt-6 flex justify-end">
-            <button className="px-8 py-3 bg-gray-100 dark:bg-white/5 text-gray-900 dark:text-white font-bold border border-gray-200 dark:border-white/10 rounded-[2px] text-sm hover:bg-gray-200 dark:hover:bg-white/10">
-              Update Password
-            </button>
-          </div>
-        </div>
-
-        {/* KYC Verification (Aadhaar) */}
+        {/* KYC Verification (Split Front/Back) */}
         <div className="bg-white dark:bg-[#121418] border border-gray-200 dark:border-white/5 rounded-[2px] p-6 md:p-8 shadow-sm">
           <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-100 dark:border-white/5">
             <h2 className="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
@@ -160,20 +145,67 @@ export default function Profile() {
             </span>
           </div>
           <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
-            Please upload a clear copy of your Aadhaar Card (Front and Back) for
+            Please upload a clear copy of your Document (Front and Back) for
             account verification.
           </p>
 
-          <label className="w-full border-2 border-dashed border-gray-300 dark:border-[#1f2c3b] rounded-[2px] p-10 flex flex-col items-center justify-center text-center hover:bg-gray-50 dark:hover:bg-white/[0.02] hover:border-[#2f8df4] dark:hover:border-[#2f8df4] transition-all cursor-pointer">
-            <UploadCloud className="w-10 h-10 text-[#2f8df4] opacity-80 mb-4" />
-            <p className="text-sm font-bold text-gray-900 dark:text-white mb-1">
-              Click to upload Aadhaar document
-            </p>
-            <p className="text-xs text-gray-500">
-              Supports PDF, JPG, PNG (Max 5MB)
-            </p>
-            <input type="file" className="hidden" accept="image/*,.pdf" />
-          </label>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* FRONT UPLOAD */}
+            <label
+              className={`w-full border-2 border-dashed rounded-[2px] p-8 flex flex-col items-center justify-center text-center transition-all cursor-pointer ${aadhaarFront ? "border-[#21d4a3] bg-[#21d4a3]/5" : "border-gray-300 dark:border-[#1f2c3b] hover:border-[#2f8df4] hover:bg-gray-50 dark:hover:bg-white/[0.02]"}`}
+            >
+              {aadhaarFront ? (
+                <CheckCircle className="w-8 h-8 text-[#21d4a3] mb-3" />
+              ) : (
+                <UploadCloud className="w-8 h-8 text-[#2f8df4] opacity-80 mb-3" />
+              )}
+              <p className="text-sm font-bold text-gray-900 dark:text-white mb-1">
+                {aadhaarFront ? aadhaarFront.name : "Upload Front Side"}
+              </p>
+              <input
+                type="file"
+                className="hidden"
+                accept="image/*,.pdf"
+                onChange={(e) => setAadhaarFront(e.target.files[0])}
+              />
+            </label>
+
+            {/* BACK UPLOAD */}
+            <label
+              className={`w-full border-2 border-dashed rounded-[2px] p-8 flex flex-col items-center justify-center text-center transition-all cursor-pointer ${aadhaarBack ? "border-[#21d4a3] bg-[#21d4a3]/5" : "border-gray-300 dark:border-[#1f2c3b] hover:border-[#2f8df4] hover:bg-gray-50 dark:hover:bg-white/[0.02]"}`}
+            >
+              {aadhaarBack ? (
+                <CheckCircle className="w-8 h-8 text-[#21d4a3] mb-3" />
+              ) : (
+                <UploadCloud className="w-8 h-8 text-[#2f8df4] opacity-80 mb-3" />
+              )}
+              <p className="text-sm font-bold text-gray-900 dark:text-white mb-1">
+                {aadhaarBack ? aadhaarBack.name : "Upload Back Side"}
+              </p>
+              <input
+                type="file"
+                className="hidden"
+                accept="image/*,.pdf"
+                onChange={(e) => setAadhaarBack(e.target.files[0])}
+              />
+            </label>
+          </div>
+
+          <div className="mt-6 flex justify-end">
+            <button
+              onClick={handleKycUpload}
+              disabled={isUploading || !aadhaarFront || !aadhaarBack}
+              className="px-8 py-3 bg-[#2f8df4] hover:bg-[#2376e8] text-white font-bold rounded-[2px] text-sm shadow-sm transition-colors disabled:opacity-50 flex items-center gap-2"
+            >
+              {isUploading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" /> Uploading...
+                </>
+              ) : (
+                "Submit Documents"
+              )}
+            </button>
+          </div>
         </div>
 
         {/* Community & Socials */}
@@ -194,7 +226,6 @@ export default function Profile() {
             </div>
             <MessageSquare className="w-6 h-6 text-white group-hover:scale-110 transition-transform" />
           </a>
-
           <a
             href="https://www.instagram.com/forexnotes.in?stkn=MTMxdWpkOWl3bTY3&utm_source=qr"
             target="_blank"

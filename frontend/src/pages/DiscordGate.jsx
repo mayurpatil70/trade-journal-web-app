@@ -1,11 +1,48 @@
 // frontend/src/pages/DiscordGate.jsx
-import { useNavigate } from "react-router-dom";
-import { MessageSquare, ArrowRight, Shield } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
+import { MessageSquare, ArrowRight, Shield, AlertTriangle } from "lucide-react";
 
 export default function DiscordGate() {
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const [errorMessage, setErrorMessage] = useState("");
 
   const DISCORD_INVITE_LINK = "https://discord.gg/Ajaw3AjfWE";
+
+  // Check for error parameters redirected from your backend controller
+  useEffect(() => {
+    const error = searchParams.get("error");
+    if (error === "not_in_server") {
+      setErrorMessage(
+        "Access Denied: You are not a member of our Discord server yet!",
+      );
+    } else if (error === "auth_failed" || error === "server_error") {
+      setErrorMessage("Discord authentication failed. Please try again.");
+    }
+  }, [searchParams]);
+
+  const handleDiscordLogin = () => {
+    const userId = localStorage.getItem("userId");
+    if (!userId) {
+      alert("Session missing. Please login again.");
+      navigate("/login");
+      return;
+    }
+
+    // Replace with your actual Discord App Client ID from Discord Developer Portal
+    const CLIENT_ID = "YOUR_DISCORD_CLIENT_ID";
+
+    // Must match the Redirect URI registered in your Discord Developer Portal & Backend .env
+    const REDIRECT_URI = encodeURIComponent(
+      "http://localhost:3000/api/discord/callback",
+    );
+
+    // Passing userId inside 'state' so backend knows which user to update in Supabase
+    const discordOAuthUrl = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=identify%20guilds&state=${userId}`;
+
+    window.location.href = discordOAuthUrl;
+  };
 
   return (
     <div
@@ -21,10 +58,17 @@ export default function DiscordGate() {
           Join the Community
         </h1>
 
-        <p className="text-sm text-gray-400 mb-8 leading-relaxed px-4">
+        <p className="text-sm text-gray-400 mb-6 leading-relaxed px-4">
           Trade Journey is better together. Join our official Discord server to
           get support, share setups, and talk directly with other traders.
         </p>
+
+        {errorMessage && (
+          <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-xs font-bold flex items-center justify-center gap-2">
+            <AlertTriangle className="w-4 h-4 shrink-0" />
+            <span>{errorMessage}</span>
+          </div>
+        )}
 
         <div className="space-y-4 w-full flex flex-col items-center">
           <a
@@ -33,14 +77,15 @@ export default function DiscordGate() {
             rel="noopener noreferrer"
             className="w-full py-4 px-6 bg-[#5865F2] hover:bg-[#4752C4] text-white font-bold rounded-2xl shadow-lg transition-all flex justify-center items-center gap-2 text-sm"
           >
-            Join Discord Server
+            1. Join Discord Server
           </a>
 
           <button
-            onClick={() => navigate("/dashboard")}
+            onClick={handleDiscordLogin}
             className="w-full py-4 px-6 bg-[#1a1b20] hover:bg-[#23252b] text-white border border-white/10 font-bold rounded-2xl transition-all flex justify-center items-center gap-2 text-sm shadow-sm"
           >
-            I've joined, take me to Dashboard <ArrowRight className="w-4 h-4" />
+            2. I've joined, Verify & Take me to Dashboard{" "}
+            <ArrowRight className="w-4 h-4" />
           </button>
         </div>
 
