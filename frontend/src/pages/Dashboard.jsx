@@ -11,6 +11,7 @@ import {
   ChevronRight,
   Loader2,
   Globe,
+  List, // <--- FIXED: Added List import here
 } from "lucide-react";
 
 export default function Dashboard() {
@@ -100,7 +101,7 @@ export default function Dashboard() {
         </div>
       ) : (
         <>
-          {/* Stat Cards Grid - Explicitly forced white bg in light mode */}
+          {/* Stat Cards Grid */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
             <div className="bg-white dark:bg-[#121418] border border-gray-200 dark:border-white/5 rounded-[2px] p-5 md:p-6 shadow-sm">
               <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-2">
@@ -231,7 +232,6 @@ export default function Dashboard() {
                     </span>
                     <ChevronRight className="w-4 h-4 text-gray-400" />
                   </button>
-                  {/* Fixed Route to /news */}
                   <button
                     onClick={() => navigate("/news")}
                     className="w-full p-4 rounded-[2px] bg-gray-50 dark:bg-[#1a1d24] hover:bg-gray-100 dark:hover:bg-white/5 border border-gray-200 dark:border-white/5 text-left font-bold text-sm text-gray-900 dark:text-white flex items-center justify-between transition-colors"
