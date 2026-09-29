@@ -19,7 +19,7 @@ export default function PreTradeGate() {
   const [chatHistory, setChatHistory] = useState([
     {
       sender: "ai",
-      text: "Hey trader. Before you click buy or sell, take a breath. What is your emotional state right now (1-10)? Is this setup in your playbook, or are you revenge trading?",
+      text: "Hey trader. Before you click buy or sell, take a breath. What is your emotional state right now ? Is this setup in your playbook, or are you revenge trading?",
     },
   ]);
 
@@ -96,7 +96,7 @@ export default function PreTradeGate() {
                   Trading Psychology Coach
                 </h3>
                 <p className="text-white/80 text-[10px] uppercase tracking-wider">
-                  Powered by Gemini
+                  Powered by FN
                 </p>
               </div>
             </div>
@@ -172,7 +172,7 @@ export default function PreTradeGate() {
           onClick={() => setIsOpen(true)}
         >
           <div className="absolute -top-12 bg-white dark:bg-[#1a1d24] text-gray-900 dark:text-white text-xs font-bold px-4 py-2 rounded-[4px] shadow-lg border border-gray-100 dark:border-white/10 whitespace-nowrap transform transition-transform group-hover:-translate-y-1">
-            Call me before Trade
+            Coach isLIVE
             <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[8px] border-t-white dark:border-t-[#1a1d24]"></div>
           </div>
 

@@ -20,14 +20,13 @@ export default function Settings() {
   const [deleting, setDeleting] = useState(false);
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "dark");
 
-  // History State
   const [historyTrades, setHistoryTrades] = useState([]);
   const [loadingHistory, setLoadingHistory] = useState(true);
 
-  // Fetch Trade History for the integrated view
   useEffect(() => {
     const fetchHistory = async () => {
-      const userId = localStorage.getItem("userId");
+      const userId =
+        localStorage.getItem("userId") || localStorage.getItem("userEmail");
       if (!userId) return;
       try {
         const response = await api.get(`/api/trades?userId=${userId}`);
@@ -46,7 +45,6 @@ export default function Settings() {
   const handleThemeChange = (newTheme) => {
     setTheme(newTheme);
     localStorage.setItem("theme", newTheme);
-    // Force DOM update immediately so it doesn't wait for a refresh
     if (newTheme === "dark") {
       document.documentElement.classList.add("dark");
     } else {
@@ -55,7 +53,8 @@ export default function Settings() {
   };
 
   const handleExport = async (format) => {
-    const userId = localStorage.getItem("userId");
+    const userId =
+      localStorage.getItem("userId") || localStorage.getItem("userEmail");
     if (!userId) return alert("User session not found.");
 
     setExporting(format);
@@ -63,7 +62,7 @@ export default function Settings() {
       const response = await api.get(
         `/api/trades/export?userId=${userId}&format=${format}`,
         {
-          responseType: format === "csv" ? "blob" : "blob",
+          responseType: "blob",
         },
       );
 
@@ -90,7 +89,8 @@ export default function Settings() {
     )
       return;
 
-    const userId = localStorage.getItem("userId");
+    const userId =
+      localStorage.getItem("userId") || localStorage.getItem("userEmail");
     setDeleting(true);
     try {
       await api.delete(`/api/trades/all?userId=${userId}`);
@@ -118,7 +118,7 @@ export default function Settings() {
             Settings & History
           </h1>
           <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400">
-            Manage workspace appearance, exports, and review your journal logs.
+            Manage appearance, exports, and review your journal logs.
           </p>
         </div>
       </div>
@@ -170,36 +170,6 @@ export default function Settings() {
                 <span className="text-xs text-[#2f8df4] font-bold">Active</span>
               )}
             </div>
-          </div>
-        </div>
-
-        {/* Export Data */}
-        <div className="bg-white dark:bg-[#121418] border border-gray-200 dark:border-white/5 rounded-[2px] p-6 md:p-8 shadow-sm">
-          <h2 className="text-base font-bold text-gray-900 dark:text-white mb-2">
-            Export Journal Data
-          </h2>
-          <p className="text-xs text-gray-500 mb-6">
-            Download a complete copy of your trading journal logs, analyses, and
-            metrics.
-          </p>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            {["csv", "excel", "doc", "pdf"].map((fmt) => (
-              <button
-                key={fmt}
-                onClick={() => handleExport(fmt)}
-                disabled={exporting === fmt}
-                className="p-4 border border-gray-200 dark:border-white/5 rounded-[2px] hover:border-[#2f8df4] transition-all flex flex-col items-center justify-center text-center gap-2 bg-gray-50 dark:bg-white/[0.02]"
-              >
-                {exporting === fmt ? (
-                  <Loader2 className="w-5 h-5 text-[#2f8df4] animate-spin" />
-                ) : (
-                  <Download className="w-5 h-5 text-[#2f8df4]" />
-                )}
-                <span className="text-xs font-bold text-gray-900 dark:text-white uppercase">
-                  Export to {fmt}
-                </span>
-              </button>
-            ))}
           </div>
         </div>
 
@@ -287,7 +257,7 @@ export default function Settings() {
                             <TrendingUp className="w-4 h-4" />
                           ) : (
                             <TrendingDown className="w-4 h-4" />
-                          )}
+                          )}{" "}
                           {trade.direction}
                         </span>
                       </td>
@@ -311,6 +281,36 @@ export default function Settings() {
                 </tbody>
               </table>
             )}
+          </div>
+        </div>
+
+        {/* Export Data (Moved to bottom) */}
+        <div className="bg-white dark:bg-[#121418] border border-gray-200 dark:border-white/5 rounded-[2px] p-6 md:p-8 shadow-sm">
+          <h2 className="text-base font-bold text-gray-900 dark:text-white mb-2">
+            Export Journal Data
+          </h2>
+          <p className="text-xs text-gray-500 mb-6">
+            Download a complete copy of your trading journal logs, analyses, and
+            metrics.
+          </p>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            {["csv", "excel", "doc", "pdf"].map((fmt) => (
+              <button
+                key={fmt}
+                onClick={() => handleExport(fmt)}
+                disabled={exporting === fmt}
+                className="p-4 border border-gray-200 dark:border-white/5 rounded-[2px] hover:border-[#2f8df4] transition-all flex flex-col items-center justify-center text-center gap-2 bg-gray-50 dark:bg-white/[0.02]"
+              >
+                {exporting === fmt ? (
+                  <Loader2 className="w-5 h-5 text-[#2f8df4] animate-spin" />
+                ) : (
+                  <Download className="w-5 h-5 text-[#2f8df4]" />
+                )}
+                <span className="text-xs font-bold text-gray-900 dark:text-white uppercase">
+                  Export to {fmt}
+                </span>
+              </button>
+            ))}
           </div>
         </div>
       </div>

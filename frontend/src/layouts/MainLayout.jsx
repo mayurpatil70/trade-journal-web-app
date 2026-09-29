@@ -1,5 +1,5 @@
 // frontend/src/layouts/MainLayout.jsx
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
@@ -17,13 +17,43 @@ import {
   Activity,
   ChevronDown,
   BrainCircuit,
+  User,
 } from "lucide-react";
+
+// FIX: Extracted outside to prevent React Hook Error 310 (Black Screen Crash)
+const NavItem = ({ to, icon: Icon, label, currentPath, onClick }) => {
+  const isActive = currentPath.includes(to);
+  return (
+    <Link
+      to={to}
+      onClick={onClick}
+      className={`flex items-center gap-3 px-4 py-2.5 rounded-[2px] transition-colors font-medium text-sm ${
+        isActive
+          ? "bg-[#2f8df4]/10 text-[#2f8df4] border border-[#2f8df4]/20"
+          : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 border border-transparent"
+      }`}
+    >
+      <Icon className="w-4 h-4 shrink-0" />
+      {label}
+    </Link>
+  );
+};
 
 export default function MainLayout() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+
+  // FIX: Enforce Theme Globally on Mount & Route Change
+  useEffect(() => {
+    const theme = localStorage.getItem("theme") || "dark";
+    if (theme === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, [location.pathname]);
 
   const handleLogout = () => {
     localStorage.removeItem("userId");
@@ -35,24 +65,6 @@ export default function MainLayout() {
   const closeMenu = () => {
     setIsMobileMenuOpen(false);
     setIsProfileOpen(false);
-  };
-
-  const NavItem = ({ to, icon: Icon, label }) => {
-    const isActive = location.pathname.includes(to);
-    return (
-      <Link
-        to={to}
-        onClick={closeMenu}
-        className={`flex items-center gap-3 px-4 py-2.5 rounded-[2px] transition-colors font-medium text-sm ${
-          isActive
-            ? "bg-[#2f8df4]/10 text-[#2f8df4] border border-[#2f8df4]/20"
-            : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 border border-transparent"
-        }`}
-      >
-        <Icon className="w-4 h-4 shrink-0" />
-        {label}
-      </Link>
-    );
   };
 
   return (
@@ -82,9 +94,7 @@ export default function MainLayout() {
 
       {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-30 w-64 bg-white dark:bg-[#121418] border-r border-gray-200 dark:border-white/5 transform transition-transform duration-300 ease-in-out flex flex-col ${
-          isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
-        } md:relative md:translate-x-0`}
+        className={`fixed inset-y-0 left-0 z-30 w-64 bg-white dark:bg-[#121418] border-r border-gray-200 dark:border-white/5 transform transition-transform duration-300 ease-in-out flex flex-col ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"} md:relative md:translate-x-0`}
       >
         <div className="h-16 flex items-center gap-3 px-6 border-b border-gray-200 dark:border-white/5 shrink-0 hidden md:flex">
           <Activity className="w-6 h-6 text-[#2f8df4]" />
@@ -103,10 +113,30 @@ export default function MainLayout() {
                 to="/dashboard"
                 icon={LayoutDashboard}
                 label="Dashboard"
+                currentPath={location.pathname}
+                onClick={closeMenu}
               />
-              <NavItem to="/add-trade" icon={PlusCircle} label="Add Trade" />
-              <NavItem to="/trades" icon={List} label="Past Trades" />
-              <NavItem to="/calendar" icon={CalendarIcon} label="Calendar" />
+              <NavItem
+                to="/add-trade"
+                icon={PlusCircle}
+                label="Add Trade"
+                currentPath={location.pathname}
+                onClick={closeMenu}
+              />
+              <NavItem
+                to="/trades"
+                icon={List}
+                label="Past Trades"
+                currentPath={location.pathname}
+                onClick={closeMenu}
+              />
+              <NavItem
+                to="/calendar"
+                icon={CalendarIcon}
+                label="Calendar"
+                currentPath={location.pathname}
+                onClick={closeMenu}
+              />
             </div>
           </div>
 
@@ -115,13 +145,33 @@ export default function MainLayout() {
               Analysis
             </p>
             <div className="space-y-1">
-              <NavItem to="/news" icon={Globe} label="Economic Calendar" />
-              <NavItem to="/accounts" icon={Users} label="Accounts" />
-              <NavItem to="/import" icon={Upload} label="Import Trades" />
+              <NavItem
+                to="/news"
+                icon={Globe}
+                label="Economic Calendar"
+                currentPath={location.pathname}
+                onClick={closeMenu}
+              />
+              <NavItem
+                to="/accounts"
+                icon={Users}
+                label="Accounts"
+                currentPath={location.pathname}
+                onClick={closeMenu}
+              />
+              <NavItem
+                to="/import"
+                icon={Upload}
+                label="Import Trades"
+                currentPath={location.pathname}
+                onClick={closeMenu}
+              />
               <NavItem
                 to="/problems"
                 icon={BrainCircuit}
                 label="Trader Problems"
+                currentPath={location.pathname}
+                onClick={closeMenu}
               />
             </div>
           </div>
@@ -131,8 +181,20 @@ export default function MainLayout() {
               App
             </p>
             <div className="space-y-1">
-              <NavItem to="/settings" icon={Settings} label="Settings" />
-              <NavItem to="/support" icon={Headphones} label="Support" />
+              <NavItem
+                to="/profile"
+                icon={User}
+                label="Profile"
+                currentPath={location.pathname}
+                onClick={closeMenu}
+              />
+              <NavItem
+                to="/settings"
+                icon={Settings}
+                label="Settings"
+                currentPath={location.pathname}
+                onClick={closeMenu}
+              />
             </div>
           </div>
         </nav>
@@ -145,7 +207,7 @@ export default function MainLayout() {
                 onClick={closeMenu}
                 className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
               >
-                <Settings className="w-4 h-4" /> Account Settings
+                <User className="w-4 h-4" /> My Profile
               </Link>
               <button
                 onClick={handleLogout}
@@ -170,15 +232,9 @@ export default function MainLayout() {
                 <p className="text-sm font-bold text-gray-900 dark:text-white leading-tight truncate max-w-[120px]">
                   {localStorage.getItem("userEmail") || "User"}
                 </p>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    alert("Pro Plan features are coming soon! Stay tuned.");
-                  }}
-                  className="text-[10px] text-emerald-500 font-bold uppercase tracking-widest hover:text-emerald-400 transition-colors text-left"
-                >
+                <p className="text-[10px] text-emerald-500 font-bold uppercase tracking-widest text-left">
                   Subscription
-                </button>
+                </p>
               </div>
             </div>
             <ChevronDown className="w-4 h-4 text-gray-400 shrink-0" />
@@ -186,6 +242,7 @@ export default function MainLayout() {
         </div>
       </aside>
 
+      {/* Main Content Area */}
       <main className="flex-1 overflow-y-auto relative pt-16 md:pt-0">
         <Outlet />
       </main>
