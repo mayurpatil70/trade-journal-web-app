@@ -31,7 +31,7 @@ export default function DiscordGate() {
     }
 
     // Replace with your actual Discord App Client ID from Discord Developer Portal
-    const CLIENT_ID = "YOUR_DISCORD_CLIENT_ID";
+    const CLIENT_ID = "1554059949422940201";
 
     // Must match the Redirect URI registered in your Discord Developer Portal & Backend .env
     const REDIRECT_URI = encodeURIComponent(
