@@ -1,236 +1,192 @@
+// frontend/src/layouts/MainLayout.jsx
 import { useState } from "react";
-import { Outlet, NavLink, useNavigate, useLocation } from "react-router-dom";
+import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
   PlusCircle,
-  Globe,
   List,
-  Calendar,
+  Calendar as CalendarIcon,
   BookOpen,
-  Upload,
+  Globe,
   Users,
+  Upload,
   Settings,
-  Palette,
   Headphones,
-  Moon,
-  Sun,
-  Search,
-  ChevronUp,
-  LogOut
+  Menu,
+  X,
+  LogOut,
+  User,
+  Activity,
+  ChevronDown,
 } from "lucide-react";
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarProvider,
-  SidebarTrigger,
-  SidebarFooter,
-  SidebarHeader
-} from "@/components/ui/sidebar";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { useTheme } from "@/components/theme-provider";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-
-const tradingItems = [
-  { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
-  { name: "Add Trade", path: "/add-trade", icon: PlusCircle },
-  { name: "Past Trades", path: "/trades", icon: List },
-  { name: "Calendar", path: "/calendar", icon: Calendar },
-];
-
-const analysisItems = [
-  { name: "Journal History", path: "/history", icon: BookOpen },
-  { name: "Economic Calendar", path: "/news", icon: Globe },
-  { name: "Accounts", path: "/accounts", icon: Users },
-  { name: "Import Trades", path: "/import", icon: Upload },
-];
-
-const appItems = [
-  { name: "Settings", path: "/settings", icon: Settings },
-  { name: "Customize", path: "/customize", icon: Palette },
-  { name: "Support", path: "/support", icon: Headphones },
-];
 
 export default function MainLayout() {
-  const { theme, setTheme } = useTheme();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
 
+  const handleLogout = () => {
+    localStorage.removeItem("userId");
+    localStorage.removeItem("token");
+    navigate("/login");
+  };
+
+  const closeMenu = () => {
+    setIsMobileMenuOpen(false);
+    setIsProfileOpen(false);
+  };
+
+  const NavItem = ({ to, icon: Icon, label }) => {
+    const isActive = location.pathname.includes(to);
+    return (
+      <Link
+        to={to}
+        onClick={closeMenu}
+        className={`flex items-center gap-3 px-4 py-2.5 rounded-[2px] transition-colors font-medium text-sm ${
+          isActive
+            ? "bg-[#2f8df4]/10 text-[#2f8df4] border border-[#2f8df4]/20"
+            : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 border border-transparent"
+        }`}
+      >
+        <Icon className="w-4 h-4 shrink-0" />
+        {label}
+      </Link>
+    );
+  };
+
   return (
-    <SidebarProvider>
-      <div className="flex h-screen w-full overflow-hidden bg-background">
-        <Sidebar className="border-r border-border">
-          <SidebarHeader className="p-4 flex flex-row items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-primary to-primary/60 rounded-xl flex items-center justify-center font-bold text-primary-foreground shadow-md">
-                💲🧠
-              </div>
-              <h1 className="text-base font-bold tracking-tight text-primary">
-                Forex Notes
-              </h1>
-            </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-              className="rounded-full w-8 h-8"
-            >
-              {theme === "light" ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
-            </Button>
-          </SidebarHeader>
-
-          <SidebarContent>
-            <SidebarGroup>
-              <SidebarGroupLabel className="text-xs uppercase tracking-wider text-muted-foreground/70">Trading</SidebarGroupLabel>
-              <SidebarGroupContent>
-                <SidebarMenu>
-                  {tradingItems.map((item) => (
-                    <SidebarMenuItem key={item.name}>
-                      <SidebarMenuButton asChild isActive={location.pathname.includes(item.path)} className="rounded-full">
-                        <NavLink to={item.path} className="flex items-center gap-3 py-5">
-                          <item.icon className="h-5 w-5" />
-                          <span className="font-medium text-sm">{item.name}</span>
-                        </NavLink>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  ))}
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </SidebarGroup>
-
-            <SidebarGroup>
-              <SidebarGroupLabel className="text-xs uppercase tracking-wider text-muted-foreground/70">Analysis</SidebarGroupLabel>
-              <SidebarGroupContent>
-                <SidebarMenu>
-                  {analysisItems.map((item) => (
-                    <SidebarMenuItem key={item.name}>
-                      <SidebarMenuButton asChild isActive={location.pathname.includes(item.path)} className="rounded-full">
-                        <NavLink to={item.path} className="flex items-center gap-3 py-5">
-                          <item.icon className="h-5 w-5" />
-                          <span className="font-medium text-sm">{item.name}</span>
-                        </NavLink>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  ))}
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </SidebarGroup>
-
-            <SidebarGroup>
-              <SidebarGroupLabel className="text-xs uppercase tracking-wider text-muted-foreground/70">App</SidebarGroupLabel>
-              <SidebarGroupContent>
-                <SidebarMenu>
-                  {appItems.map((item) => (
-                    <SidebarMenuItem key={item.name}>
-                      <SidebarMenuButton asChild isActive={location.pathname.includes(item.path)} className="rounded-full">
-                        <NavLink to={item.path} className="flex items-center gap-3 py-5">
-                          <item.icon className="h-5 w-5" />
-                          <span className="font-medium text-sm">{item.name}</span>
-                        </NavLink>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  ))}
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </SidebarGroup>
-          </SidebarContent>
-
-          <SidebarFooter className="p-4">
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <SidebarMenuButton
-                      size="lg"
-                      className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground rounded-full p-2 h-14"
-                    >
-                      <Avatar className="h-10 w-10 rounded-full">
-                        <AvatarFallback className="bg-primary/20 text-primary font-bold">
-                          MP
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="grid flex-1 text-left text-sm leading-tight ml-2">
-                        <span className="truncate font-semibold text-sm">Mayur Patil</span>
-                        <span className="truncate text-xs text-muted-foreground">Pro Plan</span>
-                      </div>
-                      <ChevronUp className="ml-auto size-4 text-muted-foreground" />
-                    </SidebarMenuButton>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent
-                    side="top"
-                    className="w-[--radix-popper-anchor-width] rounded-2xl"
-                  >
-                    <DropdownMenuItem className="rounded-xl">
-                      <Settings className="mr-2 h-4 w-4" />
-                      Account Settings
-                    </DropdownMenuItem>
-                    <DropdownMenuItem className="text-destructive rounded-xl">
-                      <LogOut className="mr-2 h-4 w-4" />
-                      Log out
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarFooter>
-        </Sidebar>
-
-        <div className="flex flex-1 flex-col overflow-hidden w-full">
-          {/* Top Header */}
-          <header className="flex h-16 items-center gap-4 border-b border-border bg-background px-4 lg:px-6 shrink-0 transition-colors">
-            <SidebarTrigger className="text-foreground -ml-2 hover:bg-muted p-2 rounded-full w-10 h-10" />
-            
-            <div className="hidden md:flex items-center relative w-72">
-              <Search className="absolute left-3 w-4 h-4 text-muted-foreground" />
-              <Input placeholder="Search trades, accounts..." className="pl-9 bg-muted/50 border-border/50 rounded-full h-10 focus-visible:ring-primary/20" />
-            </div>
-
-            <div className="ml-auto flex items-center gap-2 sm:gap-4">
-              <Button
-                variant="outline"
-                className="hidden sm:flex rounded-full gap-2 border-border/50 text-muted-foreground hover:text-foreground"
-                onClick={() => navigate("/add-trade")}
-              >
-                <PlusCircle className="w-4 h-4 text-primary" /> Quick Add
-              </Button>
-              <Button
-                className="rounded-full gap-2 shadow-sm"
-                onClick={() => navigate("/add-trade")}
-              >
-                <PlusCircle className="w-4 h-4" /> Add Trade
-              </Button>
-              
-              {/* Mobile theme toggle */}
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-                className="rounded-full md:hidden w-10 h-10"
-              >
-                {theme === "light" ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
-              </Button>
-            </div>
-          </header>
-          
-          <main className="flex-1 overflow-y-auto bg-muted/20 p-4 md:p-8">
-            <div className="max-w-7xl mx-auto w-full">
-               <Outlet />
-            </div>
-          </main>
+    <div
+      className="flex h-screen bg-gray-50 dark:bg-[#0a0a0a] transition-colors duration-200"
+      style={{ fontFamily: "'Inter', sans-serif" }}
+    >
+      {/* Mobile Header */}
+      <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-white dark:bg-[#121418] border-b border-gray-200 dark:border-white/5 flex items-center justify-between px-4 z-40">
+        <div className="flex items-center gap-2">
+          <Activity className="w-6 h-6 text-[#2f8df4]" />
+          <span className="font-bold text-gray-900 dark:text-white text-lg">
+            Forex Notes
+          </span>
         </div>
+        <button
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          className="p-2 text-gray-600 dark:text-gray-300"
+        >
+          {isMobileMenuOpen ? (
+            <X className="w-6 h-6" />
+          ) : (
+            <Menu className="w-6 h-6" />
+          )}
+        </button>
       </div>
-    </SidebarProvider>
+
+      {/* Sidebar */}
+      <aside
+        className={`fixed inset-y-0 left-0 z-30 w-64 bg-white dark:bg-[#121418] border-r border-gray-200 dark:border-white/5 transform transition-transform duration-300 ease-in-out flex flex-col ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"} md:relative md:translate-x-0`}
+      >
+        {/* Logo */}
+        <div className="h-16 flex items-center gap-3 px-6 border-b border-gray-200 dark:border-white/5 shrink-0 hidden md:flex">
+          <Activity className="w-6 h-6 text-[#2f8df4]" />
+          <span className="font-bold text-gray-900 dark:text-white text-xl tracking-tight">
+            Forex Notes
+          </span>
+        </div>
+
+        {/* Scrollable Nav Links */}
+        <nav className="flex-1 overflow-y-auto py-6 px-4 space-y-8 scrollbar-hide mt-16 md:mt-0">
+          <div>
+            <p className="px-4 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3">
+              Trading
+            </p>
+            <div className="space-y-1">
+              <NavItem
+                to="/dashboard"
+                icon={LayoutDashboard}
+                label="Dashboard"
+              />
+              <NavItem to="/add-trade" icon={PlusCircle} label="Add Trade" />
+              <NavItem to="/trades" icon={List} label="Past Trades" />
+              <NavItem to="/calendar" icon={CalendarIcon} label="Calendar" />
+            </div>
+          </div>
+
+          <div>
+            <p className="px-4 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3">
+              Analysis
+            </p>
+            <div className="space-y-1">
+              <NavItem to="/history" icon={BookOpen} label="Journal History" />
+              <NavItem to="/news" icon={Globe} label="Economic Calendar" />
+              <NavItem to="/accounts" icon={Users} label="Accounts" />
+              <NavItem to="/import" icon={Upload} label="Import Trades" />
+            </div>
+          </div>
+
+          <div>
+            <p className="px-4 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3">
+              App
+            </p>
+            <div className="space-y-1">
+              <NavItem to="/settings" icon={Settings} label="Settings" />
+              <NavItem to="/support" icon={Headphones} label="Support" />
+            </div>
+          </div>
+        </nav>
+
+        {/* Profile / Bottom Menu */}
+        <div className="p-4 border-t border-gray-200 dark:border-white/5 relative">
+          {isProfileOpen && (
+            <div className="absolute bottom-full left-4 right-4 mb-2 bg-white dark:bg-[#1a1d24] border border-gray-200 dark:border-white/10 rounded-[2px] shadow-xl overflow-hidden animate-in fade-in slide-in-from-bottom-2">
+              <Link
+                to="/profile"
+                onClick={closeMenu}
+                className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
+              >
+                <Settings className="w-4 h-4" /> Account Settings
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors text-left border-t border-gray-100 dark:border-white/5"
+              >
+                <LogOut className="w-4 h-4" /> Log out
+              </button>
+            </div>
+          )}
+
+          <div
+            onClick={() => setIsProfileOpen(!isProfileOpen)}
+            className="flex items-center justify-between p-3 rounded-[2px] bg-gray-50 dark:bg-[#0b131d] border border-gray-200 dark:border-[#1f2c3b] cursor-pointer hover:border-[#2f8df4] transition-colors"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-[#2f8df4] text-white flex items-center justify-center font-bold text-xs">
+                MP
+              </div>
+              <div>
+                <p className="text-sm font-bold text-gray-900 dark:text-white leading-tight">
+                  Mayur Patil
+                </p>
+                <p className="text-[10px] text-emerald-500 font-bold uppercase tracking-widest">
+                  Pro Plan
+                </p>
+              </div>
+            </div>
+            <ChevronDown className="w-4 h-4 text-gray-400" />
+          </div>
+        </div>
+      </aside>
+
+      {/* Main Content Area */}
+      <main className="flex-1 overflow-y-auto relative pt-16 md:pt-0">
+        <Outlet />
+      </main>
+
+      {/* Mobile Overlay */}
+      {isMobileMenuOpen && (
+        <div
+          className="fixed inset-0 bg-black/60 z-20 md:hidden backdrop-blur-sm"
+          onClick={closeMenu}
+        />
+      )}
+    </div>
   );
 }
