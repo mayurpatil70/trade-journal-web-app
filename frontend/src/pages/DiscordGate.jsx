@@ -34,8 +34,9 @@ export default function DiscordGate() {
     const CLIENT_ID = "1554059949422940201";
 
     // Must match the Redirect URI registered in your Discord Developer Portal & Backend .env
+    const BACKEND_URL = "https://your-backend-api-name.onrender.com";
     const REDIRECT_URI = encodeURIComponent(
-      "http://localhost:3000/api/discord/callback",
+      `${BACKEND_URL}/api/discord/callback`,
     );
 
     // Passing userId inside 'state' so backend knows which user to update in Supabase
