@@ -1,5 +1,4 @@
-// frontend/src/layouts/DashboardLayout.jsx
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink, Outlet, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
   BookOpen,
@@ -8,95 +7,191 @@ import {
   Bot,
   Settings,
   LifeBuoy,
+  Moon,
+  Sun,
+  LogOut,
+  ChevronUp
 } from "lucide-react";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarProvider,
+  SidebarTrigger,
+  SidebarFooter,
+  SidebarHeader
+} from "@/components/ui/sidebar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { useTheme } from "@/components/theme-provider";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
+const tradingItems = [
+  { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
+  { title: "Trade Log", url: "/trades", icon: BookOpen },
+  { title: "Calendar", url: "/calendar", icon: Calendar },
+];
+
+const analysisItems = [
+  { title: "Analytics", url: "/analytics", icon: BarChart2 },
+  { title: "AI Journal", url: "/ai-journal", icon: Bot },
+];
+
+const appItems = [
+  { title: "Settings", url: "/settings", icon: Settings },
+  { title: "Support", url: "/support", icon: LifeBuoy },
+];
 
 export default function DashboardLayout() {
-  const navClasses = ({ isActive }) =>
-    `flex items-center gap-3 px-3 py-2 rounded-md transition-colors ${
-      isActive
-        ? "bg-gray-800 text-white"
-        : "text-gray-400 hover:text-white hover:bg-gray-800/50"
-    }`;
+  const { theme, setTheme } = useTheme();
+  const location = useLocation();
 
   return (
-    <div className="flex h-screen bg-journalDark text-white overflow-hidden">
-      {/* Sidebar Navigation */}
-      <aside className="w-64 flex flex-col border-r border-gray-800 overflow-y-auto">
-        <div className="p-4 border-b border-gray-800">
-          <h1 className="text-xl font-bold flex items-center gap-2">
-            <span className="text-white text-2xl">F</span>JOURNAL
-          </h1>
+    <SidebarProvider>
+      <div className="flex h-screen w-full overflow-hidden bg-background">
+        <Sidebar className="border-r border-border">
+          <SidebarHeader className="p-4 flex flex-row items-center justify-between">
+            <h1 className="text-xl font-bold flex items-center gap-2 text-primary">
+              <span className="text-2xl">F</span>JOURNAL
+            </h1>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+              className="rounded-full"
+            >
+              {theme === "light" ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
+            </Button>
+          </SidebarHeader>
+
+          <SidebarContent>
+            <SidebarGroup>
+              <SidebarGroupLabel>Trading</SidebarGroupLabel>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  {tradingItems.map((item) => (
+                    <SidebarMenuItem key={item.title}>
+                      <SidebarMenuButton asChild isActive={location.pathname.includes(item.url)}>
+                        <NavLink to={item.url} className="flex items-center gap-2">
+                          <item.icon className="h-5 w-5" />
+                          <span>{item.title}</span>
+                        </NavLink>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))}
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+
+            <SidebarGroup>
+              <SidebarGroupLabel>Analysis</SidebarGroupLabel>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  {analysisItems.map((item) => (
+                    <SidebarMenuItem key={item.title}>
+                      <SidebarMenuButton asChild isActive={location.pathname.includes(item.url)}>
+                        <NavLink to={item.url} className="flex items-center gap-2">
+                          <item.icon className="h-5 w-5" />
+                          <span>{item.title}</span>
+                        </NavLink>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))}
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+
+            <SidebarGroup>
+              <SidebarGroupLabel>App</SidebarGroupLabel>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  {appItems.map((item) => (
+                    <SidebarMenuItem key={item.title}>
+                      <SidebarMenuButton asChild isActive={location.pathname.includes(item.url)}>
+                        <NavLink to={item.url} className="flex items-center gap-2">
+                          <item.icon className="h-5 w-5" />
+                          <span>{item.title}</span>
+                        </NavLink>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))}
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+          </SidebarContent>
+
+          <SidebarFooter>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <SidebarMenuButton
+                      size="lg"
+                      className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                    >
+                      <Avatar className="h-8 w-8 rounded-full">
+                        <AvatarFallback className="bg-primary text-primary-foreground font-bold">
+                          MP
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="grid flex-1 text-left text-sm leading-tight">
+                        <span className="truncate font-semibold">Mayur Patil</span>
+                        <span className="truncate text-xs text-muted-foreground">Free Plan</span>
+                      </div>
+                      <ChevronUp className="ml-auto size-4" />
+                    </SidebarMenuButton>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    side="top"
+                    className="w-[--radix-popper-anchor-width] rounded-xl"
+                  >
+                    <DropdownMenuItem>
+                      <Settings className="mr-2 h-4 w-4" />
+                      Account Settings
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="text-destructive">
+                      <LogOut className="mr-2 h-4 w-4" />
+                      Log out
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarFooter>
+        </Sidebar>
+
+        <div className="flex flex-1 flex-col overflow-hidden">
+          <header className="flex h-14 items-center gap-4 border-b border-border bg-background px-4 lg:hidden">
+            <SidebarTrigger className="text-foreground" />
+            <h1 className="text-xl font-bold flex items-center gap-2 text-primary">
+              <span className="text-2xl">F</span>JOURNAL
+            </h1>
+            <div className="ml-auto">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+                className="rounded-full"
+              >
+                {theme === "light" ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
+              </Button>
+            </div>
+          </header>
+          <main className="flex-1 overflow-y-auto bg-muted/20 p-4 md:p-6">
+            <Outlet />
+          </main>
         </div>
-
-        <nav className="flex-1 p-4 space-y-6">
-          {/* TRADING SECTION */}
-          <div>
-            <p className="text-xs font-semibold text-gray-500 mb-2 px-2 uppercase tracking-wider">
-              Trading
-            </p>
-            <div className="space-y-1">
-              <NavLink to="/dashboard" className={navClasses}>
-                <LayoutDashboard size={18} /> Dashboard
-              </NavLink>
-              <NavLink to="/trades" className={navClasses}>
-                <BookOpen size={18} /> Trade Log
-              </NavLink>
-              <NavLink to="/calendar" className={navClasses}>
-                <Calendar size={18} /> Calendar
-              </NavLink>
-            </div>
-          </div>
-
-          {/* ANALYSIS SECTION */}
-          <div>
-            <p className="text-xs font-semibold text-gray-500 mb-2 px-2 uppercase tracking-wider">
-              Analysis
-            </p>
-            <div className="space-y-1">
-              <NavLink to="/analytics" className={navClasses}>
-                <BarChart2 size={18} /> Analytics
-              </NavLink>
-              <NavLink to="/ai-journal" className={navClasses}>
-                <Bot size={18} /> AI Journal
-              </NavLink>
-            </div>
-          </div>
-
-          {/* APP SECTION */}
-          <div>
-            <p className="text-xs font-semibold text-gray-500 mb-2 px-2 uppercase tracking-wider">
-              App
-            </p>
-            <div className="space-y-1">
-              <NavLink to="/settings" className={navClasses}>
-                <Settings size={18} /> Settings
-              </NavLink>
-              <NavLink to="/support" className={navClasses}>
-                <LifeBuoy size={18} /> Support
-              </NavLink>
-            </div>
-          </div>
-        </nav>
-
-        {/* User Profile Snippet */}
-        <div className="p-4 border-t border-gray-800">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-journalEmerald flex items-center justify-center text-sm font-bold">
-              MP
-            </div>
-            <div className="flex flex-col">
-              <span className="text-sm font-medium">Mayur Patil</span>{" "}
-              {/*[cite: 20] */}
-              <span className="text-xs text-gray-500">Free Plan</span>
-            </div>
-          </div>
-        </div>
-      </aside>
-
-      {/* Main Content Area */}
-      <main className="flex-1 overflow-y-auto bg-[#0a0a0a]">
-        <Outlet />
-      </main>
-    </div>
+      </div>
+    </SidebarProvider>
   );
 }
