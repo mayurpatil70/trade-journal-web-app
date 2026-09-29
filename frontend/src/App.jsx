@@ -1,4 +1,5 @@
 // frontend/src/App.jsx
+import { useEffect } from "react";
 import {
   BrowserRouter,
   Routes,
@@ -16,7 +17,6 @@ import AddTrade from "./pages/AddTrade.jsx";
 import PastTrades from "./pages/PastTrades.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
 import PerformanceCalendar from "./pages/PerformanceCalendar.jsx";
-import JournalHistory from "./pages/JournalHistory.jsx";
 import Imports from "./pages/Imports.jsx";
 import PropAccounts from "./pages/PropAccounts.jsx";
 import Settings from "./pages/Settings.jsx";
@@ -28,7 +28,7 @@ import DiscordCallback from "./pages/DiscordCallback";
 import MainLayout from "./layouts/MainLayout.jsx";
 import PreTradeGate from "./components/PreTradeGate.jsx";
 
-// NEW: Trader Problems Hub Components
+// Trader Problems Hub Components
 import TraderProblemsLayout from "./pages/TraderProblems/Layout.jsx";
 import EdgeFinder from "./pages/TraderProblems/EdgeFinder.jsx";
 import PropFirm from "./pages/TraderProblems/PropFirm.jsx";
@@ -43,6 +43,17 @@ const ProtectedRoute = () => {
 };
 
 function App() {
+  // GLOBAL THEME INITIALIZATION
+  // This ensures light/dark mode persists across all routes and hard refreshes
+  useEffect(() => {
+    const theme = localStorage.getItem("theme") || "dark";
+    if (theme === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, []);
+
   return (
     <BrowserRouter>
       <Routes>
@@ -60,14 +71,12 @@ function App() {
             <Route path="news" element={<EconomicCalendar />} />
             <Route path="trades" element={<PastTrades />} />
             <Route path="calendar" element={<PerformanceCalendar />} />
-            <Route path="history" element={<JournalHistory />} />
             <Route path="import" element={<Imports />} />
             <Route path="accounts" element={<PropAccounts />} />
             <Route path="settings" element={<Settings />} />
             <Route path="profile" element={<Profile />} />
             <Route path="support" element={<Support />} />
 
-            {/* Trader Problems Hub Routes (Replaced placeholders with REAL components) */}
             <Route path="problems" element={<TraderProblemsLayout />}>
               <Route index element={<Navigate to="edge" replace />} />
               <Route path="edge" element={<EdgeFinder />} />
@@ -79,7 +88,7 @@ function App() {
         </Route>
       </Routes>
 
-      {/* Global Floating AI Coach ("Call me before Trade") */}
+      {/* Global Floating AI Coach */}
       <PreTradeGate />
     </BrowserRouter>
   );

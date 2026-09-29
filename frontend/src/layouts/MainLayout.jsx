@@ -6,7 +6,6 @@ import {
   PlusCircle,
   List,
   Calendar as CalendarIcon,
-  BookOpen,
   Globe,
   Users,
   Upload,
@@ -17,7 +16,7 @@ import {
   LogOut,
   Activity,
   ChevronDown,
-  BrainCircuit, // <-- NEW: Imported BrainCircuit for Trader Problems
+  BrainCircuit,
 } from "lucide-react";
 
 export default function MainLayout() {
@@ -87,7 +86,6 @@ export default function MainLayout() {
           isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
         } md:relative md:translate-x-0`}
       >
-        {/* Logo */}
         <div className="h-16 flex items-center gap-3 px-6 border-b border-gray-200 dark:border-white/5 shrink-0 hidden md:flex">
           <Activity className="w-6 h-6 text-[#2f8df4]" />
           <span className="font-bold text-gray-900 dark:text-white text-xl tracking-tight">
@@ -95,7 +93,6 @@ export default function MainLayout() {
           </span>
         </div>
 
-        {/* Scrollable Nav Links */}
         <nav className="flex-1 overflow-y-auto py-6 px-4 space-y-8 scrollbar-hide mt-16 md:mt-0">
           <div>
             <p className="px-4 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3">
@@ -118,11 +115,9 @@ export default function MainLayout() {
               Analysis
             </p>
             <div className="space-y-1">
-              <NavItem to="/history" icon={BookOpen} label="Journal History" />
               <NavItem to="/news" icon={Globe} label="Economic Calendar" />
               <NavItem to="/accounts" icon={Users} label="Accounts" />
               <NavItem to="/import" icon={Upload} label="Import Trades" />
-              {/* NEW: Trader Problems Navigation Link */}
               <NavItem
                 to="/problems"
                 icon={BrainCircuit}
@@ -142,7 +137,6 @@ export default function MainLayout() {
           </div>
         </nav>
 
-        {/* Profile / Bottom Menu */}
         <div className="p-4 border-t border-gray-200 dark:border-white/5 relative">
           {isProfileOpen && (
             <div className="absolute bottom-full left-4 right-4 mb-2 bg-white dark:bg-[#1a1d24] border border-gray-200 dark:border-white/10 rounded-[2px] shadow-xl overflow-hidden animate-in fade-in slide-in-from-bottom-2">
@@ -178,12 +172,12 @@ export default function MainLayout() {
                 </p>
                 <button
                   onClick={(e) => {
-                    e.stopPropagation(); // Prevents opening the profile menu
+                    e.stopPropagation();
                     alert("Pro Plan features are coming soon! Stay tuned.");
                   }}
                   className="text-[10px] text-emerald-500 font-bold uppercase tracking-widest hover:text-emerald-400 transition-colors text-left"
                 >
-                  Subsciription
+                  Subscription
                 </button>
               </div>
             </div>
@@ -192,12 +186,10 @@ export default function MainLayout() {
         </div>
       </aside>
 
-      {/* Main Content Area */}
       <main className="flex-1 overflow-y-auto relative pt-16 md:pt-0">
         <Outlet />
       </main>
 
-      {/* Mobile Overlay */}
       {isMobileMenuOpen && (
         <div
           className="fixed inset-0 bg-black/60 z-20 md:hidden backdrop-blur-sm"
