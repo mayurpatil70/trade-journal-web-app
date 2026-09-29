@@ -211,7 +211,7 @@ export default function Profile() {
         {/* Community & Socials */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <a
-            href="https://discord.gg/YOUR_INVITE_CODE"
+            href="https://discord.gg/Ajaw3AjfWE"
             target="_blank"
             rel="noopener noreferrer"
             className="bg-[#5865F2] hover:bg-[#4752C4] p-6 rounded-[2px] shadow-sm flex items-center justify-between transition-colors group"

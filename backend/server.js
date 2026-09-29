@@ -1,47 +1,42 @@
 // backend/server.js
 import express from "express";
 import cors from "cors";
-import "dotenv/config";
+import dotenv from "dotenv";
 
-import authRoutes from "./routes/authRoutes.js";
+// Load environment variables
+dotenv.config();
+
+// Import Routes
 import discordRoutes from "./routes/discordRoutes.js";
-import newsRoutes from "./routes/newsRoutes.js";
-import aiRoutes from "./routes/aiRoutes.js";
-import tradeRoutes from "./routes/tradeRoutes.js"; // <-- NEW
+import kycRoutes from "./routes/kycRoutes.js";
+import exportRoutes from "./routes/exportRoutes.js";
+// (Assuming you have other route imports like authRoutes, tradeRoutes, etc. here)
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
-const allowedOrigins = [
-  "http://localhost:5173",
-  "https://forexnotes.vercel.app",
-];
-
+// Middleware
 app.use(
   cors({
-    origin: function (origin, callback) {
-      if (!origin) return callback(null, true);
-      if (allowedOrigins.indexOf(origin) === -1) {
-        return callback(
-          new Error("CORS policy violation: This origin is not allowed."),
-          false,
-        );
-      }
-      return callback(null, true);
-    },
+    origin: ["http://localhost:5173", "https://forexnotes.vercel.app"],
     credentials: true,
   }),
 );
-
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-app.use("/api/auth", authRoutes);
+// Mount Routes
 app.use("/api/discord", discordRoutes);
-app.use("/api/news", newsRoutes);
-app.use("/api/ai", aiRoutes);
-app.use("/api/trades", tradeRoutes); // <-- NEW
+app.use("/api/auth", kycRoutes); // Mounts KYC upload route -> /api/auth/kyc
+app.use("/api/trades", exportRoutes); // Mounts Export trade data route -> /api/trades/export
 
-app.get("/", (req, res) =>
-  res.json({ message: "Forex Notes API is running!" }),
-);
-app.listen(PORT, () => console.log(`API running on http://localhost:${PORT}`));
+// Health Check Endpoint
+app.get("/", (req, res) => {
+  res
+    .status(200)
+    .json({ status: "Forex Notes Backend is running successfully!" });
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
