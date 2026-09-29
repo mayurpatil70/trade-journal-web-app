@@ -4,8 +4,6 @@ import "./index.css";
 import App from "./App.jsx";
 import { ThemeProvider } from "./components/theme-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import "@fontsource/geist-sans/400.css";
-import "./styles/globals.css";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
