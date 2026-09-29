@@ -143,7 +143,7 @@ export default function Support() {
               </select>
             </div>
 
-            <div>
+            {/* <div>
               <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-1">
                 Message
               </label>
@@ -156,7 +156,7 @@ export default function Support() {
                 className={textareaClass}
                 required
               ></textarea>
-            </div>
+            </div> */}
 
             <div className="flex justify-end">
               <button
@@ -215,7 +215,7 @@ export default function Support() {
 
           <div className="mt-8 p-4 bg-gray-50 dark:bg-[#0b131d] border border-gray-200 dark:border-[#1f2c3b] rounded-[2px] text-center">
             <p className="text-[10px] font-bold text-[#2f8df4] uppercase tracking-widest mb-1">
-              Community Discord
+              Traders Discord Community
             </p>
             <a
               href="https://discord.gg/Ajaw3AjfWE"
@@ -223,7 +223,10 @@ export default function Support() {
               rel="noopener noreferrer"
               className="text-xs text-gray-500 hover:text-[#2f8df4] transition-colors underline block"
             >
-              Need immediate peer help? Join our official trader community chat.
+              Need immediate peer help? Join our official traders community
+              chat.
+              <br />
+              CLICK ME
             </a>
           </div>
         </div>

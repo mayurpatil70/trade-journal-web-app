@@ -181,7 +181,6 @@ export default function MainLayout() {
               App
             </p>
             <div className="space-y-1">
-              // Inside the 'App' navigation section of MainLayout.jsx:
               <NavItem
                 to="/settings"
                 icon={Settings}
