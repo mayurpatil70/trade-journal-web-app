@@ -11,7 +11,7 @@ export const handleDiscordCallback = async (req, res) => {
   const { code, state, error } = req.query;
 
   // Dynamically grab the frontend URL (defaults to localhost for local development)
-  const clientUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+  const clientUrl = process.env.FRONTEND_URL || "https://forexnotes.vercel.app";
 
   if (error || !code || !state) {
     console.error("Discord Auth Cancelled or Missing Params");
