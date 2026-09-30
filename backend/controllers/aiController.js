@@ -2,9 +2,41 @@
 import { GoogleGenAI } from "@google/genai";
 import { supabase } from "../config/supabase.js";
 
-// Initialize the SDK - reads GEMINI_API_KEY from environment
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-const MODEL = "gemini-1.5-flash";
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+const MODEL = "gemini-2.0-flash"; // Current free-tier model
+
+// Helper — always wrap content in proper array format
+function makeContents(text) {
+  return [{ role: "user", parts: [{ text }] }];
+}
+
+function makeChat(history, newMessage, systemPrompt) {
+  const contents = [
+    { role: "user", parts: [{ text: systemPrompt }] },
+    { role: "model", parts: [{ text: "Understood. I'm ready to help." }] },
+  ];
+
+  // Add prior history (skip first AI greeting to avoid duplication)
+  const prev = (history || []).slice(1);
+  for (const msg of prev) {
+    contents.push({
+      role: msg.sender === "ai" ? "model" : "user",
+      parts: [{ text: msg.text }],
+    });
+  }
+
+  // Add the new user message
+  contents.push({ role: "user", parts: [{ text: newMessage }] });
+  return contents;
+}
+
+// Log the key prefix so we can confirm which key is loaded (never log the full key)
+console.log(
+  "[AI] Using Gemini key prefix:",
+  GEMINI_API_KEY ? GEMINI_API_KEY.substring(0, 8) + "..." : "⚠️ MISSING KEY"
+);
+
+const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
 
 // ─── 1. Economic Calendar News Insight ───────────────────────────────────────
 export const generateNewsInsight = async (req, res) => {
@@ -12,25 +44,21 @@ export const generateNewsInsight = async (req, res) => {
     const { event } = req.body;
     if (!event) return res.status(400).json({ success: false, error: "Event data is required." });
 
-    const prompt = `You are an elite institutional forex trader and macroeconomic analyst.
-Analyze the following economic calendar event and provide a short, punchy directional insight (max 3-4 sentences).
-If the 'Actual' data is available, explain how it missed or beat the 'Forecast' and what that means for the currency.
-If NOT released yet, explain what traders should watch for.
-
+    const prompt = `You are an elite forex trader and macroeconomic analyst.
+Analyze this economic event and give a concise directional insight (3-4 sentences).
 Event: ${event.title} | Currency: ${event.country} | Impact: ${event.impact}
 Actual: ${event.actual || "Not released"} | Forecast: ${event.forecast || "N/A"} | Previous: ${event.previous || "N/A"}
-
-Keep it professional, data-driven. No financial advice.`;
+Keep it professional and data-driven.`;
 
     const response = await ai.models.generateContent({
       model: MODEL,
-      contents: [{ role: "user", parts: [{ text: prompt }] }],
+      contents: makeContents(prompt),
     });
 
     res.status(200).json({ success: true, insight: response.text });
   } catch (error) {
-    console.error("Gemini News Error:", error.message);
-    res.status(500).json({ success: false, error: "Failed to generate AI analysis." });
+    console.error("[AI] News Insight Error:", error.message, error.status);
+    res.status(500).json({ success: false, error: error.message });
   }
 };
 
@@ -43,15 +71,14 @@ export const analyzeChart = async (req, res) => {
     const base64Image = req.file.buffer.toString("base64");
     const mimeType = req.file.mimetype;
 
-    const prompt = `You are an expert institutional technical analyst. Analyze this trading chart for ${asset || "the asset shown"}.
-Provide:
-1. Overall Trend (Bullish / Bearish / Ranging)
-2. Key Support & Resistance levels or Supply/Demand zones visible
+    const prompt = `You are an expert institutional technical analyst.
+Analyze this ${asset || "trading"} chart screenshot and provide:
+1. Overall Trend: Bullish / Bearish / Ranging
+2. Key Support & Resistance levels visible
 3. Notable Chart Patterns or Candlestick formations
-4. Probability estimate: Bullish %, Bearish %, Neutral %
-5. Risk management suggestion (max risk %, SL placement idea)
-
-Be concise, professional, and never give direct financial advice.`;
+4. Market direction probability: Bullish X%, Bearish Y%, Neutral Z%
+5. Risk management advice (max risk %, SL placement)
+Be concise and professional.`;
 
     const response = await ai.models.generateContent({
       model: MODEL,
@@ -68,8 +95,8 @@ Be concise, professional, and never give direct financial advice.`;
 
     res.status(200).json({ success: true, insight: response.text });
   } catch (error) {
-    console.error("Gemini Vision Error:", error.message);
-    res.status(500).json({ error: "Failed to analyze chart image." });
+    console.error("[AI] Chart Analysis Error:", error.message, error.status);
+    res.status(500).json({ error: error.message });
   }
 };
 
@@ -77,28 +104,18 @@ Be concise, professional, and never give direct financial advice.`;
 export const chatWithCoach = async (req, res) => {
   try {
     const { message, history = [] } = req.body;
-    if (!message) return res.status(400).json({ error: "Message is required." });
+    if (!message?.trim()) return res.status(400).json({ error: "Message is required." });
 
-    const systemInstruction = `You are "Coach isLIVE" — a world-class Forex trading psychology coach and mentor.
-You speak like a trusted trader friend: honest, direct, supportive, and highly knowledgeable.
-You help traders with: emotional discipline, revenge trading, FOMO, risk management, trade setups, market analysis, prop firm rules, and mindset.
-You answer ALL trading-related questions genuinely and accurately.
-You give real, actionable advice — not generic platitudes.
-If a trader asks about a chart pattern, session, strategy, or emotion, give them real guidance.
-Keep responses concise but complete. Use bullet points for lists. Be encouraging but firm.
-NEVER say "I cannot help with that" for any trading topic.`;
+    const systemPrompt = `You are "Coach isLIVE" — a world-class Forex and crypto trading mentor who speaks like a trusted trader friend.
+You have deep expertise in: technical analysis, price action, SMC/ICT concepts, risk management, prop firm rules, trading psychology, and market structure.
+Always give genuine, specific, actionable answers.
+For strategy questions: explain entry/exit criteria, risk:reward, and context.
+For psychology questions: be empathetic but firm — help them avoid emotional trading.
+For market questions: give real technical analysis insights.
+Keep responses clear, structured with bullet points when helpful, and under 150 words.
+Never refuse a trading question. Never say generic phrases like "consult a professional".`;
 
-    // Build contents: system instruction as first user turn, then history, then new message
-    const contents = [
-      { role: "user", parts: [{ text: systemInstruction }] },
-      { role: "model", parts: [{ text: "Understood. I'm Coach isLIVE — your trading mentor. Ask me anything." }] },
-      // Map history (skip the first AI welcome message to avoid duplication)
-      ...history.slice(1).map((msg) => ({
-        role: msg.sender === "ai" ? "model" : "user",
-        parts: [{ text: msg.text }],
-      })),
-      { role: "user", parts: [{ text: message }] },
-    ];
+    const contents = makeChat(history, message, systemPrompt);
 
     const response = await ai.models.generateContent({
       model: MODEL,
@@ -107,8 +124,9 @@ NEVER say "I cannot help with that" for any trading topic.`;
 
     res.status(200).json({ success: true, text: response.text });
   } catch (error) {
-    console.error("Coach Chat Error:", error.message);
-    res.status(500).json({ success: false, error: error.message });
+    console.error("[AI] Coach Chat Error:", error.message, error.status);
+    // Return the actual error so the frontend can display it
+    res.status(500).json({ success: false, error: `AI Error: ${error.message}` });
   }
 };
 
@@ -137,19 +155,16 @@ export const getEdgeInsights = async (req, res) => {
       });
     }
 
-    const prompt = `You are an expert quantitative trading analyst. Analyze this trader's last ${trades.length} trades.
-Find specific correlations. Look at win rates by session, asset, direction, setup, rule breaking, emotions.
-
-Identify up to 3 "edges" (where they make money consistently) and up to 3 "leaks" (where they lose).
-
-Respond ONLY in valid JSON, no markdown, no extra text:
+    const prompt = `You are a quantitative trading analyst. Analyze the trader's last ${trades.length} trades.
+Find correlations across session, asset, direction, setup, rule breaking, emotions.
+Identify up to 3 "edges" (where they profit) and 3 "leaks" (where they lose).
+Respond ONLY in valid JSON, no markdown:
 {"edges":["insight 1","insight 2"],"leaks":["leak 1","leak 2"]}
-
-Trade Data: ${JSON.stringify(trades)}`;
+Trades: ${JSON.stringify(trades)}`;
 
     const response = await ai.models.generateContent({
       model: MODEL,
-      contents: [{ role: "user", parts: [{ text: prompt }] }],
+      contents: makeContents(prompt),
     });
 
     let jsonText = response.text.replace(/```json/g, "").replace(/```/g, "").trim();
@@ -157,7 +172,7 @@ Trade Data: ${JSON.stringify(trades)}`;
 
     res.status(200).json({ success: true, insights });
   } catch (error) {
-    console.error("Edge Finder Error:", error.message);
-    res.status(500).json({ error: "Failed to generate Edge Insights." });
+    console.error("[AI] Edge Finder Error:", error.message, error.status);
+    res.status(500).json({ error: error.message });
   }
 };

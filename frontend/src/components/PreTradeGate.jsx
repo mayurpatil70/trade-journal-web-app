@@ -57,11 +57,12 @@ export default function PreTradeGate() {
       ]);
     } catch (error) {
       console.error("Chat error:", error);
+      const errMsg = error?.response?.data?.error || error.message || "Connection failed";
       setChatHistory((prev) => [
         ...prev,
         {
           sender: "ai",
-          text: "I'm having trouble connecting right now, but please review your playbook manually before executing.",
+          text: `⚠️ AI Error: ${errMsg}`,
         },
       ]);
     } finally {
