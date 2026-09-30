@@ -55,7 +55,7 @@ export default function AdminDashboard() {
   const handleDeleteOrder = async (orderId) => {
     if (!window.confirm('Are you sure you want to revoke access and delete this payment?')) return;
     try {
-      await api.delete(/api/admin/orders/);
+      await api.delete(/api/admin/subscription/);
       const response = await api.get('/api/admin/metrics');
       if (response.data.success) {
         setData(response.data);
