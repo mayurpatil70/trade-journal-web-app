@@ -15,7 +15,6 @@ router.get("/config", (req, res) => {
     success: true,
     price: JOURNAL_PRICE,
     wallets: {
-      TRC20: process.env.TRC20_ADDRESS,
       BEP20: process.env.BEP20_ADDRESS,
     },
   });
@@ -55,7 +54,7 @@ router.get("/status/:userId", async (req, res) => {
 // 3. Verify Payment & Unlock App
 router.post("/verify", async (req, res) => {
   try {
-    const { userId, txHash, chain } = req.body;
+    const { userId, txHash, chain, paymentScreenshot } = req.body;
 
     if (!txHash || !chain || !userId) {
       return res
@@ -85,14 +84,17 @@ router.post("/verify", async (req, res) => {
         .status(422)
         .json({ error: check.reason || "Payment verification failed." });
 
+    const status = check.status || "paid";
+
     const { error: insertErr } = await supabase
       .from("journal_subscriptions")
       .insert({
         user_id: userId,
-        status: "paid",
+        status: status,
         amount_usdt: JOURNAL_PRICE,
         chain,
         tx_hash: txHash,
+        payment_screenshot: paymentScreenshot,
         paid_at: new Date().toISOString(),
       });
 
@@ -104,12 +106,33 @@ router.post("/verify", async (req, res) => {
       amount: JOURNAL_PRICE,
       chain,
       txHash,
+      screenshot: paymentScreenshot,
     });
 
-    res.json({ success: true, message: "Payment verified! App unlocked." });
+    if (status === "pending") {
+      res.json({ success: true, message: "Payment submitted! Awaiting admin approval." });
+    } else {
+      res.json({ success: true, message: "Payment verified! App unlocked." });
+    }
   } catch (error) {
     console.error("Paywall verification failed:", error);
     res.status(500).json({ error: "Verification failed. Please try again." });
+  }
+});
+
+// 4. Admin route to fetch pending payments
+router.get("/admin/pending", async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from("journal_subscriptions")
+      .select("*")
+      .eq("status", "pending");
+
+    if (error) throw error;
+    res.json({ success: true, pendingPayments: data });
+  } catch (error) {
+    console.error("Failed to fetch pending payments:", error);
+    res.status(500).json({ error: "Failed to fetch pending payments." });
   }
 });
 

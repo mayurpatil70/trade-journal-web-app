@@ -133,11 +133,6 @@ export default function Paywall() {
                   </label>
                   {[
                     {
-                      id: "TRC20",
-                      label: "USDT (Tron TRC20)",
-                      hint: "Fastest, zero fees",
-                    },
-                    {
                       id: "BEP20",
                       label: "USDT (BNB Chain)",
                       hint: "Standard BSC network",
@@ -212,15 +207,31 @@ export default function Paywall() {
                   </div>
                 </div>
 
+                <div className="bg-blue-500/10 border border-blue-500/20 p-3 rounded-xl mb-4">
+                  <p className="text-[10px] font-bold text-blue-400 uppercase tracking-widest mb-2">Payment Guidelines</p>
+                  <p className="text-xs text-white">Binance -{'>'} Send/Withdraw -{'>'} USDT(TetherUS) -{'>'} Paste BEP20 Address -{'>'} Select BNB Smart Chain (BEP20) -{'>'} CONFIRM -{'>'} COPY TXID &amp; SCREENSHOT</p>
+                </div>
+
                 <div className="pt-4 border-t border-white/5 space-y-2">
                   <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">
-                    Transaction Hash
+                    Payment Screenshot
+                  </label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-blue-500/20 file:text-blue-400 hover:file:bg-blue-500/30 transition-all cursor-pointer"
+                  />
+                </div>
+
+                <div className="pt-4 border-t border-white/5 space-y-2">
+                  <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">
+                    Transaction Hash (TXID)
                   </label>
                   <input
                     type="text"
                     value={txHash}
                     onChange={(e) => setTxHash(e.target.value)}
-                    placeholder="Paste tx hash after sending..."
+                    placeholder="Paste TXID..."
                     className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3.5 text-sm font-mono text-white focus:border-blue-500 outline-none transition-colors"
                   />
                 </div>

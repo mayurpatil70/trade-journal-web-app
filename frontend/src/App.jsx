@@ -126,7 +126,6 @@ function App() {
           </Route>
         </Routes>
       </ErrorBoundary>
-      <PreTradeGate />
     </BrowserRouter>
   );
 }

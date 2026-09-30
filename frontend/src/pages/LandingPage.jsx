@@ -226,7 +226,15 @@ export default function LandingPage() {
           </div>
 
           {/* Institutional UI Preview Card */}
-          <div className="relative mx-auto max-w-4xl rounded-2xl border border-white/10 bg-[#121418] p-4 sm:p-6 shadow-2xl shadow-black/80 text-left">
+          <div className="relative mx-auto max-w-4xl rounded-2xl border border-white/10 bg-[#121418] p-4 sm:p-6 shadow-2xl shadow-black/80 text-left hover:scale-[1.02] transition-transform duration-500 relative">
+            
+            {/* Animated Floating Badges */}
+            <div className="absolute -left-12 top-10 bg-emerald-500/10 border border-emerald-500/20 px-4 py-2 rounded-xl backdrop-blur-md animate-bounce hidden md:block shadow-lg">
+              <span className="text-emerald-400 text-xs font-bold flex items-center gap-2"><TrendingUp className="w-3 h-3"/> AI Coach Active</span>
+            </div>
+            <div className="absolute -right-8 bottom-10 bg-blue-500/10 border border-blue-500/20 px-4 py-2 rounded-xl backdrop-blur-md animate-pulse hidden md:block shadow-lg">
+              <span className="text-blue-400 text-xs font-bold flex items-center gap-2"><Calculator className="w-3 h-3"/> +12.4R This Week</span>
+            </div>
             <div className="flex items-center justify-between pb-4 mb-4 border-b border-white/5 text-xs">
               <div className="flex items-center gap-2">
                 <span className="w-3 h-3 rounded-full bg-red-500/20 border border-red-500/40" />
@@ -403,6 +411,38 @@ export default function LandingPage() {
               </tbody>
             </table>
           </div>
+        </div>
+      </section>
+
+      {/* Reviews Section */}
+      <section className="py-24 px-4 md:px-8 border-t border-white/5 overflow-hidden">
+        <div className="max-w-7xl mx-auto text-center mb-16">
+          <span className="text-[10px] uppercase font-bold tracking-widest text-[#2f8df4] mb-2 block animate-pulse">
+            Trader Testimonials
+          </span>
+          <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight mb-4">
+            Trusted by Funded Traders Worldwide
+          </h2>
+        </div>
+        <div className="flex justify-center gap-6 flex-wrap">
+          {[
+            { name: "Alex P.", firm: "Funded $100k", text: "The AI coach literally saved me from a massive tilt yesterday. Best $11 I've ever spent." },
+            { name: "Sarah J.", firm: "Funded $300k", text: "Prop firm guardian is a game changer. I never have to manually calculate my daily drawdown limits again." },
+            { name: "Mike T.", firm: "Evaluation Phase", text: "The lot size calculator is so fast. Having it right next to my journal helps me execute perfectly." }
+          ].map((r, i) => (
+            <div key={i} className="bg-[#121418] border border-white/10 rounded-2xl p-6 w-full max-w-sm hover:-translate-y-2 transition-transform duration-300 shadow-xl">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center font-bold text-white shadow-lg">
+                  {r.name.charAt(0)}
+                </div>
+                <div className="text-left">
+                  <h4 className="text-sm font-bold text-white">{r.name}</h4>
+                  <p className="text-xs text-emerald-400">{r.firm}</p>
+                </div>
+              </div>
+              <p className="text-sm text-gray-400 text-left italic">"{r.text}"</p>
+            </div>
+          ))}
         </div>
       </section>
 

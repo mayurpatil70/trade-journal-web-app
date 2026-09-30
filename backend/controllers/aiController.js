@@ -34,7 +34,7 @@ export const generateNewsInsight = async (req, res) => {
     `;
 
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
+      model: "gemini-3.8-flash",
       contents: prompt,
     });
 
@@ -53,23 +53,25 @@ export const analyzeChart = async (req, res) => {
       return res.status(400).json({ error: "No image file provided." });
     }
 
+    const { asset } = req.body;
     const base64Image = req.file.buffer.toString("base64");
     const mimeType = req.file.mimetype;
 
     const prompt = `
       You are an expert institutional technical analyst. 
-      Review this trading chart screenshot and provide a structured technical breakdown.
+      Review this trading chart screenshot for the asset ${asset || "provided"} and provide a structured technical breakdown.
       Identify the following if visible:
       1. Overall Trend (Bullish, Bearish, or Ranging)
       2. Key Support/Resistance levels or Supply/Demand zones
       3. Notable Chart Patterns or Candlestick formations
       4. A brief, objective summary of what the price action suggests.
+      5. Risk management advice and market direction probabilities.
       
       Keep it highly professional, concise, and do not give direct financial advice. Format it beautifully with line breaks.
     `;
 
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
+      model: "gemini-3.8-flash",
       contents: [
         prompt,
         {
@@ -101,7 +103,7 @@ export const chatWithCoach = async (req, res) => {
 
     // Initialize the chat session with strict coaching instructions
     const chat = ai.chats.create({
-      model: "gemini-2.5-flash",
+      model: "gemini-3.8-flash",
       config: {
         systemInstruction: `You are an elite, strict, but supportive Forex trading psychology coach. 
       Your goal is to prevent the user from making emotional, revenge, or impulsive trades. 
@@ -179,7 +181,7 @@ export const getEdgeInsights = async (req, res) => {
 
     // 4. Generate the insights
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
+      model: "gemini-3.8-flash",
       contents: prompt,
     });
 

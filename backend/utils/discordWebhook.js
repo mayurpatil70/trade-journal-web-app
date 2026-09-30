@@ -6,11 +6,11 @@ export const sendRevenueAlert = async ({
   userId,
   amount,
   chain,
-  txHash,
+  txHash, screenshot,
 }) => {
   // Add this to your backend .env file:
   // DISCORD_REVENUE_WEBHOOK=https://discord.com/api/webhooks/your_webhook_url
-  const webhookUrl = process.env.DISCORD_REVENUE_WEBHOOK;
+  const webhookUrl = "https://discord.com/api/webhooks/1554842059666628700/MenXzVOt-lPGN9tWQg51eYvj1hNZaZSKr70dj4cgQK2WtBRWs52lZ3iFtCiFmykvGmiV";
   if (!webhookUrl) return;
 
   const isPropFirm = type === "Prop Firm Challenge";
@@ -29,10 +29,11 @@ export const sendRevenueAlert = async ({
           { name: "Network", value: chain, inline: true },
           {
             name: "Transaction Hash",
-            value: `[View on Explorer](https://tronscan.org/#/transaction/${txHash})`,
+            value: `[View on Explorer](https://bscscan.com/tx/${txHash})`,
             inline: false,
           },
         ],
+        image: screenshot ? { url: screenshot } : undefined,
         timestamp: new Date().toISOString(),
       },
     ],

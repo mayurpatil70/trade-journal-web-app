@@ -1,6 +1,7 @@
 // frontend/src/layouts/MainLayout.jsx
 import { useState, useEffect } from "react";
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
+import PreTradeGate from "../components/PreTradeGate.jsx";
 import {
   LayoutDashboard,
   PlusCircle,
@@ -443,6 +444,7 @@ export default function MainLayout() {
           onClick={closeMenu}
         />
       )}
+      <PreTradeGate />
     </div>
   );
 }
