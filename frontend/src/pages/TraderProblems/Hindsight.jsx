@@ -18,8 +18,12 @@ export default function Hindsight() {
 
   useEffect(() => {
     const fetchTrades = async () => {
-      const userId = localStorage.getItem("userId");
-      if (!userId) return;
+      const userId =
+        localStorage.getItem("userId") || localStorage.getItem("userEmail");
+      if (!userId) {
+        setLoading(false);
+        return;
+      }
 
       try {
         const response = await api.get(`/api/trades?userId=${userId}`);

@@ -12,10 +12,6 @@ export default function PreTradeGate() {
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef(null);
 
-  // Hide this component on pages where it shouldn't be intrusive
-  const hiddenRoutes = ["/add-trade", "/login", "/register"];
-  if (hiddenRoutes.includes(location.pathname)) return null;
-
   const [chatHistory, setChatHistory] = useState([
     {
       sender: "ai",
@@ -30,6 +26,13 @@ export default function PreTradeGate() {
   useEffect(() => {
     scrollToBottom();
   }, [chatHistory, isOpen]);
+
+  // CRITICAL FIX: All hooks (useState, useRef, useEffect) must be called before this condition!
+  // Calling an early return before hooks caused React Error #300 and a black screen crash on navigation!
+  const hiddenRoutes = ["/add-trade", "/login", "/register", "/verify"];
+  if (hiddenRoutes.includes(location.pathname)) {
+    return null;
+  }
 
   const handleSendMessage = async (e) => {
     e?.preventDefault();
@@ -71,7 +74,7 @@ export default function PreTradeGate() {
     navigate("/add-trade");
   };
 
-  // The 3D Robot Image you requested
+  // The 3D Robot Image
   const ROBOT_AVATAR =
     "https://img.magnific.com/premium-photo/robot-head-with-goggles-smile-it_7023-571826.jpg";
 

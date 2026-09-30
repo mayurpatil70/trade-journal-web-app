@@ -18,6 +18,10 @@ import {
   ChevronDown,
   BrainCircuit,
   User,
+  CreditCard,
+  CheckCircle2,
+  Sparkles,
+  ShieldCheck,
 } from "lucide-react";
 
 // FIX: Extracted outside to prevent React Hook Error 310 (Black Screen Crash)
@@ -42,6 +46,7 @@ const NavItem = ({ to, icon: Icon, label, currentPath, onClick }) => {
 export default function MainLayout() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isSubscriptionOpen, setIsSubscriptionOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -199,9 +204,10 @@ export default function MainLayout() {
           </div>
         </nav>
 
+        {/* User Card & Subscription at bottom */}
         <div className="p-4 border-t border-gray-200 dark:border-white/5 relative">
           {isProfileOpen && (
-            <div className="absolute bottom-full left-4 right-4 mb-2 bg-white dark:bg-[#1a1d24] border border-gray-200 dark:border-white/10 rounded-[2px] shadow-xl overflow-hidden animate-in fade-in slide-in-from-bottom-2">
+            <div className="absolute bottom-full left-4 right-4 mb-2 bg-white dark:bg-[#1a1d24] border border-gray-200 dark:border-white/10 rounded-[2px] shadow-xl overflow-hidden animate-in fade-in slide-in-from-bottom-2 z-50">
               <Link
                 to="/profile"
                 onClick={closeMenu}
@@ -209,6 +215,15 @@ export default function MainLayout() {
               >
                 <User className="w-4 h-4" /> Profile
               </Link>
+              <button
+                onClick={() => {
+                  setIsProfileOpen(false);
+                  setIsSubscriptionOpen(true);
+                }}
+                className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 transition-colors text-left border-t border-gray-100 dark:border-white/5"
+              >
+                <CreditCard className="w-4 h-4" /> Subscription Plan
+              </button>
               <button
                 onClick={handleLogout}
                 className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors text-left border-t border-gray-100 dark:border-white/5"
@@ -218,26 +233,40 @@ export default function MainLayout() {
             </div>
           )}
 
-          <div
-            onClick={() => setIsProfileOpen(!isProfileOpen)}
-            className="flex items-center justify-between p-3 rounded-[2px] bg-gray-50 dark:bg-[#0b131d] border border-gray-200 dark:border-[#1f2c3b] cursor-pointer hover:border-[#2f8df4] transition-colors"
-          >
-            <div className="flex items-center gap-3 overflow-hidden">
+          <div className="flex items-center justify-between p-3 rounded-[2px] bg-gray-50 dark:bg-[#0b131d] border border-gray-200 dark:border-[#1f2c3b] hover:border-[#2f8df4] transition-colors">
+            <div
+              onClick={() => setIsProfileOpen(!isProfileOpen)}
+              className="flex items-center gap-3 overflow-hidden cursor-pointer flex-1"
+            >
               <div className="w-8 h-8 rounded-full bg-[#2f8df4] text-white flex items-center justify-center font-bold text-xs shrink-0">
                 {localStorage.getItem("userEmail")
                   ? localStorage.getItem("userEmail").charAt(0).toUpperCase()
                   : "U"}
               </div>
               <div className="overflow-hidden">
-                <p className="text-sm font-bold text-gray-900 dark:text-white leading-tight truncate max-w-[120px]">
+                <p className="text-sm font-bold text-gray-900 dark:text-white leading-tight truncate max-w-[100px]">
                   {localStorage.getItem("userEmail") || "User"}
                 </p>
-                <p className="text-[10px] text-emerald-500 font-bold uppercase tracking-widest text-left">
+                {/* Clickable subscription badge */}
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsSubscriptionOpen(true);
+                  }}
+                  className="text-[10px] text-emerald-500 hover:text-emerald-400 font-bold uppercase tracking-widest text-left hover:underline flex items-center gap-1 mt-0.5"
+                >
+                  <Sparkles className="w-3 h-3 text-emerald-500" />
                   Subscription
-                </p>
+                </button>
               </div>
             </div>
-            <ChevronDown className="w-4 h-4 text-gray-400 shrink-0" />
+            <button
+              onClick={() => setIsProfileOpen(!isProfileOpen)}
+              className="p-1 text-gray-400 hover:text-gray-200"
+            >
+              <ChevronDown className="w-4 h-4" />
+            </button>
           </div>
         </div>
       </aside>
@@ -246,6 +275,69 @@ export default function MainLayout() {
       <main className="flex-1 overflow-y-auto relative pt-16 md:pt-0">
         <Outlet />
       </main>
+
+      {/* Subscription Modal */}
+      {isSubscriptionOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="relative w-full max-w-md bg-white dark:bg-[#121418] border border-gray-200 dark:border-white/10 rounded-[4px] shadow-2xl p-6 sm:p-8">
+            <button
+              onClick={() => setIsSubscriptionOpen(false)}
+              className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 dark:hover:text-white transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-12 h-12 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-500">
+                <ShieldCheck className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                  Pro Membership
+                </h3>
+                <span className="inline-block mt-0.5 px-2.5 py-0.5 bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 text-[10px] font-bold uppercase tracking-wider rounded-[2px]">
+                  Active Plan
+                </span>
+              </div>
+            </div>
+
+            <div className="space-y-4 mb-6 text-sm text-gray-700 dark:text-gray-300">
+              <div className="p-4 bg-gray-50 dark:bg-[#1a1d24] rounded-[2px] border border-gray-200 dark:border-white/5 space-y-2.5">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                  <span>Real-time AI Psychology Coach</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                  <span>Unlimited Trade Journaling & Cloud Storage</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                  <span>Trader Problems Analytics Suite (Edge, Guardian)</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                  <span>Advanced Performance & Economic Calendar</span>
+                </div>
+              </div>
+
+              <div className="flex justify-between items-center text-xs text-gray-500 dark:text-gray-400 px-1">
+                <span>Billing Period: <strong>Monthly</strong></span>
+                <span>Account: <strong>{localStorage.getItem("userEmail") || "User"}</strong></span>
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setIsSubscriptionOpen(false)}
+                className="flex-1 py-3 bg-[#2f8df4] hover:bg-[#2376e8] text-white font-bold rounded-[2px] text-sm transition-colors text-center shadow-md"
+              >
+                Close Details
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {isMobileMenuOpen && (
         <div

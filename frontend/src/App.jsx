@@ -27,10 +27,10 @@ import MainLayout from "./layouts/MainLayout.jsx";
 import PreTradeGate from "./components/PreTradeGate.jsx";
 
 import TraderProblemsLayout from "./pages/TraderProblems/Layout.jsx";
-import EdgeFinder from "./pages/TraderProblems/EdgeFinder.jsx";
+import LotSizeCalculator from "./pages/TraderProblems/LotSizeCalculator.jsx";
 import PropFirm from "./pages/TraderProblems/PropFirm.jsx";
-import Hindsight from "./pages/TraderProblems/Hindsight.jsx";
-import Partials from "./pages/TraderProblems/Partials.jsx";
+import TiltBreaker from "./pages/TraderProblems/TiltBreaker.jsx";
+import RiskOfRuin from "./pages/TraderProblems/RiskOfRuin.jsx";
 
 const ProtectedRoute = () => {
   const isAuthenticated =
@@ -68,12 +68,18 @@ function App() {
             <Route path="profile" element={<Profile />} />
             <Route path="support" element={<Support />} />
 
+            {/* Trader Problems Suite */}
             <Route path="problems" element={<TraderProblemsLayout />}>
-              <Route index element={<Navigate to="edge" replace />} />
-              <Route path="edge" element={<EdgeFinder />} />
+              <Route index element={<Navigate to="calculator" replace />} />
+              <Route path="calculator" element={<LotSizeCalculator />} />
               <Route path="prop-firm" element={<PropFirm />} />
-              <Route path="hindsight" element={<Hindsight />} />
-              <Route path="partials" element={<Partials />} />
+              <Route path="tilt-breaker" element={<TiltBreaker />} />
+              <Route path="risk-ruin" element={<RiskOfRuin />} />
+
+              {/* Backward compatibility aliases */}
+              <Route path="partials" element={<LotSizeCalculator />} />
+              <Route path="edge" element={<TiltBreaker />} />
+              <Route path="hindsight" element={<RiskOfRuin />} />
             </Route>
           </Route>
         </Route>

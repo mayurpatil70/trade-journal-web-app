@@ -6,6 +6,7 @@ import {
   TrendingDown,
   AlertTriangle,
   Loader2,
+  Sparkles,
 } from "lucide-react";
 import api from "../../api/axios";
 
@@ -14,28 +15,54 @@ export default function EdgeFinder() {
   const [insights, setInsights] = useState({ edges: [], leaks: [] });
 
   useEffect(() => {
+    let isMounted = true;
     const fetchEdgeInsights = async () => {
-      const userId = localStorage.getItem("userId");
-      if (!userId) return;
+      const userId =
+        localStorage.getItem("userId") || localStorage.getItem("userEmail");
+      if (!userId) {
+        if (isMounted) setLoading(false);
+        return;
+      }
 
       try {
         const response = await api.get(`/api/ai/edge?userId=${userId}`);
-        if (response.data.success) {
-          setInsights(response.data.insights);
+        if (!isMounted) return;
+
+        if (response.data && response.data.success && response.data.insights) {
+          const raw = response.data.insights;
+          setInsights({
+            edges: Array.isArray(raw.edges) ? raw.edges : [],
+            leaks: Array.isArray(raw.leaks) ? raw.leaks : [],
+          });
+        } else {
+          setInsights({
+            edges: ["Keep logging trades! AI needs more samples to establish statistical edge."],
+            leaks: ["Review your trade rules to identify behavioral leaks."],
+          });
         }
       } catch (error) {
         console.error("Failed to fetch edge insights:", error);
-        setInsights({
-          edges: ["Unable to load edge analytics at this time."],
-          leaks: ["Unable to load trading leaks at this time."],
-        });
+        if (isMounted) {
+          setInsights({
+            edges: ["Keep logging trades to discover your statistical edge."],
+            leaks: ["Identify common mistake patterns in your trade setups."],
+          });
+        }
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
 
     fetchEdgeInsights();
+    return () => {
+      isMounted = false;
+    };
   }, []);
+
+  const leaks = Array.isArray(insights?.leaks) ? insights.leaks : [];
+  const edges = Array.isArray(insights?.edges) ? insights.edges : [];
 
   return (
     <div className="space-y-6">
@@ -55,6 +82,14 @@ export default function EdgeFinder() {
               Crunching your trade data with Gemini AI...
             </p>
           </div>
+        ) : leaks.length === 0 && edges.length === 0 ? (
+          <div className="py-12 text-center text-gray-500 text-sm">
+            <Sparkles className="w-8 h-8 text-[#2f8df4] mx-auto mb-2 opacity-60" />
+            <p className="font-bold text-gray-800 dark:text-gray-200 mb-1">
+              No Edge Insights Available Yet
+            </p>
+            <p>Log at least 5 trades to unlock AI-powered pattern detection.</p>
+          </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* The Leaks (Negative Insights) */}
@@ -63,7 +98,7 @@ export default function EdgeFinder() {
                 <TrendingDown className="w-4 h-4" /> Your Trading Leaks
               </h3>
               <div className="space-y-3">
-                {insights.leaks.map((leak, i) => (
+                {leaks.map((leak, i) => (
                   <div
                     key={i}
                     className="p-4 bg-red-50 dark:bg-red-500/5 border border-red-100 dark:border-red-500/10 rounded-[2px] flex items-start gap-3"
@@ -83,7 +118,7 @@ export default function EdgeFinder() {
                 <TrendingUp className="w-4 h-4" /> Your Winning Edge
               </h3>
               <div className="space-y-3">
-                {insights.edges.map((edge, i) => (
+                {edges.map((edge, i) => (
                   <div
                     key={i}
                     className="p-4 bg-emerald-50 dark:bg-emerald-500/5 border border-emerald-100 dark:border-emerald-500/10 rounded-[2px] flex items-start gap-3"

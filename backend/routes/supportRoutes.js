@@ -10,8 +10,10 @@ router.post("/ticket", async (req, res) => {
     // IMPORTANT: Add your Discord Webhook URL to your .env file
     const webhookUrl = process.env.DISCORD_SUPPORT_WEBHOOK;
 
-    if (!webhookUrl)
-      return res.status(500).json({ error: "Discord webhook not configured" });
+    if (!webhookUrl) {
+      console.warn("DISCORD_SUPPORT_WEBHOOK not set. Logging support ticket to console:", { userId, message });
+      return res.status(200).json({ success: true, message: "Ticket received." });
+    }
 
     const payload = {
       content: `🚨 **New Support Ticket** 🚨\n**User:** \`${userId}\`\n**Message:**\n> ${message}`,
