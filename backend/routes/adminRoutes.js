@@ -3,36 +3,47 @@ import { supabase } from "../config/supabase.js";
 
 const router = express.Router();
 
-// Fetch total revenue
-router.get("/revenue", async (req, res) => {
+// Fetch admin metrics for the dashboard
+router.get("/metrics", async (req, res) => {
   try {
-    const { data, error } = await supabase
-      .from("journal_subscriptions")
-      .select("amount_usdt")
-      .eq("status", "paid");
-    
-    if (error) throw error;
-    
-    const totalRevenue = data.reduce((acc, curr) => acc + (Number(curr.amount_usdt) || 0), 0);
-    res.json({ success: true, totalRevenue });
-  } catch (error) {
-    res.status(500).json({ error: "Failed to fetch revenue." });
-  }
-});
-
-// Fetch recent pending/completed payments
-router.get("/payments", async (req, res) => {
-  try {
-    const { data, error } = await supabase
+    // 1. Get recent payments
+    const { data: payments, error: paymentsError } = await supabase
       .from("journal_subscriptions")
       .select("*")
       .order("paid_at", { ascending: false })
-      .limit(100);
+      .limit(50);
       
-    if (error) throw error;
-    res.json({ success: true, payments: data });
+    if (paymentsError) throw paymentsError;
+
+    // 2. Calculate revenue
+    const paidOrders = payments.filter(p => p.status === "paid");
+    const totalRevenue = paidOrders.reduce((acc, curr) => acc + (Number(curr.amount_usdt) || 0), 0);
+
+    // 3. (Mock) Account logic since there is no accounts table mentioned
+    // If you have a prop_accounts table, you would query it here.
+    const { data: accounts, error: accError } = await supabase
+      .from("users")
+      .select("*")
+      .limit(10);
+
+    const metrics = {
+      totalAccounts: accounts ? accounts.length : 0,
+      activeAccounts: accounts ? accounts.length : 0,
+      passedAccounts: 0,
+      failedAccounts: 0,
+      totalRevenue: totalRevenue,
+      paidOrdersCount: paidOrders.length,
+    };
+
+    res.json({ 
+      success: true, 
+      metrics: metrics,
+      recentOrders: payments || [],
+      accounts: accounts || [] // Mocking with users for now
+    });
   } catch (error) {
-    res.status(500).json({ error: "Failed to fetch payments." });
+    console.error("Admin metrics error:", error);
+    res.status(500).json({ success: false, error: "Failed to fetch admin metrics." });
   }
 });
 
@@ -48,7 +59,7 @@ router.delete("/subscription/:id", async (req, res) => {
     if (error) throw error;
     res.json({ success: true, message: "Subscription revoked successfully." });
   } catch (error) {
-    res.status(500).json({ error: "Failed to revoke subscription." });
+    res.status(500).json({ success: false, error: "Failed to revoke subscription." });
   }
 });
 
