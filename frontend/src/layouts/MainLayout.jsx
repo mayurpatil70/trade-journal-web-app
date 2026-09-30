@@ -16,27 +16,74 @@ import {
   LogOut,
   Activity,
   ChevronDown,
-  BrainCircuit,
   User,
   CreditCard,
   CheckCircle2,
   Sparkles,
   ShieldCheck,
   Zap,
+  Calculator as CalculatorIcon,
 } from "lucide-react";
 
 // FIX: Extracted outside to prevent React Hook Error 310 (Black Screen Crash)
-const NavItem = ({ to, icon: Icon, label, currentPath, onClick, color = "blue" }) => {
+const NavItem = ({
+  to,
+  icon: Icon,
+  label,
+  currentPath,
+  onClick,
+  color = "blue",
+}) => {
   const isActive = currentPath.includes(to);
   const colorMap = {
-    blue: { bg: "bg-blue-500/10", text: "text-blue-400", border: "border-blue-500/20", iconBg: "bg-blue-500/10" },
-    emerald: { bg: "bg-emerald-500/10", text: "text-emerald-400", border: "border-emerald-500/20", iconBg: "bg-emerald-500/10" },
-    violet: { bg: "bg-violet-500/10", text: "text-violet-400", border: "border-violet-500/20", iconBg: "bg-violet-500/10" },
-    amber: { bg: "bg-amber-500/10", text: "text-amber-400", border: "border-amber-500/20", iconBg: "bg-amber-500/10" },
-    pink: { bg: "bg-pink-500/10", text: "text-pink-400", border: "border-pink-500/20", iconBg: "bg-pink-500/10" },
-    cyan: { bg: "bg-cyan-500/10", text: "text-cyan-400", border: "border-cyan-500/20", iconBg: "bg-cyan-500/10" },
-    orange: { bg: "bg-orange-500/10", text: "text-orange-400", border: "border-orange-500/20", iconBg: "bg-orange-500/10" },
-    gray: { bg: "bg-gray-500/10", text: "text-gray-400", border: "border-gray-500/20", iconBg: "bg-gray-500/10" },
+    blue: {
+      bg: "bg-blue-500/10",
+      text: "text-blue-400",
+      border: "border-blue-500/20",
+      iconBg: "bg-blue-500/10",
+    },
+    emerald: {
+      bg: "bg-emerald-500/10",
+      text: "text-emerald-400",
+      border: "border-emerald-500/20",
+      iconBg: "bg-emerald-500/10",
+    },
+    violet: {
+      bg: "bg-violet-500/10",
+      text: "text-violet-400",
+      border: "border-violet-500/20",
+      iconBg: "bg-violet-500/10",
+    },
+    amber: {
+      bg: "bg-amber-500/10",
+      text: "text-amber-400",
+      border: "border-amber-500/20",
+      iconBg: "bg-amber-500/10",
+    },
+    pink: {
+      bg: "bg-pink-500/10",
+      text: "text-pink-400",
+      border: "border-pink-500/20",
+      iconBg: "bg-pink-500/10",
+    },
+    cyan: {
+      bg: "bg-cyan-500/10",
+      text: "text-cyan-400",
+      border: "border-cyan-500/20",
+      iconBg: "bg-cyan-500/10",
+    },
+    orange: {
+      bg: "bg-orange-500/10",
+      text: "text-orange-400",
+      border: "border-orange-500/20",
+      iconBg: "bg-orange-500/10",
+    },
+    gray: {
+      bg: "bg-gray-500/10",
+      text: "text-gray-400",
+      border: "border-gray-500/20",
+      iconBg: "bg-gray-500/10",
+    },
   };
   const c = colorMap[color] || colorMap.blue;
 
@@ -46,12 +93,16 @@ const NavItem = ({ to, icon: Icon, label, currentPath, onClick, color = "blue" }
       onClick={onClick}
       className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all font-medium text-sm ${
         isActive
-          ? `${c.bg} ${c.text} border ${c.border}`
+          ? `${c.bg} ${c.text} border${c.border}`
           : "text-gray-500 dark:text-gray-400 hover:bg-gray-100/80 dark:hover:bg-white/[0.04] border border-transparent hover:text-gray-900 dark:hover:text-white"
       }`}
     >
-      <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${isActive ? c.iconBg : "bg-gray-100/80 dark:bg-white/[0.04]"}`}>
-        <Icon className={`w-4 h-4 shrink-0 ${isActive ? c.text : "text-gray-500 dark:text-gray-400"}`} />
+      <div
+        className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${isActive ? c.iconBg : "bg-gray-100/80 dark:bg-white/[0.04]"}`}
+      >
+        <Icon
+          className={`w-4 h-4 shrink-0 ${isActive ? c.text : "text-gray-500 dark:text-gray-400"}`}
+        />
       </div>
       {label}
     </Link>
@@ -63,7 +114,6 @@ export default function MainLayout() {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isSubscriptionOpen, setIsSubscriptionOpen] = useState(false);
   const location = useLocation();
-  const navigate = useNavigate();
 
   // FIX: Enforce Theme Globally on Mount & Route Change
   useEffect(() => {
@@ -76,10 +126,8 @@ export default function MainLayout() {
   }, [location.pathname]);
 
   const handleLogout = () => {
-    localStorage.removeItem("userId");
-    localStorage.removeItem("token");
-    localStorage.removeItem("userEmail");
-    navigate("/login");
+    localStorage.clear();
+    window.location.href = "/login";
   };
 
   const closeMenu = () => {
@@ -91,19 +139,49 @@ export default function MainLayout() {
     {
       label: "Trading",
       items: [
-        { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard", color: "blue" },
-        { to: "/add-trade", icon: PlusCircle, label: "Add Trade", color: "emerald" },
+        {
+          to: "/dashboard",
+          icon: LayoutDashboard,
+          label: "Dashboard",
+          color: "blue",
+        },
+        {
+          to: "/add-trade",
+          icon: PlusCircle,
+          label: "Add Trade",
+          color: "emerald",
+        },
         { to: "/trades", icon: List, label: "Past Trades", color: "violet" },
-        { to: "/calendar", icon: CalendarIcon, label: "Calendar", color: "cyan" },
+        {
+          to: "/calendar",
+          icon: CalendarIcon,
+          label: "Calendar",
+          color: "cyan",
+        },
       ],
     },
     {
       label: "Analysis",
       items: [
-        { to: "/news", icon: Globe, label: "Economic Calendar", color: "amber" },
+        {
+          to: "/news",
+          icon: Globe,
+          label: "Economic Calendar",
+          color: "amber",
+        },
         { to: "/accounts", icon: Users, label: "Accounts", color: "pink" },
-        { to: "/import", icon: Upload, label: "Import Trades", color: "orange" },
-        { to: "/problems", icon: BrainCircuit, label: "Trader Problems", color: "blue" },
+        {
+          to: "/import",
+          icon: Upload,
+          label: "Import Trades",
+          color: "orange",
+        },
+        {
+          to: "/calculator",
+          icon: CalculatorIcon,
+          label: "Calculators",
+          color: "blue",
+        },
       ],
     },
     {
@@ -232,20 +310,20 @@ export default function MainLayout() {
                   ? localStorage.getItem("userEmail").charAt(0).toUpperCase()
                   : "U"}
               </div>
-              <div className="overflow-hidden">
+              <div className="overflow-hidden flex flex-col items-start">
                 <p className="text-sm font-bold text-gray-900 dark:text-white leading-tight truncate max-w-[100px]">
                   {localStorage.getItem("userEmail") || "User"}
                 </p>
                 <button
                   type="button"
                   onClick={(e) => {
+                    e.preventDefault();
                     e.stopPropagation();
-                    setIsSubscriptionOpen(true);
+                    alert("Pro Plan features are coming soon! Stay tuned.");
                   }}
-                  className="text-[10px] text-emerald-500 hover:text-emerald-400 font-bold uppercase tracking-widest text-left hover:underline flex items-center gap-1 mt-0.5"
+                  className="relative z-10 px-2 py-0.5 mt-1 bg-emerald-500/10 text-[10px] text-emerald-500 font-bold uppercase tracking-widest rounded-[2px] hover:bg-emerald-500/20 transition-colors text-left"
                 >
-                  <Sparkles className="w-2.5 h-2.5" />
-                  Pro Member
+                  Subscription
                 </button>
               </div>
             </div>
@@ -253,7 +331,9 @@ export default function MainLayout() {
               onClick={() => setIsProfileOpen(!isProfileOpen)}
               className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors rounded-lg hover:bg-gray-100/80 dark:hover:bg-white/[0.04]"
             >
-              <ChevronDown className={`w-4 h-4 transition-transform ${isProfileOpen ? "rotate-180" : ""}`} />
+              <ChevronDown
+                className={`w-4 h-4 transition-transform ${isProfileOpen ? "rotate-180" : ""}`}
+              />
             </button>
           </div>
         </div>
@@ -301,14 +381,19 @@ export default function MainLayout() {
                     <div className="w-5 h-5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center shrink-0">
                       <CheckCircle2 className="w-3 h-3 text-emerald-400" />
                     </div>
-                    <span className="text-sm text-gray-700 dark:text-gray-300">{feature}</span>
+                    <span className="text-sm text-gray-700 dark:text-gray-300">
+                      {feature}
+                    </span>
                   </div>
                 ))}
               </div>
 
               <div className="flex justify-between items-center text-xs text-gray-500 dark:text-gray-400 px-1">
                 <span>
-                  Billing: <strong className="text-gray-700 dark:text-gray-300">Monthly</strong>
+                  Billing:{" "}
+                  <strong className="text-gray-700 dark:text-gray-300">
+                    Monthly
+                  </strong>
                 </span>
                 <span>
                   Account:{" "}

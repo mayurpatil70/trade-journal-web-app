@@ -8,6 +8,8 @@ import {
   Outlet,
 } from "react-router-dom";
 
+// Components
+import ErrorBoundary from "./components/ErrorBoundary.jsx";
 import Login from "./pages/Login.jsx";
 import Verify from "./pages/Verify.jsx";
 import DiscordGate from "./pages/DiscordGate.jsx";
@@ -21,16 +23,17 @@ import PropAccounts from "./pages/PropAccounts.jsx";
 import Settings from "./pages/Settings.jsx";
 import Profile from "./pages/Profile.jsx";
 import Support from "./pages/Support.jsx";
-import DiscordCallback from "./pages/DiscordCallback";
+import DiscordCallback from "./pages/DiscordCallback.jsx";
+import AdminDashboard from "./pages/AdminDashboard.jsx";
 
 import MainLayout from "./layouts/MainLayout.jsx";
 import PreTradeGate from "./components/PreTradeGate.jsx";
 
-import TraderProblemsLayout from "./pages/TraderProblems/Layout.jsx";
-import LotSizeCalculator from "./pages/TraderProblems/LotSizeCalculator.jsx";
+// Calculator Hub Components
+import CalculatorLayout from "./pages/TraderProblems/Layout.jsx";
 import PropFirm from "./pages/TraderProblems/PropFirm.jsx";
-import TiltBreaker from "./pages/TraderProblems/TiltBreaker.jsx";
-import RiskOfRuin from "./pages/TraderProblems/RiskOfRuin.jsx";
+// Note: Ensure this import matches your actual file name for the Lot Size calculator
+import LotSizeCalculator from "./pages/TraderProblems/LotSizeCalculator.jsx";
 
 const ProtectedRoute = () => {
   const isAuthenticated =
@@ -47,44 +50,39 @@ function App() {
 
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/verify" element={<Verify />} />
+      <ErrorBoundary>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/verify" element={<Verify />} />
 
-        <Route element={<ProtectedRoute />}>
-          <Route path="/link-discord" element={<DiscordGate />} />
-          <Route path="/discord/callback" element={<DiscordCallback />} />
+          <Route element={<ProtectedRoute />}>
+            <Route path="/link-discord" element={<DiscordGate />} />
+            <Route path="/discord/callback" element={<DiscordCallback />} />
 
-          <Route path="/" element={<MainLayout />}>
-            <Route index element={<Navigate to="/dashboard" replace />} />
-            <Route path="dashboard" element={<Dashboard />} />
-            <Route path="add-trade" element={<AddTrade />} />
-            <Route path="news" element={<EconomicCalendar />} />
-            <Route path="trades" element={<PastTrades />} />
-            <Route path="calendar" element={<PerformanceCalendar />} />
-            <Route path="import" element={<Imports />} />
-            <Route path="accounts" element={<PropAccounts />} />
-            <Route path="settings" element={<Settings />} />
-            <Route path="profile" element={<Profile />} />
-            <Route path="support" element={<Support />} />
+            <Route path="/" element={<MainLayout />}>
+              <Route index element={<Navigate to="/dashboard" replace />} />
+              <Route path="dashboard" element={<Dashboard />} />
+              <Route path="add-trade" element={<AddTrade />} />
+              <Route path="news" element={<EconomicCalendar />} />
+              <Route path="trades" element={<PastTrades />} />
+              <Route path="calendar" element={<PerformanceCalendar />} />
+              <Route path="import" element={<Imports />} />
+              <Route path="accounts" element={<PropAccounts />} />
+              <Route path="settings" element={<Settings />} />
+              <Route path="profile" element={<Profile />} />
+              <Route path="support" element={<Support />} />
+              <Route path="admin" element={<AdminDashboard />} />
 
-            {/* Trader Problems Suite */}
-            <Route path="problems" element={<TraderProblemsLayout />}>
-              <Route index element={<Navigate to="calculator" replace />} />
-              <Route path="calculator" element={<LotSizeCalculator />} />
-              <Route path="prop-firm" element={<PropFirm />} />
-              <Route path="tilt-breaker" element={<TiltBreaker />} />
-              <Route path="risk-ruin" element={<RiskOfRuin />} />
-
-              {/* Backward compatibility aliases */}
-              <Route path="partials" element={<LotSizeCalculator />} />
-              <Route path="edge" element={<TiltBreaker />} />
-              <Route path="hindsight" element={<RiskOfRuin />} />
+              {/* RENAMED ROUTE: /problems is now /calculator */}
+              <Route path="calculator" element={<CalculatorLayout />}>
+                <Route index element={<Navigate to="lot-size" replace />} />
+                <Route path="lot-size" element={<LotSizeCalculator />} />
+                <Route path="prop-firm" element={<PropFirm />} />
+              </Route>
             </Route>
           </Route>
-        </Route>
-      </Routes>
-
+        </Routes>
+      </ErrorBoundary>
       <PreTradeGate />
     </BrowserRouter>
   );
