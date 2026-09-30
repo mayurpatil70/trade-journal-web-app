@@ -37,7 +37,7 @@ import PreTradeGate from "./components/PreTradeGate.jsx";
 
 import CalculatorLayout from "./pages/TraderProblems/Layout.jsx";
 import PropFirm from "./pages/TraderProblems/PropFirm.jsx";
-import LotSizeCalculator from "./pages/TraderProblems/LotSizeCalc.jsx";
+import LotSizeCalculator from "./pages/TraderProblems/LotSizeCalculator.jsx";
 
 // GUARD 1: Basic Authentication
 const AuthGuard = () => {
