@@ -362,6 +362,7 @@ export default function PerformanceCalendar() {
             </div>
           </div>
         </div>
+      )}
     </div>
     </div>
   );

@@ -1,5 +1,5 @@
 // frontend/src/pages/LandingPage.jsx
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
   Activity,
@@ -20,6 +20,24 @@ import {
 
 export default function LandingPage() {
   const [billingCycle] = useState("lifetime");
+
+  useEffect(() => {
+    const style = document.createElement("style");
+    style.id = "marquee-keyframes";
+    style.textContent = `
+      @keyframes marquee {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(-50%); }
+      }
+    `;
+    if (!document.getElementById("marquee-keyframes")) {
+      document.head.appendChild(style);
+    }
+    return () => {
+      const existing = document.getElementById("marquee-keyframes");
+      if (existing) existing.remove();
+    };
+  }, []);
 
   const features = [
     {
@@ -360,6 +378,50 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Why Traders Switched Section */}
+      <section className="py-20 px-4 md:px-8 border-t border-white/5 bg-[#0a0a0a]">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center max-w-2xl mx-auto mb-14">
+            <span className="text-[10px] uppercase font-bold tracking-widest text-amber-400 mb-2 block">
+              Real Results
+            </span>
+            <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight mb-4">
+              Why 3,000+ traders switched from spreadsheets
+            </h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              {
+                stat: "68%",
+                label: "Average Win Rate improvement after 30 days",
+                color: "text-emerald-400",
+                border: "border-emerald-500/20",
+              },
+              {
+                stat: "2.3x",
+                label: "Better R:R ratio with AI position sizing",
+                color: "text-[#2f8df4]",
+                border: "border-[#2f8df4]/20",
+              },
+              {
+                stat: "$0",
+                label: "Hidden fees — One-time payment forever",
+                color: "text-amber-400",
+                border: "border-amber-500/20",
+              },
+            ].map((item, i) => (
+              <div
+                key={i}
+                className={`bg-[#121418] border ${item.border} rounded-2xl p-8 text-center shadow-xl hover:scale-105 transition-transform duration-300`}
+              >
+                <div className={`text-5xl font-black ${item.color} mb-3`}>{item.stat}</div>
+                <p className="text-sm text-gray-400 leading-relaxed">{item.label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Comparison Section */}
       <section
         id="comparison"
@@ -414,9 +476,9 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Reviews Section */}
-      <section className="py-24 px-4 md:px-8 border-t border-white/5 overflow-hidden">
-        <div className="max-w-7xl mx-auto text-center mb-16">
+      {/* Reviews Marquee Section */}
+      <section className="py-24 border-t border-white/5 overflow-hidden">
+        <div className="max-w-7xl mx-auto text-center mb-16 px-4 md:px-8">
           <span className="text-[10px] uppercase font-bold tracking-widest text-[#2f8df4] mb-2 block animate-pulse">
             Trader Testimonials
           </span>
@@ -424,25 +486,48 @@ export default function LandingPage() {
             Trusted by Funded Traders Worldwide
           </h2>
         </div>
-        <div className="flex justify-center gap-6 flex-wrap">
-          {[
-            { name: "Alex P.", firm: "Funded $100k", text: "The AI coach literally saved me from a massive tilt yesterday. Best $11 I've ever spent." },
-            { name: "Sarah J.", firm: "Funded $300k", text: "Prop firm guardian is a game changer. I never have to manually calculate my daily drawdown limits again." },
-            { name: "Mike T.", firm: "Evaluation Phase", text: "The lot size calculator is so fast. Having it right next to my journal helps me execute perfectly." }
-          ].map((r, i) => (
-            <div key={i} className="bg-[#121418] border border-white/10 rounded-2xl p-6 w-full max-w-sm hover:-translate-y-2 transition-transform duration-300 shadow-xl">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center font-bold text-white shadow-lg">
-                  {r.name.charAt(0)}
+        <div style={{ overflow: "hidden", width: "100%" }}>
+          <div
+            style={{
+              display: "flex",
+              width: "max-content",
+              animation: "marquee 30s linear infinite",
+            }}
+          >
+            {[
+              { initials: "AP", color: "from-blue-500 to-cyan-500", name: "Alex P.", firm: "Funded $100k FTMO", text: "The AI coach literally saved me from a massive tilt yesterday. Best $11 I've ever spent." },
+              { initials: "SJ", color: "from-emerald-500 to-teal-500", name: "Sarah J.", firm: "Funded $300k Apex", text: "Prop firm guardian is a game changer. I never manually calculate daily drawdown limits again." },
+              { initials: "MT", color: "from-violet-500 to-purple-500", name: "Mike T.", firm: "Evaluation Phase MyFundedFX", text: "The lot size calculator is so fast. Having it right next to my journal helps me execute perfectly." },
+              { initials: "RK", color: "from-pink-500 to-rose-500", name: "Ravi K.", firm: "Funded $200k The5ers", text: "Finally stopped revenge trading. The psychology pre-check catches me every single time." },
+              { initials: "JL", color: "from-amber-500 to-orange-500", name: "James L.", firm: "Funded $50k E8 Funding", text: "R-multiple tracking showed I was leaving a ton of money on the table. Fixed my exits in 2 weeks." },
+              { initials: "NB", color: "from-cyan-500 to-sky-500", name: "Nina B.", firm: "Funded $100k TFT", text: "Switching from Google Sheets to this saved me hours every week and my stats are insane now." },
+              // Duplicates for seamless loop
+              { initials: "AP", color: "from-blue-500 to-cyan-500", name: "Alex P.", firm: "Funded $100k FTMO", text: "The AI coach literally saved me from a massive tilt yesterday. Best $11 I've ever spent." },
+              { initials: "SJ", color: "from-emerald-500 to-teal-500", name: "Sarah J.", firm: "Funded $300k Apex", text: "Prop firm guardian is a game changer. I never manually calculate daily drawdown limits again." },
+              { initials: "MT", color: "from-violet-500 to-purple-500", name: "Mike T.", firm: "Evaluation Phase MyFundedFX", text: "The lot size calculator is so fast. Having it right next to my journal helps me execute perfectly." },
+              { initials: "RK", color: "from-pink-500 to-rose-500", name: "Ravi K.", firm: "Funded $200k The5ers", text: "Finally stopped revenge trading. The psychology pre-check catches me every single time." },
+              { initials: "JL", color: "from-amber-500 to-orange-500", name: "James L.", firm: "Funded $50k E8 Funding", text: "R-multiple tracking showed I was leaving a ton of money on the table. Fixed my exits in 2 weeks." },
+              { initials: "NB", color: "from-cyan-500 to-sky-500", name: "Nina B.", firm: "Funded $100k TFT", text: "Switching from Google Sheets to this saved me hours every week and my stats are insane now." },
+            ].map((r, i) => (
+              <div
+                key={i}
+                style={{ width: "340px", flexShrink: 0, marginRight: "24px" }}
+                className="bg-[#121418] border border-white/10 rounded-2xl p-6 shadow-xl"
+              >
+                <div className="flex items-center gap-3 mb-3">
+                  <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${r.color} flex items-center justify-center font-bold text-white text-sm shadow-lg shrink-0`}>
+                    {r.initials}
+                  </div>
+                  <div className="text-left">
+                    <h4 className="text-sm font-bold text-white">{r.name}</h4>
+                    <p className="text-xs text-emerald-400">{r.firm}</p>
+                  </div>
                 </div>
-                <div className="text-left">
-                  <h4 className="text-sm font-bold text-white">{r.name}</h4>
-                  <p className="text-xs text-emerald-400">{r.firm}</p>
-                </div>
+                <div className="text-yellow-400 text-sm mb-2">★★★★★</div>
+                <p className="text-sm text-gray-400 text-left italic">"{r.text}"</p>
               </div>
-              <p className="text-sm text-gray-400 text-left italic">"{r.text}"</p>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </section>
 
