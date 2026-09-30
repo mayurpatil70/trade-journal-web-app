@@ -12,63 +12,29 @@ import {
   Loader2,
   CheckCircle,
   ChevronDown,
+  Sparkles,
 } from "lucide-react";
 
 export default function AddTrade() {
   const navigate = useNavigate();
-  const location = useLocation(); // CRITICAL FIX: Added useLocation to handle AI Coach redirect
+  const location = useLocation();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const assets = [
-    "XAUUSD",
-    "NAS100",
-    "GER40",
-    "US30",
-    "EURUSD",
-    "GBPUSD",
-    "USDJPY",
-    "AUDUSD",
-    "USDCAD",
-    "EURJPY",
-    "BTCUSD",
-    "ETHUSD",
-    "SILVER",
-    "USOIL",
+    "XAUUSD", "NAS100", "GER40", "US30", "EURUSD", "GBPUSD",
+    "USDJPY", "AUDUSD", "USDCAD", "EURJPY", "BTCUSD", "ETHUSD",
+    "SILVER", "USOIL",
   ];
-  const setups = [
-    "FVG",
-    "SMT",
-    "Liquidity Sweep",
-    "Order Block",
-    "Breakout",
-    "Pullback",
-    "Other",
-  ];
+  const setups = ["FVG", "SMT", "Liquidity Sweep", "Order Block", "Breakout", "Pullback", "Other"];
   const emotions = [
-    "Calm",
-    "Confident",
-    "Focused",
-    "Neutral",
-    "Excited",
-    "FOMO",
-    "Anxious",
-    "Fearful",
-    "Revenge",
-    "Impatient",
-    "Greedy",
-    "Tired",
-    "Frustrated",
-    "Overconfident",
+    "Calm", "Confident", "Focused", "Neutral", "Excited",
+    "FOMO", "Anxious", "Fearful", "Revenge", "Impatient",
+    "Greedy", "Tired", "Frustrated", "Overconfident",
   ];
 
-  // CRITICAL FIX: Safe optional chaining on location.state prevents Black Screen Crash
   const [formData, setFormData] = useState({
     date: new Date().toISOString().slice(0, 10),
-    time: new Date().toLocaleTimeString("en-US", {
-      hour12: false,
-      hour: "2-digit",
-      minute: "2-digit",
-    }),
+    time: new Date().toLocaleTimeString("en-US", { hour12: false, hour: "2-digit", minute: "2-digit" }),
     asset: location?.state?.asset || "XAUUSD",
     direction: location?.state?.direction || "LONG",
     session: "London",
@@ -117,12 +83,8 @@ export default function AddTrade() {
     try {
       const submitData = new FormData();
       submitData.append("userId", userId);
-      Object.keys(formData).forEach((key) =>
-        submitData.append(key, formData[key]),
-      );
-      images.forEach((img) => {
-        if (img) submitData.append("images", img);
-      });
+      Object.keys(formData).forEach((key) => submitData.append(key, formData[key]));
+      images.forEach((img) => { if (img) submitData.append("images", img); });
 
       await api.post("/api/trades", submitData, {
         headers: { "Content-Type": "multipart/form-data" },
@@ -136,42 +98,49 @@ export default function AddTrade() {
     }
   };
 
-  const cardClass =
-    "w-full bg-white dark:bg-[#121418] border border-gray-200 dark:border-white/5 rounded-[2px] p-5 sm:p-8 md:p-10 shadow-xl mb-8 box-border";
-  const inputContainerClass = "flex flex-col gap-2 w-full box-border";
-  const labelClass =
-    "text-[10px] font-bold text-gray-600 dark:text-gray-400 uppercase tracking-widest";
   const inputClass =
-    "appearance-none w-full min-h-[52px] bg-gray-50 dark:bg-[#0b131d] border border-gray-300 dark:border-[#1f2c3b] rounded-[2px] px-4 py-3 !text-[#2f8df4] [-webkit-text-fill-color:#2f8df4] font-bold focus:border-[#2f8df4] outline-none text-sm text-center [text-align-last:center]";
+    "appearance-none w-full min-h-[52px] bg-white/40 dark:bg-white/[0.04] border border-gray-300/80 dark:border-white/10 rounded-xl px-4 py-3 text-blue-600 dark:text-blue-400 font-bold focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 outline-none text-sm text-center [text-align-last:center] backdrop-blur-sm transition-all";
   const textareaClass =
-    "appearance-none w-full min-h-[100px] bg-gray-50 dark:bg-[#0b131d] border border-gray-300 dark:border-[#1f2c3b] rounded-[2px] px-4 py-3 !text-[#2f8df4] [-webkit-text-fill-color:#2f8df4] font-bold focus:border-[#2f8df4] outline-none text-sm text-left resize-y";
-  const optionClass =
-    "bg-white !text-[#2f8df4] [-webkit-text-fill-color:#2f8df4] dark:bg-[#0b131d] font-bold text-center";
+    "appearance-none w-full min-h-[100px] bg-white/40 dark:bg-white/[0.04] border border-gray-300/80 dark:border-white/10 rounded-xl px-4 py-3 text-blue-600 dark:text-blue-400 font-bold focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 outline-none text-sm text-left resize-y backdrop-blur-sm transition-all";
+  const optionClass = "bg-white dark:bg-[#0b131d] text-blue-600 dark:!text-blue-400 font-bold text-center";
+  const labelClass = "text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest";
+  const inputContainerClass = "flex flex-col gap-2 w-full box-border";
+
+  const cardClass =
+    "w-full bg-white/60 dark:bg-white/[0.03] border border-gray-200/80 dark:border-white/10 rounded-2xl p-5 sm:p-8 shadow-xl backdrop-blur-xl mb-6 box-border";
 
   return (
     <div
       className="w-full max-w-6xl mx-auto font-sans pb-16 px-4 md:px-8 mt-6 md:mt-8 overflow-visible box-border"
       style={{ fontFamily: "'Inter', sans-serif" }}
     >
-      <div className="mb-8 md:mb-12 flex items-center gap-4">
-        <div className="w-10 h-10 md:w-12 md:h-12 rounded-[2px] bg-[#2f8df4]/10 flex items-center justify-center border border-[#2f8df4]/20 shrink-0">
-          <TrendingUp className="w-5 h-5 md:w-6 md:h-6 text-[#2f8df4]" />
+      {/* Header */}
+      <div className="mb-8 md:mb-10 flex items-center gap-4">
+        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500/20 to-cyan-500/20 border border-blue-500/20 flex items-center justify-center shrink-0 shadow-lg shadow-blue-500/10">
+          <TrendingUp className="w-6 h-6 text-blue-400" />
         </div>
         <div>
-          <h1 className="text-xl md:text-3xl font-bold text-gray-900 dark:text-white tracking-tight mb-1">
-            Log New Trade
-          </h1>
+          <div className="flex items-center gap-2 mb-1">
+            <h1 className="text-2xl md:text-3xl font-black text-gray-900 dark:text-white tracking-tight">
+              Log New Trade
+            </h1>
+            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-gradient-to-r from-blue-500/20 to-cyan-500/20 text-blue-400 border border-blue-500/30">
+              Journal
+            </span>
+          </div>
           <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400">
             Record your setup, execution, psychology, and lessons.
           </p>
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-8 md:space-y-10 w-full">
+      <form onSubmit={handleSubmit} className="space-y-6 w-full">
         {/* SECTION 1: Execution Details */}
         <div className={cardClass}>
-          <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-200 dark:border-white/5">
-            <Target className="w-5 h-5 text-[#2f8df4]" />
+          <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-200/80 dark:border-white/10">
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500/20 to-cyan-500/20 border border-blue-500/20 flex items-center justify-center">
+              <Target className="w-4 h-4 text-blue-400" />
+            </div>
             <h2 className="text-lg md:text-xl font-bold text-gray-900 dark:text-white">
               Execution Details
             </h2>
@@ -202,151 +171,70 @@ export default function AddTrade() {
             <div className={inputContainerClass}>
               <label className={labelClass}>Asset / Pair</label>
               <div className="relative w-full">
-                <select
-                  name="asset"
-                  value={formData.asset}
-                  onChange={handleChange}
-                  className={`${inputClass} pr-10`}
-                >
-                  {assets.map((a) => (
-                    <option key={a} value={a} className={optionClass}>
-                      {a}
-                    </option>
-                  ))}
+                <select name="asset" value={formData.asset} onChange={handleChange} className={`${inputClass} pr-10`}>
+                  {assets.map((a) => (<option key={a} value={a} className={optionClass}>{a}</option>))}
                 </select>
-                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#2f8df4] pointer-events-none" />
+                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-blue-400 pointer-events-none" />
               </div>
             </div>
             <div className={inputContainerClass}>
               <label className={labelClass}>Direction</label>
               <div className="relative w-full">
-                <select
-                  name="direction"
-                  value={formData.direction}
-                  onChange={handleChange}
-                  className={`${inputClass} pr-10`}
-                >
-                  <option value="LONG" className={optionClass}>
-                    LONG
-                  </option>
-                  <option value="SHORT" className={optionClass}>
-                    SHORT
-                  </option>
+                <select name="direction" value={formData.direction} onChange={handleChange} className={`${inputClass} pr-10`}>
+                  <option value="LONG" className={optionClass}>LONG ▲</option>
+                  <option value="SHORT" className={optionClass}>SHORT ▼</option>
                 </select>
-                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#2f8df4] pointer-events-none" />
+                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-blue-400 pointer-events-none" />
               </div>
             </div>
             <div className={inputContainerClass}>
               <label className={labelClass}>Session</label>
               <div className="relative w-full">
-                <select
-                  name="session"
-                  value={formData.session}
-                  onChange={handleChange}
-                  className={`${inputClass} pr-10`}
-                >
-                  <option value="London" className={optionClass}>
-                    London
-                  </option>
-                  <option value="New York" className={optionClass}>
-                    New York
-                  </option>
-                  <option value="Asian" className={optionClass}>
-                    Asian
-                  </option>
-                  <option value="Other" className={optionClass}>
-                    Other
-                  </option>
+                <select name="session" value={formData.session} onChange={handleChange} className={`${inputClass} pr-10`}>
+                  {["London", "New York", "Asian", "Other"].map(s => (
+                    <option key={s} value={s} className={optionClass}>{s}</option>
+                  ))}
                 </select>
-                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#2f8df4] pointer-events-none" />
+                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-blue-400 pointer-events-none" />
               </div>
             </div>
             <div className={inputContainerClass}>
               <label className={labelClass}>Setup Type</label>
               <div className="relative w-full">
-                <select
-                  name="setup"
-                  value={formData.setup}
-                  onChange={handleChange}
-                  className={`${inputClass} pr-10`}
-                >
-                  {setups.map((s) => (
-                    <option key={s} value={s} className={optionClass}>
-                      {s}
-                    </option>
-                  ))}
+                <select name="setup" value={formData.setup} onChange={handleChange} className={`${inputClass} pr-10`}>
+                  {setups.map((s) => (<option key={s} value={s} className={optionClass}>{s}</option>))}
                 </select>
-                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#2f8df4] pointer-events-none" />
+                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-blue-400 pointer-events-none" />
               </div>
             </div>
-            <div className={inputContainerClass}>
-              <label className={labelClass}>Entry Price</label>
-              <input
-                type="number"
-                step="any"
-                name="entry"
-                placeholder="0.0000"
-                value={formData.entry}
-                onChange={handleChange}
-                className={inputClass}
-              />
-            </div>
-            <div className={inputContainerClass}>
-              <label className={labelClass}>Stop Loss</label>
-              <input
-                type="number"
-                step="any"
-                name="sl"
-                placeholder="0.0000"
-                value={formData.sl}
-                onChange={handleChange}
-                className={inputClass}
-              />
-            </div>
-            <div className={inputContainerClass}>
-              <label className={labelClass}>Take Profit</label>
-              <input
-                type="number"
-                step="any"
-                name="tp"
-                placeholder="0.0000"
-                value={formData.tp}
-                onChange={handleChange}
-                className={inputClass}
-              />
-            </div>
-            <div className={inputContainerClass}>
-              <label className={labelClass}>Risk %</label>
-              <input
-                type="number"
-                step="0.1"
-                name="risk"
-                placeholder="0.5"
-                value={formData.risk}
-                onChange={handleChange}
-                className={inputClass}
-              />
-            </div>
+            {[
+              { label: "Entry Price", name: "entry", placeholder: "0.0000" },
+              { label: "Stop Loss", name: "sl", placeholder: "0.0000" },
+              { label: "Take Profit", name: "tp", placeholder: "0.0000" },
+              { label: "Risk %", name: "risk", placeholder: "0.5" },
+            ].map((field) => (
+              <div key={field.name} className={inputContainerClass}>
+                <label className={labelClass}>{field.label}</label>
+                <input
+                  type="number"
+                  step="any"
+                  name={field.name}
+                  placeholder={field.placeholder}
+                  value={formData[field.name]}
+                  onChange={handleChange}
+                  className={inputClass}
+                />
+              </div>
+            ))}
             <div className={inputContainerClass}>
               <label className={labelClass}>Trade Result</label>
               <div className="relative w-full">
-                <select
-                  name="result"
-                  value={formData.result}
-                  onChange={handleChange}
-                  className={`${inputClass} pr-10`}
-                >
-                  <option value="win" className={optionClass}>
-                    WIN
-                  </option>
-                  <option value="loss" className={optionClass}>
-                    LOSS
-                  </option>
-                  <option value="be" className={optionClass}>
-                    BREAK-EVEN
-                  </option>
+                <select name="result" value={formData.result} onChange={handleChange} className={`${inputClass} pr-10`}>
+                  <option value="win" className={optionClass}>WIN ✓</option>
+                  <option value="loss" className={optionClass}>LOSS ✗</option>
+                  <option value="be" className={optionClass}>BREAK-EVEN</option>
                 </select>
-                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#2f8df4] pointer-events-none" />
+                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-blue-400 pointer-events-none" />
               </div>
             </div>
             <div className={inputContainerClass}>
@@ -369,7 +257,7 @@ export default function AddTrade() {
                 value={formData.reason}
                 onChange={handleChange}
                 className={textareaClass}
-              ></textarea>
+              />
             </div>
             <div className={`lg:col-span-3 ${inputContainerClass}`}>
               <label className={labelClass}>Lesson / Mistake</label>
@@ -379,100 +267,65 @@ export default function AddTrade() {
                 value={formData.lesson}
                 onChange={handleChange}
                 className={textareaClass}
-              ></textarea>
+              />
             </div>
           </div>
         </div>
 
         {/* SECTION 2: Psychology */}
-        <div className={cardClass}>
-          <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-200 dark:border-white/5">
-            <Brain className="w-5 h-5 text-[#f472b6]" />
-            <h2 className="text-lg font-bold text-gray-900 dark:text-white">
-              Psychology Tracker
-            </h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            <div className={inputContainerClass}>
-              <label className={labelClass}>Emotion Before Trade</label>
-              <div className="relative w-full">
-                <select
-                  name="emotionBefore"
-                  value={formData.emotionBefore}
-                  onChange={handleChange}
-                  className={`${inputClass} pr-10`}
-                >
-                  <option value="" className={optionClass}>
-                    Select emotion...
-                  </option>
-                  {emotions.map((e) => (
-                    <option key={e} value={e} className={optionClass}>
-                      {e}
-                    </option>
-                  ))}
-                </select>
-                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#2f8df4] pointer-events-none" />
+        <div className={cardClass.replace("from-blue-500/20 to-cyan-500/20", "from-pink-500/20 to-purple-500/20")}>
+          <div className="w-full bg-white/60 dark:bg-white/[0.03] border border-gray-200/80 dark:border-white/10 rounded-2xl p-5 sm:p-8 shadow-xl backdrop-blur-xl box-border">
+            <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-200/80 dark:border-white/10">
+              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-pink-500/20 to-purple-500/20 border border-pink-500/20 flex items-center justify-center">
+                <Brain className="w-4 h-4 text-pink-400" />
               </div>
+              <h2 className="text-lg font-bold text-gray-900 dark:text-white">
+                Psychology Tracker
+              </h2>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+              {["emotionBefore", "emotionAfter"].map((field, idx) => (
+                <div key={field} className={inputContainerClass}>
+                  <label className={labelClass}>{idx === 0 ? "Emotion Before Trade" : "Emotion After Trade"}</label>
+                  <div className="relative w-full">
+                    <select name={field} value={formData[field]} onChange={handleChange} className={`${inputClass} pr-10`}>
+                      <option value="" className={optionClass}>Select emotion...</option>
+                      {emotions.map((e) => (<option key={e} value={e} className={optionClass}>{e}</option>))}
+                    </select>
+                    <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-blue-400 pointer-events-none" />
+                  </div>
+                </div>
+              ))}
             </div>
             <div className={inputContainerClass}>
-              <label className={labelClass}>Emotion After Trade</label>
-              <div className="relative w-full">
-                <select
-                  name="emotionAfter"
-                  value={formData.emotionAfter}
-                  onChange={handleChange}
-                  className={`${inputClass} pr-10`}
-                >
-                  <option value="" className={optionClass}>
-                    Select emotion...
-                  </option>
-                  {emotions.map((e) => (
-                    <option key={e} value={e} className={optionClass}>
-                      {e}
-                    </option>
-                  ))}
-                </select>
-                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#2f8df4] pointer-events-none" />
-              </div>
-            </div>
-          </div>
-          <div className={inputContainerClass}>
-            <label className={labelClass}>Psychology Note</label>
-            <textarea
-              name="psychNote"
-              placeholder="What was going through my mind during the trade?"
-              value={formData.psychNote}
-              onChange={handleChange}
-              className={textareaClass}
-            ></textarea>
-          </div>
-          <div className="mt-8 pt-8 border-t border-gray-200 dark:border-white/5 flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-            <label className={labelClass}>
-              Did you break any trading rules?
-            </label>
-            <div className="relative w-full sm:w-auto">
-              <select
-                name="ruleBreak"
-                value={formData.ruleBreak}
+              <label className={labelClass}>Psychology Note</label>
+              <textarea
+                name="psychNote"
+                placeholder="What was going through my mind during the trade?"
+                value={formData.psychNote}
                 onChange={handleChange}
-                className={`${inputClass} sm:min-w-[150px] pr-10`}
-              >
-                <option value="no" className={optionClass}>
-                  No
-                </option>
-                <option value="yes" className={optionClass}>
-                  Yes
-                </option>
-              </select>
-              <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#2f8df4] pointer-events-none" />
+                className={textareaClass}
+              />
+            </div>
+            <div className="mt-8 pt-6 border-t border-gray-200/80 dark:border-white/10 flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+              <label className={labelClass}>Did you break any trading rules?</label>
+              <div className="relative w-full sm:w-auto">
+                <select name="ruleBreak" value={formData.ruleBreak} onChange={handleChange} className={`${inputClass} sm:min-w-[150px] pr-10`}>
+                  <option value="no" className={optionClass}>No ✓</option>
+                  <option value="yes" className={optionClass}>Yes ✗</option>
+                </select>
+                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-blue-400 pointer-events-none" />
+              </div>
             </div>
           </div>
         </div>
 
         {/* SECTION 3: Chart Uploads */}
-        <div className={cardClass}>
-          <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-200 dark:border-white/5">
-            <ImageIcon className="w-5 h-5 text-[#21d4a3]" />
+        <div className="w-full bg-white/60 dark:bg-white/[0.03] border border-gray-200/80 dark:border-white/10 rounded-2xl p-5 sm:p-8 shadow-xl backdrop-blur-xl mb-6 box-border">
+          <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-200/80 dark:border-white/10">
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 border border-emerald-500/20 flex items-center justify-center">
+              <ImageIcon className="w-4 h-4 text-emerald-400" />
+            </div>
             <h2 className="text-lg font-bold text-gray-900 dark:text-white">
               Chart Screenshots
             </h2>
@@ -481,18 +334,22 @@ export default function AddTrade() {
             {imageLabels.map((label, idx) => (
               <label
                 key={idx}
-                className="border-2 border-dashed border-gray-300 dark:border-[#1f2c3b] rounded-[2px] p-6 flex flex-col items-center justify-center text-center hover:bg-gray-50 dark:hover:bg-white/[0.02] transition-all cursor-pointer group min-h-[140px]"
+                className="border-2 border-dashed border-gray-300/80 dark:border-white/10 rounded-2xl p-6 flex flex-col items-center justify-center text-center hover:bg-emerald-500/5 hover:border-emerald-400/50 transition-all cursor-pointer group min-h-[140px] backdrop-blur-sm"
               >
                 {images[idx] ? (
                   <>
-                    <CheckCircle className="w-8 h-8 text-[#21d4a3] mb-3" />
-                    <p className="text-xs font-bold text-[#21d4a3] truncate w-full px-2">
+                    <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mb-3">
+                      <CheckCircle className="w-6 h-6 text-emerald-400" />
+                    </div>
+                    <p className="text-xs font-bold text-emerald-400 truncate w-full px-2">
                       {images[idx].name}
                     </p>
                   </>
                 ) : (
                   <>
-                    <ImageIcon className="w-8 h-8 text-[#2f8df4] opacity-70 group-hover:opacity-100 transition-opacity mb-3" />
+                    <div className="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                      <ImageIcon className="w-6 h-6 text-blue-400" />
+                    </div>
                     <p className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">
                       {label}
                     </p>
@@ -518,14 +375,14 @@ export default function AddTrade() {
             type="button"
             onClick={() => navigate("/trades")}
             disabled={isSubmitting}
-            className="w-full sm:w-auto px-8 py-3.5 bg-white dark:bg-[#121418] border border-[#2f8df4]/30 text-[#2f8df4] font-bold rounded-[2px] hover:bg-gray-50 dark:hover:bg-white/5 transition-colors flex items-center justify-center gap-2"
+            className="w-full sm:w-auto px-8 py-3.5 bg-white/60 dark:bg-white/[0.04] border border-gray-300/80 dark:border-white/10 text-gray-700 dark:text-gray-300 font-bold rounded-2xl hover:bg-white dark:hover:bg-white/10 transition-all flex items-center justify-center gap-2 backdrop-blur-sm"
           >
             <X className="w-5 h-5" /> Cancel
           </button>
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full sm:w-auto px-10 py-3.5 bg-[#2f8df4] hover:bg-[#2376e8] text-white font-bold rounded-[2px] shadow-lg transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+            className="w-full sm:w-auto px-10 py-3.5 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white font-bold rounded-2xl shadow-xl shadow-blue-500/25 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
           >
             {isSubmitting ? (
               <>
