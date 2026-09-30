@@ -143,7 +143,7 @@ export default function Support() {
               </select>
             </div>
 
-            {/* <div>
+            <div>
               <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-1">
                 Message
               </label>
@@ -156,7 +156,7 @@ export default function Support() {
                 className={textareaClass}
                 required
               ></textarea>
-            </div> */}
+            </div>
 
             <div className="flex justify-end">
               <button

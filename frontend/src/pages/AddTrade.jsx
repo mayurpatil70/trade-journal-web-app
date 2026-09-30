@@ -1,6 +1,6 @@
 // frontend/src/pages/AddTrade.jsx
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import api from "../api/axios";
 import {
   Save,
@@ -16,6 +16,7 @@ import {
 
 export default function AddTrade() {
   const navigate = useNavigate();
+  const location = useLocation(); // CRITICAL FIX: Added useLocation to handle AI Coach redirect
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const assets = [
@@ -60,6 +61,7 @@ export default function AddTrade() {
     "Overconfident",
   ];
 
+  // CRITICAL FIX: Safe optional chaining on location.state prevents Black Screen Crash
   const [formData, setFormData] = useState({
     date: new Date().toISOString().slice(0, 10),
     time: new Date().toLocaleTimeString("en-US", {
@@ -67,8 +69,8 @@ export default function AddTrade() {
       hour: "2-digit",
       minute: "2-digit",
     }),
-    asset: "XAUUSD",
-    direction: "LONG",
+    asset: location?.state?.asset || "XAUUSD",
+    direction: location?.state?.direction || "LONG",
     session: "London",
     setup: "FVG",
     entry: "",
@@ -85,13 +87,11 @@ export default function AddTrade() {
     psychNote: "",
   });
 
-  // UPDATED: Exactly 2 slots for Hindsight Slider compatibility
   const [images, setImages] = useState([null, null]);
   const imageLabels = ["Before (Entry Chart)", "After (Exit Chart)"];
 
-  const handleChange = (e) => {
+  const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
 
   const handleImageChange = (index, e) => {
     const file = e.target.files[0];
@@ -106,7 +106,8 @@ export default function AddTrade() {
     e.preventDefault();
     setIsSubmitting(true);
 
-    const userId = localStorage.getItem("userId");
+    const userId =
+      localStorage.getItem("userId") || localStorage.getItem("userEmail");
     if (!userId) {
       alert("Session expired. Please log in again.");
       setIsSubmitting(false);
@@ -116,12 +117,9 @@ export default function AddTrade() {
     try {
       const submitData = new FormData();
       submitData.append("userId", userId);
-
-      Object.keys(formData).forEach((key) => {
-        submitData.append(key, formData[key]);
-      });
-
-      // Appends images in order (0 = Before, 1 = After)
+      Object.keys(formData).forEach((key) =>
+        submitData.append(key, formData[key]),
+      );
       images.forEach((img) => {
         if (img) submitData.append("images", img);
       });
@@ -129,8 +127,6 @@ export default function AddTrade() {
       await api.post("/api/trades", submitData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-
-      alert("Trade Saved Successfully!");
       navigate("/trades");
     } catch (error) {
       console.error("Upload Error:", error);
@@ -141,33 +137,28 @@ export default function AddTrade() {
   };
 
   const cardClass =
-    "w-full max-w-full bg-white dark:bg-[#121418] border border-gray-200 dark:border-white/5 rounded-[2px] p-5 sm:p-8 md:p-10 shadow-xl mb-8 sm:mb-10 box-border";
+    "w-full bg-white dark:bg-[#121418] border border-gray-200 dark:border-white/5 rounded-[2px] p-5 sm:p-8 md:p-10 shadow-xl mb-8 box-border";
   const inputContainerClass = "flex flex-col gap-2 w-full box-border";
   const labelClass =
     "text-[10px] font-bold text-gray-600 dark:text-gray-400 uppercase tracking-widest";
-
   const inputClass =
-    "appearance-none box-border w-full min-h-[52px] block bg-gray-50 dark:bg-[#0b131d] border border-gray-300 dark:border-[#1f2c3b] rounded-[2px] px-4 py-3 !text-[#2f8df4] [-webkit-text-fill-color:#2f8df4] font-bold focus:border-[#2f8df4] focus:ring-1 focus:ring-[#2f8df4] outline-none transition-all placeholder-gray-400 dark:placeholder-gray-500 text-sm shadow-sm text-center [text-align-last:center]";
-
+    "appearance-none w-full min-h-[52px] bg-gray-50 dark:bg-[#0b131d] border border-gray-300 dark:border-[#1f2c3b] rounded-[2px] px-4 py-3 !text-[#2f8df4] [-webkit-text-fill-color:#2f8df4] font-bold focus:border-[#2f8df4] outline-none text-sm text-center [text-align-last:center]";
   const textareaClass =
-    "appearance-none box-border w-full min-h-[100px] block bg-gray-50 dark:bg-[#0b131d] border border-gray-300 dark:border-[#1f2c3b] rounded-[2px] px-4 py-3 !text-[#2f8df4] [-webkit-text-fill-color:#2f8df4] font-bold focus:border-[#2f8df4] focus:ring-1 focus:ring-[#2f8df4] outline-none transition-all placeholder-gray-400 dark:placeholder-gray-500 text-sm shadow-sm resize-y text-left";
-
+    "appearance-none w-full min-h-[100px] bg-gray-50 dark:bg-[#0b131d] border border-gray-300 dark:border-[#1f2c3b] rounded-[2px] px-4 py-3 !text-[#2f8df4] [-webkit-text-fill-color:#2f8df4] font-bold focus:border-[#2f8df4] outline-none text-sm text-left resize-y";
   const optionClass =
     "bg-white !text-[#2f8df4] [-webkit-text-fill-color:#2f8df4] dark:bg-[#0b131d] font-bold text-center";
-  const headerIconClass =
-    "w-10 h-10 md:w-12 md:h-12 rounded-[2px] bg-[#2f8df4]/10 flex items-center justify-center border border-[#2f8df4]/20 shrink-0";
 
   return (
     <div
-      className="w-full max-w-6xl mx-auto font-sans pb-16 px-4 md:px-8 mt-6 md:mt-8 overflow-hidden sm:overflow-visible box-border"
+      className="w-full max-w-6xl mx-auto font-sans pb-16 px-4 md:px-8 mt-6 md:mt-8 overflow-visible box-border"
       style={{ fontFamily: "'Inter', sans-serif" }}
     >
       <div className="mb-8 md:mb-12 flex items-center gap-4">
-        <div className={headerIconClass}>
+        <div className="w-10 h-10 md:w-12 md:h-12 rounded-[2px] bg-[#2f8df4]/10 flex items-center justify-center border border-[#2f8df4]/20 shrink-0">
           <TrendingUp className="w-5 h-5 md:w-6 md:h-6 text-[#2f8df4]" />
         </div>
         <div>
-          <h1 className="text-xl md:text-3xl font-bold text-gray-900 dark:text-white tracking-tight mb-1 md:mb-2">
+          <h1 className="text-xl md:text-3xl font-bold text-gray-900 dark:text-white tracking-tight mb-1">
             Log New Trade
           </h1>
           <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400">
@@ -179,14 +170,13 @@ export default function AddTrade() {
       <form onSubmit={handleSubmit} className="space-y-8 md:space-y-10 w-full">
         {/* SECTION 1: Execution Details */}
         <div className={cardClass}>
-          <div className="flex items-center gap-3 mb-6 md:mb-8 pb-4 md:pb-6 border-b border-gray-200 dark:border-white/5">
-            <Target className="w-5 h-5 md:w-6 md:h-6 text-[#2f8df4]" />
+          <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-200 dark:border-white/5">
+            <Target className="w-5 h-5 text-[#2f8df4]" />
             <h2 className="text-lg md:text-xl font-bold text-gray-900 dark:text-white">
               Execution Details
             </h2>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 w-full">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
             <div className={inputContainerClass}>
               <label className={labelClass}>Trade Date</label>
               <input
@@ -198,7 +188,6 @@ export default function AddTrade() {
                 required
               />
             </div>
-
             <div className={inputContainerClass}>
               <label className={labelClass}>Trade Time</label>
               <input
@@ -210,10 +199,9 @@ export default function AddTrade() {
                 required
               />
             </div>
-
             <div className={inputContainerClass}>
               <label className={labelClass}>Asset / Pair</label>
-              <div className="relative w-full flex items-center justify-center">
+              <div className="relative w-full">
                 <select
                   name="asset"
                   value={formData.asset}
@@ -226,13 +214,12 @@ export default function AddTrade() {
                     </option>
                   ))}
                 </select>
-                <ChevronDown className="absolute right-4 w-4 h-4 text-[#2f8df4] pointer-events-none" />
+                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#2f8df4] pointer-events-none" />
               </div>
             </div>
-
             <div className={inputContainerClass}>
               <label className={labelClass}>Direction</label>
-              <div className="relative w-full flex items-center justify-center">
+              <div className="relative w-full">
                 <select
                   name="direction"
                   value={formData.direction}
@@ -246,13 +233,12 @@ export default function AddTrade() {
                     SHORT
                   </option>
                 </select>
-                <ChevronDown className="absolute right-4 w-4 h-4 text-[#2f8df4] pointer-events-none" />
+                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#2f8df4] pointer-events-none" />
               </div>
             </div>
-
             <div className={inputContainerClass}>
               <label className={labelClass}>Session</label>
-              <div className="relative w-full flex items-center justify-center">
+              <div className="relative w-full">
                 <select
                   name="session"
                   value={formData.session}
@@ -272,13 +258,12 @@ export default function AddTrade() {
                     Other
                   </option>
                 </select>
-                <ChevronDown className="absolute right-4 w-4 h-4 text-[#2f8df4] pointer-events-none" />
+                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#2f8df4] pointer-events-none" />
               </div>
             </div>
-
             <div className={inputContainerClass}>
               <label className={labelClass}>Setup Type</label>
-              <div className="relative w-full flex items-center justify-center">
+              <div className="relative w-full">
                 <select
                   name="setup"
                   value={formData.setup}
@@ -291,10 +276,9 @@ export default function AddTrade() {
                     </option>
                   ))}
                 </select>
-                <ChevronDown className="absolute right-4 w-4 h-4 text-[#2f8df4] pointer-events-none" />
+                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#2f8df4] pointer-events-none" />
               </div>
             </div>
-
             <div className={inputContainerClass}>
               <label className={labelClass}>Entry Price</label>
               <input
@@ -307,7 +291,6 @@ export default function AddTrade() {
                 className={inputClass}
               />
             </div>
-
             <div className={inputContainerClass}>
               <label className={labelClass}>Stop Loss</label>
               <input
@@ -320,7 +303,6 @@ export default function AddTrade() {
                 className={inputClass}
               />
             </div>
-
             <div className={inputContainerClass}>
               <label className={labelClass}>Take Profit</label>
               <input
@@ -333,7 +315,6 @@ export default function AddTrade() {
                 className={inputClass}
               />
             </div>
-
             <div className={inputContainerClass}>
               <label className={labelClass}>Risk %</label>
               <input
@@ -346,10 +327,9 @@ export default function AddTrade() {
                 className={inputClass}
               />
             </div>
-
             <div className={inputContainerClass}>
               <label className={labelClass}>Trade Result</label>
-              <div className="relative w-full flex items-center justify-center">
+              <div className="relative w-full">
                 <select
                   name="result"
                   value={formData.result}
@@ -366,10 +346,9 @@ export default function AddTrade() {
                     BREAK-EVEN
                   </option>
                 </select>
-                <ChevronDown className="absolute right-4 w-4 h-4 text-[#2f8df4] pointer-events-none" />
+                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#2f8df4] pointer-events-none" />
               </div>
             </div>
-
             <div className={inputContainerClass}>
               <label className={labelClass}>Net R Multiple</label>
               <input
@@ -382,7 +361,6 @@ export default function AddTrade() {
                 className={inputClass}
               />
             </div>
-
             <div className={`lg:col-span-3 ${inputContainerClass}`}>
               <label className={labelClass}>Trade Reason / Analysis</label>
               <textarea
@@ -393,7 +371,6 @@ export default function AddTrade() {
                 className={textareaClass}
               ></textarea>
             </div>
-
             <div className={`lg:col-span-3 ${inputContainerClass}`}>
               <label className={labelClass}>Lesson / Mistake</label>
               <textarea
@@ -409,22 +386,16 @@ export default function AddTrade() {
 
         {/* SECTION 2: Psychology */}
         <div className={cardClass}>
-          <div className="flex items-center justify-between mb-6 md:mb-8 pb-4 md:pb-6 border-b border-gray-200 dark:border-white/5">
-            <div className="flex items-center gap-3">
-              <Brain className="w-5 h-5 md:w-6 md:h-6 text-[#f472b6]" />
-              <h2 className="text-lg md:text-xl font-bold text-gray-900 dark:text-white">
-                Psychology Tracker
-              </h2>
-            </div>
-            <span className="text-[10px] bg-gray-100 dark:bg-white/5 text-gray-500 dark:text-gray-400 px-3 py-1.5 rounded-[2px] font-bold tracking-widest uppercase border border-gray-200 dark:border-white/5">
-              Crucial
-            </span>
+          <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-200 dark:border-white/5">
+            <Brain className="w-5 h-5 text-[#f472b6]" />
+            <h2 className="text-lg font-bold text-gray-900 dark:text-white">
+              Psychology Tracker
+            </h2>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 mb-6 md:mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div className={inputContainerClass}>
               <label className={labelClass}>Emotion Before Trade</label>
-              <div className="relative w-full flex items-center justify-center">
+              <div className="relative w-full">
                 <select
                   name="emotionBefore"
                   value={formData.emotionBefore}
@@ -440,12 +411,12 @@ export default function AddTrade() {
                     </option>
                   ))}
                 </select>
-                <ChevronDown className="absolute right-4 w-4 h-4 text-[#2f8df4] pointer-events-none" />
+                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#2f8df4] pointer-events-none" />
               </div>
             </div>
             <div className={inputContainerClass}>
               <label className={labelClass}>Emotion After Trade</label>
-              <div className="relative w-full flex items-center justify-center">
+              <div className="relative w-full">
                 <select
                   name="emotionAfter"
                   value={formData.emotionAfter}
@@ -461,11 +432,10 @@ export default function AddTrade() {
                     </option>
                   ))}
                 </select>
-                <ChevronDown className="absolute right-4 w-4 h-4 text-[#2f8df4] pointer-events-none" />
+                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#2f8df4] pointer-events-none" />
               </div>
             </div>
           </div>
-
           <div className={inputContainerClass}>
             <label className={labelClass}>Psychology Note</label>
             <textarea
@@ -476,17 +446,16 @@ export default function AddTrade() {
               className={textareaClass}
             ></textarea>
           </div>
-
-          <div className="mt-6 md:mt-8 pt-6 md:pt-8 border-t border-gray-200 dark:border-white/5 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+          <div className="mt-8 pt-8 border-t border-gray-200 dark:border-white/5 flex flex-col sm:flex-row gap-4 items-start sm:items-center">
             <label className={labelClass}>
               Did you break any trading rules?
             </label>
-            <div className="relative w-full sm:w-auto flex items-center justify-center">
+            <div className="relative w-full sm:w-auto">
               <select
                 name="ruleBreak"
                 value={formData.ruleBreak}
                 onChange={handleChange}
-                className={`${inputClass} !w-full sm:!min-w-[150px] pr-10`}
+                className={`${inputClass} sm:min-w-[150px] pr-10`}
               >
                 <option value="no" className={optionClass}>
                   No
@@ -495,42 +464,36 @@ export default function AddTrade() {
                   Yes
                 </option>
               </select>
-              <ChevronDown className="absolute right-4 w-4 h-4 text-[#2f8df4] pointer-events-none" />
+              <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#2f8df4] pointer-events-none" />
             </div>
           </div>
         </div>
 
         {/* SECTION 3: Chart Uploads */}
         <div className={cardClass}>
-          <div className="flex items-center justify-between mb-6 md:mb-8 pb-4 md:pb-6 border-b border-gray-200 dark:border-white/5">
-            <div className="flex items-center gap-3">
-              <ImageIcon className="w-5 h-5 md:w-6 md:h-6 text-[#21d4a3]" />
-              <h2 className="text-lg md:text-xl font-bold text-gray-900 dark:text-white">
-                Chart Screenshots
-              </h2>
-            </div>
-            <span className="text-[10px] bg-gray-100 dark:bg-white/5 text-gray-500 dark:text-gray-400 px-3 py-1.5 rounded-[2px] font-bold tracking-widest uppercase border border-gray-200 dark:border-white/5">
-              Hindsight Slider
-            </span>
+          <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-200 dark:border-white/5">
+            <ImageIcon className="w-5 h-5 text-[#21d4a3]" />
+            <h2 className="text-lg font-bold text-gray-900 dark:text-white">
+              Chart Screenshots
+            </h2>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {imageLabels.map((label, idx) => (
               <label
                 key={idx}
-                className="border-2 border-dashed border-gray-300 dark:border-[#1f2c3b] rounded-[2px] p-6 md:p-8 flex flex-col items-center justify-center text-center hover:bg-gray-50 dark:hover:bg-white/[0.02] hover:border-[#2f8df4] dark:hover:border-[#2f8df4] transition-all cursor-pointer group min-h-[140px] md:min-h-[160px]"
+                className="border-2 border-dashed border-gray-300 dark:border-[#1f2c3b] rounded-[2px] p-6 flex flex-col items-center justify-center text-center hover:bg-gray-50 dark:hover:bg-white/[0.02] transition-all cursor-pointer group min-h-[140px]"
               >
                 {images[idx] ? (
                   <>
-                    <CheckCircle className="w-8 h-8 md:w-10 md:h-10 text-[#21d4a3] mb-3 md:mb-4" />
-                    <p className="text-xs md:text-sm font-bold text-[#21d4a3] truncate w-full px-2 md:px-4">
+                    <CheckCircle className="w-8 h-8 text-[#21d4a3] mb-3" />
+                    <p className="text-xs font-bold text-[#21d4a3] truncate w-full px-2">
                       {images[idx].name}
                     </p>
                   </>
                 ) : (
                   <>
-                    <ImageIcon className="w-8 h-8 md:w-10 md:h-10 text-[#2f8df4] opacity-70 group-hover:opacity-100 transition-opacity mb-3 md:mb-4" />
-                    <p className="text-sm md:text-base font-bold text-gray-700 dark:text-gray-300 mb-1">
+                    <ImageIcon className="w-8 h-8 text-[#2f8df4] opacity-70 group-hover:opacity-100 transition-opacity mb-3" />
+                    <p className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">
                       {label}
                     </p>
                     <p className="text-[10px] text-gray-500 uppercase tracking-widest">
@@ -550,24 +513,23 @@ export default function AddTrade() {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row items-center justify-end gap-4 md:gap-5 pt-2 md:pt-4">
+        <div className="flex flex-col sm:flex-row justify-end gap-4">
           <button
             type="button"
             onClick={() => navigate("/trades")}
-            className="w-full sm:w-auto px-8 py-3.5 md:py-4 rounded-[2px] font-bold text-[#2f8df4] bg-white dark:bg-[#121418] border border-[#2f8df4]/30 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors flex items-center justify-center gap-2"
             disabled={isSubmitting}
+            className="w-full sm:w-auto px-8 py-3.5 bg-white dark:bg-[#121418] border border-[#2f8df4]/30 text-[#2f8df4] font-bold rounded-[2px] hover:bg-gray-50 dark:hover:bg-white/5 transition-colors flex items-center justify-center gap-2"
           >
             <X className="w-5 h-5" /> Cancel
           </button>
-
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full sm:w-auto px-10 py-3.5 md:py-4 rounded-[2px] font-bold text-white bg-[#2f8df4] hover:bg-[#2376e8] shadow-lg hover:shadow-[0_0_20px_rgba(47,141,244,0.3)] transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full sm:w-auto px-10 py-3.5 bg-[#2f8df4] hover:bg-[#2376e8] text-white font-bold rounded-[2px] shadow-lg transition-all flex items-center justify-center gap-2 disabled:opacity-50"
           >
             {isSubmitting ? (
               <>
-                <Loader2 className="w-5 h-5 animate-spin" /> Uploading Data...
+                <Loader2 className="w-5 h-5 animate-spin" /> Uploading...
               </>
             ) : (
               <>

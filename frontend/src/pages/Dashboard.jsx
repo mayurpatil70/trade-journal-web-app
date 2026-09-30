@@ -6,12 +6,11 @@ import {
   LayoutDashboard,
   TrendingUp,
   Target,
-  Calendar,
   PlusCircle,
   ChevronRight,
   Loader2,
   Globe,
-  List, // <--- FIXED: Added List import here
+  List,
 } from "lucide-react";
 
 export default function Dashboard() {
@@ -21,7 +20,8 @@ export default function Dashboard() {
 
   useEffect(() => {
     const fetchTrades = async () => {
-      const userId = localStorage.getItem("userId");
+      const userId =
+        localStorage.getItem("userId") || localStorage.getItem("userEmail");
       if (!userId) {
         navigate("/login");
         return;
@@ -29,9 +29,11 @@ export default function Dashboard() {
 
       try {
         const response = await api.get(`/api/trades?userId=${userId}`);
-        setTrades(response.data.data || []);
+        // CRITICAL FIX: Fallback to empty array to prevent fatal crashes
+        setTrades(response.data?.data || []);
       } catch (error) {
         console.error("Failed to fetch dashboard trades:", error);
+        setTrades([]);
       } finally {
         setLoading(false);
       }
@@ -69,7 +71,6 @@ export default function Dashboard() {
       className="w-full max-w-7xl mx-auto font-sans pb-16 px-4 md:px-8 mt-6 md:mt-8 box-border"
       style={{ fontFamily: "'Inter', sans-serif" }}
     >
-      {/* Header */}
       <div className="mb-8 md:mb-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
           <div className="w-10 h-10 md:w-12 md:h-12 rounded-[2px] bg-[#2f8df4]/10 flex items-center justify-center border border-[#2f8df4]/20 shrink-0">
@@ -101,7 +102,6 @@ export default function Dashboard() {
         </div>
       ) : (
         <>
-          {/* Stat Cards Grid */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
             <div className="bg-white dark:bg-[#121418] border border-gray-200 dark:border-white/5 rounded-[2px] p-5 md:p-6 shadow-sm">
               <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-2">
@@ -111,7 +111,6 @@ export default function Dashboard() {
                 {totalTrades}
               </span>
             </div>
-
             <div className="bg-white dark:bg-[#121418] border border-gray-200 dark:border-white/5 rounded-[2px] p-5 md:p-6 shadow-sm">
               <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-2">
                 Net R-Multiple
@@ -123,7 +122,6 @@ export default function Dashboard() {
                 {netR.toFixed(2)}R
               </span>
             </div>
-
             <div className="bg-white dark:bg-[#121418] border border-gray-200 dark:border-white/5 rounded-[2px] p-5 md:p-6 shadow-sm">
               <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-2">
                 Win Rate
@@ -132,7 +130,6 @@ export default function Dashboard() {
                 {winRate.toFixed(1)}%
               </span>
             </div>
-
             <div className="bg-white dark:bg-[#121418] border border-gray-200 dark:border-white/5 rounded-[2px] p-5 md:p-6 shadow-sm">
               <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-2">
                 W / L / BE
@@ -144,7 +141,6 @@ export default function Dashboard() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Recent Trades Table */}
             <div className="lg:col-span-2 bg-white dark:bg-[#121418] border border-gray-200 dark:border-white/5 rounded-[2px] p-6 shadow-sm">
               <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-200 dark:border-white/5">
                 <h3 className="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
@@ -215,7 +211,6 @@ export default function Dashboard() {
               )}
             </div>
 
-            {/* Quick Actions Panel */}
             <div className="bg-white dark:bg-[#121418] border border-gray-200 dark:border-white/5 rounded-[2px] p-6 shadow-sm flex flex-col justify-between">
               <div>
                 <h3 className="text-base font-bold text-gray-900 dark:text-white mb-6 pb-4 border-b border-gray-200 dark:border-white/5">
@@ -253,16 +248,6 @@ export default function Dashboard() {
                     <ChevronRight className="w-4 h-4 text-gray-400" />
                   </button>
                 </div>
-              </div>
-
-              <div className="mt-8 p-4 bg-gray-50 dark:bg-[#1a1d24] border border-gray-200 dark:border-white/5 rounded-[2px]">
-                <p className="text-[10px] font-bold text-[#2f8df4] uppercase tracking-widest mb-1">
-                  Pro Tip
-                </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
-                  Consistent journaling with psychology tracking leads to
-                  sustainable edge. Log your emotional state every time!
-                </p>
               </div>
             </div>
           </div>

@@ -10,7 +10,6 @@ import {
   ChevronRight,
   Image as ImageIcon,
   X,
-  Brain,
   Calendar,
   TrendingUp,
 } from "lucide-react";
@@ -19,31 +18,29 @@ export default function PastTrades() {
   const navigate = useNavigate();
   const [trades, setTrades] = useState([]);
   const [loading, setLoading] = useState(true);
-
   const [search, setSearch] = useState("");
   const [resultFilter, setResultFilter] = useState("");
-
-  // Modal State
   const [selectedTrade, setSelectedTrade] = useState(null);
 
   useEffect(() => {
     const fetchTrades = async () => {
-      const userId = localStorage.getItem("userId");
+      const userId =
+        localStorage.getItem("userId") || localStorage.getItem("userEmail");
       if (!userId) {
         navigate("/login");
         return;
       }
-
       try {
         const response = await api.get(`/api/trades?userId=${userId}`);
-        setTrades(response.data.data);
+        // CRITICAL FIX: Fallback to empty array to prevent fatal crashes
+        setTrades(response.data?.data || []);
       } catch (error) {
         console.error("Failed to fetch trades:", error);
+        setTrades([]);
       } finally {
         setLoading(false);
       }
     };
-
     fetchTrades();
   }, [navigate]);
 
@@ -71,7 +68,6 @@ export default function PastTrades() {
       className="w-full max-w-7xl mx-auto font-sans pb-16 px-4 md:px-8 mt-8"
       style={{ fontFamily: "'Inter', sans-serif" }}
     >
-      {/* Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
         <div className="flex items-center gap-4">
           <div className="w-12 h-12 rounded-[2px] bg-[#a78bfa]/10 flex items-center justify-center border border-[#a78bfa]/20 shrink-0">
@@ -94,7 +90,6 @@ export default function PastTrades() {
         </button>
       </div>
 
-      {/* Filters Bar */}
       <div className="flex flex-col sm:flex-row gap-6 mb-8">
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -103,7 +98,7 @@ export default function PastTrades() {
             placeholder="Search asset, setup, or session..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-white dark:bg-[#121418] border border-gray-200 dark:border-white/10 rounded-[2px] py-4 pl-12 pr-4 text-gray-900 dark:text-white text-sm focus:border-[#2f8df4] dark:focus:border-[#2f8df4] focus:ring-1 focus:ring-[#2f8df4] outline-none shadow-sm"
+            className="w-full bg-white dark:bg-[#121418] border border-gray-200 dark:border-white/10 rounded-[2px] py-4 pl-12 pr-4 text-gray-900 dark:text-white text-sm focus:border-[#2f8df4] outline-none shadow-sm"
           />
         </div>
         <div className="relative">
@@ -111,45 +106,41 @@ export default function PastTrades() {
           <select
             value={resultFilter}
             onChange={(e) => setResultFilter(e.target.value)}
-            className="appearance-none bg-white dark:bg-[#121418] border border-gray-200 dark:border-white/10 rounded-[2px] py-4 pl-12 pr-12 text-gray-900 dark:text-white text-sm focus:border-[#2f8df4] dark:focus:border-[#2f8df4] focus:ring-1 focus:ring-[#2f8df4] outline-none shadow-sm min-w-[200px]"
+            className="appearance-none bg-white dark:bg-[#121418] border border-gray-200 dark:border-white/10 rounded-[2px] py-4 pl-12 pr-12 text-gray-900 dark:text-white text-sm focus:border-[#2f8df4] outline-none shadow-sm min-w-[200px]"
           >
             <option value="">All Results</option>
             <option value="win">Win</option>
             <option value="loss">Loss</option>
             <option value="be">Break-Even</option>
-            <option value="ctc">CTC</option>
-            <option value="trail">Trail-sl-CTC</option>
           </select>
         </div>
       </div>
 
-      {/* Trades Table */}
       <div className="bg-white dark:bg-[#121418] border border-gray-200 dark:border-white/5 rounded-[2px] shadow-xl overflow-hidden">
         {loading ? (
           <div className="flex flex-col items-center justify-center h-80">
             <Loader2 className="w-10 h-10 text-[#a78bfa] animate-spin mb-4" />
-            <p className="text-gray-500 dark:text-gray-400 text-sm font-medium">
+            <p className="text-gray-500 text-sm font-medium">
               Loading your journal...
             </p>
           </div>
         ) : filteredTrades.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-80 text-center px-4">
             <div className="w-16 h-16 bg-gray-100 dark:bg-white/5 rounded-[2px] flex items-center justify-center mb-6">
-              <Target className="w-8 h-8 text-gray-400 dark:text-gray-600" />
+              <Target className="w-8 h-8 text-gray-400" />
             </div>
             <h3 className="text-xl font-bold text-gray-900 dark:text-gray-300 mb-2">
               No trades found
             </h3>
             <p className="text-gray-500 text-sm">
-              Adjust your filters or record a new trade to populate your
-              journal.
+              Adjust filters or record a new trade.
             </p>
           </div>
         ) : (
           <div className="overflow-x-auto scrollbar-hide">
             <table className="w-full text-left border-collapse whitespace-nowrap min-w-[1000px]">
               <thead>
-                <tr className="bg-gray-50 dark:bg-[#1a1d24] text-[11px] text-gray-500 dark:text-gray-400 uppercase tracking-widest border-b border-gray-200 dark:border-white/5">
+                <tr className="bg-gray-50 dark:bg-[#1a1d24] text-[11px] text-gray-500 uppercase tracking-widest border-b border-gray-200 dark:border-white/5">
                   <th className="py-5 px-8 font-bold">Date & Time</th>
                   <th className="py-5 px-8 font-bold">Market</th>
                   <th className="py-5 px-8 font-bold">Direction</th>
@@ -164,7 +155,6 @@ export default function PastTrades() {
                 {filteredTrades.map((t, idx) => {
                   const rMultiple = parseFloat(t.r_multiple || 0);
                   const hasImages = t.images && t.images.length > 0;
-
                   return (
                     <tr
                       key={idx}
@@ -212,20 +202,18 @@ export default function PastTrades() {
                       </td>
                       <td className="py-5 px-8 text-center">
                         {hasImages ? (
-                          <div className="flex items-center justify-center gap-1.5 text-gray-500 dark:text-gray-400 group-hover:text-[#2f8df4] transition-colors">
+                          <div className="flex items-center justify-center gap-1.5 text-gray-500 group-hover:text-[#2f8df4] transition-colors">
                             <ImageIcon className="w-5 h-5" />
                             <span className="text-xs font-bold">
                               {t.images.length}
                             </span>
                           </div>
                         ) : (
-                          <span className="text-gray-400 dark:text-gray-600">
-                            —
-                          </span>
+                          <span className="text-gray-400">—</span>
                         )}
                       </td>
                       <td className="py-5 px-8 text-right">
-                        <button className="text-gray-400 group-hover:text-gray-900 dark:text-gray-500 dark:group-hover:text-white transition-colors">
+                        <button className="text-gray-400 group-hover:text-[#2f8df4] transition-colors">
                           <ChevronRight className="w-6 h-6 inline" />
                         </button>
                       </td>
@@ -238,21 +226,16 @@ export default function PastTrades() {
         )}
       </div>
 
-      {/* Trade Details Modal */}
       {selectedTrade && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6"
           style={{ fontFamily: "'Inter', sans-serif" }}
         >
-          {/* Backdrop */}
           <div
-            className="absolute inset-0 bg-black/70 backdrop-blur-sm transition-opacity"
+            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
             onClick={() => setSelectedTrade(null)}
           ></div>
-
-          {/* Modal Container */}
-          <div className="relative w-full max-w-5xl max-h-[90vh] overflow-y-auto bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-white/10 rounded-[2px] shadow-[0_0_50px_rgba(0,0,0,0.5)] animate-in fade-in zoom-in-95 duration-200 flex flex-col scrollbar-hide">
-            {/* Modal Header */}
+          <div className="relative w-full max-w-5xl max-h-[90vh] overflow-y-auto bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-white/10 rounded-[2px] shadow-[0_0_50px_rgba(0,0,0,0.5)] flex flex-col scrollbar-hide">
             <div className="sticky top-0 z-10 flex items-center justify-between p-6 md:p-8 bg-white dark:bg-[#121418] border-b border-gray-200 dark:border-white/5">
               <div className="flex items-center gap-5">
                 <div className="w-14 h-14 rounded-[2px] bg-gray-100 dark:bg-[#1a1d24] border border-gray-200 dark:border-white/5 flex items-center justify-center shadow-sm">
@@ -269,7 +252,7 @@ export default function PastTrades() {
                       {selectedTrade.direction}
                     </span>
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 font-medium">
+                  <div className="flex items-center gap-2 text-sm text-gray-500 font-medium">
                     <Calendar className="w-4 h-4" />
                     <span>
                       {selectedTrade.date} at {selectedTrade.time}
@@ -281,15 +264,13 @@ export default function PastTrades() {
               </div>
               <button
                 onClick={() => setSelectedTrade(null)}
-                className="p-2.5 bg-gray-50 dark:bg-[#1a1d24] hover:bg-gray-100 dark:hover:bg-white/10 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white rounded-[2px] transition-colors border border-gray-200 dark:border-white/5 shadow-sm"
+                className="p-2.5 bg-gray-50 dark:bg-[#1a1d24] hover:bg-gray-100 dark:hover:bg-white/10 text-gray-500 hover:text-gray-900 dark:hover:text-white rounded-[2px] transition-colors border border-gray-200 dark:border-white/5 shadow-sm"
               >
                 <X className="w-6 h-6" />
               </button>
             </div>
 
-            {/* Modal Content */}
             <div className="p-6 md:p-8 space-y-8 bg-gray-50 dark:bg-[#0a0a0a]">
-              {/* Metrics Grid */}
               <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
                 {[
                   { label: "Setup", value: selectedTrade.setup },
@@ -314,7 +295,7 @@ export default function PastTrades() {
                     key={i}
                     className="bg-white dark:bg-[#121418] border border-gray-200 dark:border-white/5 rounded-[2px] p-5 flex flex-col justify-center shadow-sm"
                   >
-                    <span className="text-[10px] font-bold text-gray-500 dark:text-gray-500 uppercase tracking-widest mb-2">
+                    <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2">
                       {stat.label}
                     </span>
                     {stat.isPill ? (
@@ -336,7 +317,6 @@ export default function PastTrades() {
                 ))}
               </div>
 
-              {/* Analysis & Lesson Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="bg-white dark:bg-[#121418] border border-gray-200 dark:border-white/5 rounded-[2px] p-6 shadow-sm">
                   <h3 className="text-xs font-bold text-gray-900 dark:text-white uppercase tracking-widest mb-3 flex items-center gap-2">
@@ -348,7 +328,7 @@ export default function PastTrades() {
                 </div>
                 <div className="bg-white dark:bg-[#121418] border border-gray-200 dark:border-white/5 rounded-[2px] p-6 shadow-sm">
                   <h3 className="text-xs font-bold text-gray-900 dark:text-white uppercase tracking-widest mb-3 flex items-center gap-2">
-                    <Brain className="w-4 h-4 text-[#21d4a3]" /> Key Lesson
+                    Key Lesson
                   </h3>
                   <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed whitespace-pre-wrap">
                     {selectedTrade.lesson || "No lesson recorded."}
@@ -356,63 +336,12 @@ export default function PastTrades() {
                 </div>
               </div>
 
-              {/* Psychology Section */}
-              <div className="bg-white dark:bg-[#121418] border border-gray-200 dark:border-white/5 rounded-[2px] p-6 shadow-sm bg-gradient-to-br from-white dark:from-[#121418] to-gray-50 dark:to-[#161922]">
-                <div className="flex flex-col sm:flex-row sm:items-center gap-6 mb-6">
-                  <div className="flex items-center gap-3">
-                    <h3 className="text-xs font-bold text-gray-900 dark:text-white uppercase tracking-widest flex items-center gap-2">
-                      <Brain className="w-4 h-4 text-[#f472b6]" /> Psychology
-                      State
-                    </h3>
-                  </div>
-                  <div className="flex gap-4">
-                    <div className="px-4 py-2 bg-gray-100 dark:bg-[#1a1d24] border border-gray-200 dark:border-white/5 rounded-[2px]">
-                      <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-1">
-                        Before Entry
-                      </span>
-                      <span className="text-sm font-bold text-gray-900 dark:text-white">
-                        {selectedTrade.emotion_before || "—"}
-                      </span>
-                    </div>
-                    <div className="px-4 py-2 bg-gray-100 dark:bg-[#1a1d24] border border-gray-200 dark:border-white/5 rounded-[2px]">
-                      <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-1">
-                        After Exit
-                      </span>
-                      <span className="text-sm font-bold text-gray-900 dark:text-white">
-                        {selectedTrade.emotion_after || "—"}
-                      </span>
-                    </div>
-                    <div className="px-4 py-2 bg-gray-100 dark:bg-[#1a1d24] border border-gray-200 dark:border-white/5 rounded-[2px]">
-                      <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-1">
-                        Rule Break
-                      </span>
-                      <span
-                        className={`text-sm font-bold uppercase ${selectedTrade.rule_break === "yes" ? "text-red-600 dark:text-red-500" : "text-emerald-600 dark:text-emerald-500"}`}
-                      >
-                        {selectedTrade.rule_break || "NO"}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                {selectedTrade.psych_note && (
-                  <div>
-                    <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-2">
-                      Psychology Notes
-                    </span>
-                    <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed italic border-l-2 border-gray-300 dark:border-white/10 pl-4">
-                      "{selectedTrade.psych_note}"
-                    </p>
-                  </div>
-                )}
-              </div>
-
-              {/* Chart Screenshots Gallery */}
-              <div className="bg-white dark:bg-[#121418] border border-gray-200 dark:border-white/5 rounded-[2px] p-6 shadow-sm">
-                <h3 className="text-xs font-bold text-gray-900 dark:text-white uppercase tracking-widest mb-5 flex items-center gap-2">
-                  <ImageIcon className="w-4 h-4 text-[#a78bfa]" /> Execution
-                  Charts
-                </h3>
-                {selectedTrade.images && selectedTrade.images.length > 0 ? (
+              {selectedTrade.images && selectedTrade.images.length > 0 && (
+                <div className="bg-white dark:bg-[#121418] border border-gray-200 dark:border-white/5 rounded-[2px] p-6 shadow-sm">
+                  <h3 className="text-xs font-bold text-gray-900 dark:text-white uppercase tracking-widest mb-5 flex items-center gap-2">
+                    <ImageIcon className="w-4 h-4 text-[#a78bfa]" /> Execution
+                    Charts
+                  </h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                     {selectedTrade.images.map((img, i) => (
                       <div
@@ -421,32 +350,15 @@ export default function PastTrades() {
                       >
                         <img
                           src={img}
-                          alt={`Trade Screenshot ${i + 1}`}
+                          alt="Chart"
                           className="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-105"
                           loading="lazy"
                         />
-                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors"></div>
-                        <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/80 to-transparent">
-                          <span className="text-[10px] font-bold text-white uppercase tracking-widest drop-shadow-md">
-                            {i === 0
-                              ? "Before Entry"
-                              : i === 1
-                                ? "Entry"
-                                : "Exit"}
-                          </span>
-                        </div>
                       </div>
                     ))}
                   </div>
-                ) : (
-                  <div className="py-12 flex flex-col items-center justify-center text-center border-2 border-dashed border-gray-200 dark:border-white/5 rounded-[2px] bg-gray-50 dark:bg-white/[0.02]">
-                    <ImageIcon className="w-10 h-10 text-gray-300 dark:text-gray-600 mb-3" />
-                    <p className="text-sm font-bold text-gray-500 dark:text-gray-400">
-                      No charts attached.
-                    </p>
-                  </div>
-                )}
-              </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
