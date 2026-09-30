@@ -78,9 +78,9 @@ export default function PerformanceCalendar() {
   };
 
   return (
+    <div className="min-h-screen bg-[#0a0a0a]" style={{ fontFamily: "'Inter', sans-serif" }}>
     <div
-      className="w-full max-w-7xl mx-auto font-sans pb-16 px-4 md:px-8 mt-6 md:mt-8 box-border"
-      style={{ fontFamily: "'Inter', sans-serif" }}
+      className="w-full max-w-7xl mx-auto pb-16 px-4 md:px-8 mt-6 md:mt-8 box-border"
     >
       <div className="mb-8 md:mb-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
@@ -362,7 +362,7 @@ export default function PerformanceCalendar() {
             </div>
           </div>
         </div>
-      )}
+    </div>
     </div>
   );
 }

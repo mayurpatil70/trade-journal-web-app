@@ -5,8 +5,6 @@ import {
   DollarSign,
   Activity,
   Loader2,
-  CheckCircle,
-  AlertCircle,
 } from "lucide-react";
 import api from "../api/axios";
 
@@ -66,6 +64,20 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleDeleteAccount = async (userId) => {
+    if (!window.confirm('Are you sure you want to delete this user account and revoke access?')) return;
+    try {
+      await api.delete(`/api/admin/user/${userId}`);
+      const response = await api.get('/api/admin/metrics');
+      if (response.data.success) {
+        setData(response.data);
+      }
+    } catch (error) {
+      console.error('Failed to delete account:', error);
+      alert('Failed to delete account');
+    }
+  };
+
   const { metrics, recentOrders, accounts } = data;
 
   return (
@@ -90,11 +102,12 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      {/* Stat Cards — only Total Revenue and Active Users */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
         <div className="bg-[#121418] border border-white/5 rounded-[2px] p-6 shadow-sm">
           <div className="flex justify-between items-start mb-4">
             <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-              Total Revenue
+              Total Revenue (USDT)
             </span>
             <div className="p-2 bg-emerald-500/10 text-emerald-500 rounded-[2px]">
               <DollarSign className="w-4 h-4" />
@@ -111,51 +124,17 @@ export default function AdminDashboard() {
         <div className="bg-[#121418] border border-white/5 rounded-[2px] p-6 shadow-sm">
           <div className="flex justify-between items-start mb-4">
             <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-              Active Challenges
+              Active Users
             </span>
             <div className="p-2 bg-[#2f8df4]/10 text-[#2f8df4] rounded-[2px]">
               <Activity className="w-4 h-4" />
             </div>
           </div>
           <p className="text-3xl font-black text-white">
-            {metrics.activeAccounts}
+            {accounts.length}
           </p>
           <p className="text-xs text-gray-500 font-medium mt-2">
-            Out of {metrics.totalAccounts} total accounts
-          </p>
-        </div>
-
-        <div className="bg-[#121418] border border-white/5 rounded-[2px] p-6 shadow-sm">
-          <div className="flex justify-between items-start mb-4">
-            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-              Passed Evaluations
-            </span>
-            <div className="p-2 bg-emerald-500/10 text-emerald-500 rounded-[2px]">
-              <CheckCircle className="w-4 h-4" />
-            </div>
-          </div>
-          <p className="text-3xl font-black text-white">
-            {metrics.passedAccounts}
-          </p>
-          <p className="text-xs text-emerald-500 font-medium mt-2">
-            Ready for funded payouts
-          </p>
-        </div>
-
-        <div className="bg-[#121418] border border-white/5 rounded-[2px] p-6 shadow-sm">
-          <div className="flex justify-between items-start mb-4">
-            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-              Violated / Failed
-            </span>
-            <div className="p-2 bg-red-500/10 text-red-500 rounded-[2px]">
-              <AlertCircle className="w-4 h-4" />
-            </div>
-          </div>
-          <p className="text-3xl font-black text-white">
-            {metrics.failedAccounts}
-          </p>
-          <p className="text-xs text-red-500 font-medium mt-2">
-            Max drawdown breached
+            Registered SAAS users
           </p>
         </div>
       </div>
@@ -213,36 +192,29 @@ export default function AdminDashboard() {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="border-b border-white/5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-                  <th className="pb-3">User ID</th>
-                  <th className="pb-3">Balance</th>
+                  <th className="pb-3">Email</th>
                   <th className="pb-3">Status</th>
-                  <th className="pb-3 text-right">MT5 Login</th>
+                  <th className="pb-3 text-right">Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5 text-xs">
                 {accounts.map((acc) => (
                   <tr key={acc.id} className="hover:bg-white/[0.02]">
-                    <td className="py-3 font-medium text-white truncate max-w-[120px]">
-                      {acc.user_id}
-                    </td>
-                    <td className="py-3 font-bold text-[#2f8df4]">
-                      ${Number(acc.start_balance).toLocaleString()}
+                    <td className="py-3 font-medium text-white truncate max-w-[160px]">
+                      {acc.email}
                     </td>
                     <td className="py-3">
-                      <span
-                        className={`px-2 py-0.5 rounded-[2px] text-[10px] font-bold uppercase tracking-wider ${
-                          acc.status === "active"
-                            ? "bg-blue-500/10 text-[#2f8df4]"
-                            : acc.status === "passed"
-                              ? "bg-emerald-500/10 text-emerald-500"
-                              : "bg-red-500/10 text-red-500"
-                        }`}
-                      >
-                        {acc.status} (Ph {acc.phase})
+                      <span className="px-2 py-0.5 rounded-[2px] text-[10px] font-bold uppercase tracking-wider bg-blue-500/10 text-[#2f8df4]">
+                        Active SAAS User
                       </span>
                     </td>
-                    <td className="py-3 text-right font-mono text-gray-500">
-                      {acc.mt5_login || "Pending"}
+                    <td className="py-3 text-right">
+                      <button
+                        onClick={() => handleDeleteAccount(acc.id)}
+                        className="bg-red-500/20 text-red-500 hover:bg-red-500 hover:text-white border border-red-500/30 px-3 py-1 rounded-[2px] text-[10px] uppercase font-bold transition-colors"
+                      >
+                        Delete Account
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -254,9 +226,3 @@ export default function AdminDashboard() {
     </div>
   );
 }
-
-
-
-
-
-

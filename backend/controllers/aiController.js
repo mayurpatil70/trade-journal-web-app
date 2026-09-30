@@ -73,12 +73,12 @@ export const analyzeChart = async (req, res) => {
     const response = await ai.models.generateContent({
       model: "gemini-1.5-flash",
       contents: [
-        prompt,
         {
-          inlineData: {
-            data: base64Image,
-            mimeType: mimeType,
-          },
+          role: "user",
+          parts: [
+            { text: prompt },
+            { inlineData: { data: base64Image, mimeType } },
+          ],
         },
       ],
     });
@@ -95,15 +95,21 @@ export const chatWithCoach = async (req, res) => {
   try {
     const { message, history } = req.body;
 
-    // Convert frontend history format to the official Gemini SDK format
-    const formattedHistory = history.map((msg) => ({
+    // Build the contents array from history (alternating user/model roles)
+    const historyContents = history.map((msg) => ({
       role: msg.sender === "ai" ? "model" : "user",
       parts: [{ text: msg.text }],
     }));
 
-    // Initialize the chat session with strict coaching instructions
-    const chat = ai.chats.create({
+    // Append the new user message as the final turn
+    const contents = [
+      ...historyContents,
+      { role: "user", parts: [{ text: message }] },
+    ];
+
+    const response = await ai.models.generateContent({
       model: "gemini-1.5-flash",
+      contents,
       config: {
         systemInstruction: `You are an elite, strict, but supportive Forex trading psychology coach. 
       Your goal is to prevent the user from making emotional, revenge, or impulsive trades. 
@@ -113,11 +119,7 @@ export const chatWithCoach = async (req, res) => {
       3. Are you revenge trading from a previous loss?
       Wait for their answers. If they sound emotional, tell them to step away from the charts. Keep responses concise, punchy, and highly relevant to day trading.`,
       },
-      history: formattedHistory,
     });
-
-    // Send the user's new message to the active chat
-    const response = await chat.sendMessage({ message: message });
 
     res.status(200).json({ success: true, text: response.text });
   } catch (error) {

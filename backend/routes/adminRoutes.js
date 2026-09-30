@@ -63,4 +63,21 @@ router.delete("/subscription/:id", async (req, res) => {
   }
 });
 
+// Delete all subscriptions for a specific user (ban/remove user access)
+router.delete("/user/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { error } = await supabase
+      .from("journal_subscriptions")
+      .delete()
+      .eq("user_id", userId);
+
+    if (error) throw error;
+    res.json({ success: true, message: "User subscriptions deleted successfully." });
+  } catch (error) {
+    console.error("Delete user error:", error);
+    res.status(500).json({ success: false, error: "Failed to delete user." });
+  }
+});
+
 export default router;

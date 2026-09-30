@@ -29,7 +29,7 @@ export default function PreTradeGate() {
 
   // CRITICAL FIX: All hooks (useState, useRef, useEffect) must be called before this condition!
   // Calling an early return before hooks caused React Error #300 and a black screen crash on navigation!
-  const hiddenRoutes = ["/add-trade", "/login", "/register", "/verify"];
+  const hiddenRoutes = ['/', '/login', '/verify', '/paywall', '/discord-gate', '/discord-callback', '/add-trade', '/register'];
   if (hiddenRoutes.includes(location.pathname)) {
     return null;
   }
