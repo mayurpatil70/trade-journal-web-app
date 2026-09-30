@@ -29,8 +29,8 @@ export default function LandingPage() {
         "Detect revenge trading, FOMO, and hesitation before executing. Log emotional states before and after every trade.",
       tag: "Edge Protection",
       color: "text-pink-400",
-      bg: "bg-purple-500/20",
-      border: "border-purple-500/30",
+      bg: "bg-pink-500/10",
+      border: "border-pink-500/20",
     },
     {
       icon: ShieldCheck,
@@ -38,9 +38,9 @@ export default function LandingPage() {
       description:
         "Track daily drawdown, maximum trailing loss, and profit targets automatically across your evaluation phases.",
       tag: "Rule Compliance",
-      color: "text-pink-400",
-      bg: "bg-purple-500/20",
-      border: "border-purple-500/30",
+      color: "text-emerald-400",
+      bg: "bg-emerald-500/10",
+      border: "border-emerald-500/20",
     },
     {
       icon: Calculator,
@@ -48,9 +48,9 @@ export default function LandingPage() {
       description:
         "Calculate exact position sizing tailored to your account balance, instrument tick value, and strict risk percentage.",
       tag: "Precision Sizing",
-      color: "text-[#A855F7]",
-      bg: "bg-[#A855F7]/10",
-      border: "border-[#A855F7]/20",
+      color: "text-[#2f8df4]",
+      bg: "bg-[#2f8df4]/10",
+      border: "border-[#2f8df4]/20",
     },
     {
       icon: TrendingUp,
@@ -58,9 +58,9 @@ export default function LandingPage() {
       description:
         "Deep-dive analytics on setup win rates, session performance (London vs. NY), and cumulative R-multiples.",
       tag: "Data Driven",
-      color: "text-fuchsia-400",
-      bg: "bg-fuchsia-500/10",
-      border: "border-fuchsia-500/20",
+      color: "text-cyan-400",
+      bg: "bg-cyan-500/10",
+      border: "border-cyan-500/20",
     },
     {
       icon: Layers,
@@ -114,26 +114,26 @@ export default function LandingPage() {
 
   return (
     <div
-      className="min-h-screen bg-[#050014] text-white selection:bg-[#A855F7]/30 selection:text-white"
+      className="min-h-screen bg-[#0a0a0a] text-white selection:bg-[#2f8df4]/30 selection:text-white"
       style={{ fontFamily: "'Inter', sans-serif" }}
     >
       {/* Top Announcement Bar */}
-      <div className="bg-gradient-to-r from-purple-500/10 via-fuchsia-500/10 to-purple-500/10 border-b border-white/5 py-2.5 px-4 text-center text-xs font-semibold text-gray-300 flex items-center justify-center gap-2">
-        <Sparkles className="w-3.5 h-3.5 text-[#A855F7] shrink-0" />
-        <span>@forexnotes.in — Lifetime Access via On-Chain USDT</span>
+      <div className="bg-gradient-to-r from-blue-500/10 via-cyan-500/10 to-blue-500/10 border-b border-white/5 py-2.5 px-4 text-center text-xs font-semibold text-gray-300 flex items-center justify-center gap-2">
+        <Sparkles className="w-3.5 h-3.5 text-[#2f8df4] shrink-0" />
+        <span>Forex Notes 2.0 Live — Lifetime Access via On-Chain USDT</span>
         <Link
           to="/login"
-          className="text-[#A855F7] hover:underline inline-flex items-center ml-1"
+          className="text-[#2f8df4] hover:underline inline-flex items-center ml-1"
         >
           Claim Access <ChevronRight className="w-3 h-3" />
         </Link>
       </div>
 
       {/* Navigation */}
-      <header className="sticky top-0 z-50 backdrop-blur-xl bg-[#050014]/80 border-b border-white/5">
+      <header className="sticky top-0 z-50 backdrop-blur-xl bg-[#0a0a0a]/80 border-b border-white/5">
         <div className="max-w-7xl mx-auto px-4 md:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-purple-500 to-fuchsia-500 flex items-center justify-center shadow-lg shadow-purple-500/20">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-blue-500/20">
               <Activity className="w-5 h-5 text-white" />
             </div>
             <span className="text-lg font-black tracking-tight text-white">
@@ -173,7 +173,7 @@ export default function LandingPage() {
             </Link>
             <Link
               to="/login"
-              className="text-xs font-bold uppercase tracking-wider px-5 py-2.5 rounded-lg bg-[#A855F7] hover:bg-[#9333EA] text-white shadow-lg shadow-purple-500/25 transition-all flex items-center gap-1.5"
+              className="text-xs font-bold uppercase tracking-wider px-5 py-2.5 rounded-lg bg-[#2f8df4] hover:bg-[#2376e8] text-white shadow-lg shadow-blue-500/25 transition-all flex items-center gap-1.5"
             >
               Get Access ($11) <ArrowRight className="w-3.5 h-3.5" />
             </Link>
@@ -184,8 +184,8 @@ export default function LandingPage() {
       {/* Hero Section */}
       <section className="relative pt-20 md:pt-32 pb-20 px-4 md:px-8 overflow-hidden">
         {/* Ambient Glows */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-purple-500/15 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute top-1/3 left-1/3 w-64 h-64 bg-fuchsia-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-blue-500/15 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-1/3 left-1/3 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="max-w-5xl mx-auto text-center relative z-10">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/[0.04] border border-white/10 text-xs text-gray-300 font-semibold mb-6">
@@ -195,7 +195,7 @@ export default function LandingPage() {
 
           <h1 className="text-3xl sm:text-5xl md:text-6xl font-black tracking-tight leading-tight text-white mb-6">
             Stop Bleeding Capital to Emotional Mistakes. <br />
-            <span className="bg-gradient-to-r from-purple-400 via-fuchsia-400 to-pink-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-blue-400 via-cyan-400 to-emerald-400 bg-clip-text text-transparent">
               Master Your Statistical Edge.
             </span>
           </h1>
@@ -209,7 +209,7 @@ export default function LandingPage() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
             <Link
               to="/login"
-              className="w-full sm:w-auto px-8 py-4 rounded-xl bg-[#A855F7] hover:bg-[#9333EA] text-white text-sm font-bold shadow-xl shadow-purple-500/25 transition-all flex items-center justify-center gap-2 group"
+              className="w-full sm:w-auto px-8 py-4 rounded-xl bg-[#2f8df4] hover:bg-[#2376e8] text-white text-sm font-bold shadow-xl shadow-blue-500/25 transition-all flex items-center justify-center gap-2 group"
             >
               Unlock Lifetime Access ($11 USDT)
               <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
@@ -226,76 +226,73 @@ export default function LandingPage() {
           </div>
 
           {/* Institutional UI Preview Card */}
-          <div className="relative mx-auto max-w-4xl rounded-2xl border border-white/10 bg-[#0a0520] p-4 sm:p-6 shadow-2xl shadow-black/80 text-left hover:scale-[1.02] transition-transform duration-500 relative">
+          <div className="relative mx-auto max-w-4xl rounded-2xl border border-white/10 bg-[#121418] p-4 sm:p-6 shadow-2xl shadow-black/80 text-left hover:scale-[1.02] transition-transform duration-500 relative">
+            
             {/* Animated Floating Badges */}
-            <div className="absolute -left-12 top-10 bg-purple-500/20 border border-purple-500/30 px-4 py-2 rounded-xl backdrop-blur-md animate-bounce hidden md:block shadow-lg">
-              <span className="text-pink-400 text-xs font-bold flex items-center gap-2">
-                <TrendingUp className="w-3 h-3" /> AI Coach Active
-              </span>
+            <div className="absolute -left-12 top-10 bg-emerald-500/10 border border-emerald-500/20 px-4 py-2 rounded-xl backdrop-blur-md animate-bounce hidden md:block shadow-lg">
+              <span className="text-emerald-400 text-xs font-bold flex items-center gap-2"><TrendingUp className="w-3 h-3"/> AI Coach Active</span>
             </div>
-            <div className="absolute -right-8 bottom-10 bg-purple-500/10 border border-purple-500/20 px-4 py-2 rounded-xl backdrop-blur-md animate-pulse hidden md:block shadow-lg">
-              <span className="text-purple-400 text-xs font-bold flex items-center gap-2">
-                <Calculator className="w-3 h-3" /> +12.4R This Week
-              </span>
+            <div className="absolute -right-8 bottom-10 bg-blue-500/10 border border-blue-500/20 px-4 py-2 rounded-xl backdrop-blur-md animate-pulse hidden md:block shadow-lg">
+              <span className="text-blue-400 text-xs font-bold flex items-center gap-2"><Calculator className="w-3 h-3"/> +12.4R This Week</span>
             </div>
             <div className="flex items-center justify-between pb-4 mb-4 border-b border-white/5 text-xs">
               <div className="flex items-center gap-2">
                 <span className="w-3 h-3 rounded-full bg-red-500/20 border border-red-500/40" />
                 <span className="w-3 h-3 rounded-full bg-yellow-500/20 border border-yellow-500/40" />
-                <span className="w-3 h-3 rounded-full bg-pink-500/20 border border-pink-500/40" />
+                <span className="w-3 h-3 rounded-full bg-emerald-500/20 border border-emerald-500/40" />
                 <span className="text-gray-500 font-mono ml-2">
                   app.forexnotes.in / dashboard
                 </span>
               </div>
-              <div className="flex items-center gap-2 text-pink-400 font-mono font-bold">
+              <div className="flex items-center gap-2 text-emerald-400 font-mono font-bold">
                 <ShieldCheck className="w-4 h-4" /> Live Guardian Active
               </div>
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-4">
-              <div className="bg-[#0e0730] p-3 rounded-lg border border-white/5">
+              <div className="bg-[#0b131d] p-3 rounded-lg border border-white/5">
                 <span className="text-[10px] uppercase font-bold text-gray-500 tracking-wider">
                   Win Rate
                 </span>
                 <p className="text-xl font-bold text-white mt-1">68.4%</p>
-                <span className="text-[10px] text-pink-400 font-medium">
+                <span className="text-[10px] text-emerald-400 font-medium">
                   +4.2% this month
                 </span>
               </div>
-              <div className="bg-[#0e0730] p-3 rounded-lg border border-white/5">
+              <div className="bg-[#0b131d] p-3 rounded-lg border border-white/5">
                 <span className="text-[10px] uppercase font-bold text-gray-500 tracking-wider">
                   Net R Multiple
                 </span>
-                <p className="text-xl font-bold text-pink-400 mt-1">
+                <p className="text-xl font-bold text-emerald-400 mt-1">
                   +34.80R
                 </p>
                 <span className="text-[10px] text-gray-400 font-medium">
                   Avg win: 2.4R
                 </span>
               </div>
-              <div className="bg-[#0e0730] p-3 rounded-lg border border-white/5">
+              <div className="bg-[#0b131d] p-3 rounded-lg border border-white/5">
                 <span className="text-[10px] uppercase font-bold text-gray-500 tracking-wider">
                   Profit Factor
                 </span>
                 <p className="text-xl font-bold text-white mt-1">2.18</p>
-                <span className="text-[10px] text-pink-400 font-medium">
+                <span className="text-[10px] text-emerald-400 font-medium">
                   Institutional edge
                 </span>
               </div>
-              <div className="bg-[#0e0730] p-3 rounded-lg border border-white/5">
+              <div className="bg-[#0b131d] p-3 rounded-lg border border-white/5">
                 <span className="text-[10px] uppercase font-bold text-gray-500 tracking-wider">
                   Rule Discipline
                 </span>
-                <p className="text-xl font-bold text-fuchsia-400 mt-1">94%</p>
+                <p className="text-xl font-bold text-cyan-400 mt-1">94%</p>
                 <span className="text-[10px] text-gray-400 font-medium">
                   Zero revenge trades
                 </span>
               </div>
             </div>
 
-            <div className="bg-[#0e0730] p-3.5 rounded-lg border border-white/5 flex items-center justify-between text-xs">
+            <div className="bg-[#0b131d] p-3.5 rounded-lg border border-white/5 flex items-center justify-between text-xs">
               <div className="flex items-center gap-3">
-                <span className="px-2 py-0.5 rounded bg-purple-500/20 text-pink-400 border border-purple-500/30 font-bold uppercase tracking-wider text-[10px]">
+                <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-bold uppercase tracking-wider text-[10px]">
                   LONG
                 </span>
                 <span className="font-bold text-white">XAUUSD</span>
@@ -305,7 +302,7 @@ export default function LandingPage() {
               </div>
               <div className="flex items-center gap-4">
                 <span className="text-gray-500 font-mono">Risk: 0.5%</span>
-                <span className="text-pink-400 font-bold font-mono">
+                <span className="text-emerald-400 font-bold font-mono">
                   +3.20R
                 </span>
               </div>
@@ -317,11 +314,11 @@ export default function LandingPage() {
       {/* Bento Features Section */}
       <section
         id="features"
-        className="py-24 px-4 md:px-8 border-t border-white/5 bg-[#050014]"
+        className="py-24 px-4 md:px-8 border-t border-white/5 bg-[#0b0c0e]"
       >
         <div className="max-w-7xl mx-auto">
           <div className="text-center max-w-2xl mx-auto mb-16">
-            <span className="text-[10px] uppercase font-bold tracking-widest text-[#A855F7] mb-2 block">
+            <span className="text-[10px] uppercase font-bold tracking-widest text-[#2f8df4] mb-2 block">
               Core Architecture
             </span>
             <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight mb-4">
@@ -337,7 +334,7 @@ export default function LandingPage() {
             {features.map((f, i) => (
               <div
                 key={i}
-                className="bg-[#0a0520] border border-white/5 rounded-2xl p-6 hover:border-white/10 transition-all flex flex-col justify-between group"
+                className="bg-[#121418] border border-white/5 rounded-2xl p-6 hover:border-white/10 transition-all flex flex-col justify-between group"
               >
                 <div>
                   <div className="flex items-center justify-between mb-4">
@@ -350,7 +347,7 @@ export default function LandingPage() {
                       {f.tag}
                     </span>
                   </div>
-                  <h3 className="text-base font-bold text-white mb-2 group-hover:text-[#A855F7] transition-colors">
+                  <h3 className="text-base font-bold text-white mb-2 group-hover:text-[#2f8df4] transition-colors">
                     {f.title}
                   </h3>
                   <p className="text-xs text-gray-400 leading-relaxed">
@@ -370,7 +367,7 @@ export default function LandingPage() {
       >
         <div className="max-w-5xl mx-auto">
           <div className="text-center max-w-xl mx-auto mb-16">
-            <span className="text-[10px] uppercase font-bold tracking-widest text-pink-400 mb-2 block">
+            <span className="text-[10px] uppercase font-bold tracking-widest text-emerald-400 mb-2 block">
               Direct Comparison
             </span>
             <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight mb-4">
@@ -382,15 +379,15 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div className="border border-white/10 rounded-2xl overflow-hidden bg-[#0a0520]">
+          <div className="border border-white/10 rounded-2xl overflow-hidden bg-[#121418]">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="border-b border-white/5 bg-[#0e0730] text-[10px] uppercase tracking-wider text-gray-400">
+                <tr className="border-b border-white/5 bg-[#0b131d] text-[10px] uppercase tracking-wider text-gray-400">
                   <th className="py-4 px-6 font-bold">Feature / Metric</th>
                   <th className="py-4 px-6 font-bold text-gray-400">
                     Spreadsheets / Notion
                   </th>
-                  <th className="py-4 px-6 font-bold text-[#A855F7]">
+                  <th className="py-4 px-6 font-bold text-[#2f8df4]">
                     Forex Notes
                   </th>
                 </tr>
@@ -405,7 +402,7 @@ export default function LandingPage() {
                       {row.metric}
                     </td>
                     <td className="py-4 px-6 text-gray-400">{row.manual}</td>
-                    <td className="py-4 px-6 text-pink-400 font-bold flex items-center gap-1.5">
+                    <td className="py-4 px-6 text-emerald-400 font-bold flex items-center gap-1.5">
                       <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />{" "}
                       {row.journal}
                     </td>
@@ -420,7 +417,7 @@ export default function LandingPage() {
       {/* Reviews Section */}
       <section className="py-24 px-4 md:px-8 border-t border-white/5 overflow-hidden">
         <div className="max-w-7xl mx-auto text-center mb-16">
-          <span className="text-[10px] uppercase font-bold tracking-widest text-[#A855F7] mb-2 block animate-pulse">
+          <span className="text-[10px] uppercase font-bold tracking-widest text-[#2f8df4] mb-2 block animate-pulse">
             Trader Testimonials
           </span>
           <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight mb-4">
@@ -429,38 +426,21 @@ export default function LandingPage() {
         </div>
         <div className="flex justify-center gap-6 flex-wrap">
           {[
-            {
-              name: "Alex P.",
-              firm: "Funded $100k",
-              text: "The AI coach literally saved me from a massive tilt yesterday. Best $11 I've ever spent.",
-            },
-            {
-              name: "Sarah J.",
-              firm: "Funded $300k",
-              text: "Prop firm guardian is a game changer. I never have to manually calculate my daily drawdown limits again.",
-            },
-            {
-              name: "Mike T.",
-              firm: "Evaluation Phase",
-              text: "The lot size calculator is so fast. Having it right next to my journal helps me execute perfectly.",
-            },
+            { name: "Alex P.", firm: "Funded $100k", text: "The AI coach literally saved me from a massive tilt yesterday. Best $11 I've ever spent." },
+            { name: "Sarah J.", firm: "Funded $300k", text: "Prop firm guardian is a game changer. I never have to manually calculate my daily drawdown limits again." },
+            { name: "Mike T.", firm: "Evaluation Phase", text: "The lot size calculator is so fast. Having it right next to my journal helps me execute perfectly." }
           ].map((r, i) => (
-            <div
-              key={i}
-              className="bg-[#0a0520] border border-white/10 rounded-2xl p-6 w-full max-w-sm hover:-translate-y-2 transition-transform duration-300 shadow-xl"
-            >
+            <div key={i} className="bg-[#121418] border border-white/10 rounded-2xl p-6 w-full max-w-sm hover:-translate-y-2 transition-transform duration-300 shadow-xl">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-fuchsia-500 flex items-center justify-center font-bold text-white shadow-lg">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center font-bold text-white shadow-lg">
                   {r.name.charAt(0)}
                 </div>
                 <div className="text-left">
                   <h4 className="text-sm font-bold text-white">{r.name}</h4>
-                  <p className="text-xs text-pink-400">{r.firm}</p>
+                  <p className="text-xs text-emerald-400">{r.firm}</p>
                 </div>
               </div>
-              <p className="text-sm text-gray-400 text-left italic">
-                "{r.text}"
-              </p>
+              <p className="text-sm text-gray-400 text-left italic">"{r.text}"</p>
             </div>
           ))}
         </div>
@@ -469,10 +449,10 @@ export default function LandingPage() {
       {/* Pricing Section */}
       <section
         id="pricing"
-        className="py-24 px-4 md:px-8 border-t border-white/5 bg-[#050014]"
+        className="py-24 px-4 md:px-8 border-t border-white/5 bg-[#0b0c0e]"
       >
         <div className="max-w-3xl mx-auto text-center">
-          <span className="text-[10px] uppercase font-bold tracking-widest text-[#A855F7] mb-2 block">
+          <span className="text-[10px] uppercase font-bold tracking-widest text-[#2f8df4] mb-2 block">
             Transparent Pricing
           </span>
           <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight mb-4">
@@ -483,8 +463,8 @@ export default function LandingPage() {
             and receive lifetime access immediately.
           </p>
 
-          <div className="bg-[#0a0520] border-2 border-[#A855F7]/40 rounded-3xl p-8 sm:p-10 shadow-2xl relative overflow-hidden text-left">
-            <div className="absolute top-0 right-0 bg-[#A855F7] text-white text-[10px] font-black uppercase tracking-widest px-4 py-1.5 rounded-bl-xl">
+          <div className="bg-[#121418] border-2 border-[#2f8df4]/40 rounded-3xl p-8 sm:p-10 shadow-2xl relative overflow-hidden text-left">
+            <div className="absolute top-0 right-0 bg-[#2f8df4] text-white text-[10px] font-black uppercase tracking-widest px-4 py-1.5 rounded-bl-xl">
               Lifetime Pass
             </div>
 
@@ -502,7 +482,7 @@ export default function LandingPage() {
                 <span className="text-sm font-bold text-gray-400 ml-1">
                   USDT
                 </span>
-                <span className="block text-[10px] uppercase tracking-wider text-pink-400 font-bold mt-1">
+                <span className="block text-[10px] uppercase tracking-wider text-emerald-400 font-bold mt-1">
                   One-time payment
                 </span>
               </div>
@@ -523,7 +503,7 @@ export default function LandingPage() {
                   key={i}
                   className="flex items-center gap-2.5 text-xs text-gray-300"
                 >
-                  <CheckCircle2 className="w-4 h-4 text-pink-400 shrink-0" />
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
                   <span>{item}</span>
                 </div>
               ))}
@@ -532,15 +512,14 @@ export default function LandingPage() {
             <div className="space-y-4">
               <Link
                 to="/login"
-                className="w-full py-4 rounded-xl bg-[#A855F7] hover:bg-[#9333EA] text-white text-sm font-bold shadow-lg shadow-purple-500/25 transition-all flex items-center justify-center gap-2 group"
+                className="w-full py-4 rounded-xl bg-[#2f8df4] hover:bg-[#2376e8] text-white text-sm font-bold shadow-lg shadow-blue-500/25 transition-all flex items-center justify-center gap-2 group"
               >
                 Join Now for $11 USDT
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
               </Link>
               <div className="flex items-center justify-center gap-4 text-[10px] text-gray-500 font-mono uppercase tracking-wider">
                 <span className="flex items-center gap-1">
-                  <Lock className="w-3 h-3" />
-                  BEP20 Network Transaction Supported
+                  <Lock className="w-3 h-3" /> TRC20 & BEP20 Supported
                 </span>
                 <span>•</span>
                 <span>Instant On-Chain Verification</span>
@@ -552,7 +531,7 @@ export default function LandingPage() {
 
       {/* Community Section */}
       <section className="py-20 px-4 md:px-8 border-t border-white/5">
-        <div className="max-w-4xl mx-auto bg-gradient-to-br from-[#5865F2]/20 via-[#0a0520] to-[#0a0520] border border-[#5865F2]/30 rounded-3xl p-8 sm:p-12 text-center relative overflow-hidden">
+        <div className="max-w-4xl mx-auto bg-gradient-to-br from-[#5865F2]/20 via-[#121418] to-[#121418] border border-[#5865F2]/30 rounded-3xl p-8 sm:p-12 text-center relative overflow-hidden">
           <div className="w-12 h-12 rounded-2xl bg-[#5865F2] flex items-center justify-center mx-auto mb-6 shadow-lg shadow-[#5865F2]/30">
             <MessageSquare className="w-6 h-6 text-white" />
           </div>
@@ -575,10 +554,10 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-white/5 py-10 px-4 md:px-8 bg-[#050014] text-xs text-gray-500">
+      <footer className="border-t border-white/5 py-10 px-4 md:px-8 bg-[#0a0a0a] text-xs text-gray-500">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <Activity className="w-4 h-4 text-[#A855F7]" />
+            <Activity className="w-4 h-4 text-[#2f8df4]" />
             <span className="font-bold text-gray-300">Forex Notes</span>
             <span className="text-[10px] text-gray-600">
               © {new Date().getFullYear()} All Rights Reserved.
@@ -611,3 +590,4 @@ export default function LandingPage() {
     </div>
   );
 }
+

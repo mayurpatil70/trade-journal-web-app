@@ -34,7 +34,7 @@ export const generateNewsInsight = async (req, res) => {
     `;
 
     const response = await ai.models.generateContent({
-      model: "gemini-3.8-flash",
+      model: "gemini-1.5-flash",
       contents: prompt,
     });
 
@@ -71,7 +71,7 @@ export const analyzeChart = async (req, res) => {
     `;
 
     const response = await ai.models.generateContent({
-      model: "gemini-3.8-flash",
+      model: "gemini-1.5-flash",
       contents: [
         prompt,
         {
@@ -103,7 +103,7 @@ export const chatWithCoach = async (req, res) => {
 
     // Initialize the chat session with strict coaching instructions
     const chat = ai.chats.create({
-      model: "gemini-3.8-flash",
+      model: "gemini-1.5-flash",
       config: {
         systemInstruction: `You are an elite, strict, but supportive Forex trading psychology coach. 
       Your goal is to prevent the user from making emotional, revenge, or impulsive trades. 
@@ -181,7 +181,7 @@ export const getEdgeInsights = async (req, res) => {
 
     // 4. Generate the insights
     const response = await ai.models.generateContent({
-      model: "gemini-3.8-flash",
+      model: "gemini-1.5-flash",
       contents: prompt,
     });
 

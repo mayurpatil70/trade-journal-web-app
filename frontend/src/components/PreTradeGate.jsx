@@ -85,7 +85,7 @@ export default function PreTradeGate() {
     >
       {/* The Chat Modal */}
       {isOpen && (
-        <div className="mb-4 w-[350px] md:w-[400px] h-[550px] bg-white dark:bg-[#121418] border border-gray-200 dark:border-white/10 rounded-[4px] shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom-5">
+        <div className="mb-4 w-[350px] md:w-[400px] h-[550px] bg-white/80 dark:bg-[#121418]/80 backdrop-blur-xl border border-gray-200 dark:border-white/20 rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom-5">
           {/* Header */}
           <div className="bg-[#2f8df4] p-4 flex items-center justify-between shrink-0">
             <div className="flex items-center gap-3">
@@ -119,7 +119,7 @@ export default function PreTradeGate() {
                 className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}
               >
                 <div
-                  className={`max-w-[85%] p-3 rounded-[4px] text-sm leading-relaxed shadow-sm ${
+                  className={`max-w-[85%] p-3 rounded-3xl text-sm leading-relaxed shadow-sm ${
                     msg.sender === "user"
                       ? "bg-[#2f8df4] text-white"
                       : "bg-white dark:bg-[#1a1d24] text-gray-800 dark:text-gray-200 border border-gray-100 dark:border-white/5"
@@ -131,7 +131,7 @@ export default function PreTradeGate() {
             ))}
             {isLoading && (
               <div className="flex justify-start">
-                <div className="bg-white dark:bg-[#1a1d24] p-3 rounded-[4px] border border-gray-100 dark:border-white/5 shadow-sm">
+                <div className="bg-white dark:bg-[#1a1d24] p-3 rounded-3xl border border-gray-100 dark:border-white/5 shadow-sm">
                   <Loader2 className="w-4 h-4 text-[#2f8df4] animate-spin" />
                 </div>
               </div>
@@ -147,12 +147,12 @@ export default function PreTradeGate() {
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder="Type your answer here..."
-                className="flex-1 bg-gray-100 dark:bg-[#1a1d24] text-sm text-gray-900 dark:text-white border-none rounded-[2px] px-3 py-2.5 focus:outline-none focus:ring-1 focus:ring-[#2f8df4]"
+                className="flex-1 bg-gray-100 dark:bg-[#1a1d24] text-sm text-gray-900 dark:text-white border-none rounded-full px-3 py-2.5 focus:outline-none focus:ring-1 focus:ring-[#2f8df4]"
               />
               <button
                 type="submit"
                 disabled={isLoading || !message.trim()}
-                className="bg-[#2f8df4] hover:bg-[#2376e8] disabled:bg-[#2f8df4]/50 text-white p-2.5 rounded-[2px] transition-colors flex items-center justify-center shrink-0"
+                className="bg-[#2f8df4] hover:bg-[#2376e8] disabled:bg-[#2f8df4]/50 text-white p-2.5 rounded-full transition-colors flex items-center justify-center shrink-0"
               >
                 <Send className="w-4 h-4" />
               </button>
@@ -160,7 +160,7 @@ export default function PreTradeGate() {
 
             <button
               onClick={handleReadyToTrade}
-              className="w-full py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm rounded-[2px] transition-colors shadow-sm flex items-center justify-center gap-2"
+              className="w-full py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm rounded-full transition-colors shadow-sm flex items-center justify-center gap-2"
             >
               I'm ready to trade, Thanks <ChevronRight className="w-4 h-4" />
             </button>
@@ -174,7 +174,7 @@ export default function PreTradeGate() {
           className="relative flex flex-col items-center cursor-pointer group"
           onClick={() => setIsOpen(true)}
         >
-          <div className="absolute -top-12 bg-white dark:bg-[#1a1d24] text-gray-900 dark:text-white text-xs font-bold px-4 py-2 rounded-[4px] shadow-lg border border-gray-100 dark:border-white/10 whitespace-nowrap transform transition-transform group-hover:-translate-y-1">
+          <div className="absolute -top-12 bg-white dark:bg-[#1a1d24] text-gray-900 dark:text-white text-xs font-bold px-4 py-2 rounded-3xl shadow-lg border border-gray-100 dark:border-white/10 whitespace-nowrap transform transition-transform group-hover:-translate-y-1">
             Coach isLIVE
             <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[8px] border-t-white dark:border-t-[#1a1d24]"></div>
           </div>
@@ -191,3 +191,4 @@ export default function PreTradeGate() {
     </div>
   );
 }
+

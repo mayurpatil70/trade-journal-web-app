@@ -351,7 +351,8 @@ export default function PastTrades() {
                     {selectedTrade.images.map((img, i) => (
                       <div
                         key={i}
-                        className="group relative rounded-2xl overflow-hidden border border-gray-200/80 dark:border-white/10 bg-gray-100 dark:bg-white/5 shadow-sm"
+                        className="group relative rounded-2xl overflow-hidden border border-gray-200/80 dark:border-white/10 bg-gray-100 dark:bg-white/5 shadow-sm cursor-pointer"
+                        onClick={() => window.open(img, '_blank')}
                       >
                         <img
                           src={img}

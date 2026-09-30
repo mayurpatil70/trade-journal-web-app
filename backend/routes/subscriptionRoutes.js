@@ -62,6 +62,12 @@ router.post("/verify", async (req, res) => {
         .json({ error: "Missing required payment details." });
     }
 
+    if (!/^0x([A-Fa-f0-9]{64})$/.test(txHash)) {
+      return res
+        .status(400)
+        .json({ error: "Invalid transaction hash format. Must be a valid 66-character hex string starting with 0x." });
+    }
+
     const { data: used } = await supabase
       .from("journal_subscriptions")
       .select("id")

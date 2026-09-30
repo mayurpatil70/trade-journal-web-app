@@ -16,28 +16,24 @@ export const sendRevenueAlert = async ({
   const isPropFirm = type === "Prop Firm Challenge";
   const color = isPropFirm ? 3066993 : 15105570; // Blue for Prop, Orange for Journal
 
-  const payload = {
-    embeds: [
-      {
-        title: isPropFirm
-          ? "🎯 New Challenge Purchased!"
-          : "🔓 Journal Access Unlocked!",
-        color: color,
-        fields: [
-          { name: "User", value: `\`${userId}\``, inline: true },
-          { name: "Amount", value: `**$${amount} USDT**`, inline: true },
-          { name: "Network", value: chain, inline: true },
-          {
-            name: "Transaction Hash",
-            value: `[View on Explorer](https://bscscan.com/tx/${txHash})`,
-            inline: false,
-          },
-        ],
-        image: screenshot ? { url: screenshot } : undefined,
-        timestamp: new Date().toISOString(),
-      },
+  const embed = {
+    title: isPropFirm ? "🎯 New Challenge Purchased!" : "🔓 Journal Access Unlocked!",
+    color: color,
+    fields: [
+      { name: "User", value: `\`${userId}\``, inline: true },
+      { name: "Amount", value: `**$${amount} USDT**`, inline: true },
+      { name: "Network", value: chain, inline: true },
+      { name: "TXID", value: `\`${txHash}\``, inline: false },
+      { name: "Explorer Link", value: `[View on Explorer](https://bscscan.com/tx/${txHash})`, inline: false }
     ],
+    timestamp: new Date().toISOString()
   };
+
+  if (screenshot) {
+    embed.image = { url: screenshot };
+  }
+
+  const payload = { embeds: [embed] };
 
   try {
     await fetch(webhookUrl, {

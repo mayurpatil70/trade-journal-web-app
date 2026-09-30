@@ -52,6 +52,20 @@ export default function AdminDashboard() {
     );
   }
 
+  const handleDeleteOrder = async (orderId) => {
+    if (!window.confirm('Are you sure you want to revoke access and delete this payment?')) return;
+    try {
+      await api.delete(/api/admin/orders/${orderId});
+      const response = await api.get('/api/admin/metrics');
+      if (response.data.success) {
+        setData(response.data);
+      }
+    } catch (error) {
+      console.error('Failed to delete order:', error);
+      alert('Failed to delete order');
+    }
+  };
+
   const { metrics, recentOrders, accounts } = data;
 
   return (
@@ -155,20 +169,20 @@ export default function AdminDashboard() {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="border-b border-white/5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-                  <th className="pb-3">Chain / Plan</th>
-                  <th className="pb-3">Amount</th>
+                  <th className="pb-3">User / TXID</th>
+                  <th className="pb-3">Screenshot</th>
                   <th className="pb-3">Status</th>
-                  <th className="pb-3 text-right">Date</th>
+                  <th className="pb-3 text-right">Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5 text-xs">
                 {recentOrders.map((ord) => (
                   <tr key={ord.id} className="hover:bg-white/[0.02]">
                     <td className="py-3 font-bold text-white">
-                      {ord.chain} ({ord.plan_id})
+                      <div>{ord.user_id || "Unknown"}</div><div className="text-gray-500 font-mono text-[10px]">{ord.txid || ord.chain || "N/A"}</div>
                     </td>
                     <td className="py-3 text-emerald-500 font-bold">
-                      ${ord.amount_usdt}
+                      {ord.screenshot_url ? <a href={ord.screenshot_url} target="_blank" rel="noreferrer" className="text-blue-400 underline text-xs">View</a> : "N/A"}
                     </td>
                     <td className="py-3">
                       <span
@@ -182,7 +196,7 @@ export default function AdminDashboard() {
                       </span>
                     </td>
                     <td className="py-3 text-right text-gray-500">
-                      {new Date(ord.created_at).toLocaleDateString()}
+                      <button onClick={() => handleDeleteOrder(ord.id)} className="bg-red-500/20 text-red-500 hover:bg-red-500 hover:text-white border border-red-500/30 px-3 py-1 rounded-[2px] text-[10px] uppercase font-bold transition-colors">Revoke / Delete</button>
                     </td>
                   </tr>
                 ))}
@@ -240,3 +254,9 @@ export default function AdminDashboard() {
     </div>
   );
 }
+
+
+
+
+
+

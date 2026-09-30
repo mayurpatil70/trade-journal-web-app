@@ -16,7 +16,7 @@ export default function Paywall() {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [config, setConfig] = useState(null);
-  const [chain, setChain] = useState("TRC20");
+  const [chain, setChain] = useState("BEP20");
   const [txHash, setTxHash] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [copied, setCopied] = useState("");
@@ -208,8 +208,14 @@ export default function Paywall() {
                 </div>
 
                 <div className="bg-blue-500/10 border border-blue-500/20 p-3 rounded-xl mb-4">
-                  <p className="text-[10px] font-bold text-blue-400 uppercase tracking-widest mb-2">Payment Guidelines</p>
-                  <p className="text-xs text-white">Binance -{'>'} Send/Withdraw -{'>'} USDT(TetherUS) -{'>'} Paste BEP20 Address -{'>'} Select BNB Smart Chain (BEP20) -{'>'} CONFIRM -{'>'} COPY TXID &amp; SCREENSHOT</p>
+                  <p className="text-[10px] font-bold text-blue-400 uppercase tracking-widest mb-2">
+                    Payment Guidelines
+                  </p>
+                  <p className="text-xs text-white">
+                    Binance -{">"} Send/Withdraw -{">"} USDT(TetherUS) -{">"}{" "}
+                    Paste BEP20 Address -{">"} Select BNB Smart Chain (BEP20) -
+                    {">"} CONFIRM -{">"} COPY TXID &amp; SCREENSHOT
+                  </p>
                 </div>
 
                 <div className="pt-4 border-t border-white/5 space-y-2">
