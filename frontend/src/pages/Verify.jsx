@@ -34,18 +34,24 @@ export default function Verify() {
         const userId =
           response.data.userId || response.data.user?.id || response.data.id;
         const authToken = response.data.token;
+        const discordVerified = response.data.discordVerified;
+        const hasPaid = response.data.hasPaid; // Extracted from backend response
 
         if (userId) localStorage.setItem("userId", userId);
         if (authToken) localStorage.setItem("token", authToken);
-
-        // NEW: Save the email for the Sidebar profile badge!
         localStorage.setItem("userEmail", email);
 
         setStatus("success");
 
-        // 3. Redirect to Discord Gateway on success
+        // 3. Smart Redirect: Discord -> Paywall -> Dashboard
         setTimeout(() => {
-          navigate("/link-discord");
+          if (!discordVerified) {
+            navigate("/link-discord");
+          } else if (!hasPaid) {
+            navigate("/paywall");
+          } else {
+            navigate("/dashboard");
+          }
         }, 1500);
       } catch (error) {
         setStatus("error");

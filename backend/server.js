@@ -12,6 +12,7 @@ import kycRoutes from "./routes/kycRoutes.js";
 import newsRoutes from "./routes/newsRoutes.js";
 import tradeRoutes from "./routes/tradeRoutes.js";
 import supportRoutes from "./routes/supportRoutes.js";
+import subscriptionRoutes from "./routes/subscriptionRoutes.js";
 
 const app = express();
 
@@ -34,6 +35,7 @@ app.use("/api/news", newsRoutes);
 app.use("/api/trades", tradeRoutes);
 app.use("/api/trades", exportRoutes); // <-- This handles your exports
 app.use("/api/support", supportRoutes);
+app.use("/api/subscriptions", subscriptionRoutes);
 
 // Health Check Endpoint
 app.get("/", (req, res) => {

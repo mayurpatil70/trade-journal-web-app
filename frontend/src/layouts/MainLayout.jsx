@@ -114,6 +114,7 @@ export default function MainLayout() {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isSubscriptionOpen, setIsSubscriptionOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
   // FIX: Enforce Theme Globally on Mount & Route Change
   useEffect(() => {
@@ -126,8 +127,10 @@ export default function MainLayout() {
   }, [location.pathname]);
 
   const handleLogout = () => {
-    localStorage.clear();
-    window.location.href = "/login";
+    localStorage.removeItem("userId");
+    localStorage.removeItem("token");
+    localStorage.removeItem("userEmail");
+    navigate("/login");
   };
 
   const closeMenu = () => {
@@ -260,6 +263,25 @@ export default function MainLayout() {
               </div>
             </div>
           ))}
+
+          {/* ADMIN BYPASS MENU - ONLY VISIBLE TO YOUR EMAIL */}
+          {localStorage.getItem("userEmail") === "noballondesk@gmail.com" && (
+            <div className="pt-4 mt-4 border-t border-gray-200/80 dark:border-white/10">
+              <p className="px-3 text-[9px] font-black text-emerald-500 uppercase tracking-[0.2em] mb-2">
+                Admin Area
+              </p>
+              <div className="space-y-0.5">
+                <NavItem
+                  to="/admin"
+                  icon={ShieldCheck}
+                  label="Command Center"
+                  color="emerald"
+                  currentPath={location.pathname}
+                  onClick={closeMenu}
+                />
+              </div>
+            </div>
+          )}
         </nav>
 
         {/* User Card & Subscription at bottom */}

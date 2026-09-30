@@ -22,23 +22,8 @@ export const requestLogin = async (req, res) => {
         { onConflict: "email" },
       );
 
-    // if (dbError) throw new Error(dbError.message);
-
-    // const magicLink = `http://localhost:5173/verify?token=${token}&email=${email}`;
-
-    // // Updated to use your verified domain
-    // const { error: emailError } = await resend.emails.send({
-    //   from: "forexnotes.in <auth@nationalsteell.com>",
-    //   to: email,
-    //   subject: "Verify - ForexNotes.in Login and Join our Discord Server",
-    //   html: `<p>Click <a href="${magicLink}">here</a> to access your trading journal.</p>`,
-    // });
-
-    // backend/controllers/authController.js
-
     if (dbError) throw new Error(dbError.message);
 
-    // Dynamically choose the URL based on your .env file
     const clientUrl = process.env.FRONTEND_URL || "http://localhost:5173";
     const magicLink = `${clientUrl}/verify?token=${token}&email=${email}`;
 
@@ -79,10 +64,26 @@ export const verifyLogin = async (req, res) => {
       .update({ login_token: null, token_expires: null })
       .eq("id", user.id);
 
+    // 1. Check if user is the Admin
+    const isAdmin = user.email === process.env.ADMIN_EMAIL;
+
+    // 2. Check if they have a paid subscription
+    const { data: subData } = await supabase
+      .from("journal_subscriptions")
+      .select("status")
+      .eq("user_id", user.id)
+      .eq("status", "paid")
+      .maybeSingle();
+
+    // 3. ADMIN BYPASS: If they are admin OR have paid, grant access
+    const hasPaid = isAdmin || !!subData;
+
     res.json({
       message: "Verified successfully",
       discordVerified: user.discord_verified,
       userId: user.id,
+      hasPaid: hasPaid,
+      isAdmin: isAdmin,
     });
   } catch (error) {
     console.error("Verify Error:", error.message);
