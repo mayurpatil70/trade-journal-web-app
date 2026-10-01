@@ -46,10 +46,14 @@ export default function PreTradeGate() {
     setIsLoading(true);
 
     try {
-      const response = await api.post("/api/ai/chat", {
-        message: userMessage.text,
-        history: currentHistory,
-      });
+      const response = await api.post(
+        "/api/ai/chat",
+        {
+          message: userMessage.text,
+          history: currentHistory,
+        },
+        { timeout: 120000 }, // 120s — nemotron-ultra-550B needs 30–60s to respond
+      );
 
       setChatHistory((prev) => [
         ...prev,
