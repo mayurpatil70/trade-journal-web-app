@@ -148,3 +148,105 @@ describe("chat history endpoints", () => {
     expect(res.json).toHaveBeenCalledWith({ success: true });
   });
 });
+
+describe("model fallback", () => {
+  const overloaded = () => Object.assign(new Error("Service temporarily overloaded"), { status: 503 });
+  const ok = (content) => ({ choices: [{ message: { content } }] });
+  const msgs = [{ role: "user", content: "x" }];
+  const fast = { retryDelayMs: 0, models: ["a", "b", "c"] };
+  const clientWith = (create) => ({ chat: { completions: { create: jest.fn(create) } } });
+  const modelsTried = (client) => client.chat.completions.create.mock.calls.map((c) => c[0].model);
+
+  it("moves to the next model when the first is overloaded", async () => {
+    const client = clientWith(async (p) => {
+      if (p.model === "a") throw overloaded();
+      return ok(p.model);
+    });
+    expect(await ai.nimComplete(msgs, fast, client)).toBe("b");
+    expect(modelsTried(client)).toEqual(["a", "b"]);
+  });
+
+  it("tries every model then throws the last error", async () => {
+    const client = clientWith(async () => { throw overloaded(); });
+    await expect(ai.nimComplete(msgs, fast, client)).rejects.toThrow(/overloaded/);
+    expect(modelsTried(client)).toEqual(["a", "b", "c"]);
+  });
+
+  it.each([[400], [401], [404]])("does not fall back on HTTP %s", async (status) => {
+    const client = clientWith(async () => { throw Object.assign(new Error("bad"), { status }); });
+    await expect(ai.nimComplete(msgs, fast, client)).rejects.toThrow("bad");
+    expect(client.chat.completions.create).toHaveBeenCalledTimes(1);
+  });
+
+  it("falls back on 429 and on overload wording without a status", async () => {
+    const errors = [Object.assign(new Error("slow down"), { status: 429 }), new Error("Service temporarily overloaded")];
+    for (const err of errors) {
+      const client = clientWith(async (p) => {
+        if (p.model === "a") throw err;
+        return ok("fine");
+      });
+      expect(await ai.nimComplete(msgs, fast, client)).toBe("fine");
+    }
+  });
+
+  it("stream falls back if the first model fails before sending anything", async () => {
+    const client = clientWith(async (p) => {
+      if (p.model === "a") throw overloaded();
+      return (async function* () { yield { choices: [{ delta: { content: "hi" } }] }; })();
+    });
+    const out = [];
+    for await (const p of ai.nimStream(msgs, fast, client)) out.push(p);
+    expect(out).toEqual([{ type: "content", text: "hi" }]);
+    expect(modelsTried(client)).toEqual(["a", "b"]);
+  });
+
+  it("stream falls back when the error arrives on the first read", async () => {
+    const client = clientWith(async (p) =>
+      p.model === "a"
+        ? (async function* () { throw overloaded(); })()
+        : (async function* () { yield { choices: [{ delta: { content: "ok" } }] }; })(),
+    );
+    const out = [];
+    for await (const p of ai.nimStream(msgs, fast, client)) out.push(p);
+    expect(out).toEqual([{ type: "content", text: "ok" }]);
+  });
+
+  it("stream does not restart once text has been sent", async () => {
+    const client = clientWith(async () =>
+      (async function* () {
+        yield { choices: [{ delta: { content: "partial" } }] };
+        throw overloaded();
+      })(),
+    );
+    const out = [];
+    await expect(
+      (async () => { for await (const p of ai.nimStream(msgs, fast, client)) out.push(p); })(),
+    ).rejects.toThrow(/overloaded/);
+    expect(out).toEqual([{ type: "content", text: "partial" }]);
+    expect(client.chat.completions.create).toHaveBeenCalledTimes(1);
+  });
+
+  it("stream does not fall back after the client aborted", async () => {
+    const controller = new AbortController();
+    controller.abort();
+    const client = clientWith(async () => { throw overloaded(); });
+    await expect(
+      (async () => { for await (const _ of ai.nimStream(msgs, { ...fast, signal: controller.signal }, client)); })(),
+    ).rejects.toThrow();
+    expect(client.chat.completions.create).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("modelChain and error messages", () => {
+  it("puts the primary first, dedupes, and reads NIM_FALLBACK_MODELS", () => {
+    expect(ai.modelChain(`${ai.NVIDIA_MODEL}, x/one ,,x/two`)).toEqual([ai.NVIDIA_MODEL, "x/one", "x/two"]);
+    expect(ai.modelChain("")).toEqual([ai.NVIDIA_MODEL]);
+    expect(ai.modelChain(undefined)[0]).toBe(ai.NVIDIA_MODEL);
+    expect(ai.modelChain(undefined).length).toBeGreaterThan(1);
+  });
+
+  it("shows a friendly message for overload and the raw one otherwise", () => {
+    expect(ai.friendlyAiError(Object.assign(new Error("x"), { status: 503 }))).toMatch(/busy right now/);
+    expect(ai.friendlyAiError(new Error("boom"))).toBe("AI Error: boom");
+  });
+});
