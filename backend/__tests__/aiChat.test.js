@@ -120,9 +120,9 @@ describe("chat history endpoints", () => {
 
   it("requires a user id", async () => {
     const res = makeRes();
-    await ai.getChatHistory({ query: {} }, res);
+    await ai.getChatHistory({}, res);
     expect(res.status).toHaveBeenCalledWith(401);
-    await ai.clearChatHistory({ query: {} }, res);
+    await ai.clearChatHistory({}, res);
     expect(res.status).toHaveBeenCalledTimes(2);
   });
 
@@ -133,7 +133,7 @@ describe("chat history endpoints", () => {
     ];
     supabase.from.mockReturnValue({ select: () => ({ eq: () => ({ order: () => ({ limit: async () => ({ data: rows, error: null }) }) }) }) });
     const res = makeRes();
-    await ai.getChatHistory({ query: { userId: "u1" } }, res);
+    await ai.getChatHistory({ userId: "u1" }, res);
     const body = res.json.mock.calls[0][0];
     expect(body.messages.map((m) => [m.sender, m.text])).toEqual([["user", "a"], ["ai", "b"]]);
   });
@@ -142,7 +142,7 @@ describe("chat history endpoints", () => {
     const eq = jest.fn(async () => ({ error: null }));
     supabase.from.mockReturnValue({ delete: () => ({ eq }) });
     const res = makeRes();
-    await ai.clearChatHistory({ query: { userId: "u1" } }, res);
+    await ai.clearChatHistory({ userId: "u1" }, res);
     expect(supabase.from).toHaveBeenCalledWith("chat_messages");
     expect(eq).toHaveBeenCalledWith("user_id", "u1");
     expect(res.json).toHaveBeenCalledWith({ success: true });

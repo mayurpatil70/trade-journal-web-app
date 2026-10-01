@@ -1,6 +1,8 @@
 // backend/routes/aiRoutes.js
 import express from "express";
 import { upload } from "../middlewares/upload.js";
+import { requireAuth } from "../middlewares/requireAuth.js";
+import { rateLimit } from "../middlewares/rateLimit.js";
 import {
   generateNewsInsight,
   analyzeChart,
@@ -12,14 +14,17 @@ import {
 } from "../controllers/aiController.js";
 
 const router = express.Router();
+const llmLimit = rateLimit({ windowMs: 60_000, max: 12 });
 
-router.post("/news-insight", generateNewsInsight);
-router.post("/chat", chatWithCoach);
-router.post("/chat/stream", streamCoachChat);
+router.use(requireAuth);
+
+router.post("/news-insight", llmLimit, generateNewsInsight);
+router.post("/chat", llmLimit, chatWithCoach);
+router.post("/chat/stream", llmLimit, streamCoachChat);
 router.get("/chat/history", getChatHistory);
 router.delete("/chat/history", clearChatHistory);
-router.post("/import", upload.single("image"), analyzeChart);
-router.post("/analyze-chart", upload.single("image"), analyzeChart);
+router.post("/import", llmLimit, upload.single("image"), analyzeChart);
+router.post("/analyze-chart", llmLimit, upload.single("image"), analyzeChart);
 
 router.get("/edge", getEdgeInsights);
 

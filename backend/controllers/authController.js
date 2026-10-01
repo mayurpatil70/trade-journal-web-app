@@ -2,6 +2,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { Resend } from "resend";
 import crypto from "crypto";
+import { signAuthToken } from "../utils/authToken.js";
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
@@ -82,6 +83,7 @@ export const verifyLogin = async (req, res) => {
       message: "Verified successfully",
       discordVerified: user.discord_verified,
       userId: user.id,
+      authToken: signAuthToken(user.id),
       hasPaid: hasPaid,
       isAdmin: isAdmin,
     });

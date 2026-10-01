@@ -7,7 +7,10 @@ import api from "../../api/axios";
 export async function streamChat({ message, history, userId, regenerate, signal, onEvent }) {
   const res = await fetch(`${api.defaults.baseURL}/api/ai/chat/stream`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
+    },
     credentials: "include",
     body: JSON.stringify({ message, history, userId, regenerate }),
     signal,

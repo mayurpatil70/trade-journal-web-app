@@ -399,7 +399,7 @@ export const streamCoachChat = async (req, res) => {
 };
 
 export const getChatHistory = async (req, res) => {
-  const { userId } = req.query;
+  const { userId } = req;
   if (!userId) return res.status(401).json({ error: "Unauthorized: Missing User ID" });
   try {
     const { data, error } = await supabase
@@ -423,7 +423,7 @@ export const getChatHistory = async (req, res) => {
 };
 
 export const clearChatHistory = async (req, res) => {
-  const { userId } = req.query;
+  const { userId } = req;
   if (!userId) return res.status(401).json({ error: "Unauthorized: Missing User ID" });
   try {
     const { error } = await supabase.from("chat_messages").delete().eq("user_id", userId);
@@ -438,7 +438,7 @@ export const clearChatHistory = async (req, res) => {
 // ─── 4. Edge Finder — Trade Data Analytics ───────────────────────────────────
 export const getEdgeInsights = async (req, res) => {
   try {
-    const { userId } = req.query;
+    const { userId } = req;
     if (!userId)
       return res.status(401).json({ error: "Unauthorized: Missing User ID" });
 
