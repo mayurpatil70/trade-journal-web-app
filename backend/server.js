@@ -23,7 +23,9 @@ app.use(
     origin: [
       "http://localhost:5173",
       "https://forexnotes.vercel.app",
+      "https://www.forexnotes.in",
       "https://forexnotes.in",
+      "",
     ],
     credentials: true,
   }),
