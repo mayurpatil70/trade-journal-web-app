@@ -28,7 +28,7 @@ export const requestLogin = async (req, res) => {
     const magicLink = `${clientUrl}/verify?token=${token}&email=${email}`;
 
     const { error: emailError } = await resend.emails.send({
-      from: "ForexNotes <auth@nationalsteell.com>",
+      from: "ForexNotes <auth@forexnotes.in>",
       to: email,
       subject: "ForexNotes - Secure Login",
       html: `<p>Click <a href="${magicLink}">here</a> to access your trading journal.</p>`,
