@@ -138,7 +138,7 @@ export default function LandingPage() {
       {/* Top Announcement Bar */}
       <div className="bg-gradient-to-r from-blue-500/10 via-cyan-500/10 to-blue-500/10 border-b border-white/5 py-2.5 px-4 text-center text-xs font-semibold text-gray-300 flex items-center justify-center gap-2">
         <Sparkles className="w-3.5 h-3.5 text-[#2f8df4] shrink-0" />
-        <span>Forex Notes 2.0 Live — Lifetime Access via On-Chain USDT</span>
+        <span>Forex Notes — Lifetime Access via On-Chain USDT</span>
         <Link
           to="/login"
           className="text-[#2f8df4] hover:underline inline-flex items-center ml-1"
@@ -245,13 +245,16 @@ export default function LandingPage() {
 
           {/* Institutional UI Preview Card */}
           <div className="relative mx-auto max-w-4xl rounded-2xl border border-white/10 bg-[#121418] p-4 sm:p-6 shadow-2xl shadow-black/80 text-left hover:scale-[1.02] transition-transform duration-500 relative">
-            
             {/* Animated Floating Badges */}
             <div className="absolute -left-12 top-10 bg-emerald-500/10 border border-emerald-500/20 px-4 py-2 rounded-xl backdrop-blur-md animate-bounce hidden md:block shadow-lg">
-              <span className="text-emerald-400 text-xs font-bold flex items-center gap-2"><TrendingUp className="w-3 h-3"/> AI Coach Active</span>
+              <span className="text-emerald-400 text-xs font-bold flex items-center gap-2">
+                <TrendingUp className="w-3 h-3" /> AI Coach Active
+              </span>
             </div>
             <div className="absolute -right-8 bottom-10 bg-blue-500/10 border border-blue-500/20 px-4 py-2 rounded-xl backdrop-blur-md animate-pulse hidden md:block shadow-lg">
-              <span className="text-blue-400 text-xs font-bold flex items-center gap-2"><Calculator className="w-3 h-3"/> +12.4R This Week</span>
+              <span className="text-blue-400 text-xs font-bold flex items-center gap-2">
+                <Calculator className="w-3 h-3" /> +12.4R This Week
+              </span>
             </div>
             <div className="flex items-center justify-between pb-4 mb-4 border-b border-white/5 text-xs">
               <div className="flex items-center gap-2">
@@ -414,8 +417,12 @@ export default function LandingPage() {
                 key={i}
                 className={`bg-[#121418] border ${item.border} rounded-2xl p-8 text-center shadow-xl hover:scale-105 transition-transform duration-300`}
               >
-                <div className={`text-5xl font-black ${item.color} mb-3`}>{item.stat}</div>
-                <p className="text-sm text-gray-400 leading-relaxed">{item.label}</p>
+                <div className={`text-5xl font-black ${item.color} mb-3`}>
+                  {item.stat}
+                </div>
+                <p className="text-sm text-gray-400 leading-relaxed">
+                  {item.label}
+                </p>
               </div>
             ))}
           </div>
@@ -495,19 +502,91 @@ export default function LandingPage() {
             }}
           >
             {[
-              { initials: "AP", color: "from-blue-500 to-cyan-500", name: "Alex P.", firm: "Funded $100k FTMO", text: "The AI coach literally saved me from a massive tilt yesterday. Best $11 I've ever spent." },
-              { initials: "SJ", color: "from-emerald-500 to-teal-500", name: "Sarah J.", firm: "Funded $300k Apex", text: "Prop firm guardian is a game changer. I never manually calculate daily drawdown limits again." },
-              { initials: "MT", color: "from-violet-500 to-purple-500", name: "Mike T.", firm: "Evaluation Phase MyFundedFX", text: "The lot size calculator is so fast. Having it right next to my journal helps me execute perfectly." },
-              { initials: "RK", color: "from-pink-500 to-rose-500", name: "Ravi K.", firm: "Funded $200k The5ers", text: "Finally stopped revenge trading. The psychology pre-check catches me every single time." },
-              { initials: "JL", color: "from-amber-500 to-orange-500", name: "James L.", firm: "Funded $50k E8 Funding", text: "R-multiple tracking showed I was leaving a ton of money on the table. Fixed my exits in 2 weeks." },
-              { initials: "NB", color: "from-cyan-500 to-sky-500", name: "Nina B.", firm: "Funded $100k TFT", text: "Switching from Google Sheets to this saved me hours every week and my stats are insane now." },
+              {
+                initials: "AP",
+                color: "from-blue-500 to-cyan-500",
+                name: "Alex P.",
+                firm: "Funded $100k FTMO",
+                text: "The AI coach literally saved me from a massive tilt yesterday. Best $11 I've ever spent.",
+              },
+              {
+                initials: "SJ",
+                color: "from-emerald-500 to-teal-500",
+                name: "Sarah J.",
+                firm: "Funded $300k Apex",
+                text: "Prop firm guardian is a game changer. I never manually calculate daily drawdown limits again.",
+              },
+              {
+                initials: "MT",
+                color: "from-violet-500 to-purple-500",
+                name: "Mike T.",
+                firm: "Evaluation Phase MyFundedFX",
+                text: "The lot size calculator is so fast. Having it right next to my journal helps me execute perfectly.",
+              },
+              {
+                initials: "RK",
+                color: "from-pink-500 to-rose-500",
+                name: "Ravi K.",
+                firm: "Funded $200k The5ers",
+                text: "Finally stopped revenge trading. The psychology pre-check catches me every single time.",
+              },
+              {
+                initials: "JL",
+                color: "from-amber-500 to-orange-500",
+                name: "James L.",
+                firm: "Funded $50k E8 Funding",
+                text: "R-multiple tracking showed I was leaving a ton of money on the table. Fixed my exits in 2 weeks.",
+              },
+              {
+                initials: "NB",
+                color: "from-cyan-500 to-sky-500",
+                name: "Nina B.",
+                firm: "Funded $100k TFT",
+                text: "Switching from Google Sheets to this saved me hours every week and my stats are insane now.",
+              },
               // Duplicates for seamless loop
-              { initials: "AP", color: "from-blue-500 to-cyan-500", name: "Alex P.", firm: "Funded $100k FTMO", text: "The AI coach literally saved me from a massive tilt yesterday. Best $11 I've ever spent." },
-              { initials: "SJ", color: "from-emerald-500 to-teal-500", name: "Sarah J.", firm: "Funded $300k Apex", text: "Prop firm guardian is a game changer. I never manually calculate daily drawdown limits again." },
-              { initials: "MT", color: "from-violet-500 to-purple-500", name: "Mike T.", firm: "Evaluation Phase MyFundedFX", text: "The lot size calculator is so fast. Having it right next to my journal helps me execute perfectly." },
-              { initials: "RK", color: "from-pink-500 to-rose-500", name: "Ravi K.", firm: "Funded $200k The5ers", text: "Finally stopped revenge trading. The psychology pre-check catches me every single time." },
-              { initials: "JL", color: "from-amber-500 to-orange-500", name: "James L.", firm: "Funded $50k E8 Funding", text: "R-multiple tracking showed I was leaving a ton of money on the table. Fixed my exits in 2 weeks." },
-              { initials: "NB", color: "from-cyan-500 to-sky-500", name: "Nina B.", firm: "Funded $100k TFT", text: "Switching from Google Sheets to this saved me hours every week and my stats are insane now." },
+              {
+                initials: "AP",
+                color: "from-blue-500 to-cyan-500",
+                name: "Alex P.",
+                firm: "Funded $100k FTMO",
+                text: "The AI coach literally saved me from a massive tilt yesterday. Best $11 I've ever spent.",
+              },
+              {
+                initials: "SJ",
+                color: "from-emerald-500 to-teal-500",
+                name: "Sarah J.",
+                firm: "Funded $300k Apex",
+                text: "Prop firm guardian is a game changer. I never manually calculate daily drawdown limits again.",
+              },
+              {
+                initials: "MT",
+                color: "from-violet-500 to-purple-500",
+                name: "Mike T.",
+                firm: "Evaluation Phase MyFundedFX",
+                text: "The lot size calculator is so fast. Having it right next to my journal helps me execute perfectly.",
+              },
+              {
+                initials: "RK",
+                color: "from-pink-500 to-rose-500",
+                name: "Ravi K.",
+                firm: "Funded $200k The5ers",
+                text: "Finally stopped revenge trading. The psychology pre-check catches me every single time.",
+              },
+              {
+                initials: "JL",
+                color: "from-amber-500 to-orange-500",
+                name: "James L.",
+                firm: "Funded $50k E8 Funding",
+                text: "R-multiple tracking showed I was leaving a ton of money on the table. Fixed my exits in 2 weeks.",
+              },
+              {
+                initials: "NB",
+                color: "from-cyan-500 to-sky-500",
+                name: "Nina B.",
+                firm: "Funded $100k TFT",
+                text: "Switching from Google Sheets to this saved me hours every week and my stats are insane now.",
+              },
             ].map((r, i) => (
               <div
                 key={i}
@@ -515,7 +594,9 @@ export default function LandingPage() {
                 className="bg-[#121418] border border-white/10 rounded-2xl p-6 shadow-xl"
               >
                 <div className="flex items-center gap-3 mb-3">
-                  <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${r.color} flex items-center justify-center font-bold text-white text-sm shadow-lg shrink-0`}>
+                  <div
+                    className={`w-10 h-10 rounded-full bg-gradient-to-br ${r.color} flex items-center justify-center font-bold text-white text-sm shadow-lg shrink-0`}
+                  >
                     {r.initials}
                   </div>
                   <div className="text-left">
@@ -524,7 +605,9 @@ export default function LandingPage() {
                   </div>
                 </div>
                 <div className="text-yellow-400 text-sm mb-2">★★★★★</div>
-                <p className="text-sm text-gray-400 text-left italic">"{r.text}"</p>
+                <p className="text-sm text-gray-400 text-left italic">
+                  "{r.text}"
+                </p>
               </div>
             ))}
           </div>
@@ -675,4 +758,3 @@ export default function LandingPage() {
     </div>
   );
 }
-
