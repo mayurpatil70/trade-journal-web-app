@@ -1,183 +1,265 @@
 // frontend/src/components/PreTradeGate.jsx
-import { useState, useRef, useEffect } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { X, Send, ChevronRight, Loader2 } from "lucide-react";
-import api from "../api/axios";
+import {
+  X,
+  Send,
+  ChevronRight,
+  Maximize2,
+  Minimize2,
+  Square,
+  Trash2,
+} from "lucide-react";
+import { useCoachChat } from "./coach/useCoachChat";
+import MessageBubble from "./coach/MessageBubble";
+
+const ROBOT_AVATAR =
+  "https://img.magnific.com/premium-photo/robot-head-with-goggles-smile-it_7023-571826.jpg";
+
+const MAX_CHARS = 2000;
+
+const QUICK_PROMPTS = [
+  "Review my recent trades",
+  "What's my biggest leak?",
+  "How's EURUSD looking right now?",
+  "Any high-impact news today?",
+  "I just took a loss — help me reset",
+];
+
+const STATUS_LABEL = {
+  waiting: "Pulling live data…",
+  thinking: "Thinking…",
+};
+
+const hiddenRoutes = ["/", "/login", "/verify", "/paywall", "/discord-gate", "/discord-callback", "/add-trade", "/register"];
 
 export default function PreTradeGate() {
   const navigate = useNavigate();
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
-  const [message, setMessage] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const messagesEndRef = useRef(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [input, setInput] = useState("");
+  const { messages, status, isBusy, send, stop, regenerate, clear } = useCoachChat(isOpen);
 
-  const [chatHistory, setChatHistory] = useState([
-    {
-      sender: "ai",
-      text: "Hey trader. Before you click buy or sell, take a breath. What is your emotional state right now ? Is this setup in your playbook, or are you revenge trading?",
-    },
-  ]);
+  const scrollRef = useRef(null);
+  const inputRef = useRef(null);
+  const stickToBottom = useRef(true);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  const onScroll = () => {
+    const el = scrollRef.current;
+    if (el) stickToBottom.current = el.scrollHeight - el.scrollTop - el.clientHeight < 80;
   };
 
   useEffect(() => {
-    scrollToBottom();
-  }, [chatHistory, isOpen]);
+    const el = scrollRef.current;
+    if (el && stickToBottom.current) el.scrollTo({ top: el.scrollHeight });
+  }, [messages, status, isOpen, isFullscreen]);
 
-  // CRITICAL FIX: All hooks (useState, useRef, useEffect) must be called before this condition!
-  // Calling an early return before hooks caused React Error #300 and a black screen crash on navigation!
-  const hiddenRoutes = ['/', '/login', '/verify', '/paywall', '/discord-gate', '/discord-callback', '/add-trade', '/register'];
-  if (hiddenRoutes.includes(location.pathname)) {
-    return null;
-  }
+  useEffect(() => {
+    if (isOpen) inputRef.current?.focus();
+  }, [isOpen, isFullscreen]);
 
-  const handleSendMessage = async (e) => {
-    e?.preventDefault();
-    if (!message.trim()) return;
+  useEffect(() => {
+    const el = inputRef.current;
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = `${Math.min(el.scrollHeight, 120)}px`;
+  }, [input, isOpen, isFullscreen]);
 
-    const userMessage = { sender: "user", text: message };
-    const currentHistory = [...chatHistory];
+  useEffect(() => {
+    if (!isOpen || !isFullscreen) return;
+    const onKey = (e) => e.key === "Escape" && setIsFullscreen(false);
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [isOpen, isFullscreen]);
 
-    setChatHistory((prev) => [...prev, userMessage]);
-    setMessage("");
-    setIsLoading(true);
+  const close = useCallback(() => {
+    setIsOpen(false);
+    setIsFullscreen(false);
+  }, []);
 
-    try {
-      const response = await api.post(
-        "/api/ai/chat",
-        {
-          message: userMessage.text,
-          history: currentHistory,
-        },
-        { timeout: 120000 }, // 120s — nemotron-ultra-550B needs 30–60s to respond
-      );
+  // All hooks must run before this early return (React error #300 otherwise).
+  if (hiddenRoutes.includes(location.pathname)) return null;
 
-      setChatHistory((prev) => [
-        ...prev,
-        { sender: "ai", text: response.data.text },
-      ]);
-    } catch (error) {
-      console.error("Chat error:", error);
-      const errMsg = error?.response?.data?.error || error.message || "Connection failed";
-      setChatHistory((prev) => [
-        ...prev,
-        {
-          sender: "ai",
-          text: `⚠️ AI Error: ${errMsg}`,
-        },
-      ]);
-    } finally {
-      setIsLoading(false);
+  const submit = (text = input) => {
+    if (!text.trim() || isBusy) return;
+    stickToBottom.current = true;
+    send(text);
+    setInput("");
+  };
+
+  const onKeyDown = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      submit();
     }
   };
 
-  const handleReadyToTrade = () => {
-    setIsOpen(false);
-    navigate("/add-trade");
-  };
+  const lastIdx = messages.length - 1;
+  const showQuickPrompts = messages.length <= 1 && !isBusy;
+  const column = `w-full mx-auto ${isFullscreen ? "max-w-3xl" : ""}`;
 
-  // The 3D Robot Image
-  const ROBOT_AVATAR =
-    "https://img.magnific.com/premium-photo/robot-head-with-goggles-smile-it_7023-571826.jpg";
+  const panelClass = isFullscreen
+    ? "fixed inset-0 z-[60] bg-white/95 dark:bg-[#0d0e12]/95 backdrop-blur-xl flex flex-col animate-in fade-in"
+    : "mb-4 w-[calc(100vw-2rem)] sm:w-[400px] h-[min(600px,calc(100dvh-8rem))] bg-white/80 dark:bg-[#121418]/80 backdrop-blur-xl border border-gray-200 dark:border-white/20 rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom-5";
+
+  const iconBtn =
+    "p-1.5 rounded-lg text-white/80 hover:text-white hover:bg-white/15 transition-colors";
 
   return (
     <div
       className="fixed bottom-6 right-6 z-50 flex flex-col items-end"
       style={{ fontFamily: "'Inter', sans-serif" }}
     >
-      {/* The Chat Modal */}
       {isOpen && (
-        <div className="mb-4 w-[350px] md:w-[400px] h-[550px] bg-white/80 dark:bg-[#121418]/80 backdrop-blur-xl border border-gray-200 dark:border-white/20 rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom-5">
-          {/* Header */}
-          <div className="bg-[#2f8df4] p-4 flex items-center justify-between shrink-0">
-            <div className="flex items-center gap-3">
-              <img
-                src={ROBOT_AVATAR}
-                alt="AI Coach"
-                className="w-8 h-8 rounded-full border border-white/30 object-cover"
-              />
-              <div>
-                <h3 className="text-white font-bold text-sm">
-                  Trading Psychology Coach
-                </h3>
-                <p className="text-white/80 text-[10px] uppercase tracking-wider">
-                  Powered by FN
-                </p>
+        <div className={panelClass} role="dialog" aria-label="Coach isLIVE chat">
+          <div className="bg-[#2f8df4] shrink-0">
+            <div className={`${column} p-4 flex items-center justify-between`}>
+              <div className="flex items-center gap-3 min-w-0">
+                <img
+                  src={ROBOT_AVATAR}
+                  alt=""
+                  className="w-9 h-9 rounded-full border border-white/30 object-cover"
+                />
+                <div className="min-w-0">
+                  <h3 className="text-white font-bold text-sm truncate">Coach isLIVE</h3>
+                  <p className="text-white/80 text-[10px] uppercase tracking-wider flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-300 animate-pulse" />
+                    Live market · Your journal
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-0.5">
+                <button onClick={clear} disabled={isBusy} className={`${iconBtn} disabled:opacity-40`} aria-label="New chat" title="New chat">
+                  <Trash2 className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => setIsFullscreen((v) => !v)}
+                  className={iconBtn}
+                  aria-label={isFullscreen ? "Exit full screen" : "Full screen"}
+                  title={isFullscreen ? "Exit full screen (Esc)" : "Full screen"}
+                >
+                  {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+                </button>
+                <button onClick={close} className={iconBtn} aria-label="Close chat" title="Close">
+                  <X className="w-5 h-5" />
+                </button>
               </div>
             </div>
-            <button
-              onClick={() => setIsOpen(false)}
-              className="text-white/80 hover:text-white transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
           </div>
 
-          {/* Chat Messages */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50 dark:bg-[#0d0e12]">
-            {chatHistory.map((msg, idx) => (
-              <div
-                key={idx}
-                className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}
-              >
-                <div
-                  className={`max-w-[85%] p-3 rounded-3xl text-sm leading-relaxed shadow-sm ${
-                    msg.sender === "user"
-                      ? "bg-[#2f8df4] text-white"
-                      : "bg-white dark:bg-[#1a1d24] text-gray-800 dark:text-gray-200 border border-gray-100 dark:border-white/5"
-                  }`}
-                >
-                  {msg.text}
+          <div
+            ref={scrollRef}
+            onScroll={onScroll}
+            role="log"
+            aria-live="polite"
+            className="flex-1 overflow-y-auto bg-gray-50 dark:bg-[#0d0e12]"
+          >
+            <div className={`${column} p-4 space-y-4`}>
+              {messages.map((msg, idx) => (
+                <MessageBubble
+                  key={msg.id ?? idx}
+                  message={msg}
+                  isLast={idx === lastIdx}
+                  canRegenerate={idx === lastIdx && messages.some((m) => m.sender === "user")}
+                  onRegenerate={regenerate}
+                  isBusy={isBusy}
+                />
+              ))}
+
+              {STATUS_LABEL[status] && (
+                <div className="flex justify-start">
+                  <div className="bg-white dark:bg-[#1a1d24] px-4 py-3 rounded-3xl border border-gray-100 dark:border-white/5 shadow-sm flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+                    <span className="flex gap-1">
+                      {[0, 150, 300].map((d) => (
+                        <span key={d} className="w-1.5 h-1.5 rounded-full bg-[#2f8df4] animate-bounce" style={{ animationDelay: `${d}ms` }} />
+                      ))}
+                    </span>
+                    {STATUS_LABEL[status]}
+                  </div>
                 </div>
-              </div>
-            ))}
-            {isLoading && (
-              <div className="flex justify-start">
-                <div className="bg-white dark:bg-[#1a1d24] p-3 rounded-3xl border border-gray-100 dark:border-white/5 shadow-sm">
-                  <Loader2 className="w-4 h-4 text-[#2f8df4] animate-spin" />
+              )}
+
+              {showQuickPrompts && (
+                <div className="flex flex-wrap gap-2 pt-1">
+                  {QUICK_PROMPTS.map((p) => (
+                    <button
+                      key={p}
+                      onClick={() => submit(p)}
+                      className="text-xs px-3 py-1.5 rounded-full border border-[#2f8df4]/40 text-[#2f8df4] hover:bg-[#2f8df4]/10 transition-colors"
+                    >
+                      {p}
+                    </button>
+                  ))}
                 </div>
-              </div>
-            )}
-            <div ref={messagesEndRef} />
+              )}
+            </div>
           </div>
 
-          {/* User Input & Action Button */}
-          <div className="p-4 bg-white dark:bg-[#121418] border-t border-gray-200 dark:border-white/5 shrink-0">
-            <form onSubmit={handleSendMessage} className="flex gap-2 mb-3">
-              <input
-                type="text"
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                placeholder="Type your answer here..."
-                className="flex-1 bg-gray-100 dark:bg-[#1a1d24] text-sm text-gray-900 dark:text-white border-none rounded-full px-3 py-2.5 focus:outline-none focus:ring-1 focus:ring-[#2f8df4]"
-              />
+          <div className="bg-white dark:bg-[#121418] border-t border-gray-200 dark:border-white/5 shrink-0">
+            <div className={`${column} p-4`}>
+              <div className="flex gap-2 items-end mb-2">
+                <textarea
+                  ref={inputRef}
+                  rows={1}
+                  value={input}
+                  maxLength={MAX_CHARS}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={onKeyDown}
+                  placeholder="Ask about a pair, your trades, or how you're feeling…"
+                  aria-label="Message"
+                  className="flex-1 resize-none bg-gray-100 dark:bg-[#1a1d24] text-sm text-gray-900 dark:text-white border-none rounded-2xl px-4 py-2.5 focus:outline-none focus:ring-1 focus:ring-[#2f8df4]"
+                />
+                {isBusy ? (
+                  <button
+                    onClick={stop}
+                    aria-label="Stop generating"
+                    title="Stop"
+                    className="bg-gray-800 dark:bg-white/15 hover:bg-gray-700 text-white p-2.5 rounded-full transition-colors shrink-0"
+                  >
+                    <Square className="w-4 h-4 fill-current" />
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => submit()}
+                    disabled={!input.trim()}
+                    aria-label="Send message"
+                    className="bg-[#2f8df4] hover:bg-[#2376e8] disabled:bg-[#2f8df4]/50 text-white p-2.5 rounded-full transition-colors shrink-0"
+                  >
+                    <Send className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
+              <p className="text-[10px] text-gray-400 mb-3 flex justify-between">
+                <span>AI can make mistakes. Not financial advice.</span>
+                {input.length > MAX_CHARS * 0.8 && <span>{input.length}/{MAX_CHARS}</span>}
+              </p>
+
               <button
-                type="submit"
-                disabled={isLoading || !message.trim()}
-                className="bg-[#2f8df4] hover:bg-[#2376e8] disabled:bg-[#2f8df4]/50 text-white p-2.5 rounded-full transition-colors flex items-center justify-center shrink-0"
+                onClick={() => {
+                  close();
+                  navigate("/add-trade");
+                }}
+                className="w-full py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm rounded-full transition-colors shadow-sm flex items-center justify-center gap-2"
               >
-                <Send className="w-4 h-4" />
+                I'm ready to trade, Thanks <ChevronRight className="w-4 h-4" />
               </button>
-            </form>
-
-            <button
-              onClick={handleReadyToTrade}
-              className="w-full py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm rounded-full transition-colors shadow-sm flex items-center justify-center gap-2"
-            >
-              I'm ready to trade, Thanks <ChevronRight className="w-4 h-4" />
-            </button>
+            </div>
           </div>
         </div>
       )}
 
-      {/* Floating Trigger Button */}
       {!isOpen && (
-        <div
+        <button
+          type="button"
           className="relative flex flex-col items-center cursor-pointer group"
           onClick={() => setIsOpen(true)}
+          aria-label="Open Coach isLIVE chat"
         >
           <div className="absolute -top-12 bg-white dark:bg-[#1a1d24] text-gray-900 dark:text-white text-xs font-bold px-4 py-2 rounded-3xl shadow-lg border border-gray-100 dark:border-white/10 whitespace-nowrap transform transition-transform group-hover:-translate-y-1">
             Coach isLIVE
@@ -185,15 +267,10 @@ export default function PreTradeGate() {
           </div>
 
           <div className="w-16 h-16 rounded-full overflow-hidden shadow-2xl border-[3px] border-[#2f8df4] bg-[#121418] transform transition-transform group-hover:scale-105">
-            <img
-              src={ROBOT_AVATAR}
-              alt="AI Trading Coach"
-              className="w-full h-full object-cover"
-            />
+            <img src={ROBOT_AVATAR} alt="" className="w-full h-full object-cover" />
           </div>
-        </div>
+        </button>
       )}
     </div>
   );
 }
-
