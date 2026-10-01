@@ -11,10 +11,11 @@ const FIAT = new Set(["USD", "EUR", "GBP", "JPY", "AUD", "NZD", "CAD", "CHF"]);
 const CRYPTO = new Set(["BTC", "ETH", "SOL", "XRP", "BNB", "DOGE", "ADA", "LTC"]);
 
 const INSTRUMENTS = {
-  XAUUSD: { yahoo: "GC=F", name: "Gold" },
-  XAGUSD: { yahoo: "SI=F", name: "Silver" },
-  USOIL: { yahoo: "CL=F", name: "WTI Oil" },
-  UKOIL: { yahoo: "BZ=F", name: "Brent Oil" },
+  // Yahoo has no spot metals feed; front-month futures trade a few dollars above spot.
+  XAUUSD: { yahoo: "GC=F", name: "Gold futures" },
+  XAGUSD: { yahoo: "SI=F", name: "Silver futures" },
+  USOIL: { yahoo: "CL=F", name: "WTI Oil futures" },
+  UKOIL: { yahoo: "BZ=F", name: "Brent Oil futures" },
   NAS100: { yahoo: "^NDX", name: "Nasdaq 100" },
   US30: { yahoo: "^DJI", name: "Dow Jones" },
   US500: { yahoo: "^GSPC", name: "S&P 500" },
@@ -53,6 +54,10 @@ const ALIASES = {
   btc: "BTCUSD",
   ethereum: "ETHUSD",
   eth: "ETHUSD",
+  solana: "SOLUSD",
+  sol: "SOLUSD",
+  ripple: "XRPUSD",
+  xrp: "XRPUSD",
   xau: "XAUUSD",
   xag: "XAGUSD",
 };
@@ -100,15 +105,41 @@ export function needsMarketData(text, symbols) {
 const round = (n, dp) => (Number.isFinite(n) ? Number(n.toFixed(dp)) : null);
 const pct = (from, to) => (from ? round(((to - from) / from) * 100, 2) : null);
 
+const YAHOO_HOSTS = ["query1.finance.yahoo.com", "query2.finance.yahoo.com"];
+const YAHOO_COOLDOWN_MS = 60_000;
+let yahooBlockedUntil = 0;
+
+const retryable = (err) => !err.response || err.response.status === 429 || err.response.status >= 500;
+
+async function getYahooChart(yahooSymbol, http) {
+  if (Date.now() < yahooBlockedUntil) throw new Error("Yahoo rate limited, cooling down");
+  let lastErr;
+  for (const host of YAHOO_HOSTS) {
+    try {
+      const { data } = await http.get(
+        `https://${host}/v8/finance/chart/${encodeURIComponent(yahooSymbol)}`,
+        {
+          params: { interval: "15m", range: "1d" },
+          timeout: 6000,
+          headers: { "User-Agent": "Mozilla/5.0" },
+        },
+      );
+      return data;
+    } catch (err) {
+      lastErr = err;
+      if (!retryable(err)) break;
+    }
+  }
+  if (lastErr.response?.status === 429) yahooBlockedUntil = Date.now() + YAHOO_COOLDOWN_MS;
+  throw lastErr;
+}
+
+export function resetYahooCooldown() {
+  yahooBlockedUntil = 0;
+}
+
 export async function fetchYahooQuote(yahooSymbol, http = axios) {
-  const { data } = await http.get(
-    `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(yahooSymbol)}`,
-    {
-      params: { interval: "15m", range: "1d" },
-      timeout: 6000,
-      headers: { "User-Agent": "Mozilla/5.0" },
-    },
-  );
+  const data = await getYahooChart(yahooSymbol, http);
 
   const result = data?.chart?.result?.[0];
   const meta = result?.meta;
@@ -150,14 +181,25 @@ export async function getQuotes(instruments) {
   });
 }
 
+const CALENDAR_URL = "https://nfs.faireconomy.media/ff_calendar_thisweek.json";
+// Proxy fallback for hosts whose IPs the origin blocks (seen on Render).
+const CALENDAR_SOURCES = [
+  CALENDAR_URL,
+  `https://api.allorigins.win/raw?url=${encodeURIComponent(CALENDAR_URL)}`,
+];
+
 export async function fetchEconomicCalendar(http = axios) {
-  const target = "https://nfs.faireconomy.media/ff_calendar_thisweek.json";
-  // Proxy avoids Render/Cloudflare IP blocks on the origin.
-  const { data } = await http.get(
-    `https://api.allorigins.win/raw?url=${encodeURIComponent(target)}`,
-    { timeout: 15000, headers: { Accept: "application/json" } },
-  );
-  return Array.isArray(data) ? data : [];
+  let lastErr;
+  for (const url of CALENDAR_SOURCES) {
+    try {
+      const { data } = await http.get(url, { timeout: 10000, headers: { Accept: "application/json" } });
+      if (Array.isArray(data)) return data;
+      lastErr = new Error("Calendar response was not a JSON array");
+    } catch (err) {
+      lastErr = err;
+    }
+  }
+  throw lastErr;
 }
 
 export async function getEconomicCalendar() {

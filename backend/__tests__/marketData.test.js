@@ -30,6 +30,8 @@ describe("resolveSymbol", () => {
     ["US30", "^DJI"],
     ["btc", "BTC-USD"],
     ["BTCUSDT", "BTC-USD"],
+    ["sol", "SOL-USD"],
+    ["DXY", "DX-Y.NYB"],
   ])("%s → %s", (input, yahoo) => {
     expect(md.resolveSymbol(input).yahoo).toBe(yahoo);
   });
@@ -96,6 +98,59 @@ describe("fetchYahooQuote", () => {
   it("throws when the quote is missing", async () => {
     const http = { get: jest.fn(async () => ({ data: { chart: { result: null } } })) };
     await expect(md.fetchYahooQuote("NOPE", http)).rejects.toThrow(/No quote/);
+  });
+
+  const httpError = (status) => Object.assign(new Error(`HTTP ${status}`), { response: { status } });
+
+  describe("rate limits", () => {
+    beforeEach(() => md.resetYahooCooldown());
+
+    it("falls back to query2 when query1 is rate limited", async () => {
+      const http = {
+        get: jest.fn()
+          .mockRejectedValueOnce(httpError(429))
+          .mockResolvedValueOnce(payload([1.0])),
+      };
+      const q = await md.fetchYahooQuote("GC=F", http);
+      expect(q.price).toBe(1.1);
+      expect(http.get.mock.calls[1][0]).toContain("query2.finance.yahoo.com");
+    });
+
+    it("cools down after both hosts return 429", async () => {
+      const http = { get: jest.fn(async () => { throw httpError(429); }) };
+      await expect(md.fetchYahooQuote("GC=F", http)).rejects.toThrow(/429/);
+      await expect(md.fetchYahooQuote("GC=F", http)).rejects.toThrow(/cooling down/);
+      expect(http.get).toHaveBeenCalledTimes(2);
+    });
+
+    it("does not retry a 404", async () => {
+      const http = { get: jest.fn(async () => { throw httpError(404); }) };
+      await expect(md.fetchYahooQuote("NOPE", http)).rejects.toThrow(/404/);
+      expect(http.get).toHaveBeenCalledTimes(1);
+    });
+  });
+});
+
+describe("fetchEconomicCalendar", () => {
+  it("uses the origin feed directly", async () => {
+    const http = { get: jest.fn(async () => ({ data: [{ title: "CPI" }] })) };
+    expect(await md.fetchEconomicCalendar(http)).toEqual([{ title: "CPI" }]);
+    expect(http.get.mock.calls[0][0]).toContain("nfs.faireconomy.media");
+  });
+
+  it("falls back to the proxy when the origin fails", async () => {
+    const http = {
+      get: jest.fn()
+        .mockRejectedValueOnce(new Error("blocked"))
+        .mockResolvedValueOnce({ data: [{ title: "NFP" }] }),
+    };
+    expect(await md.fetchEconomicCalendar(http)).toEqual([{ title: "NFP" }]);
+    expect(http.get.mock.calls[1][0]).toContain("allorigins");
+  });
+
+  it("throws when no source returns a list", async () => {
+    const http = { get: jest.fn(async () => ({ data: "<html>" })) };
+    await expect(md.fetchEconomicCalendar(http)).rejects.toThrow(/not a JSON array/);
   });
 });
 
