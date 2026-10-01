@@ -20,7 +20,11 @@ const app = express();
 // Middleware
 app.use(
   cors({
-    origin: ["http://localhost:5173", "https://forexnotes.vercel.app"],
+    origin: [
+      "http://localhost:5173",
+      "https://forexnotes.vercel.app",
+      "https://forexnotes.in",
+    ],
     credentials: true,
   }),
 );
