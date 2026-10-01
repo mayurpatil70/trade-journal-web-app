@@ -33,7 +33,7 @@ export default function Verify() {
 
         const userId =
           response.data.userId || response.data.user?.id || response.data.id;
-        const authToken = response.data.token;
+        const authToken = response.data.authToken;
         const discordVerified = response.data.discordVerified;
         const hasPaid = response.data.hasPaid; // Extracted from backend response
 
