@@ -20,6 +20,30 @@ export const NVIDIA_MODEL    = "nvidia/nemotron-3-ultra-550b-a55b";
 
 const NVIDIA_API_KEY = process.env.NVIDIA_API_KEY;
 
+const DEFAULT_FALLBACK_MODELS = [
+  "nvidia/nemotron-3-super-120b-a12b",
+  "nvidia/llama-3.1-nemotron-ultra-253b-v1",
+];
+const RETRY_DELAY_MS = 500;
+
+export const modelChain = (env = process.env.NIM_FALLBACK_MODELS) => {
+  const fallbacks = env === undefined ? DEFAULT_FALLBACK_MODELS : env.split(",").map((m) => m.trim()).filter(Boolean);
+  return [...new Set([NVIDIA_MODEL, ...fallbacks])];
+};
+
+export function isOverloadError(err) {
+  if ([408, 429, 500, 502, 503, 504].includes(err?.status)) return true;
+  if (err?.name === "APIConnectionError") return true;
+  return /overload|temporarily|rate limit|capacity/i.test(err?.message ?? "");
+}
+
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+export const friendlyAiError = (err) =>
+  isOverloadError(err)
+    ? "The AI coach is busy right now. Please try again in a moment."
+    : `AI Error: ${err.message}`;
+
 console.log(
   "[AI] Using NVIDIA key prefix:",
   NVIDIA_API_KEY ? NVIDIA_API_KEY.substring(0, 12) + "..." : "⚠️ MISSING KEY",
@@ -40,6 +64,22 @@ export const openai = new OpenAI({
  * @returns {string}                 The assistant reply text
  */
 export async function nimComplete(messages, opts = {}, client = openai) {
+  const models = opts.models ?? modelChain();
+  let lastErr;
+  for (let i = 0; i < models.length; i++) {
+    try {
+      return await completeWithModel(models[i], messages, opts, client);
+    } catch (err) {
+      lastErr = err;
+      if (!isOverloadError(err) || i === models.length - 1) throw err;
+      console.warn(`[AI] ${models[i]} failed (${err.message}); trying ${models[i + 1]}`);
+      await sleep(opts.retryDelayMs ?? RETRY_DELAY_MS);
+    }
+  }
+  throw lastErr;
+}
+
+async function completeWithModel(model, messages, opts, client) {
   const timeoutMs = opts.timeoutMs ?? 90_000; // 90s default — 550B model is slow
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
@@ -47,7 +87,7 @@ export async function nimComplete(messages, opts = {}, client = openai) {
   try {
     const completion = await client.chat.completions.create(
       {
-        model: NVIDIA_MODEL,
+        model,
         messages,
         temperature: opts.temperature ?? 0.7,
         top_p: opts.top_p ?? 0.95,
@@ -67,6 +107,25 @@ export async function nimComplete(messages, opts = {}, client = openai) {
  * Reasoning deltas are surfaced only so the UI can show a "thinking" state.
  */
 export async function* nimStream(messages, opts = {}, client = openai) {
+  const models = opts.models ?? modelChain();
+  for (let i = 0; i < models.length; i++) {
+    let started = false;
+    try {
+      for await (const part of streamWithModel(models[i], messages, opts, client)) {
+        started = true;
+        yield part;
+      }
+      return;
+    } catch (err) {
+      const canFallBack = !started && !opts.signal?.aborted && isOverloadError(err) && i < models.length - 1;
+      if (!canFallBack) throw err;
+      console.warn(`[AI] ${models[i]} failed (${err.message}); trying ${models[i + 1]}`);
+      await sleep(opts.retryDelayMs ?? RETRY_DELAY_MS);
+    }
+  }
+}
+
+async function* streamWithModel(model, messages, opts, client) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), opts.timeoutMs ?? 120_000);
   opts.signal?.addEventListener("abort", () => controller.abort(), { once: true });
@@ -74,7 +133,7 @@ export async function* nimStream(messages, opts = {}, client = openai) {
   try {
     const stream = await client.chat.completions.create(
       {
-        model: NVIDIA_MODEL,
+        model,
         messages,
         temperature: opts.temperature ?? 0.7,
         top_p: opts.top_p ?? 0.95,
@@ -345,7 +404,7 @@ export const chatWithCoach = async (req, res) => {
     res.status(200).json({ success: true, text, context: ctx.meta });
   } catch (error) {
     console.error("[AI] Coach Chat Error:", error.message);
-    res.status(500).json({ success: false, error: `AI Error: ${error.message}` });
+    res.status(500).json({ success: false, error: friendlyAiError(error) });
   }
 };
 
@@ -391,7 +450,7 @@ export const streamCoachChat = async (req, res) => {
   } catch (error) {
     if (!abort.signal.aborted) {
       console.error("[AI] Coach Stream Error:", error.message);
-      send({ type: "error", error: `AI Error: ${error.message}` });
+      send({ type: "error", error: friendlyAiError(error) });
     }
   } finally {
     res.end();
