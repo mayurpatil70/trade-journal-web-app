@@ -266,7 +266,7 @@ export default function MainLayout() {
           ))}
 
           {/* ADMIN BYPASS MENU - ONLY VISIBLE TO YOUR EMAIL */}
-          {localStorage.getItem("userEmail") === "noballondesk@gmail.com" && (
+          { ["noballondesk@gmail.com", "akpatil51340@gmail.com"].includes(localStorage.getItem("userEmail")) && (
             <div className="pt-4 mt-4 border-t border-gray-200/80 dark:border-white/10">
               <p className="px-3 text-[9px] font-black text-emerald-500 uppercase tracking-[0.2em] mb-2">
                 Admin Area
