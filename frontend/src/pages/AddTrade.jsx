@@ -90,6 +90,17 @@ export default function AddTrade() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (step !== 6) {
+       nextStep();
+       return;
+    }
+
+    if (!images[0] || !images[1]) {
+       alert("Please upload both Before and After chart images before saving.");
+       return;
+    }
+
     setIsSubmitting(true);
 
     const userId = localStorage.getItem("userId") || localStorage.getItem("userEmail");
@@ -204,7 +215,7 @@ export default function AddTrade() {
                     <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className={labelClass}>Date</label>
                     <input type="date" name="date" value={formData.date} onChange={handleChange} className={`${inputClass} [color-scheme:dark]`} required />
@@ -423,7 +434,7 @@ export default function AddTrade() {
                   Continue <ArrowRight className="w-4 h-4" />
                </button>
              ) : (
-               <button type="submit" disabled={isSubmitting} className="px-8 py-3 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-white font-bold text-sm transition-all shadow-lg shadow-cyan-500/30 flex items-center gap-2 disabled:opacity-50">
+               <button type="submit" disabled={isSubmitting || !images[0] || !images[1]} className="px-8 py-3 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-white font-bold text-sm transition-all shadow-lg shadow-cyan-500/30 flex items-center gap-2 disabled:opacity-50 disabled:hover:bg-cyan-500 disabled:cursor-not-allowed">
                   {isSubmitting ? <><Loader2 className="w-4 h-4 animate-spin" /> Saving...</> : <><Save className="w-4 h-4" /> Save Trade</>}
                </button>
              )}

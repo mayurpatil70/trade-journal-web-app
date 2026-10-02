@@ -130,9 +130,10 @@ export default function Settings() {
             <h2 className="text-base font-bold text-gray-900 dark:text-white">
               Export Journal Data
             </h2>
+            <span className="text-[10px] bg-blue-500/10 text-blue-400 border border-blue-500/20 px-2 py-0.5 rounded uppercase tracking-wider font-bold">Trades + Daily Notes</span>
           </div>
           <p className="text-xs text-gray-500 dark:text-gray-400 mb-6">
-            Download a complete copy of your trading journal logs, analyses, and metrics.
+            Download a complete combined copy of your trading journal logs and your daily Pre/Post market notes.
           </p>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             {exportFormats.map(({ fmt, label, icon, color, border, text }) => (

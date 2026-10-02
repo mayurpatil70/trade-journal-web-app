@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import api from "../api/axios";
 import {
   Loader2,
@@ -9,6 +9,7 @@ import {
   ChevronRight,
   Image as ImageIcon,
   X,
+  List,
   Calendar,
   TrendingUp,
   PlusCircle,
@@ -20,6 +21,7 @@ import {
 
 export default function PastTrades() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [trades, setTrades] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -32,7 +34,14 @@ export default function PastTrades() {
       if (!userId) return navigate("/login");
       try {
         const response = await api.get(`/api/trades?userId=${userId}`);
-        setTrades(response.data?.data || []);
+        const allTrades = response.data?.data || [];
+        setTrades(allTrades);
+        
+        // Auto open trade if requested via navigation
+        if (location.state?.openTradeId) {
+          const t = allTrades.find(x => x.id === location.state.openTradeId);
+          if (t) setSelectedTrade(t);
+        }
       } catch (error) {
         console.error("Failed to fetch trades:", error);
       } finally {
@@ -40,7 +49,7 @@ export default function PastTrades() {
       }
     };
     fetchTrades();
-  }, [navigate]);
+  }, [navigate, location.state]);
 
   const filteredTrades = trades.filter((t) => {
     const matchesSearch =
