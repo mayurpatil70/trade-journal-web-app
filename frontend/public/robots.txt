@@ -1,19 +1,7 @@
 User-agent: *
-Allow: /$
-Disallow: /link-discord
-Disallow: /discord/
-Disallow: /paywall
-Disallow: /dashboard
-Disallow: /add-trade
-Disallow: /news
-Disallow: /trades
-Disallow: /calendar
-Disallow: /import
-Disallow: /accounts
-Disallow: /settings
-Disallow: /profile
-Disallow: /support
-Disallow: /admin
-Disallow: /calculator
+Allow: /
+Disallow: /login
+Disallow: /verify
+Disallow: /dashboard/
 
 Sitemap: https://forexnotes.in/sitemap.xml

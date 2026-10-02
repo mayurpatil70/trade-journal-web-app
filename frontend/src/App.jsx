@@ -1,5 +1,5 @@
 // frontend/src/App.jsx
-import { useEffect, useState } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 import {
   BrowserRouter,
   useLocation,
@@ -11,36 +11,39 @@ import {
 import { Loader2 } from "lucide-react";
 import api from "./api/axios";
 
-// Public Pages
-import LandingPage from "./pages/LandingPage.jsx"; // Make sure you saved the LandingPage code here!
-import Login from "./pages/Login.jsx";
-import Verify from "./pages/Verify.jsx";
-import DiscordGate from "./pages/DiscordGate.jsx";
-import DiscordCallback from "./pages/DiscordCallback.jsx";
-import Paywall from "./pages/Paywall.jsx";
+// Public Pages (Landing Page remains eagerly loaded for SEO/LCP)
+import LandingPage from "./pages/LandingPage.jsx";
+import PrivacyPolicy from "./pages/PrivacyPolicy.jsx";
+import NotFound from "./pages/NotFound.jsx";
 
-// Protected App Pages
-import ErrorBoundary from "./components/ErrorBoundary.jsx";
-import EconomicCalendar from "./pages/EconomicCalendar.jsx";
-import AddTrade from "./pages/AddTrade.jsx";
-import PastTrades from "./pages/PastTrades.jsx";
-import Dashboard from "./pages/Dashboard.jsx";
-import PerformanceCalendar from "./pages/PerformanceCalendar.jsx";
-import Imports from "./pages/Imports.jsx";
-import PropAccounts from "./pages/PropAccounts.jsx";
-import Settings from "./pages/Settings.jsx";
-import Profile from "./pages/Profile.jsx";
-import Support from "./pages/Support.jsx";
-import AdminDashboard from "./pages/AdminDashboard.jsx";
+// Lazy Loaded Protected App Pages
+const Login = lazy(() => import("./pages/Login.jsx"));
+const Verify = lazy(() => import("./pages/Verify.jsx"));
+const DiscordGate = lazy(() => import("./pages/DiscordGate.jsx"));
+const DiscordCallback = lazy(() => import("./pages/DiscordCallback.jsx"));
+const Paywall = lazy(() => import("./pages/Paywall.jsx"));
 
-import MainLayout from "./layouts/MainLayout.jsx";
-import PreTradeGate from "./components/PreTradeGate.jsx";
+const ErrorBoundary = lazy(() => import("./components/ErrorBoundary.jsx"));
+const EconomicCalendar = lazy(() => import("./pages/EconomicCalendar.jsx"));
+const AddTrade = lazy(() => import("./pages/AddTrade.jsx"));
+const PastTrades = lazy(() => import("./pages/PastTrades.jsx"));
+const Dashboard = lazy(() => import("./pages/Dashboard.jsx"));
+const PerformanceCalendar = lazy(() => import("./pages/PerformanceCalendar.jsx"));
+const Imports = lazy(() => import("./pages/Imports.jsx"));
+const PropAccounts = lazy(() => import("./pages/PropAccounts.jsx"));
+const Settings = lazy(() => import("./pages/Settings.jsx"));
+const Profile = lazy(() => import("./pages/Profile.jsx"));
+const Support = lazy(() => import("./pages/Support.jsx"));
+const AdminDashboard = lazy(() => import("./pages/AdminDashboard.jsx"));
 
-import CalculatorLayout from "./pages/TraderProblems/Layout.jsx";
-import PropFirm from "./pages/TraderProblems/PropFirm.jsx";
-import LotSizeCalculator from "./pages/TraderProblems/LotSizeCalculator.jsx";
+const MainLayout = lazy(() => import("./layouts/MainLayout.jsx"));
+const PreTradeGate = lazy(() => import("./components/PreTradeGate.jsx"));
 
-const INDEXABLE_PATHS = ["/"];
+const CalculatorLayout = lazy(() => import("./pages/TraderProblems/Layout.jsx"));
+const PropFirm = lazy(() => import("./pages/TraderProblems/PropFirm.jsx"));
+const LotSizeCalculator = lazy(() => import("./pages/TraderProblems/LotSizeCalculator.jsx"));
+
+const INDEXABLE_PATHS = ["/", "/privacy"];
 
 const RouteSeo = () => {
   const { pathname } = useLocation();
@@ -110,45 +113,50 @@ function App() {
   return (
     <BrowserRouter>
       <RouteSeo />
-      <ErrorBoundary>
-        <Routes>
-          {/* Public Landing Page is now the default root */}
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/verify" element={<Verify />} />
+      <Suspense fallback={<div className="flex h-screen bg-[#0a0a0a] items-center justify-center"><Loader2 className="w-8 h-8 text-[#2f8df4] animate-spin" /></div>}>
+        <ErrorBoundary>
+          <Routes>
+            {/* Public Landing Pages */}
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/privacy" element={<PrivacyPolicy />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/verify" element={<Verify />} />
 
-          {/* Guard 1: Must be logged in */}
-          <Route element={<AuthGuard />}>
-            <Route path="/link-discord" element={<DiscordGate />} />
-            <Route path="/discord/callback" element={<DiscordCallback />} />
-            <Route path="/paywall" element={<Paywall />} />
+            {/* Guard 1: Must be logged in */}
+            <Route element={<AuthGuard />}>
+              <Route path="/link-discord" element={<DiscordGate />} />
+              <Route path="/discord/callback" element={<DiscordCallback />} />
+              <Route path="/paywall" element={<Paywall />} />
 
-            {/* Guard 2: Must be logged in AND Paid (or Admin) */}
-            <Route element={<PaywallGuard />}>
-              <Route path="/" element={<MainLayout />}>
-                {/* Dashboard is now explicitly /dashboard */}
-                <Route path="dashboard" element={<Dashboard />} />
-                <Route path="add-trade" element={<AddTrade />} />
-                <Route path="news" element={<EconomicCalendar />} />
-                <Route path="trades" element={<PastTrades />} />
-                <Route path="calendar" element={<PerformanceCalendar />} />
-                <Route path="import" element={<Imports />} />
-                <Route path="accounts" element={<PropAccounts />} />
-                <Route path="settings" element={<Settings />} />
-                <Route path="profile" element={<Profile />} />
-                <Route path="support" element={<Support />} />
-                <Route path="admin" element={<AdminDashboard />} />
+              {/* Guard 2: Must be logged in AND Paid (or Admin) */}
+              <Route element={<PaywallGuard />}>
+                <Route path="/" element={<MainLayout />}>
+                  <Route path="dashboard" element={<Dashboard />} />
+                  <Route path="add-trade" element={<AddTrade />} />
+                  <Route path="news" element={<EconomicCalendar />} />
+                  <Route path="trades" element={<PastTrades />} />
+                  <Route path="calendar" element={<PerformanceCalendar />} />
+                  <Route path="import" element={<Imports />} />
+                  <Route path="accounts" element={<PropAccounts />} />
+                  <Route path="settings" element={<Settings />} />
+                  <Route path="profile" element={<Profile />} />
+                  <Route path="support" element={<Support />} />
+                  <Route path="admin" element={<AdminDashboard />} />
 
-                <Route path="calculator" element={<CalculatorLayout />}>
-                  <Route index element={<Navigate to="lot-size" replace />} />
-                  <Route path="lot-size" element={<LotSizeCalculator />} />
-                  <Route path="prop-firm" element={<PropFirm />} />
+                  <Route path="calculator" element={<CalculatorLayout />}>
+                    <Route index element={<Navigate to="lot-size" replace />} />
+                    <Route path="lot-size" element={<LotSizeCalculator />} />
+                    <Route path="prop-firm" element={<PropFirm />} />
+                  </Route>
                 </Route>
               </Route>
             </Route>
-          </Route>
-        </Routes>
-      </ErrorBoundary>
+
+            {/* 404 Catch All */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </ErrorBoundary>
+      </Suspense>
     </BrowserRouter>
   );
 }

@@ -12,7 +12,7 @@ const features = [
   {
     icon: Brain,
     title: 'AI Pre-Trade Psychology Guard',
-    description: 'Before every trade, the AI scans your emotional state — detecting FOMO, revenge trading urges, and hesitation. If you\'re not in the zone, it blocks you from a costly mistake.',
+    description: 'Before every trade, the AI scans your emotional state — detecting FOMO and revenge trading urges. If you\'re tilted trading XAUUSD or Bitcoin, it blocks you from a costly mistake.',
     tag: 'Protect Your Edge',
     color: '#ec4899',
     bg: 'rgba(236,72,153,0.08)',
@@ -23,8 +23,8 @@ const features = [
   },
   {
     icon: ShieldCheck,
-    title: 'Prop Firm Guardian',
-    description: 'Track daily drawdown, trailing max loss, and profit targets across every evaluation phase. Get breach alerts before you hit the threshold.',
+    title: 'Prop Firm Challenge Guardian',
+    description: 'Track daily drawdown, trailing max loss, and profit targets across every evaluation phase. Get breach alerts before you fail your prop firm challenge.',
     tag: 'Rule Compliance',
     color: '#10b981',
     bg: 'rgba(16,185,129,0.08)',
@@ -35,13 +35,13 @@ const features = [
   {
     icon: Calculator,
     title: 'Precision Lot Size & Pip Calculator',
-    description: 'Calculate exact position sizes instantly based on your account balance, risk percentage, and instrument tick value. No more manual math errors.',
+    description: 'Calculate exact position sizes instantly based on your account balance, risk percentage, and instrument tick value. Perfect for Forex, Gold (XAUUSD), and Crypto markets.',
     tag: 'Precision Sizing',
     color: '#2f8df4',
     bg: 'rgba(47,141,244,0.08)',
     border: 'rgba(47,141,244,0.2)',
     glow: 'rgba(47,141,244,0.12)',
-    detail: '0.01 lot precision for all Forex pairs',
+    detail: '0.01 lot precision for Forex & Crypto',
   },
   {
     icon: TrendingUp,
