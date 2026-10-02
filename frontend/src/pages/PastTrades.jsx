@@ -9,7 +9,6 @@ import {
   ChevronRight,
   Image as ImageIcon,
   X,
-  List,
   Calendar,
   TrendingUp,
   PlusCircle,
