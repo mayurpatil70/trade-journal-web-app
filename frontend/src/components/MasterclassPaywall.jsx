@@ -6,7 +6,6 @@ import {
   Copy,
   Loader2,
   ShieldCheck,
-  Sparkles,
 } from "lucide-react";
 import api from "../api/axios";
 
@@ -95,9 +94,6 @@ export default function MasterclassPaywall() {
       <div className="absolute top-0 right-0 w-64 h-64 bg-yellow-500/10 rounded-full blur-3xl pointer-events-none group-hover:bg-yellow-500/20 transition-colors" />
 
       <div className="p-6 bg-gradient-to-b from-yellow-500/10 to-transparent border-b border-yellow-500/10 flex flex-col md:flex-row items-center gap-6 text-center md:text-left">
-        <div className="w-16 h-16 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-2xl flex items-center justify-center shrink-0 shadow-lg shadow-yellow-500/20">
-          <Sparkles className="w-8 h-8 text-yellow-950" />
-        </div>
         <div className="flex-1">
           <h2 className="text-xl font-black text-white mb-1">
             Prop Firm Pass Masterclass

@@ -21,9 +21,7 @@ export default function AddTrade() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const assets = [
-    "XAUUSD", "NAS100", "GER40", "US30", "EURUSD", "GBPUSD",
-    "USDJPY", "AUDUSD", "USDCAD", "EURJPY", "BTCUSD", "ETHUSD",
-    "SILVER", "USOIL", "Other",
+    "XAUUSD", "BTCUSD", "ETHUSD", "XAGUSD", "Other",
   ];
   const setups = ["FVG", "SMT", "Liquidity Sweep", "Order Block", "Breakout", "Pullback", "Other"];
   const emotions = [
@@ -42,7 +40,7 @@ export default function AddTrade() {
     entry: "",
     sl: "",
     tp: "",
-    risk: "0.5",
+    risk: "",
     result: "win",
     rMultiple: "",
     ruleBreak: "no",
@@ -224,10 +222,10 @@ export default function AddTrade() {
               )}
             </div>
             {[
-              { label: "Entry Price", name: "entry", placeholder: "0.0000" },
-              { label: "Stop Loss", name: "sl", placeholder: "0.0000" },
-              { label: "Take Profit", name: "tp", placeholder: "0.0000" },
-              { label: "Risk %", name: "risk", placeholder: "0.5" },
+              { label: "Entry Price", name: "entry", placeholder: "" },
+              { label: "Stop Loss", name: "sl", placeholder: "" },
+              { label: "Take Profit", name: "tp", placeholder: "" },
+              { label: "Risk %", name: "risk", placeholder: "" },
             ].map((field) => (
               <div key={field.name} className={inputContainerClass}>
                 <label className={labelClass}>{field.label}</label>
@@ -259,7 +257,7 @@ export default function AddTrade() {
                 type="number"
                 step="0.1"
                 name="rMultiple"
-                placeholder="e.g. 2.5"
+                placeholder=""
                 value={formData.rMultiple}
                 onChange={handleChange}
                 className={inputClass}

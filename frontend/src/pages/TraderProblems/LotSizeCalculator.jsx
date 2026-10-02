@@ -15,36 +15,6 @@ import {
 
 const INSTRUMENTS = [
   {
-    symbol: "EURUSD",
-    name: "EUR/USD (Forex Major)",
-    type: "forex",
-    pipSize: 0.0001,
-    contractSize: 100000,
-    pipValueStandard: 10, // $10 per pip on 1 standard lot
-    defaultEntry: 1.0850,
-    defaultSL: 1.0825,
-  },
-  {
-    symbol: "GBPUSD",
-    name: "GBP/USD (Forex Major)",
-    type: "forex",
-    pipSize: 0.0001,
-    contractSize: 100000,
-    pipValueStandard: 10,
-    defaultEntry: 1.2950,
-    defaultSL: 1.2920,
-  },
-  {
-    symbol: "USDJPY",
-    name: "USD/JPY (JPY Pair)",
-    type: "jpy",
-    pipSize: 0.01,
-    contractSize: 100000,
-    pipValueStandard: 6.7, // approx $6.70 per pip depending on JPY rate ~150
-    defaultEntry: 152.4,
-    defaultSL: 152.0,
-  },
-  {
     symbol: "XAUUSD",
     name: "Gold (XAU/USD)",
     type: "commodity",
@@ -55,26 +25,6 @@ const INSTRUMENTS = [
     defaultSL: 2742.0,
   },
   {
-    symbol: "US30",
-    name: "Dow Jones (US30 Index)",
-    type: "index",
-    pipSize: 1.0, // 1 index point
-    contractSize: 1,
-    pipValueStandard: 1, // $1 per point per lot/contract
-    defaultEntry: 42500,
-    defaultSL: 42420,
-  },
-  {
-    symbol: "NAS100",
-    name: "Nasdaq (NAS100 Index)",
-    type: "index",
-    pipSize: 1.0,
-    contractSize: 1,
-    pipValueStandard: 1,
-    defaultEntry: 20400,
-    defaultSL: 20350,
-  },
-  {
     symbol: "BTCUSD",
     name: "Bitcoin (BTC/USD)",
     type: "crypto",
@@ -83,6 +33,36 @@ const INSTRUMENTS = [
     pipValueStandard: 1,
     defaultEntry: 92000,
     defaultSL: 90500,
+  },
+  {
+    symbol: "ETHUSD",
+    name: "Ethereum (ETH/USD)",
+    type: "crypto",
+    pipSize: 0.1,
+    contractSize: 1,
+    pipValueStandard: 1,
+    defaultEntry: 3400.0,
+    defaultSL: 3350.0,
+  },
+  {
+    symbol: "XAGUSD",
+    name: "Silver (XAG/USD)",
+    type: "commodity",
+    pipSize: 0.01,
+    contractSize: 5000,
+    pipValueStandard: 50,
+    defaultEntry: 32.50,
+    defaultSL: 32.00,
+  },
+  {
+    symbol: "Other",
+    name: "Other (Custom)",
+    type: "custom",
+    pipSize: 1.0,
+    contractSize: 1,
+    pipValueStandard: 1,
+    defaultEntry: 0,
+    defaultSL: 0,
   },
 ];
 
@@ -96,6 +76,7 @@ export default function LotSizeCalculator() {
   const [riskCash, setRiskCash] = useState(500);
 
   const [selectedSymbol, setSelectedSymbol] = useState("XAUUSD");
+  const [customSymbol, setCustomSymbol] = useState("");
   const [inputMode, setInputMode] = useState("prices"); // 'prices' or 'pips'
   const [entryPrice, setEntryPrice] = useState(2750.0);
   const [slPrice, setSlPrice] = useState(2742.0);
@@ -213,7 +194,7 @@ export default function LotSizeCalculator() {
                 value={balance}
                 onChange={(e) => setBalance(Number(e.target.value))}
                 className="w-full bg-gray-50 dark:bg-[#0b131d] border border-gray-200 dark:border-white/10 rounded-xl pl-9 pr-4 py-3.5 text-lg font-black text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all shadow-inner"
-                placeholder="50000"
+                placeholder=""
               />
             </div>
 
@@ -336,6 +317,15 @@ export default function LotSizeCalculator() {
                   </option>
                 ))}
               </select>
+              {selectedSymbol === "Other" && (
+                <input
+                  type="text"
+                  placeholder=""
+                  value={customSymbol}
+                  onChange={(e) => setCustomSymbol(e.target.value)}
+                  className="w-full bg-gray-50 dark:bg-[#0b131d] border border-gray-200 dark:border-white/10 rounded-xl px-4 py-3.5 text-base font-bold text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all mt-3"
+                />
+              )}
             </div>
 
             <div className="flex justify-between items-center pt-2">
@@ -433,7 +423,7 @@ export default function LotSizeCalculator() {
                 </span>
               </div>
               <p className="text-xs text-emerald-400/90 font-medium">
-                {instrument.symbol} • {pipDistance.toFixed(1)} {instrument.type === "index" ? "pts" : "pips"} Stop Loss
+                {selectedSymbol === "Other" && customSymbol ? customSymbol : instrument.symbol} • {pipDistance.toFixed(1)} {instrument.type === "index" ? "pts" : "pips"} Stop Loss
               </p>
             </div>
 
