@@ -390,7 +390,27 @@ async function saveExchange(userId, userText, replyText, { replace = false, db =
   if (error) console.warn("[AI] chat history save failed:", error.message);
 }
 
+function attachImageIfPresent(req, messages) {
+  if (req.file) {
+    const base64Image = req.file.buffer.toString("base64");
+    const mimeType = req.file.mimetype;
+    const dataUrl = `data:${mimeType};base64,${base64Image}`;
+    const lastMsg = messages[messages.length - 1];
+    messages[messages.length - 1] = {
+      role: "user",
+      content: [
+        { type: "text", text: lastMsg.content || "Analyze this chart." },
+        { type: "image_url", image_url: { url: dataUrl } },
+      ],
+    };
+  }
+}
+
 export const chatWithCoach = async (req, res) => {
+  if (typeof req.body.history === "string") {
+    try { req.body.history = JSON.parse(req.body.history); } catch { req.body.history = []; }
+  }
+
   const parsed = parseChatRequest(req.body);
   if (parsed.error) return res.status(400).json({ error: parsed.error });
 
@@ -398,6 +418,7 @@ export const chatWithCoach = async (req, res) => {
     const ctx = await buildChatContext(parsed);
     const systemPrompt = buildCoachSystemPrompt(ctx);
     const messages = buildChatMessages(parsed.history, parsed.message, systemPrompt);
+    attachImageIfPresent(req, messages);
     const text = stripThinking(await nimComplete(messages, CHAT_OPTS));
     if (!text) throw new Error("The model returned an empty reply.");
     await saveExchange(parsed.userId, parsed.message, text, { replace: parsed.replace });
@@ -410,6 +431,10 @@ export const chatWithCoach = async (req, res) => {
 
 /** Same as chatWithCoach but streams Server-Sent Events: context, thinking, delta, done, error. */
 export const streamCoachChat = async (req, res) => {
+  if (typeof req.body.history === "string") {
+    try { req.body.history = JSON.parse(req.body.history); } catch { req.body.history = []; }
+  }
+
   const parsed = parseChatRequest(req.body);
   if (parsed.error) return res.status(400).json({ error: parsed.error });
 
@@ -431,6 +456,7 @@ export const streamCoachChat = async (req, res) => {
     send({ type: "context", ...ctx.meta });
 
     const messages = buildChatMessages(parsed.history, parsed.message, buildCoachSystemPrompt(ctx));
+    attachImageIfPresent(req, messages);
     let reply = "";
     let thinking = false;
     for await (const part of nimStream(messages, { ...CHAT_OPTS, signal: abort.signal })) {

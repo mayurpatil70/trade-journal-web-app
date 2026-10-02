@@ -19,8 +19,8 @@ const llmLimit = rateLimit({ windowMs: 60_000, max: 12 });
 router.use(requireAuth);
 
 router.post("/news-insight", llmLimit, generateNewsInsight);
-router.post("/chat", llmLimit, chatWithCoach);
-router.post("/chat/stream", llmLimit, streamCoachChat);
+router.post("/chat", llmLimit, upload.single("image"), chatWithCoach);
+router.post("/chat/stream", llmLimit, upload.single("image"), streamCoachChat);
 router.get("/chat/history", getChatHistory);
 router.delete("/chat/history", clearChatHistory);
 router.post("/import", llmLimit, upload.single("image"), analyzeChart);

@@ -154,7 +154,7 @@ GLOBAL RESET
   }
 
   html {
-    scroll-behavior: smooth;
+    /* scroll-behavior: smooth; — Lenis smooth scroll handles this */
     font-family: var(--font-sans);
     background: var(--background);
   }
@@ -332,4 +332,70 @@ UTILITY HELPERS
   transform: translateY(-2px);
   border-color: oklch(1 0 0 / 15%);
   box-shadow: 0 12px 35px oklch(0 0 0 / 25%);
+}
+
+/* =========================================================
+LANDING PAGE ANIMATIONS
+========================================================= */
+
+/* Marquee for testimonials */
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* Ambient blob drift animations */
+@keyframes blobDrift1 {
+  0% { transform: translate(-50%, -50%) scale(1); }
+  100% { transform: translate(-48%, -54%) scale(1.15); }
+}
+@keyframes blobDrift2 {
+  0% { transform: translate(-30%, -40%) scale(1); }
+  100% { transform: translate(-34%, -36%) scale(1.1); }
+}
+@keyframes blobDrift3 {
+  0% { transform: translate(-70%, -60%) scale(1); }
+  100% { transform: translate(-66%, -64%) scale(1.08); }
+}
+
+/* Scroll indicator bounce */
+@keyframes scrollBounce {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(8px); }
+}
+
+/* Pulse animation for live badge dot */
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(0.85); }
+}
+
+/* Glassmorphism card for landing */
+.glass-card-landing {
+  background: rgba(12, 16, 24, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+/* Desktop-only nav links helper */
+.hidden { display: none; }
+@media (min-width: 768px) {
+  .md\:block { display: block; }
+}
+
+/* Mobile: disable 3D grid layout for feature bento */
+@media (max-width: 768px) {
+  [style*="grid-template-columns: repeat(3"] {
+    grid-template-columns: 1fr !important;
+  }
+  [style*="grid-column: span 2"] {
+    grid-column: span 1 !important;
+  }
+  [style*="grid-template-columns: 2fr 2fr 2fr"] {
+    grid-template-columns: 1fr !important;
+  }
+  [style*="grid-template-columns: repeat(4"] {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
 }
