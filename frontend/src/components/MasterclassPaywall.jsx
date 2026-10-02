@@ -1,5 +1,13 @@
 import { useState, useEffect } from "react";
-import { Lock, ArrowRight, CheckCircle, Copy, Loader2, ShieldCheck, Sparkles } from "lucide-react";
+import {
+  Lock,
+  ArrowRight,
+  CheckCircle,
+  Copy,
+  Loader2,
+  ShieldCheck,
+  Sparkles,
+} from "lucide-react";
 import api from "../api/axios";
 
 export default function MasterclassPaywall() {
@@ -10,7 +18,7 @@ export default function MasterclassPaywall() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [copied, setCopied] = useState("");
 
-  const PRICE = 7.00;
+  const PRICE = 7.0;
 
   useEffect(() => {
     const fetchConfig = async () => {
@@ -35,20 +43,26 @@ export default function MasterclassPaywall() {
   };
 
   const handleVerify = async () => {
-    if (txHash.length < 10) return alert("Please enter a valid Transaction Hash.");
+    if (txHash.length < 10)
+      return alert("Please enter a valid Transaction Hash.");
     setIsProcessing(true);
     // Note: this is a dummy verification since it's a separate product.
     // We just simulate wait, then redirect to the discord webhook.
-    
+
     setTimeout(() => {
       setStep(3); // Success Screen
       setTimeout(() => {
-        window.location.href = "https://discord.com/api/webhooks/1555511995888042014/cZt2zgCcTFtnfGPfFc-ye2r6jxmBp6bbu4sC3CE77TYMVMw_xYYslCFzthfnFWeRczyY";
+        window.location.href = process.env.DISCORD_PROPFIRM_WEBHOOK;
       }, 2500);
     }, 2000);
   };
 
-  if (!config) return <div className="p-8 flex justify-center"><Loader2 className="w-6 h-6 text-yellow-500 animate-spin" /></div>;
+  if (!config)
+    return (
+      <div className="p-8 flex justify-center">
+        <Loader2 className="w-6 h-6 text-yellow-500 animate-spin" />
+      </div>
+    );
 
   const PAY_ADDRESS = config.wallets[chain];
 
@@ -56,14 +70,19 @@ export default function MasterclassPaywall() {
     <div className="bg-gradient-to-br from-[#1a1410] to-[#121418] border border-yellow-500/20 rounded-2xl shadow-[0_0_40px_rgba(234,179,8,0.05)] overflow-hidden mb-8 relative group">
       {/* Decorative Glow */}
       <div className="absolute top-0 right-0 w-64 h-64 bg-yellow-500/10 rounded-full blur-3xl pointer-events-none group-hover:bg-yellow-500/20 transition-colors" />
-      
+
       <div className="p-6 bg-gradient-to-b from-yellow-500/10 to-transparent border-b border-yellow-500/10 flex flex-col md:flex-row items-center gap-6 text-center md:text-left">
         <div className="w-16 h-16 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-2xl flex items-center justify-center shrink-0 shadow-lg shadow-yellow-500/20">
           <Sparkles className="w-8 h-8 text-yellow-950" />
         </div>
         <div className="flex-1">
-          <h2 className="text-xl font-black text-white mb-1">Prop Firm Pass Masterclass</h2>
-          <p className="text-sm text-yellow-500/80 font-medium">How to pass propfirm challenges: detailed guidance from our industry experts. Start to end help for traders until payout arrives.</p>
+          <h2 className="text-xl font-black text-white mb-1">
+            Prop Firm Pass Masterclass
+          </h2>
+          <p className="text-sm text-yellow-500/80 font-medium">
+            How to pass propfirm challenges: detailed guidance from our industry
+            experts. Start to end help for traders until payout arrives.
+          </p>
         </div>
         {step === 1 && (
           <button
@@ -78,24 +97,35 @@ export default function MasterclassPaywall() {
       {step === 2 && (
         <div className="p-6 md:p-8 space-y-6 animate-in slide-in-from-top-4 relative z-10">
           <div className="bg-black/40 border border-white/5 rounded-xl p-4 text-center max-w-sm mx-auto">
-            <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Send Exactly</p>
+            <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">
+              Send Exactly
+            </p>
             <div className="flex items-center justify-center gap-3">
-              <span className="text-3xl font-black text-white">{PRICE.toFixed(2)} USDT</span>
+              <span className="text-3xl font-black text-white">
+                {PRICE.toFixed(2)} USDT
+              </span>
               <button
                 onClick={() => handleCopy(PRICE.toString(), "amt")}
                 className="p-1.5 text-gray-400 hover:text-white bg-white/5 rounded-md transition-colors"
               >
-                {copied === "amt" ? <CheckCircle className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4" />}
+                {copied === "amt" ? (
+                  <CheckCircle className="w-4 h-4 text-emerald-500" />
+                ) : (
+                  <Copy className="w-4 h-4" />
+                )}
               </button>
             </div>
           </div>
 
           <div className="max-w-sm mx-auto space-y-2">
             <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex justify-between">
-              To Address (BEP20) <span className="text-red-400">BSC Network only</span>
+              To Address (BEP20){" "}
+              <span className="text-red-400">BSC Network only</span>
             </p>
             <div className="flex items-center gap-2 bg-black/40 border border-white/5 rounded-xl p-1.5 pl-4">
-              <span className="text-xs font-mono text-white truncate flex-1">{PAY_ADDRESS}</span>
+              <span className="text-xs font-mono text-white truncate flex-1">
+                {PAY_ADDRESS}
+              </span>
               <button
                 onClick={() => handleCopy(PAY_ADDRESS, "addr")}
                 className="px-4 py-2 bg-yellow-500/20 text-yellow-500 font-bold text-xs rounded-lg hover:bg-yellow-500/30 transition-colors"
@@ -106,7 +136,9 @@ export default function MasterclassPaywall() {
           </div>
 
           <div className="max-w-sm mx-auto pt-4 border-t border-white/5 space-y-2">
-            <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Transaction Hash (TXID)</label>
+            <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">
+              Transaction Hash (TXID)
+            </label>
             <input
               type="text"
               value={txHash}
@@ -128,7 +160,13 @@ export default function MasterclassPaywall() {
               disabled={isProcessing || txHash.trim().length < 10}
               className="flex-1 py-4 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm rounded-xl transition-all shadow-lg shadow-emerald-500/25 flex items-center justify-center gap-2 disabled:opacity-50"
             >
-              {isProcessing ? <><Loader2 className="w-4 h-4 animate-spin" /> Verifying...</> : "Verify Payment"}
+              {isProcessing ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" /> Verifying...
+                </>
+              ) : (
+                "Verify Payment"
+              )}
             </button>
           </div>
         </div>
@@ -140,7 +178,9 @@ export default function MasterclassPaywall() {
             <ShieldCheck className="w-8 h-8 text-emerald-500" />
           </div>
           <h3 className="text-2xl font-black text-white">Payment Verified!</h3>
-          <p className="text-sm text-gray-400">Redirecting you to the Private Masterclass Server...</p>
+          <p className="text-sm text-gray-400">
+            Redirecting you to the Private Masterclass Server...
+          </p>
           <Loader2 className="w-6 h-6 text-yellow-500 animate-spin mt-4" />
         </div>
       )}
