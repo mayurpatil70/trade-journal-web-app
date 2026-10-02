@@ -1,5 +1,7 @@
 // backend/routes/subscriptionRoutes.js
 import express from "express";
+import { requireAuth } from "../middlewares/requireAuth.js";
+import { requireAdmin } from "../middlewares/requireAdmin.js";
 import { supabase } from "../config/supabase.js";
 import { sendRevenueAlert } from "../utils/discordWebhook.js";
 
@@ -52,7 +54,7 @@ router.get("/status/:userId", async (req, res) => {
 });
 
 // 3. Verify Payment & Unlock App
-router.post("/verify", async (req, res) => {
+router.post("/verify", requireAuth, async (req, res) => {
   try {
     const { userId, txHash, chain, paymentScreenshot } = req.body;
 
@@ -127,7 +129,7 @@ router.post("/verify", async (req, res) => {
 });
 
 // 4. Admin route to fetch pending payments
-router.get("/admin/pending", async (req, res) => {
+router.get("/admin/pending", requireAuth, requireAdmin, async (req, res) => {
   try {
     const { data, error } = await supabase
       .from("journal_subscriptions")

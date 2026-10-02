@@ -27,7 +27,8 @@ const uploadToCloudinary = (buffer) => {
 
 export const createTrade = async (req, res) => {
   try {
-    const { userId, ...tradeData } = req.body;
+    const { userId } = req;
+    const tradeData = req.body;
 
     if (!userId) {
       return res
@@ -97,7 +98,7 @@ export const createTrade = async (req, res) => {
 
 export const getTrades = async (req, res) => {
   try {
-    const { userId } = req.query;
+    const { userId } = req;
 
     if (!userId) {
       return res
@@ -123,7 +124,7 @@ export const getTrades = async (req, res) => {
 
 export const deleteAllTrades = async (req, res) => {
   try {
-    const { userId } = req.query;
+    const { userId } = req;
 
     if (!userId) {
       return res
@@ -149,7 +150,8 @@ export const deleteAllTrades = async (req, res) => {
 
 export const exportTrades = async (req, res) => {
   try {
-    const { userId, format } = req.query;
+    const { userId } = req;
+    const { format } = req.query;
 
     if (!userId) {
       return res
