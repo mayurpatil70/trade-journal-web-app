@@ -6,27 +6,34 @@ export const sendRevenueAlert = async ({
   userId,
   amount,
   chain,
-  txHash, screenshot,
+  txHash,
+  screenshot,
 }) => {
   // Add this to your backend .env file:
   // DISCORD_REVENUE_WEBHOOK=https://discord.com/api/webhooks/your_webhook_url
-  const webhookUrl = "https://discord.com/api/webhooks/1554842059666628700/MenXzVOt-lPGN9tWQg51eYvj1hNZaZSKr70dj4cgQK2WtBRWs52lZ3iFtCiFmykvGmiV";
+  const webhookUrl = "process.env.DISCORD_REVENUE_WEBHOOK";
   if (!webhookUrl) return;
 
   const isPropFirm = type === "Prop Firm Challenge";
   const color = isPropFirm ? 3066993 : 15105570; // Blue for Prop, Orange for Journal
 
   const embed = {
-    title: isPropFirm ? "🎯 New Challenge Purchased!" : "🔓 Journal Access Unlocked!",
+    title: isPropFirm
+      ? "🎯 New Challenge Purchased!"
+      : "🔓 Journal Access Unlocked!",
     color: color,
     fields: [
       { name: "User", value: `\`${userId}\``, inline: true },
       { name: "Amount", value: `**$${amount} USDT**`, inline: true },
       { name: "Network", value: chain, inline: true },
       { name: "TXID", value: `\`${txHash}\``, inline: false },
-      { name: "Explorer Link", value: `[View on Explorer](https://bscscan.com/tx/${txHash})`, inline: false }
+      {
+        name: "Explorer Link",
+        value: `[View on Explorer](https://bscscan.com/tx/${txHash})`,
+        inline: false,
+      },
     ],
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   };
 
   if (screenshot) {
