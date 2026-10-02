@@ -181,20 +181,15 @@ export default function FeaturesBento() {
         </div>
 
         {/* Bento Grid */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(3, 1fr)',
-          gap: '16px',
-        }}>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {features.map((f, i) => {
             const Icon = f.icon;
             const isWide = f.wide;
             return (
               <div
                 key={i}
-                className="feature-card"
+                className={`feature-card h-full flex flex-col ${isWide ? 'md:col-span-2' : 'col-span-1'}`}
                 style={{
-                  gridColumn: isWide ? 'span 2' : 'span 1',
                   background: 'rgba(12,16,24,0.7)',
                   backdropFilter: 'blur(20px)',
                   WebkitBackdropFilter: 'blur(20px)',
@@ -268,14 +263,16 @@ export default function FeaturesBento() {
                   {f.title}
                 </h3>
 
-                <p style={{
-                  fontSize: '13px',
-                  color: 'rgba(255,255,255,0.45)',
-                  lineHeight: 1.65,
-                  marginBottom: '16px',
-                }}>
-                  {f.description}
-                </p>
+                <div className="flex-1">
+                  <p style={{
+                    fontSize: '13px',
+                    color: 'rgba(255,255,255,0.45)',
+                    lineHeight: 1.65,
+                    marginBottom: '16px',
+                  }}>
+                    {f.description}
+                  </p>
+                </div>
 
                 {/* Trader hint detail */}
                 <div style={{

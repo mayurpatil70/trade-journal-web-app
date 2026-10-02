@@ -10,6 +10,7 @@ import {
   ChevronDown,
   Activity,
 } from "lucide-react";
+import MasterclassPaywall from "../components/MasterclassPaywall.jsx";
 
 export default function PropAccounts() {
   const [accounts, setAccounts] = useState([
@@ -98,6 +99,8 @@ export default function PropAccounts() {
           <Plus className="w-4 h-4" /> Add Account
         </button>
       </div>
+
+      <MasterclassPaywall />
 
       {/* Account Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

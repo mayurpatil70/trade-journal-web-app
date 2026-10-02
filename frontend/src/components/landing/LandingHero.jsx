@@ -36,10 +36,10 @@ export default function LandingHero() {
   const dummyProgress = { current: 0 };
 
   return (
-    <div style={{ position: 'relative', overflow: 'hidden', paddingTop: '120px', paddingBottom: '60px' }}>
+    <div style={{ position: 'relative', overflow: 'hidden', paddingTop: '80px', paddingBottom: '60px' }}>
       <div
         className="flex flex-col items-center justify-center px-5"
-        style={{ minHeight: '60vh' }}
+        style={{ minHeight: '50vh' }}
       >
         {/* Text + 3D Row */}
         <div

@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import PreTradeGate from "../components/PreTradeGate.jsx";
+import PromoPopup from "../components/PromoPopup.jsx";
 import {
   LayoutDashboard,
   PlusCircle,
@@ -444,6 +445,7 @@ export default function MainLayout() {
           onClick={closeMenu}
         />
       )}
+      <PromoPopup />
       <PreTradeGate />
     </div>
   );
