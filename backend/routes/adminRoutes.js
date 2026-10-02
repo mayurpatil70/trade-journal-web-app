@@ -1,7 +1,11 @@
 import express from "express";
+import { requireAuth } from "../middlewares/requireAuth.js";
+import { requireAdmin } from "../middlewares/requireAdmin.js";
 import { supabase } from "../config/supabase.js";
 
 const router = express.Router();
+
+router.use(requireAuth, requireAdmin);
 
 // Fetch admin metrics for the dashboard
 router.get("/metrics", async (req, res) => {

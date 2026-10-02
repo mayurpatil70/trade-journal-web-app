@@ -9,9 +9,7 @@ export const sendRevenueAlert = async ({
   txHash,
   screenshot,
 }) => {
-  // Add this to your backend .env file:
-  // DISCORD_REVENUE_WEBHOOK=https://discord.com/api/webhooks/your_webhook_url
-  const webhookUrl = "process.env.DISCORD_REVENUE_WEBHOOK";
+  const webhookUrl = process.env.DISCORD_REVENUE_WEBHOOK;
   if (!webhookUrl) return;
 
   const isPropFirm = type === "Prop Firm Challenge";

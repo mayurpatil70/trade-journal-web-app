@@ -8,7 +8,7 @@ const supabase = createClient(
 
 export const uploadKycDocuments = async (req, res) => {
   try {
-    const { userId } = req.body;
+    const { userId } = req;
     const files = req.files; // Expected array from multer (Front & Back)
 
     if (!userId || !files || files.length < 2) {

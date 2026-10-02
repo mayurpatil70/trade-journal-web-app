@@ -26,7 +26,7 @@ export const requestLogin = async (req, res) => {
     if (dbError) throw new Error(dbError.message);
 
     const clientUrl = process.env.FRONTEND_URL || "http://localhost:5173";
-    const magicLink = `${clientUrl}/verify?token=${token}&email=${email}`;
+    const magicLink = `${clientUrl}/verify?token=${token}&email=${encodeURIComponent(email)}`;
 
     const { error: emailError } = await resend.emails.send({
       from: "ForexNotes <auth@forexnotes.in>",
