@@ -250,3 +250,112 @@ describe("modelChain and error messages", () => {
     expect(ai.friendlyAiError(new Error("boom"))).toBe("AI Error: boom");
   });
 });
+
+describe("image and edge-case handling", () => {
+  const png = { mimetype: "image/png", buffer: Buffer.from("fake") };
+  const multimodalErr = () => Object.assign(new Error("400 ValueError: Received multimodal data but multimodal processing is not enabled."), { status: 400 });
+  const openaiClient = async () => (await import("../controllers/aiController.js")).openai;
+
+  it("friendlyAiError maps multimodal, too-large, timeout and empty replies", () => {
+    expect(ai.friendlyAiError(multimodalErr())).toMatch(/can't read images/);
+    expect(ai.friendlyAiError(Object.assign(new Error("x"), { status: 413 }))).toMatch(/too large/);
+    expect(ai.friendlyAiError(Object.assign(new Error("Request aborted"), { name: "AbortError" }))).toMatch(/too long/);
+    expect(ai.friendlyAiError(new Error("The model returned an empty reply."))).toMatch(/empty reply/);
+  });
+
+  it("withoutImages flattens image parts into text with a note", () => {
+    const out = ai.withoutImages([{ role: "user", content: [{ type: "text", text: "hi" }, { type: "image_url", image_url: { url: "data:x" } }] }, { role: "user", content: "plain" }]);
+    expect(out[0].content).toContain("hi");
+    expect(out[0].content).toContain(ai.IMAGE_UNAVAILABLE_NOTE);
+    expect(JSON.stringify(out)).not.toContain("data:x");
+    expect(out[1].content).toBe("plain");
+  });
+
+  it("chatWithCoach retries text-only when the model rejects images", async () => {
+    const client = await openaiClient();
+    client.chat.completions.create.mockReset()
+      .mockRejectedValueOnce(multimodalErr())
+      .mockResolvedValueOnce({ choices: [{ message: { content: "Describe it to me." } }] });
+    const res = makeRes();
+    await ai.chatWithCoach({ body: { message: "see chart" }, file: png }, res);
+    expect(client.chat.completions.create).toHaveBeenCalledTimes(2);
+    expect(JSON.stringify(client.chat.completions.create.mock.calls[1][0].messages)).not.toContain("image_url");
+    expect(res.status).toHaveBeenCalledWith(200);
+  });
+
+  it("chatWithCoach returns a friendly 500 for an empty model reply", async () => {
+    const client = await openaiClient();
+    client.chat.completions.create.mockReset().mockResolvedValue({ choices: [{ message: { content: "<think>x</think>" } }] });
+    const res = makeRes();
+    await ai.chatWithCoach({ body: { message: "hi" } }, res);
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json.mock.calls[0][0].error).toMatch(/empty reply/);
+  });
+
+  it("streamCoachChat falls back to text-only on a multimodal error", async () => {
+    const client = await openaiClient();
+    const stream = (async function* () { yield { choices: [{ delta: { content: "ok" } }] }; })();
+    client.chat.completions.create.mockReset().mockRejectedValueOnce(multimodalErr()).mockResolvedValueOnce(stream);
+    const res = makeRes();
+    await ai.streamCoachChat({ body: { message: "see chart" }, file: png }, res);
+    expect(res.events().map((e) => e.type)).toEqual(expect.arrayContaining(["delta", "done"]));
+    expect(res.events().some((e) => e.type === "error")).toBe(false);
+  });
+
+  it("streamCoachChat emits a friendly error for provider failures", async () => {
+    const client = await openaiClient();
+    client.chat.completions.create.mockReset().mockRejectedValue(Object.assign(new Error("bad"), { status: 400 }));
+    const res = makeRes();
+    await ai.streamCoachChat({ body: { message: "hi" } }, res);
+    expect(res.events().at(-1)).toEqual({ type: "error", error: "AI Error: bad" });
+  });
+
+  it("strips base64 images from history, drops malformed entries and caps length", async () => {
+    const client = await openaiClient();
+    client.chat.completions.create.mockReset().mockResolvedValue({ choices: [{ message: { content: "fine" } }] });
+    const history = [
+      null, 5, { sender: "user" }, { sender: "user", text: "   " },
+      { sender: "user", text: `look data:image/png;base64,${"A".repeat(50000)} here` },
+      ...Array.from({ length: 30 }, (_, i) => ({ sender: i % 2 ? "ai" : "user", text: `m${i}` })),
+    ];
+    const res = makeRes();
+    await ai.chatWithCoach({ body: { message: "hi", history } }, res);
+    const sent = client.chat.completions.create.mock.calls[0][0].messages;
+    expect(JSON.stringify(sent)).not.toContain("AAAA");
+    expect(sent.length).toBeLessThanOrEqual(14);
+    expect(res.status).toHaveBeenCalledWith(200);
+  });
+
+  it("accepts history sent as a JSON string, malformed JSON, and a missing body", async () => {
+    const client = await openaiClient();
+    client.chat.completions.create.mockReset().mockResolvedValue({ choices: [{ message: { content: "fine" } }] });
+    for (const body of [{ message: "hi", history: JSON.stringify([{ sender: "ai", text: "yo" }]) }, { message: "hi", history: "{oops" }]) {
+      const res = makeRes();
+      await ai.chatWithCoach({ body }, res);
+      expect(res.status).toHaveBeenCalledWith(200);
+    }
+    const res = makeRes();
+    await ai.chatWithCoach({}, res);
+    expect(res.status).toHaveBeenCalledWith(400);
+  });
+
+  it("accepts a message of exactly the max length and trims whitespace", async () => {
+    const client = await openaiClient();
+    client.chat.completions.create.mockReset().mockResolvedValue({ choices: [{ message: { content: "fine" } }] });
+    const res = makeRes();
+    await ai.chatWithCoach({ body: { message: `  ${"x".repeat(2000)}  ` } }, res);
+    expect(res.status).toHaveBeenCalledWith(200);
+  });
+
+  it("does not report an error when the client aborts mid-stream", async () => {
+    const client = await openaiClient();
+    client.chat.completions.create.mockReset().mockImplementation(async () => {
+      throw Object.assign(new Error("aborted"), { name: "AbortError" });
+    });
+    const res = makeRes();
+    const p = ai.streamCoachChat({ body: { message: "hi" } }, res);
+    res.listeners.close?.();
+    await p;
+    expect(res.events().some((e) => e.type === "error")).toBe(false);
+  });
+});
