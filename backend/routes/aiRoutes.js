@@ -14,13 +14,22 @@ import {
 } from "../controllers/aiController.js";
 
 const router = express.Router();
+
+const imageUpload = (req, res, next) =>
+  upload.single("image")(req, res, (err) => {
+    if (!err) return next();
+    const tooBig = err.code === "LIMIT_FILE_SIZE";
+    res.status(tooBig ? 413 : 400).json({
+      error: tooBig ? "Image is too large (max 5 MB)." : err.message || "Invalid upload.",
+    });
+  });
 const llmLimit = rateLimit({ windowMs: 60_000, max: 12 });
 
 router.use(requireAuth);
 
 router.post("/news-insight", llmLimit, generateNewsInsight);
-router.post("/chat", llmLimit, upload.single("image"), chatWithCoach);
-router.post("/chat/stream", llmLimit, upload.single("image"), streamCoachChat);
+router.post("/chat", llmLimit, imageUpload, chatWithCoach);
+router.post("/chat/stream", llmLimit, imageUpload, streamCoachChat);
 router.get("/chat/history", getChatHistory);
 router.delete("/chat/history", clearChatHistory);
 router.post("/import", llmLimit, upload.single("image"), analyzeChart);

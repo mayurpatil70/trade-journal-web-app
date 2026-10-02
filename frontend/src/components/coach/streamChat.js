@@ -18,7 +18,8 @@ export async function streamChat({ message, history, userId, regenerate, signal,
 
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
-    throw new Error(body.error || `Request failed (${res.status})`);
+    const fallback = res.status === 413 ? "That request was too large. Try a shorter message." : `Request failed (${res.status})`;
+    throw new Error(body.error || fallback);
   }
 
   const reader = res.body.getReader();

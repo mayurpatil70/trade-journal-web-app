@@ -37,12 +37,24 @@ export function isOverloadError(err) {
   return /overload|temporarily|rate limit|capacity/i.test(err?.message ?? "");
 }
 
+const EMPTY_REPLY = "The model returned an empty reply.";
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-export const friendlyAiError = (err) =>
-  isOverloadError(err)
-    ? "The AI coach is busy right now. Please try again in a moment."
-    : `AI Error: ${err.message}`;
+export const isMultimodalError = (err) =>
+  /multimodal|image_url|image input|does not support (image|vision)|vision/i.test(err?.message ?? "");
+
+export function friendlyAiError(err) {
+  if (isMultimodalError(err)) return "The AI coach can't read images right now. Please describe the chart in text instead.";
+  if (err?.status === 413 || /payload too large|request entity too large/i.test(err?.message ?? "")) {
+    return "That request was too large. Try a smaller image or a shorter message.";
+  }
+  if (err?.name === "AbortError" || err?.name === "APIUserAbortError" || /timed? ?out/i.test(err?.message ?? "")) {
+    return "The AI coach took too long to respond. Please try again.";
+  }
+  if (isOverloadError(err)) return "The AI coach is busy right now. Please try again in a moment.";
+  if (err?.message === EMPTY_REPLY) return "The AI coach returned an empty reply. Please try again.";
+  return `AI Error: ${err?.message ?? "unknown error"}`;
+}
 
 console.log(
   "[AI] Using NVIDIA key prefix:",
@@ -357,17 +369,21 @@ export async function buildChatContext({ userId, message }, deps = {}) {
   };
 }
 
+const stripDataUrls = (text) => text.replace(/data:[\w/+.-]+;base64,[A-Za-z0-9+/=]+/g, "[image]");
+
 function parseChatRequest(body) {
   const { message, history = [], userId, regenerate = false } = body ?? {};
-  if (typeof message !== "string" || !message.trim()) return { error: "Message is required." };
-  if (message.length > MAX_MESSAGE_CHARS) {
+  const trimmed = typeof message === "string" ? message.trim() : "";
+  if (!trimmed) return { error: "Message is required." };
+  if (trimmed.length > MAX_MESSAGE_CHARS) {
     return { error: `Message is too long (max ${MAX_MESSAGE_CHARS} characters).` };
   }
   const safeHistory = (Array.isArray(history) ? history : [])
-    .filter((m) => m && typeof m.text === "string" && m.text)
-    .slice(-MAX_HISTORY)
-    .map((m) => ({ sender: m.sender, text: m.text.slice(0, 4000) }));
-  return { message: message.trim(), history: safeHistory, userId: userId || null, replace: regenerate === true };
+    .filter((m) => m && typeof m.text === "string")
+    .map((m) => ({ sender: m.sender === "ai" ? "ai" : "user", text: stripDataUrls(m.text).trim().slice(0, 4000) }))
+    .filter((m) => m.text)
+    .slice(-MAX_HISTORY);
+  return { message: trimmed, history: safeHistory, userId: userId || null, replace: regenerate === true };
 }
 
 async function dropLastExchange(userId, db) {
@@ -391,22 +407,32 @@ async function saveExchange(userId, userText, replyText, { replace = false, db =
 }
 
 function attachImageIfPresent(req, messages) {
-  if (req.file) {
-    const base64Image = req.file.buffer.toString("base64");
-    const mimeType = req.file.mimetype;
-    const dataUrl = `data:${mimeType};base64,${base64Image}`;
-    const lastMsg = messages[messages.length - 1];
-    messages[messages.length - 1] = {
-      role: "user",
-      content: [
-        { type: "text", text: lastMsg.content || "Analyze this chart." },
-        { type: "image_url", image_url: { url: dataUrl } },
-      ],
-    };
-  }
+  if (!req.file) return false;
+  const dataUrl = `data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}`;
+  const lastMsg = messages[messages.length - 1];
+  messages[messages.length - 1] = {
+    role: "user",
+    content: [
+      { type: "text", text: lastMsg.content || "Analyze this chart." },
+      { type: "image_url", image_url: { url: dataUrl } },
+    ],
+  };
+  return true;
+}
+
+export const IMAGE_UNAVAILABLE_NOTE =
+  "[The user attached an image, but you cannot view images right now. Tell them briefly and ask them to describe the chart in text.]";
+
+export function withoutImages(messages) {
+  return messages.map((m) => {
+    if (!Array.isArray(m.content)) return m;
+    const text = m.content.filter((p) => p.type === "text").map((p) => p.text).join("\n");
+    return { ...m, content: `${text}\n\n${IMAGE_UNAVAILABLE_NOTE}` };
+  });
 }
 
 export const chatWithCoach = async (req, res) => {
+  req.body ??= {};
   if (typeof req.body.history === "string") {
     try { req.body.history = JSON.parse(req.body.history); } catch { req.body.history = []; }
   }
@@ -418,9 +444,16 @@ export const chatWithCoach = async (req, res) => {
     const ctx = await buildChatContext(parsed);
     const systemPrompt = buildCoachSystemPrompt(ctx);
     const messages = buildChatMessages(parsed.history, parsed.message, systemPrompt);
-    attachImageIfPresent(req, messages);
-    const text = stripThinking(await nimComplete(messages, CHAT_OPTS));
-    if (!text) throw new Error("The model returned an empty reply.");
+    const hasImage = attachImageIfPresent(req, messages);
+    let raw;
+    try {
+      raw = await nimComplete(messages, CHAT_OPTS);
+    } catch (err) {
+      if (!hasImage || !isMultimodalError(err)) throw err;
+      raw = await nimComplete(withoutImages(messages), CHAT_OPTS);
+    }
+    const text = stripThinking(raw);
+    if (!text) throw new Error(EMPTY_REPLY);
     await saveExchange(parsed.userId, parsed.message, text, { replace: parsed.replace });
     res.status(200).json({ success: true, text, context: ctx.meta });
   } catch (error) {
@@ -431,6 +464,7 @@ export const chatWithCoach = async (req, res) => {
 
 /** Same as chatWithCoach but streams Server-Sent Events: context, thinking, delta, done, error. */
 export const streamCoachChat = async (req, res) => {
+  req.body ??= {};
   if (typeof req.body.history === "string") {
     try { req.body.history = JSON.parse(req.body.history); } catch { req.body.history = []; }
   }
@@ -456,21 +490,29 @@ export const streamCoachChat = async (req, res) => {
     send({ type: "context", ...ctx.meta });
 
     const messages = buildChatMessages(parsed.history, parsed.message, buildCoachSystemPrompt(ctx));
-    attachImageIfPresent(req, messages);
+    const hasImage = attachImageIfPresent(req, messages);
     let reply = "";
     let thinking = false;
-    for await (const part of nimStream(messages, { ...CHAT_OPTS, signal: abort.signal })) {
-      if (part.type === "content") {
-        reply += part.text;
-        send({ type: "delta", text: part.text });
-      } else if (!thinking) {
-        thinking = true;
-        send({ type: "thinking" });
+    const consume = async (msgs) => {
+      for await (const part of nimStream(msgs, { ...CHAT_OPTS, signal: abort.signal })) {
+        if (part.type === "content") {
+          reply += part.text;
+          send({ type: "delta", text: part.text });
+        } else if (!thinking) {
+          thinking = true;
+          send({ type: "thinking" });
+        }
       }
+    };
+    try {
+      await consume(messages);
+    } catch (err) {
+      if (!hasImage || reply || !isMultimodalError(err)) throw err;
+      await consume(withoutImages(messages));
     }
 
     const text = stripThinking(reply);
-    if (!text) throw new Error("The model returned an empty reply.");
+    if (!text) throw new Error(EMPTY_REPLY);
     await saveExchange(parsed.userId, parsed.message, text, { replace: parsed.replace });
     send({ type: "done" });
   } catch (error) {
