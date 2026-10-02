@@ -90,7 +90,7 @@ export default function PreTradeGate() {
       text: userText,
       imagePreview: imagePreview || null, // store preview for display
     };
-    const currentHistory = [...chatHistory];
+    const currentHistory = chatHistory.map(({ sender, text }) => ({ sender, text }));
 
     setChatHistory((prev) => [...prev, userMessage]);
     setMessage("");
@@ -125,7 +125,10 @@ export default function PreTradeGate() {
       ]);
     } catch (error) {
       console.error("Chat error:", error);
-      const errMsg = error?.response?.data?.error || error.message || "Connection failed";
+      const status = error?.response?.status;
+      const errMsg =
+        error?.response?.data?.error ||
+        (status === 413 ? "That request was too large. Try a smaller image." : error.message || "Connection failed");
       setChatHistory((prev) => [
         ...prev,
         { sender: "ai", text: `Something went wrong: ${errMsg}` },
