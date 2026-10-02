@@ -331,7 +331,7 @@ export default function LotSizeCalculator() {
                 className="w-full bg-gray-50 dark:bg-[#0b131d] border border-gray-200 dark:border-white/10 rounded-xl px-4 py-3.5 text-base font-bold text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all"
               >
                 {INSTRUMENTS.map((inst) => (
-                  <option key={inst.symbol} value={inst.symbol}>
+                  <option key={inst.symbol} value={inst.symbol} className="bg-white dark:bg-[#0b131d] text-blue-600 dark:text-blue-400 font-bold">
                     {inst.name}
                   </option>
                 ))}

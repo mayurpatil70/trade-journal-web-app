@@ -32,6 +32,15 @@ export default function AdminDashboard() {
 
   useEffect(() => { fetchData(); }, []);
 
+  const handleVerifyOrder = async (orderId) => {
+    try {
+      await api.put(`/api/admin/subscription/${orderId}`, { status: "paid" });
+      await fetchData();
+    } catch (error) {
+      alert("Failed to verify subscription");
+    }
+  };
+
   const handleDeleteOrder = async (orderId) => {
     if (!window.confirm("Revoke this subscription? The user will lose access.")) return;
     try {
@@ -153,8 +162,8 @@ export default function AdminDashboard() {
                     </div>
                   </td>
                   <td className="py-3 pr-4">
-                    {ord.screenshot_url ? (
-                      <a href={ord.screenshot_url} target="_blank" rel="noreferrer"
+                    {ord.payment_screenshot ? (
+                      <a href={ord.payment_screenshot} target="_blank" rel="noreferrer"
                         className="flex items-center gap-1 text-[#2f8df4] hover:underline text-[10px] font-bold">
                         View <ExternalLink className="w-3 h-3" />
                       </a>
@@ -171,10 +180,18 @@ export default function AdminDashboard() {
                     </span>
                   </td>
                   <td className="py-3 text-right">
-                    <button onClick={() => handleDeleteOrder(ord.id)}
-                      className="bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white border border-red-500/20 px-3 py-1.5 rounded-xl text-[10px] uppercase font-bold transition-all flex items-center gap-1 ml-auto">
-                      <Trash2 className="w-3 h-3" /> Revoke
-                    </button>
+                    <div className="flex items-center justify-end gap-2">
+                      {ord.status === "pending" && (
+                        <button onClick={() => handleVerifyOrder(ord.id)}
+                          className="bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500 hover:text-white border border-emerald-500/20 px-3 py-1.5 rounded-xl text-[10px] uppercase font-bold transition-all">
+                          Verify
+                        </button>
+                      )}
+                      <button onClick={() => handleDeleteOrder(ord.id)}
+                        className="bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white border border-red-500/20 px-3 py-1.5 rounded-xl text-[10px] uppercase font-bold transition-all flex items-center gap-1">
+                        <Trash2 className="w-3 h-3" /> Revoke
+                      </button>
+                    </div>
                   </td>
                 </tr>
               )) : (

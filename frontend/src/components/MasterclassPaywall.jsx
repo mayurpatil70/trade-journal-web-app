@@ -46,15 +46,38 @@ export default function MasterclassPaywall() {
     if (txHash.length < 10)
       return alert("Please enter a valid Transaction Hash.");
     setIsProcessing(true);
-    // Note: this is a dummy verification since it's a separate product.
-    // We just simulate wait, then redirect to the discord webhook.
+    
+    const userId =
+      localStorage.getItem("userId") || localStorage.getItem("userEmail");
 
-    setTimeout(() => {
-      setStep(3); // Success Screen
-      setTimeout(() => {
-        window.location.href = process.env.DISCORD_PROPFIRM_WEBHOOK;
-      }, 2500);
-    }, 2000);
+    try {
+      const submitData = new FormData();
+      submitData.append("userId", userId);
+      submitData.append("txHash", txHash.trim());
+      submitData.append("chain", chain);
+      
+      const fileInput = document.getElementById("masterclass-payment-screenshot");
+      if (fileInput && fileInput.files[0]) {
+        submitData.append("screenshot", fileInput.files[0]);
+      } else {
+        return alert("Please upload a payment screenshot.");
+      }
+
+      await api.post("/api/subscriptions/masterclass/verify", submitData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      setStep(3); // Success/Pending Screen
+      // Only redirect if they want to discord automatically, but we want pending state.
+      // So let's just let it be pending.
+    } catch (error) {
+      alert(
+        error.response?.data?.error ||
+          "Payment verification failed."
+      );
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   if (!config)
@@ -137,6 +160,18 @@ export default function MasterclassPaywall() {
 
           <div className="max-w-sm mx-auto pt-4 border-t border-white/5 space-y-2">
             <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">
+              Payment Screenshot
+            </label>
+            <input
+              id="masterclass-payment-screenshot"
+              type="file"
+              accept="image/*"
+              className="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-yellow-500/20 file:text-yellow-500 hover:file:bg-yellow-500/30 transition-all cursor-pointer"
+            />
+          </div>
+
+          <div className="max-w-sm mx-auto pt-4 border-t border-white/5 space-y-2">
+            <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">
               Transaction Hash (TXID)
             </label>
             <input
@@ -174,12 +209,12 @@ export default function MasterclassPaywall() {
 
       {step === 3 && (
         <div className="p-8 flex flex-col items-center text-center space-y-4 animate-in zoom-in-95">
-          <div className="w-16 h-16 bg-emerald-500/10 rounded-full flex items-center justify-center border border-emerald-500/20 mb-2">
-            <ShieldCheck className="w-8 h-8 text-emerald-500" />
+          <div className="w-16 h-16 bg-yellow-500/10 rounded-full flex items-center justify-center border border-yellow-500/20 mb-2">
+            <ShieldCheck className="w-8 h-8 text-yellow-500" />
           </div>
-          <h3 className="text-2xl font-black text-white">Payment Verified!</h3>
+          <h3 className="text-2xl font-black text-white">Payment Pending Verification</h3>
           <p className="text-sm text-gray-400">
-            Redirecting you to the Private Masterclass Server...
+            Your payment has been submitted. Our admin team will verify it shortly.
           </p>
           <Loader2 className="w-6 h-6 text-yellow-500 animate-spin mt-4" />
         </div>

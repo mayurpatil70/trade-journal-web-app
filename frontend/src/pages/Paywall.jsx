@@ -52,17 +52,22 @@ export default function Paywall() {
       localStorage.getItem("userId") || localStorage.getItem("userEmail");
 
     try {
-      await api.post("/api/subscriptions/verify", {
-        userId,
-        txHash: txHash.trim(),
-        chain,
+      const submitData = new FormData();
+      submitData.append("userId", userId);
+      submitData.append("txHash", txHash.trim());
+      submitData.append("chain", chain);
+      const fileInput = document.getElementById("payment-screenshot");
+      if (fileInput && fileInput.files[0]) {
+        submitData.append("screenshot", fileInput.files[0]);
+      } else {
+        return alert("Please upload a payment screenshot.");
+      }
+
+      const res = await api.post("/api/subscriptions/verify", submitData, {
+        headers: { "Content-Type": "multipart/form-data" },
       });
 
-      setStep(3); // Success Screen
-      setTimeout(() => {
-        // Hard refresh to clear the PaywallGuard cache and load the app
-        window.location.href = "/dashboard";
-      }, 2500);
+      setStep(3); // Success/Pending Screen
     } catch (error) {
       alert(
         error.response?.data?.error ||
@@ -223,6 +228,7 @@ export default function Paywall() {
                     Payment Screenshot
                   </label>
                   <input
+                    id="payment-screenshot"
                     type="file"
                     accept="image/*"
                     className="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-blue-500/20 file:text-blue-400 hover:file:bg-blue-500/30 transition-all cursor-pointer"
@@ -268,16 +274,16 @@ export default function Paywall() {
 
             {step === 3 && (
               <div className="py-8 flex flex-col items-center text-center space-y-4 animate-in zoom-in-95">
-                <div className="w-20 h-20 bg-emerald-500/10 rounded-full flex items-center justify-center border border-emerald-500/20 mb-2">
-                  <ShieldCheck className="w-10 h-10 text-emerald-500" />
+                <div className="w-20 h-20 bg-yellow-500/10 rounded-full flex items-center justify-center border border-yellow-500/20 mb-2">
+                  <ShieldCheck className="w-10 h-10 text-yellow-500" />
                 </div>
                 <h3 className="text-2xl font-black text-white">
-                  Access Granted!
+                  Payment Pending Verification
                 </h3>
                 <p className="text-sm text-gray-400">
-                  Your payment was verified. Loading your dashboard...
+                  Your payment has been submitted. Our admin team will verify it shortly. You will get access once verified.
                 </p>
-                <Loader2 className="w-6 h-6 text-[#2f8df4] animate-spin mt-4" />
+                <Loader2 className="w-6 h-6 text-yellow-500 animate-spin mt-4" />
               </div>
             )}
           </div>

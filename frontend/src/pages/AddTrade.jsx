@@ -23,13 +23,13 @@ export default function AddTrade() {
   const assets = [
     "XAUUSD", "NAS100", "GER40", "US30", "EURUSD", "GBPUSD",
     "USDJPY", "AUDUSD", "USDCAD", "EURJPY", "BTCUSD", "ETHUSD",
-    "SILVER", "USOIL",
+    "SILVER", "USOIL", "Other",
   ];
   const setups = ["FVG", "SMT", "Liquidity Sweep", "Order Block", "Breakout", "Pullback", "Other"];
   const emotions = [
     "Calm", "Confident", "Focused", "Neutral", "Excited",
     "FOMO", "Anxious", "Fearful", "Revenge", "Impatient",
-    "Greedy", "Tired", "Frustrated", "Overconfident",
+    "Greedy", "Tired", "Frustrated", "Overconfident", "Other",
   ];
 
   const [formData, setFormData] = useState({
@@ -53,11 +53,15 @@ export default function AddTrade() {
     psychNote: "",
   });
 
+  const [customFields, setCustomFields] = useState({});
   const [images, setImages] = useState([null, null]);
   const imageLabels = ["Before (Entry Chart)", "After (Exit Chart)"];
 
   const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    
+  const handleCustomChange = (e) =>
+    setCustomFields({ ...customFields, [e.target.name]: e.target.value });
 
   const handleImageChange = (index, e) => {
     const file = e.target.files[0];
@@ -83,7 +87,10 @@ export default function AddTrade() {
     try {
       const submitData = new FormData();
       submitData.append("userId", userId);
-      Object.keys(formData).forEach((key) => submitData.append(key, formData[key]));
+      Object.keys(formData).forEach((key) => {
+        const val = formData[key] === "Other" && customFields[key] ? customFields[key] : formData[key];
+        submitData.append(key, val);
+      });
       images.forEach((img) => { if (img) submitData.append("images", img); });
 
       await api.post("/api/trades", submitData, {
@@ -176,6 +183,9 @@ export default function AddTrade() {
                 </select>
                 <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-blue-400 pointer-events-none" />
               </div>
+              {formData.asset === "Other" && (
+                <input type="text" name="asset" placeholder="Type custom asset" value={customFields.asset || ""} onChange={handleCustomChange} className={`${inputClass} mt-2`} />
+              )}
             </div>
             <div className={inputContainerClass}>
               <label className={labelClass}>Direction</label>
@@ -197,6 +207,9 @@ export default function AddTrade() {
                 </select>
                 <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-blue-400 pointer-events-none" />
               </div>
+              {formData.session === "Other" && (
+                <input type="text" name="session" placeholder="Type custom session" value={customFields.session || ""} onChange={handleCustomChange} className={`${inputClass} mt-2`} />
+              )}
             </div>
             <div className={inputContainerClass}>
               <label className={labelClass}>Setup Type</label>
@@ -206,6 +219,9 @@ export default function AddTrade() {
                 </select>
                 <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-blue-400 pointer-events-none" />
               </div>
+              {formData.setup === "Other" && (
+                <input type="text" name="setup" placeholder="Type custom setup" value={customFields.setup || ""} onChange={handleCustomChange} className={`${inputClass} mt-2`} />
+              )}
             </div>
             {[
               { label: "Entry Price", name: "entry", placeholder: "0.0000" },
@@ -294,6 +310,9 @@ export default function AddTrade() {
                     </select>
                     <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-blue-400 pointer-events-none" />
                   </div>
+                  {formData[field] === "Other" && (
+                    <input type="text" name={field} placeholder="Type custom emotion" value={customFields[field] || ""} onChange={handleCustomChange} className={`${inputClass} mt-2`} />
+                  )}
                 </div>
               ))}
             </div>

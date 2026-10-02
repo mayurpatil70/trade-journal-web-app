@@ -8,6 +8,22 @@ import { sendRevenueAlert } from "../utils/discordWebhook.js";
 // FIX: Point to the new chain verifier utility
 import { verifyPayment } from "../utils/chainVerifier.js";
 
+import { v2 as cloudinary } from "cloudinary";
+import { upload } from "../middlewares/upload.js";
+
+const uploadToCloudinary = (buffer) => {
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      { folder: "forex_notes_payments" },
+      (error, result) => {
+        if (error) reject(error);
+        else resolve(result.secure_url);
+      },
+    );
+    stream.end(buffer);
+  });
+};
+
 const router = express.Router();
 const JOURNAL_PRICE = 11.0;
 
@@ -54,9 +70,14 @@ router.get("/status/:userId", async (req, res) => {
 });
 
 // 3. Verify Payment & Unlock App
-router.post("/verify", requireAuth, async (req, res) => {
+router.post("/verify", requireAuth, upload.single("screenshot"), async (req, res) => {
   try {
-    const { userId, txHash, chain, paymentScreenshot } = req.body;
+    const { userId, txHash, chain } = req.body;
+    let paymentScreenshot = null;
+
+    if (req.file) {
+      paymentScreenshot = await uploadToCloudinary(req.file.buffer);
+    }
 
     if (!txHash || !chain || !userId) {
       return res
@@ -128,7 +149,75 @@ router.post("/verify", requireAuth, async (req, res) => {
   }
 });
 
-// 4. Admin route to fetch pending payments
+// 4. Verify Masterclass Payment
+router.post("/masterclass/verify", requireAuth, upload.single("screenshot"), async (req, res) => {
+  try {
+    const { userId, txHash, chain } = req.body;
+    let paymentScreenshot = null;
+
+    if (req.file) {
+      paymentScreenshot = await uploadToCloudinary(req.file.buffer);
+    }
+
+    if (!txHash || !chain || !userId) {
+      return res.status(400).json({ error: "Missing required payment details." });
+    }
+
+    if (!/^0x([A-Fa-f0-9]{64})$/.test(txHash)) {
+      return res.status(400).json({ error: "Invalid transaction hash format." });
+    }
+
+    const { data: used } = await supabase
+      .from("journal_subscriptions")
+      .select("id")
+      .eq("tx_hash", txHash)
+      .maybeSingle();
+
+    if (used) return res.status(409).json({ error: "Transaction hash already used." });
+
+    const MASTERCLASS_PRICE = 7.0;
+    const since = Date.now() - 24 * 60 * 60 * 1000;
+    const check = await verifyPayment({ chain, txHash, amount: MASTERCLASS_PRICE, since });
+
+    if (!check.ok) return res.status(422).json({ error: check.reason || "Payment verification failed." });
+
+    const status = check.status || "pending";
+
+    const { error: insertErr } = await supabase
+      .from("journal_subscriptions")
+      .insert({
+        user_id: userId,
+        status: status,
+        amount_usdt: MASTERCLASS_PRICE,
+        chain,
+        tx_hash: txHash,
+        payment_screenshot: paymentScreenshot,
+        paid_at: new Date().toISOString(),
+      });
+
+    if (insertErr) throw insertErr;
+
+    await sendRevenueAlert({
+      type: "Masterclass Access",
+      userId,
+      amount: MASTERCLASS_PRICE,
+      chain,
+      txHash,
+      screenshot: paymentScreenshot,
+    });
+
+    if (status === "pending") {
+      res.json({ success: true, message: "Payment submitted! Awaiting admin approval." });
+    } else {
+      res.json({ success: true, message: "Payment verified!" });
+    }
+  } catch (error) {
+    console.error("Masterclass verification failed:", error);
+    res.status(500).json({ error: "Verification failed. Please try again." });
+  }
+});
+
+// 5. Admin route to fetch pending payments
 router.get("/admin/pending", requireAuth, requireAdmin, async (req, res) => {
   try {
     const { data, error } = await supabase

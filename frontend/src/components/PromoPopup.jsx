@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, Sparkles, ArrowRight } from 'lucide-react';
+import { X, Activity, ArrowRight } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 export default function PromoPopup() {
@@ -20,24 +20,29 @@ export default function PromoPopup() {
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
-      <div className="relative w-full max-w-md bg-gradient-to-br from-[#121418] to-[#0a0a0a] border border-white/10 rounded-3xl shadow-[0_0_80px_rgba(236,72,153,0.15)] overflow-hidden">
+      <div className="relative w-full max-w-md bg-gradient-to-br from-[#121418] to-[#0a0a0a] border border-white/10 rounded-3xl shadow-[0_0_80px_rgba(47,141,244,0.15)] overflow-hidden">
         {/* Glossy Overlay */}
         <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-white/10 pointer-events-none" />
         
         {/* Glow Effects */}
-        <div className="absolute -top-24 -right-24 w-48 h-48 bg-pink-500/30 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-blue-500/30 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -top-24 -right-24 w-48 h-48 bg-blue-500/30 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-cyan-500/30 rounded-full blur-3xl pointer-events-none" />
 
         <button
-          onClick={() => setIsOpen(false)}
-          className="absolute top-4 right-4 z-10 p-2 rounded-full bg-black/40 text-gray-400 hover:text-white hover:bg-black/60 transition-colors border border-white/10 backdrop-blur-md"
+          type="button"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setIsOpen(false);
+          }}
+          className="absolute top-4 right-4 z-[110] p-2 rounded-full bg-black/40 text-gray-400 hover:text-white hover:bg-black/60 transition-colors border border-white/10 backdrop-blur-md cursor-pointer"
         >
           <X className="w-4 h-4" />
         </button>
 
         <div className="p-8 relative z-10 flex flex-col items-center text-center">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-pink-500 to-purple-500 flex items-center justify-center shadow-lg shadow-pink-500/30 mb-6">
-            <Sparkles className="w-8 h-8 text-white" />
+          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-blue-500/30 mb-6">
+            <Activity className="w-8 h-8 text-white" />
           </div>
 
           <h2 className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400 mb-3 leading-tight">

@@ -71,13 +71,29 @@ router.delete("/subscription/:id", async (req, res) => {
 router.delete("/user/:userId", async (req, res) => {
   try {
     const { userId } = req.params;
-    const { error } = await supabase
+    
+    // 1. Delete from journal_subscriptions (logs them out of $11 model / paywall)
+    const { error: subError } = await supabase
       .from("journal_subscriptions")
       .delete()
       .eq("user_id", userId);
+    if (subError) console.error(subError);
 
-    if (error) throw error;
-    res.json({ success: true, message: "User subscriptions deleted successfully." });
+    // 2. Delete all their trades
+    const { error: tradesError } = await supabase
+      .from("trades")
+      .delete()
+      .eq("user_id", userId);
+    if (tradesError) console.error(tradesError);
+
+    // 3. Delete from users table
+    const { error: userError } = await supabase
+      .from("users")
+      .delete()
+      .eq("id", userId);
+    if (userError) console.error(userError);
+
+    res.json({ success: true, message: "User data and subscription deleted successfully." });
   } catch (error) {
     console.error("Delete user error:", error);
     res.status(500).json({ success: false, error: "Failed to delete user." });

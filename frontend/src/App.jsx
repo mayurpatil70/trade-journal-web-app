@@ -29,7 +29,6 @@ const AddTrade = lazy(() => import("./pages/AddTrade.jsx"));
 const PastTrades = lazy(() => import("./pages/PastTrades.jsx"));
 const Dashboard = lazy(() => import("./pages/Dashboard.jsx"));
 const PerformanceCalendar = lazy(() => import("./pages/PerformanceCalendar.jsx"));
-const Imports = lazy(() => import("./pages/Imports.jsx"));
 const PropAccounts = lazy(() => import("./pages/PropAccounts.jsx"));
 const Settings = lazy(() => import("./pages/Settings.jsx"));
 const Profile = lazy(() => import("./pages/Profile.jsx"));
@@ -136,7 +135,6 @@ function App() {
                   <Route path="news" element={<EconomicCalendar />} />
                   <Route path="trades" element={<PastTrades />} />
                   <Route path="calendar" element={<PerformanceCalendar />} />
-                  <Route path="import" element={<Imports />} />
                   <Route path="accounts" element={<PropAccounts />} />
                   <Route path="settings" element={<Settings />} />
                   <Route path="profile" element={<Profile />} />
