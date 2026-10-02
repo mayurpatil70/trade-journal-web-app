@@ -1,15 +1,9 @@
 // src/components/landing/LandingHero.jsx
-// The main scrollytelling hero section
-// Uses GSAP ScrollTrigger + Lenis for cinematic scroll-pinning
+// The main hero text and 3D candlestick section
 
-import { useRef, useEffect, lazy, Suspense } from 'react';
+import { lazy, Suspense } from 'react';
 import { Link } from 'react-router-dom';
-import gsap from 'gsap';
-import ScrollTrigger from 'gsap/ScrollTrigger';
 import { ArrowRight, MessageSquare, Zap, ShieldCheck, Brain, TrendingUp, Calculator } from 'lucide-react';
-import DashboardMockup from './DashboardMockup';
-
-gsap.registerPlugin(ScrollTrigger);
 
 // Lazy load Three.js scene only on desktop
 const CandlestickScene = lazy(() => import('./CandlestickScene'));
@@ -22,104 +16,52 @@ const TRADER_HINTS = [
   { icon: TrendingUp, label: 'R-Multiple Analytics Engine', color: '#22d3ee', bg: 'rgba(34,211,238,0.1)', border: 'rgba(34,211,238,0.25)' },
 ];
 
+const LIVE_FEEDS = [
+  { id: 1, title: 'AI Blocked Trade', detail: 'Revenge trade detected', time: 'Just now', color: '#ec4899' },
+  { id: 2, title: 'Prop Limit Alert', detail: '75% daily drawdown', time: '2m ago', color: '#10b981' },
+  { id: 3, title: 'Trade Logged', detail: '+4.2R Win (EURUSD)', time: '5m ago', color: '#2f8df4' },
+  { id: 4, title: 'AI Insight', detail: 'You perform best in London session', time: '12m ago', color: '#22d3ee' },
+  // Duplicates for seamless infinite marquee scroll
+  { id: 5, title: 'AI Blocked Trade', detail: 'Revenge trade detected', time: 'Just now', color: '#ec4899' },
+  { id: 6, title: 'Prop Limit Alert', detail: '75% daily drawdown', time: '2m ago', color: '#10b981' },
+  { id: 7, title: 'Trade Logged', detail: '+4.2R Win (EURUSD)', time: '5m ago', color: '#2f8df4' },
+  { id: 8, title: 'AI Insight', detail: 'You perform best in London session', time: '12m ago', color: '#22d3ee' },
+];
+
 export default function LandingHero() {
-  const pinContainerRef = useRef(null);
-  const stickyRef = useRef(null);
-  const textRef = useRef(null);
-  const mockupWrapRef = useRef(null);
-  const canvasRef = useRef(null);
-  const scrollProgress = useRef(0);
   const isDesktop = typeof window !== 'undefined' && window.innerWidth >= 768;
-
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: pinContainerRef.current,
-          start: 'top top',
-          end: '+=180%',
-          pin: stickyRef.current,
-          scrub: 1.4,
-          onUpdate: (self) => {
-            scrollProgress.current = self.progress;
-          },
-        },
-      });
-
-      // Text block fades out
-      tl.to(textRef.current, {
-        opacity: 0,
-        y: -50,
-        duration: 0.4,
-      }, 0);
-
-      // 3D canvas fades left
-      if (canvasRef.current) {
-        tl.to(canvasRef.current, {
-          x: -60,
-          opacity: 0,
-          duration: 0.4,
-        }, 0);
-      }
-
-      // Dashboard mockup scales up from perspective-tilted state to full flat
-      tl.fromTo(
-        mockupWrapRef.current,
-        {
-          scale: 0.58,
-          rotateX: 18,
-          y: 60,
-          opacity: 0.6,
-        },
-        {
-          scale: 1,
-          rotateX: 0,
-          y: 0,
-          opacity: 1,
-          duration: 1,
-          ease: 'power2.out',
-        },
-        0
-      );
-    }, pinContainerRef);
-
-    return () => ctx.revert();
-  }, []);
+  
+  // Create a dummy ref object to pass to CandlestickScene since it expects a scrollProgress ref
+  // but we removed the GSAP pinning here. It will just default to 0.
+  const dummyProgress = { current: 0 };
 
   return (
-    <div ref={pinContainerRef} style={{ height: '280vh', position: 'relative' }}>
+    <div style={{ position: 'relative', overflow: 'hidden', paddingTop: '120px', paddingBottom: '60px' }}>
       <div
-        ref={stickyRef}
-        className="flex flex-col items-center justify-start md:justify-center pt-24 md:pt-0 px-5"
-        style={{
-          position: 'sticky',
-          top: 0,
-          height: '100vh',
-          overflow: 'hidden',
-        }}
+        className="flex flex-col items-center justify-center px-5"
+        style={{ minHeight: '60vh' }}
       >
         {/* Text + 3D Row */}
         <div
-          ref={textRef}
           className="flex flex-col md:flex-row items-center justify-center"
           style={{
             width: '100%',
             maxWidth: '1100px',
             gap: '40px',
-            marginBottom: '40px',
             position: 'relative',
             zIndex: 2,
           }}
         >
-          {/* 3D Candlestick */}
+          {/* 3D Candlestick - Desktop Only */}
           <div
-            ref={canvasRef}
-            className="order-2 md:order-1"
+            className="hidden md:block order-2 md:order-1"
             style={{ width: '220px', height: '200px', flexShrink: 0 }}
           >
-            <Suspense fallback={<div style={{ width: '100%', height: '100%' }} />}>
-              <CandlestickScene scrollProgress={scrollProgress} />
-            </Suspense>
+            {isDesktop && (
+              <Suspense fallback={<div style={{ width: '100%', height: '100%' }} />}>
+                <CandlestickScene scrollProgress={dummyProgress} />
+              </Suspense>
+            )}
           </div>
 
           {/* Hero Text */}
@@ -144,12 +86,12 @@ export default function LandingHero() {
             </div>
 
             <h1 style={{
-              fontSize: 'clamp(2rem, 5vw, 3.8rem)',
+              fontSize: 'clamp(2.5rem, 6vw, 4.2rem)',
               fontWeight: 900,
-              lineHeight: 1.08,
+              lineHeight: 1.05,
               letterSpacing: '-0.03em',
               color: 'white',
-              marginBottom: '16px',
+              marginBottom: '20px',
             }}>
               Stop Bleeding Capital<br />
               <span style={{
@@ -163,24 +105,24 @@ export default function LandingHero() {
             </h1>
 
             <p style={{
-              fontSize: 'clamp(13px, 1.5vw, 15px)',
-              color: 'rgba(255,255,255,0.5)',
-              lineHeight: 1.7,
-              marginBottom: '24px',
-              maxWidth: '480px',
+              fontSize: 'clamp(14px, 1.5vw, 16px)',
+              color: 'rgba(255,255,255,0.6)',
+              lineHeight: 1.6,
+              marginBottom: '32px',
+              maxWidth: '520px',
             }}>
-              The only trading journal that pairs your chart setups with an <strong style={{ color: 'rgba(255,255,255,0.75)' }}>AI psychology guard</strong>, <strong style={{ color: 'rgba(255,255,255,0.75)' }}>prop firm rule tracking</strong>, and <strong style={{ color: 'rgba(255,255,255,0.75)' }}>automated R-multiple analytics</strong> — all for a one-time $11 USDT.
+              The only trading journal that pairs your chart setups with an <strong style={{ color: 'rgba(255,255,255,0.8)' }}>AI psychology guard</strong>, <strong style={{ color: 'rgba(255,255,255,0.8)' }}>prop firm rule tracking</strong>, and <strong style={{ color: 'rgba(255,255,255,0.8)' }}>automated R-multiple analytics</strong> — all for a one-time $11 USDT.
             </p>
 
             {/* Trader Hint Chips */}
-            <div className="flex flex-wrap justify-center md:justify-start" style={{ gap: '8px', marginBottom: '28px' }}>
+            <div className="flex flex-wrap justify-center md:justify-start" style={{ gap: '8px', marginBottom: '32px' }}>
               {TRADER_HINTS.map(({ icon: Icon, label, color, bg, border }) => (
                 <div key={label} style={{
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: '6px',
-                  padding: '5px 12px',
-                  borderRadius: '8px',
+                  padding: '6px 14px',
+                  borderRadius: '10px',
                   background: bg,
                   border: `1px solid ${border}`,
                   fontSize: '11px',
@@ -188,43 +130,43 @@ export default function LandingHero() {
                   fontWeight: 600,
                   letterSpacing: '0.01em',
                 }}>
-                  <Icon size={11} />
+                  <Icon size={12} />
                   {label}
                 </div>
               ))}
             </div>
 
             {/* CTA Buttons */}
-            <div className="flex flex-wrap justify-center md:justify-start" style={{ gap: '12px' }}>
+            <div className="flex flex-wrap justify-center md:justify-start" style={{ gap: '14px' }}>
               <Link
                 to="/login"
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
-                  gap: '8px',
-                  padding: '13px 28px',
-                  borderRadius: '12px',
+                  gap: '10px',
+                  padding: '14px 32px',
+                  borderRadius: '14px',
                   background: 'linear-gradient(135deg, #2f8df4, #1d6fd8)',
                   color: 'white',
-                  fontSize: '13px',
-                  fontWeight: 700,
+                  fontSize: '14px',
+                  fontWeight: 800,
                   textDecoration: 'none',
                   boxShadow: '0 8px 32px rgba(47,141,244,0.4), 0 0 0 1px rgba(47,141,244,0.3)',
                   transition: 'transform 0.2s, box-shadow 0.2s',
                   letterSpacing: '0.01em',
                 }}
                 onMouseEnter={e => {
-                  e.currentTarget.style.transform = 'translateY(-1px)';
-                  e.currentTarget.style.boxShadow = '0 12px 40px rgba(47,141,244,0.5), 0 0 0 1px rgba(47,141,244,0.4)';
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 16px 40px rgba(47,141,244,0.5), 0 0 0 1px rgba(47,141,244,0.4)';
                 }}
                 onMouseLeave={e => {
                   e.currentTarget.style.transform = 'translateY(0)';
                   e.currentTarget.style.boxShadow = '0 8px 32px rgba(47,141,244,0.4), 0 0 0 1px rgba(47,141,244,0.3)';
                 }}
               >
-                <Zap size={14} />
+                <Zap size={16} />
                 Unlock Lifetime Access — $11 USDT
-                <ArrowRight size={14} />
+                <ArrowRight size={16} />
               </Link>
               <a
                 href="https://discord.gg/Ajaw3AjfWE"
@@ -234,12 +176,12 @@ export default function LandingHero() {
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: '8px',
-                  padding: '13px 22px',
-                  borderRadius: '12px',
+                  padding: '14px 26px',
+                  borderRadius: '14px',
                   background: 'rgba(255,255,255,0.04)',
                   border: '1px solid rgba(255,255,255,0.1)',
                   color: 'rgba(255,255,255,0.7)',
-                  fontSize: '13px',
+                  fontSize: '14px',
                   fontWeight: 600,
                   textDecoration: 'none',
                   transition: 'background 0.2s, color 0.2s',
@@ -253,54 +195,41 @@ export default function LandingHero() {
                   e.currentTarget.style.color = 'rgba(255,255,255,0.7)';
                 }}
               >
-                <MessageSquare size={14} color="#5865F2" />
+                <MessageSquare size={16} color="#5865F2" />
                 Join Trader Discord
               </a>
             </div>
           </div>
         </div>
 
-        {/* Perspective Dashboard Mockup */}
-        <div
-          ref={mockupWrapRef}
-          style={{
-            width: '100%',
-            maxWidth: '900px',
-            transformStyle: 'preserve-3d',
-            perspective: '1200px',
-            perspectiveOrigin: '50% 40%',
-            willChange: 'transform',
-          }}
-        >
-          {/* Glow behind mockup */}
+        {/* Floating Live Feed Cards (Right Side) */}
+        <div className="hidden xl:block absolute right-4 top-1/2" style={{ transform: 'translateY(-50%)', width: '260px', height: '400px', overflow: 'hidden', zIndex: 0, opacity: 0.7, pointerEvents: 'none' }}>
           <div style={{
-            position: 'absolute',
-            inset: '-20px',
-            background: 'radial-gradient(ellipse at 50% 100%, rgba(47,141,244,0.2) 0%, transparent 70%)',
-            filter: 'blur(30px)',
-            zIndex: 0,
-            borderRadius: '24px',
-          }} />
-          <div style={{ position: 'relative', zIndex: 1 }}>
-            <DashboardMockup />
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '16px',
+            animation: 'floatUp 25s linear infinite',
+          }}>
+            {LIVE_FEEDS.map((feed) => (
+              <div key={feed.id} style={{
+                padding: '16px',
+                background: 'rgba(255,255,255,0.03)',
+                backdropFilter: 'blur(10px)',
+                WebkitBackdropFilter: 'blur(10px)',
+                border: '1px solid rgba(255,255,255,0.06)',
+                borderRadius: '16px',
+                borderLeft: `4px solid ${feed.color}`,
+                boxShadow: '0 8px 24px rgba(0,0,0,0.3)',
+              }}>
+                <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)', marginBottom: '4px', letterSpacing: '0.05em', textTransform: 'uppercase', fontWeight: 600 }}>{feed.time}</div>
+                <div style={{ fontSize: '13px', fontWeight: 700, color: 'white', marginBottom: '4px', letterSpacing: '-0.02em' }}>{feed.title}</div>
+                <div style={{ fontSize: '12px', color: feed.color, fontWeight: 500 }}>{feed.detail}</div>
+              </div>
+            ))}
           </div>
-        </div>
-
-        {/* Scroll hint */}
-        <div style={{
-          position: 'absolute',
-          bottom: '32px',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: '6px',
-          opacity: 0.4,
-          animation: 'scrollBounce 2s ease-in-out infinite',
-        }}>
-          <span style={{ fontSize: '9px', color: 'white', letterSpacing: '0.15em', textTransform: 'uppercase', fontWeight: 600 }}>Scroll to explore</span>
-          <div style={{ width: 1, height: 28, background: 'linear-gradient(to bottom, white, transparent)' }} />
+          {/* Gradient masks for smooth fade at top/bottom */}
+          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '80px', background: 'linear-gradient(to bottom, #000, transparent)' }} />
+          <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '80px', background: 'linear-gradient(to top, #000, transparent)' }} />
         </div>
       </div>
     </div>

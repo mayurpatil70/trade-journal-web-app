@@ -370,6 +370,12 @@ LANDING PAGE ANIMATIONS
   50% { opacity: 0.6; transform: scale(0.85); }
 }
 
+/* Floating cards animation */
+@keyframes floatUp {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-50%); }
+}
+
 /* Glassmorphism card for landing */
 .glass-card-landing {
   background: rgba(12, 16, 24, 0.7);

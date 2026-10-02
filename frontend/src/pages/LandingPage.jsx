@@ -23,6 +23,8 @@ import {
 import { useLenis } from "../components/landing/useLenis";
 import AmbientBackground from "../components/landing/AmbientBackground";
 import LandingHero from "../components/landing/LandingHero";
+import MarketingVideos from "../components/landing/MarketingVideos";
+import LandingDashboard from "../components/landing/LandingDashboard";
 import FeaturesBento from "../components/landing/FeaturesBento";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -391,8 +393,14 @@ export default function LandingPage() {
           </div>
         </header>
 
-        {/* ── HERO (Scrollytelling) ── */}
+        {/* ── HERO (Text) ── */}
         <LandingHero />
+
+        {/* ── Marketing Videos ── */}
+        <MarketingVideos />
+
+        {/* ── Dashboard Mockup ── */}
+        <LandingDashboard />
 
         {/* ── Features Bento ── */}
         <FeaturesBento />
