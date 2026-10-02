@@ -35,6 +35,12 @@ const Profile = lazy(() => import("./pages/Profile.jsx"));
 const Support = lazy(() => import("./pages/Support.jsx"));
 const AdminDashboard = lazy(() => import("./pages/AdminDashboard.jsx"));
 
+// New Premium Workspaces
+const Analytics = lazy(() => import("./pages/Analytics.jsx"));
+const Psychology = lazy(() => import("./pages/Psychology.jsx"));
+const Mistakes = lazy(() => import("./pages/Mistakes.jsx"));
+const DailyJournal = lazy(() => import("./pages/DailyJournal.jsx"));
+
 const MainLayout = lazy(() => import("./layouts/MainLayout.jsx"));
 const PreTradeGate = lazy(() => import("./components/PreTradeGate.jsx"));
 
@@ -135,6 +141,10 @@ function App() {
                   <Route path="news" element={<EconomicCalendar />} />
                   <Route path="trades" element={<PastTrades />} />
                   <Route path="calendar" element={<PerformanceCalendar />} />
+                  <Route path="analytics" element={<Analytics />} />
+                  <Route path="psychology" element={<Psychology />} />
+                  <Route path="mistakes" element={<Mistakes />} />
+                  <Route path="daily-journal" element={<DailyJournal />} />
                   <Route path="accounts" element={<PropAccounts />} />
                   <Route path="settings" element={<Settings />} />
                   <Route path="profile" element={<Profile />} />

@@ -1,5 +1,4 @@
-// frontend/src/pages/AddTrade.jsx
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import api from "../api/axios";
 import {
@@ -12,17 +11,20 @@ import {
   Loader2,
   CheckCircle,
   ChevronDown,
-  Sparkles,
+  ArrowRight,
+  ArrowLeft,
+  Activity,
+  Check,
+  UploadCloud
 } from "lucide-react";
 
 export default function AddTrade() {
   const navigate = useNavigate();
   const location = useLocation();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [step, setStep] = useState(1);
 
-  const assets = [
-    "XAUUSD", "BTCUSD", "ETHUSD", "XAGUSD", "Other",
-  ];
+  const assets = ["XAUUSD", "BTCUSD", "ETHUSD", "XAGUSD", "Other"];
   const setups = ["FVG", "SMT", "Liquidity Sweep", "Order Block", "Breakout", "Pullback", "Other"];
   const emotions = [
     "Calm", "Confident", "Focused", "Neutral", "Excited",
@@ -53,13 +55,29 @@ export default function AddTrade() {
 
   const [customFields, setCustomFields] = useState({});
   const [images, setImages] = useState([null, null]);
-  const imageLabels = ["Before (Entry Chart)", "After (Exit Chart)"];
 
-  const handleChange = (e) =>
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-    
-  const handleCustomChange = (e) =>
-    setCustomFields({ ...customFields, [e.target.name]: e.target.value });
+  // Real-time R:R Calculations
+  const [calcRR, setCalcRR] = useState(0);
+  
+  useEffect(() => {
+    if (formData.entry && formData.sl && formData.tp) {
+      const entry = parseFloat(formData.entry);
+      const sl = parseFloat(formData.sl);
+      const tp = parseFloat(formData.tp);
+      
+      const risk = Math.abs(entry - sl);
+      const reward = Math.abs(tp - entry);
+      
+      if (risk > 0) {
+        setCalcRR((reward / risk).toFixed(2));
+      } else {
+        setCalcRR(0);
+      }
+    }
+  }, [formData.entry, formData.sl, formData.tp]);
+
+  const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
+  const handleCustomChange = (e) => setCustomFields({ ...customFields, [e.target.name]: e.target.value });
 
   const handleImageChange = (index, e) => {
     const file = e.target.files[0];
@@ -74,8 +92,7 @@ export default function AddTrade() {
     e.preventDefault();
     setIsSubmitting(true);
 
-    const userId =
-      localStorage.getItem("userId") || localStorage.getItem("userEmail");
+    const userId = localStorage.getItem("userId") || localStorage.getItem("userEmail");
     if (!userId) {
       alert("Session expired. Please log in again.");
       setIsSubmitting(false);
@@ -103,316 +120,317 @@ export default function AddTrade() {
     }
   };
 
-  const inputClass =
-    "appearance-none w-full min-h-[52px] bg-white/40 dark:bg-white/[0.04] border border-gray-300/80 dark:border-white/10 rounded-xl px-4 py-3 text-blue-600 dark:text-blue-400 font-bold focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 outline-none text-sm text-center [text-align-last:center] backdrop-blur-sm transition-all";
-  const textareaClass =
-    "appearance-none w-full min-h-[100px] bg-white/40 dark:bg-white/[0.04] border border-gray-300/80 dark:border-white/10 rounded-xl px-4 py-3 text-blue-600 dark:text-blue-400 font-bold focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 outline-none text-sm text-left resize-y backdrop-blur-sm transition-all";
-  const optionClass = "bg-white dark:bg-[#0b131d] text-blue-600 dark:!text-blue-400 font-bold text-center";
-  const labelClass = "text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest";
-  const inputContainerClass = "flex flex-col gap-2 w-full box-border";
+  const nextStep = () => setStep(s => Math.min(s + 1, 6));
+  const prevStep = () => setStep(s => Math.max(s - 1, 1));
 
-  const cardClass =
-    "w-full bg-white/60 dark:bg-white/[0.03] border border-gray-200/80 dark:border-white/10 rounded-2xl p-5 sm:p-8 shadow-xl backdrop-blur-xl mb-6 box-border";
+  const steps = [
+    { num: 1, title: "Market" },
+    { num: 2, title: "Execution" },
+    { num: 3, title: "Setup" },
+    { num: 4, title: "Psychology" },
+    { num: 5, title: "Review" },
+    { num: 6, title: "Evidence" },
+  ];
+
+  const inputClass = "w-full bg-[#15181D] border border-white/10 rounded-xl px-4 py-3.5 text-white placeholder-gray-600 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 outline-none text-[15px] transition-all";
+  const selectClass = "appearance-none w-full bg-[#15181D] border border-white/10 rounded-xl px-4 py-3.5 text-white focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 outline-none text-[15px] transition-all pr-10 cursor-pointer";
+  const textareaClass = "w-full min-h-[120px] bg-[#15181D] border border-white/10 rounded-xl px-4 py-3.5 text-white placeholder-gray-600 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 outline-none text-[15px] resize-y transition-all";
+  const labelClass = "text-[12px] font-semibold text-gray-400 mb-2 block uppercase tracking-wider";
 
   return (
-    <div
-      className="w-full max-w-6xl mx-auto font-sans pb-16 px-4 md:px-8 mt-6 md:mt-8 overflow-visible box-border"
-      style={{ fontFamily: "'Inter', sans-serif" }}
-    >
-      {/* Header */}
-      <div className="mb-8 md:mb-10 flex items-center gap-4">
-        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500/20 to-cyan-500/20 border border-blue-500/20 flex items-center justify-center shrink-0 shadow-lg shadow-blue-500/10">
-          <TrendingUp className="w-6 h-6 text-blue-400" />
-        </div>
+    <div className="w-full max-w-4xl mx-auto font-sans pb-24 px-4 md:px-8 mt-6">
+      {/* HEADER */}
+      <div className="flex items-center justify-between mb-8">
         <div>
-          <div className="flex items-center gap-2 mb-1">
-            <h1 className="text-2xl md:text-3xl font-black text-gray-900 dark:text-white tracking-tight">
-              Log New Trade
-            </h1>
-            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-gradient-to-r from-blue-500/20 to-cyan-500/20 text-blue-400 border border-blue-500/30">
-              Journal
-            </span>
-          </div>
-          <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400">
-            Record your setup, execution, psychology, and lessons.
-          </p>
+          <h1 className="text-2xl font-semibold text-white flex items-center gap-2">
+            <Target className="w-6 h-6 text-cyan-400" /> Log Trade
+          </h1>
+          <p className="text-sm text-gray-500 mt-1">Capture your edge efficiently.</p>
         </div>
+        <button onClick={() => navigate("/dashboard")} className="p-2 rounded-lg bg-white/5 text-gray-400 hover:text-white transition-colors">
+          <X className="w-5 h-5" />
+        </button>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6 w-full">
-        {/* SECTION 1: Execution Details */}
-        <div className={cardClass}>
-          <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-200/80 dark:border-white/10">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500/20 to-cyan-500/20 border border-blue-500/20 flex items-center justify-center">
-              <Target className="w-4 h-4 text-blue-400" />
+      {/* PROGRESS BAR */}
+      <div className="flex items-center justify-between mb-10 relative">
+        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-[2px] bg-white/5 z-0"></div>
+        <div className="absolute left-0 top-1/2 -translate-y-1/2 h-[2px] bg-cyan-500 z-0 transition-all duration-300" style={{ width: `${((step - 1) / 5) * 100}%` }}></div>
+        
+        {steps.map(s => (
+          <div key={s.num} className="relative z-10 flex flex-col items-center gap-2">
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-colors duration-300 ${step >= s.num ? 'bg-cyan-500 text-white' : 'bg-[#15181D] border border-white/10 text-gray-500'}`}>
+              {step > s.num ? <Check className="w-4 h-4" /> : s.num}
             </div>
-            <h2 className="text-lg md:text-xl font-bold text-gray-900 dark:text-white">
-              Execution Details
-            </h2>
+            <span className={`text-[10px] uppercase tracking-widest absolute -bottom-6 whitespace-nowrap font-semibold ${step >= s.num ? 'text-cyan-400' : 'text-gray-600'}`}>{s.title}</span>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
-            <div className={inputContainerClass}>
-              <label className={labelClass}>Trade Date</label>
-              <input
-                type="date"
-                name="date"
-                value={formData.date}
-                onChange={handleChange}
-                className={`${inputClass} dark:[color-scheme:dark]`}
-                required
-              />
-            </div>
-            <div className={inputContainerClass}>
-              <label className={labelClass}>Trade Time</label>
-              <input
-                type="time"
-                name="time"
-                value={formData.time}
-                onChange={handleChange}
-                className={`${inputClass} dark:[color-scheme:dark]`}
-                required
-              />
-            </div>
-            <div className={inputContainerClass}>
-              <label className={labelClass}>Asset / Pair</label>
-              <div className="relative w-full">
-                <select name="asset" value={formData.asset} onChange={handleChange} className={`${inputClass} pr-10`}>
-                  {assets.map((a) => (<option key={a} value={a} className={optionClass}>{a}</option>))}
-                </select>
-                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-blue-400 pointer-events-none" />
-              </div>
-              {formData.asset === "Other" && (
-                <input type="text" name="asset" placeholder="Type custom asset" value={customFields.asset || ""} onChange={handleCustomChange} className={`${inputClass} mt-2`} />
-              )}
-            </div>
-            <div className={inputContainerClass}>
-              <label className={labelClass}>Direction</label>
-              <div className="relative w-full">
-                <select name="direction" value={formData.direction} onChange={handleChange} className={`${inputClass} pr-10`}>
-                  <option value="LONG" className={optionClass}>LONG ▲</option>
-                  <option value="SHORT" className={optionClass}>SHORT ▼</option>
-                </select>
-                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-blue-400 pointer-events-none" />
-              </div>
-            </div>
-            <div className={inputContainerClass}>
-              <label className={labelClass}>Session</label>
-              <div className="relative w-full">
-                <select name="session" value={formData.session} onChange={handleChange} className={`${inputClass} pr-10`}>
-                  {["London", "New York", "Asian", "Other"].map(s => (
-                    <option key={s} value={s} className={optionClass}>{s}</option>
-                  ))}
-                </select>
-                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-blue-400 pointer-events-none" />
-              </div>
-              {formData.session === "Other" && (
-                <input type="text" name="session" placeholder="Type custom session" value={customFields.session || ""} onChange={handleCustomChange} className={`${inputClass} mt-2`} />
-              )}
-            </div>
-            <div className={inputContainerClass}>
-              <label className={labelClass}>Setup Type</label>
-              <div className="relative w-full">
-                <select name="setup" value={formData.setup} onChange={handleChange} className={`${inputClass} pr-10`}>
-                  {setups.map((s) => (<option key={s} value={s} className={optionClass}>{s}</option>))}
-                </select>
-                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-blue-400 pointer-events-none" />
-              </div>
-              {formData.setup === "Other" && (
-                <input type="text" name="setup" placeholder="Type custom setup" value={customFields.setup || ""} onChange={handleCustomChange} className={`${inputClass} mt-2`} />
-              )}
-            </div>
-            {[
-              { label: "Entry Price", name: "entry", placeholder: "" },
-              { label: "Stop Loss", name: "sl", placeholder: "" },
-              { label: "Take Profit", name: "tp", placeholder: "" },
-              { label: "Risk %", name: "risk", placeholder: "" },
-            ].map((field) => (
-              <div key={field.name} className={inputContainerClass}>
-                <label className={labelClass}>{field.label}</label>
-                <input
-                  type="number"
-                  step="any"
-                  name={field.name}
-                  placeholder={field.placeholder}
-                  value={formData[field.name]}
-                  onChange={handleChange}
-                  className={inputClass}
-                />
-              </div>
-            ))}
-            <div className={inputContainerClass}>
-              <label className={labelClass}>Trade Result</label>
-              <div className="relative w-full">
-                <select name="result" value={formData.result} onChange={handleChange} className={`${inputClass} pr-10`}>
-                  <option value="win" className={optionClass}>WIN ✓</option>
-                  <option value="loss" className={optionClass}>LOSS ✗</option>
-                  <option value="be" className={optionClass}>BREAK-EVEN</option>
-                </select>
-                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-blue-400 pointer-events-none" />
-              </div>
-            </div>
-            <div className={inputContainerClass}>
-              <label className={labelClass}>Net R Multiple</label>
-              <input
-                type="number"
-                step="0.1"
-                name="rMultiple"
-                placeholder=""
-                value={formData.rMultiple}
-                onChange={handleChange}
-                className={inputClass}
-              />
-            </div>
-            <div className={`lg:col-span-3 ${inputContainerClass}`}>
-              <label className={labelClass}>Trade Reason / Analysis</label>
-              <textarea
-                name="reason"
-                placeholder="Why did I take this trade?"
-                value={formData.reason}
-                onChange={handleChange}
-                className={textareaClass}
-              />
-            </div>
-            <div className={`lg:col-span-3 ${inputContainerClass}`}>
-              <label className={labelClass}>Lesson / Mistake</label>
-              <textarea
-                name="lesson"
-                placeholder="What will I do better next time?"
-                value={formData.lesson}
-                onChange={handleChange}
-                className={textareaClass}
-              />
-            </div>
-          </div>
-        </div>
+        ))}
+      </div>
 
-        {/* SECTION 2: Psychology */}
-        <div className={cardClass.replace("from-blue-500/20 to-cyan-500/20", "from-pink-500/20 to-purple-500/20")}>
-          <div className="w-full bg-white/60 dark:bg-white/[0.03] border border-gray-200/80 dark:border-white/10 rounded-2xl p-5 sm:p-8 shadow-xl backdrop-blur-xl box-border">
-            <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-200/80 dark:border-white/10">
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-pink-500/20 to-purple-500/20 border border-pink-500/20 flex items-center justify-center">
-                <Brain className="w-4 h-4 text-pink-400" />
-              </div>
-              <h2 className="text-lg font-bold text-gray-900 dark:text-white">
-                Psychology Tracker
-              </h2>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              {["emotionBefore", "emotionAfter"].map((field, idx) => (
-                <div key={field} className={inputContainerClass}>
-                  <label className={labelClass}>{idx === 0 ? "Emotion Before Trade" : "Emotion After Trade"}</label>
-                  <div className="relative w-full">
-                    <select name={field} value={formData[field]} onChange={handleChange} className={`${inputClass} pr-10`}>
-                      <option value="" className={optionClass}>Select emotion...</option>
-                      {emotions.map((e) => (<option key={e} value={e} className={optionClass}>{e}</option>))}
+      {/* FORM CONTAINER */}
+      <div className="bg-[#101216] border border-white/5 rounded-3xl p-6 md:p-10 shadow-2xl relative overflow-hidden min-h-[400px]">
+        <form onSubmit={handleSubmit} className="relative z-10">
+          
+          {/* STEP 1: MARKET */}
+          {step === 1 && (
+            <div className="space-y-6 animate-in fade-in slide-in-from-right-4">
+              <h2 className="text-xl font-semibold text-white mb-6">Market Context</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className={labelClass}>Asset / Pair</label>
+                  <div className="relative">
+                    <select name="asset" value={formData.asset} onChange={handleChange} className={selectClass}>
+                      {assets.map(a => <option key={a} value={a}>{a}</option>)}
                     </select>
-                    <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-blue-400 pointer-events-none" />
+                    <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
                   </div>
-                  {formData[field] === "Other" && (
-                    <input type="text" name={field} placeholder="Type custom emotion" value={customFields[field] || ""} onChange={handleCustomChange} className={`${inputClass} mt-2`} />
+                  {formData.asset === "Other" && (
+                    <input type="text" name="asset" placeholder="Custom asset" value={customFields.asset || ""} onChange={handleCustomChange} className={`${inputClass} mt-3`} />
                   )}
                 </div>
-              ))}
-            </div>
-            <div className={inputContainerClass}>
-              <label className={labelClass}>Psychology Note</label>
-              <textarea
-                name="psychNote"
-                placeholder="What was going through my mind during the trade?"
-                value={formData.psychNote}
-                onChange={handleChange}
-                className={textareaClass}
-              />
-            </div>
-            <div className="mt-8 pt-6 border-t border-gray-200/80 dark:border-white/10 flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-              <label className={labelClass}>Did you break any trading rules?</label>
-              <div className="relative w-full sm:w-auto">
-                <select name="ruleBreak" value={formData.ruleBreak} onChange={handleChange} className={`${inputClass} sm:min-w-[150px] pr-10`}>
-                  <option value="no" className={optionClass}>No ✓</option>
-                  <option value="yes" className={optionClass}>Yes ✗</option>
-                </select>
-                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-blue-400 pointer-events-none" />
+                <div>
+                  <label className={labelClass}>Direction</label>
+                  <div className="flex gap-3">
+                    <button type="button" onClick={() => setFormData({...formData, direction: "LONG"})} className={`flex-1 py-3.5 rounded-xl font-bold text-sm transition-colors border ${formData.direction === "LONG" ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400" : "bg-[#15181D] border-white/10 text-gray-500 hover:text-white"}`}>LONG ▲</button>
+                    <button type="button" onClick={() => setFormData({...formData, direction: "SHORT"})} className={`flex-1 py-3.5 rounded-xl font-bold text-sm transition-colors border ${formData.direction === "SHORT" ? "bg-red-500/10 border-red-500/30 text-red-400" : "bg-[#15181D] border-white/10 text-gray-500 hover:text-white"}`}>SHORT ▼</button>
+                  </div>
+                </div>
+                <div>
+                  <label className={labelClass}>Session</label>
+                  <div className="relative">
+                    <select name="session" value={formData.session} onChange={handleChange} className={selectClass}>
+                      {["London", "New York", "Asian", "Sydney", "Other"].map(s => <option key={s} value={s}>{s}</option>)}
+                    </select>
+                    <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className={labelClass}>Date</label>
+                    <input type="date" name="date" value={formData.date} onChange={handleChange} className={`${inputClass} [color-scheme:dark]`} required />
+                  </div>
+                  <div>
+                    <label className={labelClass}>Time</label>
+                    <input type="time" name="time" value={formData.time} onChange={handleChange} className={`${inputClass} [color-scheme:dark]`} required />
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
+          )}
 
-        {/* SECTION 3: Chart Uploads */}
-        <div className="w-full bg-white/60 dark:bg-white/[0.03] border border-gray-200/80 dark:border-white/10 rounded-2xl p-5 sm:p-8 shadow-xl backdrop-blur-xl mb-6 box-border">
-          <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-200/80 dark:border-white/10">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 border border-emerald-500/20 flex items-center justify-center">
-              <ImageIcon className="w-4 h-4 text-emerald-400" />
+          {/* STEP 2: EXECUTION & VISUALIZATION */}
+          {step === 2 && (
+            <div className="space-y-6 animate-in fade-in slide-in-from-right-4">
+              <h2 className="text-xl font-semibold text-white mb-6">Execution Parameters</h2>
+              
+              {/* Real-time Visualization */}
+              <div className="bg-[#15181D] border border-white/5 rounded-2xl p-6 mb-6">
+                 <div className="flex justify-between items-end mb-4">
+                    <span className="text-xs text-gray-500 font-semibold uppercase tracking-widest">Trade Architecture</span>
+                    {calcRR > 0 && <span className="text-sm font-bold text-cyan-400">1 : {calcRR} R:R</span>}
+                 </div>
+                 
+                 <div className="relative h-20 flex flex-col justify-center">
+                    {/* Simplified Visualizer */}
+                    <div className="w-full flex items-center">
+                       {formData.direction === "LONG" ? (
+                         <>
+                           <div className="w-1/4 flex flex-col items-center">
+                              <span className="text-[10px] text-red-400 mb-1 block">STOP LOSS</span>
+                              <div className="w-full h-1 bg-red-500/50 rounded-l-full relative"><div className="w-2 h-2 rounded-full bg-red-400 absolute right-0 top-1/2 -translate-y-1/2"></div></div>
+                              <span className="text-xs text-gray-300 mt-1">{formData.sl || "---"}</span>
+                           </div>
+                           <div className="flex-1 flex flex-col items-center border-l-2 border-white/20">
+                              <span className="text-[10px] text-gray-400 mb-1 block">ENTRY</span>
+                              <div className="w-full h-1 bg-white/20"></div>
+                              <span className="text-xs text-white mt-1 font-bold">{formData.entry || "---"}</span>
+                           </div>
+                           <div className="w-1/2 flex flex-col items-center">
+                              <span className="text-[10px] text-emerald-400 mb-1 block">TAKE PROFIT</span>
+                              <div className="w-full h-1 bg-emerald-500/50 rounded-r-full relative"><div className="w-2 h-2 rounded-full bg-emerald-400 absolute left-0 top-1/2 -translate-y-1/2"></div></div>
+                              <span className="text-xs text-gray-300 mt-1">{formData.tp || "---"}</span>
+                           </div>
+                         </>
+                       ) : (
+                         <>
+                           <div className="w-1/2 flex flex-col items-center">
+                              <span className="text-[10px] text-emerald-400 mb-1 block">TAKE PROFIT</span>
+                              <div className="w-full h-1 bg-emerald-500/50 rounded-l-full relative"><div className="w-2 h-2 rounded-full bg-emerald-400 absolute right-0 top-1/2 -translate-y-1/2"></div></div>
+                              <span className="text-xs text-gray-300 mt-1">{formData.tp || "---"}</span>
+                           </div>
+                           <div className="flex-1 flex flex-col items-center border-r-2 border-white/20">
+                              <span className="text-[10px] text-gray-400 mb-1 block">ENTRY</span>
+                              <div className="w-full h-1 bg-white/20"></div>
+                              <span className="text-xs text-white mt-1 font-bold">{formData.entry || "---"}</span>
+                           </div>
+                           <div className="w-1/4 flex flex-col items-center">
+                              <span className="text-[10px] text-red-400 mb-1 block">STOP LOSS</span>
+                              <div className="w-full h-1 bg-red-500/50 rounded-r-full relative"><div className="w-2 h-2 rounded-full bg-red-400 absolute left-0 top-1/2 -translate-y-1/2"></div></div>
+                              <span className="text-xs text-gray-300 mt-1">{formData.sl || "---"}</span>
+                           </div>
+                         </>
+                       )}
+                    </div>
+                 </div>
+              </div>
+
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div>
+                  <label className={labelClass}>Entry Price</label>
+                  <input type="number" step="any" name="entry" value={formData.entry} onChange={handleChange} className={inputClass} placeholder="0.00" />
+                </div>
+                <div>
+                  <label className={labelClass}>Stop Loss</label>
+                  <input type="number" step="any" name="sl" value={formData.sl} onChange={handleChange} className={inputClass} placeholder="0.00" />
+                </div>
+                <div>
+                  <label className={labelClass}>Take Profit</label>
+                  <input type="number" step="any" name="tp" value={formData.tp} onChange={handleChange} className={inputClass} placeholder="0.00" />
+                </div>
+                <div>
+                  <label className={labelClass}>Risk %</label>
+                  <input type="number" step="any" name="risk" value={formData.risk} onChange={handleChange} className={inputClass} placeholder="1.0" />
+                </div>
+              </div>
             </div>
-            <h2 className="text-lg font-bold text-gray-900 dark:text-white">
-              Chart Screenshots
-            </h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {imageLabels.map((label, idx) => (
-              <label
-                key={idx}
-                className="border-2 border-dashed border-gray-300/80 dark:border-white/10 rounded-2xl p-6 flex flex-col items-center justify-center text-center hover:bg-emerald-500/5 hover:border-emerald-400/50 transition-all cursor-pointer group min-h-[140px] backdrop-blur-sm"
-              >
-                {images[idx] ? (
-                  <>
-                    <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mb-3">
-                      <CheckCircle className="w-6 h-6 text-emerald-400" />
-                    </div>
-                    <p className="text-xs font-bold text-emerald-400 truncate w-full px-2">
-                      {images[idx].name}
-                    </p>
-                  </>
-                ) : (
-                  <>
-                    <div className="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                      <ImageIcon className="w-6 h-6 text-blue-400" />
-                    </div>
-                    <p className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">
-                      {label}
-                    </p>
-                    <p className="text-[10px] text-gray-500 uppercase tracking-widest">
-                      Click to upload
-                    </p>
-                  </>
-                )}
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => handleImageChange(idx, e)}
-                  className="hidden"
-                />
-              </label>
-            ))}
-          </div>
-        </div>
+          )}
 
-        {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row justify-end gap-4">
-          <button
-            type="button"
-            onClick={() => navigate("/trades")}
-            disabled={isSubmitting}
-            className="w-full sm:w-auto px-8 py-3.5 bg-white/60 dark:bg-white/[0.04] border border-gray-300/80 dark:border-white/10 text-gray-700 dark:text-gray-300 font-bold rounded-2xl hover:bg-white dark:hover:bg-white/10 transition-all flex items-center justify-center gap-2 backdrop-blur-sm"
-          >
-            <X className="w-5 h-5" /> Cancel
-          </button>
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="w-full sm:w-auto px-10 py-3.5 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white font-bold rounded-2xl shadow-xl shadow-blue-500/25 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
-          >
-            {isSubmitting ? (
-              <>
-                <Loader2 className="w-5 h-5 animate-spin" /> Uploading...
-              </>
-            ) : (
-              <>
-                <Save className="w-5 h-5" /> Save Trade
-              </>
-            )}
-          </button>
-        </div>
-      </form>
+          {/* STEP 3: SETUP & OUTCOME */}
+          {step === 3 && (
+            <div className="space-y-6 animate-in fade-in slide-in-from-right-4">
+              <h2 className="text-xl font-semibold text-white mb-6">Setup & Outcome</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className={labelClass}>Strategy / Setup</label>
+                  <div className="relative">
+                    <select name="setup" value={formData.setup} onChange={handleChange} className={selectClass}>
+                      {setups.map(s => <option key={s} value={s}>{s}</option>)}
+                    </select>
+                    <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
+                  </div>
+                  {formData.setup === "Other" && (
+                    <input type="text" name="setup" placeholder="Custom setup" value={customFields.setup || ""} onChange={handleCustomChange} className={`${inputClass} mt-3`} />
+                  )}
+                </div>
+                <div>
+                  <label className={labelClass}>Trade Result</label>
+                  <div className="flex gap-2">
+                     <button type="button" onClick={() => setFormData({...formData, result: "win"})} className={`flex-1 py-3.5 rounded-xl font-bold text-sm transition-colors border ${formData.result === "win" ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400" : "bg-[#15181D] border-white/10 text-gray-500 hover:text-white"}`}>WIN ✓</button>
+                     <button type="button" onClick={() => setFormData({...formData, result: "loss"})} className={`flex-1 py-3.5 rounded-xl font-bold text-sm transition-colors border ${formData.result === "loss" ? "bg-red-500/10 border-red-500/30 text-red-400" : "bg-[#15181D] border-white/10 text-gray-500 hover:text-white"}`}>LOSS ✗</button>
+                     <button type="button" onClick={() => setFormData({...formData, result: "be"})} className={`flex-1 py-3.5 rounded-xl font-bold text-sm transition-colors border ${formData.result === "be" ? "bg-gray-500/20 border-gray-500/50 text-gray-300" : "bg-[#15181D] border-white/10 text-gray-500 hover:text-white"}`}>BE —</button>
+                  </div>
+                </div>
+                <div>
+                  <label className={labelClass}>Net R-Multiple</label>
+                  <input type="number" step="0.1" name="rMultiple" value={formData.rMultiple} onChange={handleChange} className={inputClass} placeholder="e.g. 2.5 or -1.0" />
+                </div>
+                <div>
+                  <label className={labelClass}>Rule Broken?</label>
+                  <div className="flex gap-2">
+                     <button type="button" onClick={() => setFormData({...formData, ruleBreak: "no"})} className={`flex-1 py-3.5 rounded-xl font-bold text-sm transition-colors border ${formData.ruleBreak === "no" ? "bg-cyan-500/10 border-cyan-500/30 text-cyan-400" : "bg-[#15181D] border-white/10 text-gray-500 hover:text-white"}`}>Followed Plan</button>
+                     <button type="button" onClick={() => setFormData({...formData, ruleBreak: "yes"})} className={`flex-1 py-3.5 rounded-xl font-bold text-sm transition-colors border ${formData.ruleBreak === "yes" ? "bg-amber-500/10 border-amber-500/30 text-amber-400" : "bg-[#15181D] border-white/10 text-gray-500 hover:text-white"}`}>Broke Rule</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* STEP 4: PSYCHOLOGY */}
+          {step === 4 && (
+            <div className="space-y-6 animate-in fade-in slide-in-from-right-4">
+               <div className="flex items-center gap-3 mb-6">
+                  <div className="p-2 bg-purple-500/10 rounded-lg"><Brain className="w-5 h-5 text-purple-400" /></div>
+                  <h2 className="text-xl font-semibold text-white">Psychology Tracker</h2>
+               </div>
+               
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {["emotionBefore", "emotionAfter"].map((field, idx) => (
+                    <div key={field}>
+                      <label className={labelClass}>{idx === 0 ? "Emotion Before Trade" : "Emotion After Trade"}</label>
+                      <div className="relative">
+                        <select name={field} value={formData[field]} onChange={handleChange} className={selectClass}>
+                          <option value="">Select emotion...</option>
+                          {emotions.map(e => <option key={e} value={e}>{e}</option>)}
+                        </select>
+                        <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
+                      </div>
+                      {formData[field] === "Other" && <input type="text" name={field} placeholder="Custom emotion" value={customFields[field] || ""} onChange={handleCustomChange} className={`${inputClass} mt-3`} />}
+                    </div>
+                  ))}
+               </div>
+               
+               <div>
+                  <label className={labelClass}>Psychological State / Notes</label>
+                  <textarea name="psychNote" placeholder="What were you feeling during execution? Did you hesitate? Did you move your stop loss early?" value={formData.psychNote} onChange={handleChange} className={textareaClass} />
+               </div>
+            </div>
+          )}
+
+          {/* STEP 5: REVIEW */}
+          {step === 5 && (
+            <div className="space-y-6 animate-in fade-in slide-in-from-right-4">
+               <h2 className="text-xl font-semibold text-white mb-6">Trade Review</h2>
+               <div>
+                  <label className={labelClass}>Why did I take this trade? (Confluence)</label>
+                  <textarea name="reason" placeholder="e.g., 15m order block + structural shift on 1m..." value={formData.reason} onChange={handleChange} className={textareaClass} />
+               </div>
+               <div>
+                  <label className={labelClass}>Lessons & Mistakes</label>
+                  <textarea name="lesson" placeholder="What went right? What went wrong? What will I do differently?" value={formData.lesson} onChange={handleChange} className={textareaClass} />
+               </div>
+            </div>
+          )}
+
+          {/* STEP 6: VISUAL EVIDENCE */}
+          {step === 6 && (
+            <div className="space-y-6 animate-in fade-in slide-in-from-right-4">
+               <h2 className="text-xl font-semibold text-white mb-6">Visual Evidence</h2>
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {["Before (Entry Chart)", "After (Exit Chart)"].map((label, idx) => (
+                    <label key={idx} className="border-2 border-dashed border-white/10 rounded-2xl p-8 flex flex-col items-center justify-center text-center hover:bg-white/5 hover:border-cyan-500/50 transition-all cursor-pointer group min-h-[200px] bg-[#15181D]">
+                      {images[idx] ? (
+                        <>
+                          <div className="w-14 h-14 rounded-full bg-emerald-500/10 flex items-center justify-center mb-4 border border-emerald-500/20">
+                            <CheckCircle className="w-6 h-6 text-emerald-400" />
+                          </div>
+                          <p className="text-sm font-semibold text-emerald-400 truncate w-full px-4">{images[idx].name}</p>
+                          <p className="text-xs text-gray-500 mt-2">Click to replace</p>
+                        </>
+                      ) : (
+                        <>
+                          <div className="w-14 h-14 rounded-full bg-cyan-500/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                            <UploadCloud className="w-6 h-6 text-cyan-400" />
+                          </div>
+                          <p className="text-sm font-semibold text-gray-300 mb-1">{label}</p>
+                          <p className="text-[11px] text-gray-500 uppercase tracking-widest">Click to upload</p>
+                        </>
+                      )}
+                      <input type="file" accept="image/*" onChange={(e) => handleImageChange(idx, e)} className="hidden" />
+                    </label>
+                  ))}
+               </div>
+            </div>
+          )}
+          
+          {/* NAVIGATION FOOTER */}
+          <div className="mt-10 pt-6 border-t border-white/5 flex items-center justify-between">
+             <button type="button" onClick={prevStep} disabled={step === 1} className="px-6 py-3 rounded-xl font-semibold text-sm text-gray-400 hover:text-white hover:bg-white/5 disabled:opacity-0 transition-all flex items-center gap-2">
+                <ArrowLeft className="w-4 h-4" /> Back
+             </button>
+             
+             {step < 6 ? (
+               <button type="button" onClick={nextStep} className="px-8 py-3 rounded-xl bg-white text-black font-bold text-sm hover:bg-gray-200 transition-all flex items-center gap-2">
+                  Continue <ArrowRight className="w-4 h-4" />
+               </button>
+             ) : (
+               <button type="submit" disabled={isSubmitting} className="px-8 py-3 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-white font-bold text-sm transition-all shadow-lg shadow-cyan-500/30 flex items-center gap-2 disabled:opacity-50">
+                  {isSubmitting ? <><Loader2 className="w-4 h-4 animate-spin" /> Saving...</> : <><Save className="w-4 h-4" /> Save Trade</>}
+               </button>
+             )}
+          </div>
+
+        </form>
+      </div>
     </div>
   );
 }

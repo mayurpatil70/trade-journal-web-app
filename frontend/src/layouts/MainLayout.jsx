@@ -34,79 +34,40 @@ const NavItem = ({
   label,
   currentPath,
   onClick,
-  color = "blue",
+  isBeta = false,
+  isDisabled = false,
 }) => {
-  const isActive = currentPath.includes(to);
-  const colorMap = {
-    blue: {
-      bg: "bg-blue-500/10",
-      text: "text-blue-400",
-      border: "border-blue-500/20",
-      iconBg: "bg-blue-500/10",
-    },
-    emerald: {
-      bg: "bg-emerald-500/10",
-      text: "text-emerald-400",
-      border: "border-emerald-500/20",
-      iconBg: "bg-emerald-500/10",
-    },
-    violet: {
-      bg: "bg-violet-500/10",
-      text: "text-violet-400",
-      border: "border-violet-500/20",
-      iconBg: "bg-violet-500/10",
-    },
-    amber: {
-      bg: "bg-amber-500/10",
-      text: "text-amber-400",
-      border: "border-amber-500/20",
-      iconBg: "bg-amber-500/10",
-    },
-    pink: {
-      bg: "bg-pink-500/10",
-      text: "text-pink-400",
-      border: "border-pink-500/20",
-      iconBg: "bg-pink-500/10",
-    },
-    cyan: {
-      bg: "bg-cyan-500/10",
-      text: "text-cyan-400",
-      border: "border-cyan-500/20",
-      iconBg: "bg-cyan-500/10",
-    },
-    orange: {
-      bg: "bg-orange-500/10",
-      text: "text-orange-400",
-      border: "border-orange-500/20",
-      iconBg: "bg-orange-500/10",
-    },
-    gray: {
-      bg: "bg-gray-500/10",
-      text: "text-gray-400",
-      border: "border-gray-500/20",
-      iconBg: "bg-gray-500/10",
-    },
-  };
-  const c = colorMap[color] || colorMap.blue;
+  const isActive = currentPath === to || currentPath.startsWith(to + "/");
 
   return (
     <Link
-      to={to}
-      onClick={onClick}
-      className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all font-medium text-sm ${
-        isActive
-          ? `${c.bg} ${c.text} border${c.border}`
-          : "text-gray-500 dark:text-gray-400 hover:bg-gray-100/80 dark:hover:bg-white/[0.04] border border-transparent hover:text-gray-900 dark:hover:text-white"
+      to={isDisabled ? "#" : to}
+      onClick={(e) => {
+        if (isDisabled) e.preventDefault();
+        else if (onClick) onClick();
+      }}
+      className={`group flex items-center justify-between px-3 py-2.5 rounded-xl transition-all font-medium text-[13px] ${
+        isDisabled
+          ? "opacity-50 cursor-not-allowed text-gray-500"
+          : isActive
+          ? "bg-[#1B2027] text-white border border-white/5 shadow-sm"
+          : "text-gray-400 hover:bg-[#15181D] hover:text-gray-200 border border-transparent"
       }`}
     >
-      <div
-        className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${isActive ? c.iconBg : "bg-gray-100/80 dark:bg-white/[0.04]"}`}
-      >
+      <div className="flex items-center gap-3">
         <Icon
-          className={`w-4 h-4 shrink-0 ${isActive ? c.text : "text-gray-500 dark:text-gray-400"}`}
+          className={`w-[18px] h-[18px] transition-colors ${
+            isActive ? "text-cyan-400" : "text-gray-500 group-hover:text-gray-300"
+          }`}
+          strokeWidth={isActive ? 2.5 : 2}
         />
+        <span className="tracking-tight">{label}</span>
       </div>
-      {label}
+      {isBeta && (
+        <span className="text-[9px] uppercase tracking-wider font-bold bg-blue-500/10 text-blue-400 px-1.5 py-0.5 rounded-md">
+          Beta
+        </span>
+      )}
     </Link>
   );
 };
@@ -115,17 +76,26 @@ export default function MainLayout() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isSubscriptionOpen, setIsSubscriptionOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
 
   // FIX: Enforce Theme Globally on Mount & Route Change
   useEffect(() => {
-    const theme = localStorage.getItem("theme") || "dark";
-    if (theme === "dark") {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
+    // We enforce a premium dark theme globally for the new design
+    document.documentElement.classList.add("dark");
+    document.body.style.backgroundColor = "#0A0B0D";
+    document.body.style.color = "#FFFFFF";
+    
+    // Command Palette listener
+    const handleKeyDown = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setIsSearchOpen(true);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, [location.pathname]);
 
   const handleLogout = () => {
@@ -142,80 +112,62 @@ export default function MainLayout() {
 
   const navSections = [
     {
-      label: "Trading",
+      label: "Trade",
       items: [
-        {
-          to: "/dashboard",
-          icon: LayoutDashboard,
-          label: "Dashboard",
-          color: "blue",
-        },
-        {
-          to: "/add-trade",
-          icon: PlusCircle,
-          label: "Add Trade",
-          color: "emerald",
-        },
-        { to: "/trades", icon: List, label: "Past Trades", color: "violet" },
-        {
-          to: "/calendar",
-          icon: CalendarIcon,
-          label: "Calendar",
-          color: "cyan",
-        },
+        { to: "/dashboard", icon: LayoutDashboard, label: "Command Center" },
+        { to: "/add-trade", icon: PlusCircle, label: "Log Trade" },
+        { to: "/trades", icon: List, label: "Past Trades" },
+        { to: "/calendar", icon: CalendarIcon, label: "Calendar" },
       ],
     },
     {
-      label: "Analysis",
+      label: "Analyze",
       items: [
-        {
-          to: "/news",
-          icon: Globe,
-          label: "Economic Calendar",
-          color: "amber",
-        },
-        { to: "/accounts", icon: Users, label: "Accounts", color: "pink" },
-        {
-          to: "/calculator/lot-size",
-          icon: CalculatorIcon,
-          label: "Lot Calculator",
-          color: "blue",
-        },
-        {
-          to: "/calculator/prop-firm",
-          icon: CalculatorIcon,
-          label: "Funded Guardian",
-          color: "blue",
-        },
+        { to: "/analytics", icon: Activity, label: "Strategy Analytics" },
+        { to: "/psychology", icon: User, label: "Psychology" },
+        { to: "/mistakes", icon: ShieldCheck, label: "Mistake Lab" },
       ],
     },
     {
-      label: "App",
+      label: "Plan",
       items: [
-        { to: "/settings", icon: Settings, label: "Settings", color: "gray" },
-        { to: "/support", icon: Headphones, label: "Support", color: "amber" },
+        { to: "/daily-journal", icon: Settings, label: "Daily Journal" },
+      ],
+    },
+    {
+      label: "Tools",
+      items: [
+        { to: "/news", icon: Globe, label: "Economic Calendar" },
+        { to: "/calculator/lot-size", icon: CalculatorIcon, label: "Lot Calculator" },
+        { to: "/calculator/prop-firm", icon: CalculatorIcon, label: "Funded Guardian" },
+      ],
+    },
+    {
+      label: "System",
+      items: [
+        { to: "/accounts", icon: Users, label: "Accounts" },
+        { to: "/settings", icon: Settings, label: "Settings" },
+        { to: "/support", icon: Headphones, label: "Support" },
       ],
     },
   ];
 
   return (
     <div
-      className="flex h-screen bg-gray-50 dark:bg-[#0a0a0a] transition-colors duration-200"
+      className="flex h-screen bg-[#0A0B0D] text-white transition-colors duration-200 overflow-hidden"
       style={{ fontFamily: "'Inter', sans-serif" }}
     >
       {/* Mobile Header */}
-      <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-white/90 dark:bg-[#121418]/90 border-b border-gray-200/80 dark:border-white/10 flex items-center justify-between px-4 z-40 backdrop-blur-xl">
+      <div className="md:hidden fixed top-0 left-0 right-0 h-14 bg-[#101216]/95 border-b border-white/5 flex items-center justify-between px-4 z-40 backdrop-blur-xl">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500/20 to-cyan-500/20 border border-blue-500/20 flex items-center justify-center">
-            <Activity className="w-5 h-5 text-blue-400" />
-          </div>
-          <span className="font-black text-gray-900 dark:text-white text-lg tracking-tight">
+          <Activity className="w-5 h-5 text-cyan-400" />
+          <span className="font-semibold text-white text-base tracking-tight">
             Forex Notes
           </span>
         </div>
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className="p-2 rounded-xl bg-gray-100/80 dark:bg-white/[0.04] border border-gray-200/80 dark:border-white/10 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-white/10 transition-colors"
+          className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-colors"
         >
           {isMobileMenuOpen ? (
             <X className="w-5 h-5" />
@@ -225,29 +177,29 @@ export default function MainLayout() {
         </button>
       </div>
 
-      {/* Sidebar */}
+      {/* Sidebar - Premium Trading Cockpit Style */}
       <aside
-        className={`fixed inset-y-0 left-0 z-30 w-64 bg-white/95 dark:bg-[#121418]/95 border-r border-gray-200/80 dark:border-white/10 transform transition-transform duration-300 ease-in-out flex flex-col backdrop-blur-xl ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"} md:relative md:translate-x-0`}
+        className={`fixed inset-y-0 left-0 z-30 w-[260px] bg-[#0A0B0D] border-r border-white/5 transform transition-transform duration-300 ease-in-out flex flex-col ${
+          isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
+        } md:relative md:translate-x-0`}
       >
         {/* Logo */}
-        <div className="h-16 flex items-center gap-3 px-5 border-b border-gray-200/80 dark:border-white/10 shrink-0 hidden md:flex">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-blue-500/30">
-            <Activity className="w-5 h-5 text-white" />
-          </div>
-          <div>
-            <span className="font-black text-gray-900 dark:text-white text-lg tracking-tight block leading-none">
+        <div className="h-16 flex items-center justify-between px-5 shrink-0 hidden md:flex border-b border-white/5">
+          <div className="flex items-center gap-2.5">
+            <Activity className="w-5 h-5 text-cyan-400" />
+            <span className="font-semibold text-gray-100 text-[15px] tracking-tight">
               Forex Notes
             </span>
-            <span className="text-[9px] text-gray-400 font-bold uppercase tracking-widest">
-              Trade Journal
-            </span>
           </div>
+          <button onClick={() => setIsSearchOpen(true)} className="p-1.5 text-gray-500 hover:text-gray-300 rounded-md hover:bg-white/5 transition-colors">
+            <span className="text-[10px] font-mono border border-gray-700 px-1 rounded">⌘K</span>
+          </button>
         </div>
 
-        <nav className="flex-1 overflow-y-auto py-5 px-3 space-y-6 scrollbar-hide mt-16 md:mt-0">
+        <nav className="flex-1 overflow-y-auto py-5 px-3 space-y-7 scrollbar-hide mt-14 md:mt-0">
           {navSections.map((section) => (
             <div key={section.label}>
-              <p className="px-3 text-[9px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] mb-2">
+              <p className="px-3 text-[10px] font-semibold text-gray-600 uppercase tracking-widest mb-2.5">
                 {section.label}
               </p>
               <div className="space-y-0.5">
@@ -257,7 +209,8 @@ export default function MainLayout() {
                     to={item.to}
                     icon={item.icon}
                     label={item.label}
-                    color={item.color}
+                    isBeta={item.isBeta}
+                    isDisabled={item.isDisabled}
                     currentPath={location.pathname}
                     onClick={closeMenu}
                   />
@@ -266,18 +219,17 @@ export default function MainLayout() {
             </div>
           ))}
 
-          {/* ADMIN BYPASS MENU - ONLY VISIBLE TO YOUR EMAIL */}
+          {/* ADMIN BYPASS MENU */}
           { ["noballondesk@gmail.com", "akpatil51340@gmail.com"].includes(localStorage.getItem("userEmail")) && (
-            <div className="pt-4 mt-4 border-t border-gray-200/80 dark:border-white/10">
-              <p className="px-3 text-[9px] font-black text-emerald-500 uppercase tracking-[0.2em] mb-2">
-                Admin Area
+            <div className="pt-5 mt-5 border-t border-white/5">
+              <p className="px-3 text-[10px] font-semibold text-emerald-500/70 uppercase tracking-widest mb-2.5">
+                Admin
               </p>
               <div className="space-y-0.5">
                 <NavItem
                   to="/admin"
                   icon={ShieldCheck}
                   label="Command Center"
-                  color="emerald"
                   currentPath={location.pathname}
                   onClick={closeMenu}
                 />
@@ -286,18 +238,16 @@ export default function MainLayout() {
           )}
         </nav>
 
-        {/* User Card & Subscription at bottom */}
-        <div className="p-3 border-t border-gray-200/80 dark:border-white/10 relative">
+        {/* User Card */}
+        <div className="p-3 relative">
           {isProfileOpen && (
-            <div className="absolute bottom-full left-3 right-3 mb-2 bg-white/95 dark:bg-[#1a1d24]/95 border border-gray-200/80 dark:border-white/10 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-2 z-50 backdrop-blur-xl">
+            <div className="absolute bottom-full left-3 right-3 mb-2 bg-[#1B2027] border border-white/10 rounded-xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-2 z-50">
               <Link
                 to="/profile"
                 onClick={closeMenu}
-                className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
+                className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-300 hover:bg-[#232931] hover:text-white transition-colors"
               >
-                <div className="w-7 h-7 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
-                  <User className="w-3.5 h-3.5 text-blue-400" />
-                </div>
+                <User className="w-4 h-4 text-cyan-400" />
                 Profile
               </Link>
               <button
@@ -305,134 +255,121 @@ export default function MainLayout() {
                   setIsProfileOpen(false);
                   setIsSubscriptionOpen(true);
                 }}
-                className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 transition-colors text-left border-t border-gray-100 dark:border-white/5"
+                className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-emerald-400 hover:bg-emerald-400/10 transition-colors text-left border-t border-white/5"
               >
-                <div className="w-7 h-7 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
-                  <CreditCard className="w-3.5 h-3.5 text-emerald-400" />
-                </div>
+                <CreditCard className="w-4 h-4 text-emerald-400" />
                 Subscription Plan
               </button>
               <button
                 onClick={handleLogout}
-                className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors text-left border-t border-gray-100 dark:border-white/5"
+                className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-red-400 hover:bg-red-400/10 transition-colors text-left border-t border-white/5"
               >
-                <div className="w-7 h-7 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center">
-                  <LogOut className="w-3.5 h-3.5 text-red-400" />
-                </div>
+                <LogOut className="w-4 h-4 text-red-400" />
                 Log out
               </button>
             </div>
           )}
 
-          <div className="flex items-center justify-between p-3 rounded-2xl bg-gradient-to-r from-blue-500/5 to-cyan-500/5 border border-blue-500/10 hover:border-blue-400/30 transition-colors cursor-pointer">
-            <div
-              onClick={() => setIsProfileOpen(!isProfileOpen)}
-              className="flex items-center gap-3 overflow-hidden flex-1"
-            >
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 text-white flex items-center justify-center font-black text-sm shrink-0 shadow-md shadow-blue-500/20">
+          <div
+            onClick={() => setIsProfileOpen(!isProfileOpen)}
+            className="flex items-center justify-between p-3 rounded-xl bg-[#101216] border border-white/5 hover:border-white/10 transition-colors cursor-pointer group"
+          >
+            <div className="flex items-center gap-3 overflow-hidden">
+              <div className="w-8 h-8 rounded-lg bg-cyan-500/10 text-cyan-400 flex items-center justify-center font-bold text-sm shrink-0 border border-cyan-500/20">
                 {localStorage.getItem("userEmail")
                   ? localStorage.getItem("userEmail").charAt(0).toUpperCase()
                   : "U"}
               </div>
               <div className="overflow-hidden flex flex-col items-start">
-                <p className="text-sm font-bold text-gray-900 dark:text-white leading-tight truncate max-w-[100px]">
-                  {localStorage.getItem("userEmail") || "User"}
+                <p className="text-[13px] font-medium text-gray-200 leading-tight truncate max-w-[110px]">
+                  {localStorage.getItem("userEmail") || "Trader"}
                 </p>
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    alert("Pro Plan features are coming soon! Stay tuned.");
-                  }}
-                  className="relative z-10 px-2 py-0.5 mt-1 bg-emerald-500/10 text-[10px] text-emerald-500 font-bold uppercase tracking-widest rounded-[2px] hover:bg-emerald-500/20 transition-colors text-left"
-                >
-                  Subscription
-                </button>
+                <span className="text-[10px] text-gray-500 mt-0.5 group-hover:text-gray-400 transition-colors">
+                  Pro Workspace
+                </span>
               </div>
             </div>
-            <button
-              onClick={() => setIsProfileOpen(!isProfileOpen)}
-              className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors rounded-lg hover:bg-gray-100/80 dark:hover:bg-white/[0.04]"
-            >
-              <ChevronDown
-                className={`w-4 h-4 transition-transform ${isProfileOpen ? "rotate-180" : ""}`}
-              />
-            </button>
+            <ChevronDown
+              className={`w-4 h-4 text-gray-500 transition-transform ${isProfileOpen ? "rotate-180 text-white" : "group-hover:text-gray-300"}`}
+            />
           </div>
         </div>
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 overflow-y-auto relative pt-16 md:pt-0">
+      <main className="flex-1 overflow-y-auto relative pt-14 md:pt-0 bg-[#0A0B0D]">
         <Outlet />
       </main>
+
+      {/* Command Palette Overlay (Mock) */}
+      {isSearchOpen && (
+        <div className="fixed inset-0 z-50 flex items-start justify-center pt-[15vh] p-4 bg-black/50 backdrop-blur-sm animate-in fade-in" onClick={() => setIsSearchOpen(false)}>
+          <div className="w-full max-w-xl bg-[#101216] border border-white/10 rounded-2xl shadow-2xl overflow-hidden" onClick={e => e.stopPropagation()}>
+             <div className="flex items-center px-4 py-3 border-b border-white/5">
+                <Sparkles className="w-5 h-5 text-gray-400 mr-3" />
+                <input type="text" placeholder="Search trades, analytics, or actions..." autoFocus className="flex-1 bg-transparent border-none outline-none text-white placeholder-gray-500 text-[15px]" />
+                <button onClick={() => setIsSearchOpen(false)} className="px-2 py-1 bg-white/5 text-gray-400 text-[10px] rounded hover:bg-white/10">ESC</button>
+             </div>
+             <div className="p-2">
+                <p className="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Quick Actions</p>
+                <button onClick={() => { navigate('/add-trade'); setIsSearchOpen(false); }} className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-gray-300 hover:bg-white/5 rounded-lg transition-colors text-left">
+                  <PlusCircle className="w-4 h-4 text-cyan-400" /> Log a new trade
+                </button>
+                <button onClick={() => { navigate('/dashboard'); setIsSearchOpen(false); }} className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-gray-300 hover:bg-white/5 rounded-lg transition-colors text-left">
+                  <LayoutDashboard className="w-4 h-4 text-emerald-400" /> Go to Command Center
+                </button>
+             </div>
+          </div>
+        </div>
+      )}
 
       {/* Subscription Modal */}
       {isSubscriptionOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="relative w-full max-w-md bg-white/95 dark:bg-[#121418]/95 border border-gray-200/80 dark:border-white/10 rounded-3xl shadow-2xl p-6 sm:p-8 backdrop-blur-2xl">
+          <div className="relative w-full max-w-md bg-[#101216] border border-white/10 rounded-2xl shadow-2xl p-6 sm:p-8">
             <button
               onClick={() => setIsSubscriptionOpen(false)}
-              className="absolute top-4 right-4 p-2 rounded-xl bg-gray-100/80 dark:bg-white/[0.04] text-gray-400 hover:text-gray-600 dark:hover:text-white transition-colors border border-gray-200/80 dark:border-white/10"
+              className="absolute top-4 right-4 p-2 rounded-lg bg-white/5 text-gray-400 hover:text-white transition-colors"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4" />
             </button>
 
             <div className="flex items-center gap-4 mb-6">
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-green-500/20 border border-emerald-500/20 flex items-center justify-center shadow-lg shadow-emerald-500/10">
-                <ShieldCheck className="w-7 h-7 text-emerald-400" />
+              <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
+                <ShieldCheck className="w-6 h-6 text-emerald-400" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                  Pro Membership
+                <h3 className="text-lg font-bold text-white tracking-tight">
+                  Pro Workspace
                 </h3>
-                <span className="inline-block mt-1 px-2.5 py-0.5 bg-gradient-to-r from-emerald-500/20 to-green-500/20 text-emerald-400 border border-emerald-500/20 text-[10px] font-bold uppercase tracking-wider rounded-full">
-                  ✓ Active Plan
+                <span className="inline-block mt-0.5 text-emerald-400 text-[11px] font-semibold uppercase tracking-wider">
+                  Active Subscription
                 </span>
               </div>
             </div>
 
-            <div className="space-y-3 mb-6 text-sm text-gray-700 dark:text-gray-300">
-              <div className="p-4 bg-gradient-to-br from-emerald-500/5 to-green-500/5 rounded-2xl border border-emerald-500/10 space-y-3">
+            <div className="space-y-3 mb-8">
+              <div className="p-4 bg-[#15181D] rounded-xl border border-white/5 space-y-3">
                 {[
-                  "Real-time AI Psychology Coach",
-                  "Unlimited Trade Journaling & Cloud Storage",
-                  "Trader Problems Analytics Suite",
-                  "Advanced Performance & Economic Calendar",
+                  "Advanced Execution & Strategy Analytics",
+                  "Deep Psychology Tracking",
+                  "Performance Intelligence & Mistake Lab",
+                  "Cloud Sync & Trade Previews",
                 ].map((feature, i) => (
-                  <div key={i} className="flex items-center gap-3">
-                    <div className="w-5 h-5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center shrink-0">
-                      <CheckCircle2 className="w-3 h-3 text-emerald-400" />
-                    </div>
-                    <span className="text-sm text-gray-700 dark:text-gray-300">
+                  <div key={i} className="flex items-start gap-3">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                    <span className="text-[13px] text-gray-300 leading-snug">
                       {feature}
                     </span>
                   </div>
                 ))}
               </div>
-
-              <div className="flex justify-between items-center text-xs text-gray-500 dark:text-gray-400 px-1">
-                <span>
-                  Billing:{" "}
-                  <strong className="text-gray-700 dark:text-gray-300">
-                    Monthly
-                  </strong>
-                </span>
-                <span>
-                  Account:{" "}
-                  <strong className="text-gray-700 dark:text-gray-300">
-                    {localStorage.getItem("userEmail") || "User"}
-                  </strong>
-                </span>
-              </div>
             </div>
 
             <button
               onClick={() => setIsSubscriptionOpen(false)}
-              className="w-full py-3.5 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-500 hover:to-green-500 text-white font-bold rounded-2xl text-sm transition-all shadow-lg shadow-emerald-500/25"
+              className="w-full py-3 bg-white text-black font-semibold rounded-xl text-sm transition-all hover:bg-gray-200"
             >
-              <Zap className="w-4 h-4 inline mr-2" />
               Manage Subscription
             </button>
           </div>
