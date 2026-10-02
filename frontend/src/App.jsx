@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import {
   BrowserRouter,
+  useLocation,
   Routes,
   Route,
   Navigate,
@@ -38,6 +39,27 @@ import PreTradeGate from "./components/PreTradeGate.jsx";
 import CalculatorLayout from "./pages/TraderProblems/Layout.jsx";
 import PropFirm from "./pages/TraderProblems/PropFirm.jsx";
 import LotSizeCalculator from "./pages/TraderProblems/LotSizeCalculator.jsx";
+
+const INDEXABLE_PATHS = ["/"];
+
+const RouteSeo = () => {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    const indexable = INDEXABLE_PATHS.includes(pathname);
+    let robots = document.querySelector('meta[name="robots"]');
+    if (!robots) {
+      robots = document.createElement("meta");
+      robots.name = "robots";
+      document.head.appendChild(robots);
+    }
+    robots.content = indexable ? "index, follow" : "noindex, nofollow";
+    const canonical = document.querySelector('link[rel="canonical"]');
+    if (canonical) canonical.disabled = !indexable;
+  }, [pathname]);
+
+  return null;
+};
 
 // GUARD 1: Basic Authentication
 const AuthGuard = () => {
@@ -87,6 +109,7 @@ function App() {
 
   return (
     <BrowserRouter>
+      <RouteSeo />
       <ErrorBoundary>
         <Routes>
           {/* Public Landing Page is now the default root */}
