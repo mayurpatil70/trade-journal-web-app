@@ -245,6 +245,51 @@ export default function AdminDashboard() {
           </table>
         </div>
       </div>
+      {/* Incomplete Registrations Table */}
+      <div className="bg-[#0a0a0a]/60 backdrop-blur-xl border border-white/10 rounded-2xl p-6 shadow-xl mt-6">
+        <h2 className="text-base font-bold text-white mb-5 flex items-center gap-2">
+          Incomplete Registrations 
+          <span className="text-[10px] font-normal bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2 py-0.5 rounded-full uppercase tracking-wider">Follow-up List</span>
+        </h2>
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="border-b border-white/5 text-[10px] font-bold text-gray-500 uppercase tracking-widest">
+                <th className="pb-3 pr-4">Email</th>
+                <th className="pb-3 pr-4">Joined</th>
+                <th className="pb-3 text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-white/5 text-xs">
+              {accounts?.filter(acc => !recentOrders?.some(ord => ord.user_id === acc.id && ord.status === 'paid'))?.length > 0 ? (
+                accounts.filter(acc => !recentOrders?.some(ord => ord.user_id === acc.id && ord.status === 'paid')).map((acc) => (
+                  <tr key={`inc-${acc.id}`} className="hover:bg-white/[0.02] transition-colors">
+                    <td className="py-3 pr-4 font-medium text-white">{acc.email || "Unknown"}</td>
+                    <td className="py-3 pr-4 text-gray-500 font-mono">
+                      {acc.created_at ? new Date(acc.created_at).toLocaleDateString() : "N/A"}
+                    </td>
+                    <td className="py-3 text-right">
+                      <button onClick={() => {
+                          if (acc.email) {
+                              navigator.clipboard.writeText(acc.email);
+                              alert("Email copied to clipboard!");
+                          }
+                        }}
+                        className="text-[#2f8df4] hover:underline text-[10px] font-bold uppercase tracking-wider ml-auto">
+                        Copy Email
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={3} className="py-10 text-center text-gray-600 text-sm">No incomplete registrations found.</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
 }

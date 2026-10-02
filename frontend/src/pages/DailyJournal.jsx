@@ -15,41 +15,62 @@ export default function DailyJournal() {
   const todayKey = new Date().toISOString().slice(0, 10);
 
   useEffect(() => {
-    // Load local notes
-    const pre = localStorage.getItem(`preMarket_${todayKey}`);
-    const post = localStorage.getItem(`postMarket_${todayKey}`);
-    if (pre) {
-      setPreMarketNote(pre);
-      setIsPreMarketSaved(true);
-    }
-    if (post) {
-      setPostMarketNote(post);
-      setIsPostMarketSaved(true);
-    }
-
-    // Fetch today's trades
-    const fetchTrades = async () => {
+    const fetchJournalData = async () => {
       const userId = localStorage.getItem("userId") || localStorage.getItem("userEmail");
       if (!userId) return;
+
       try {
-        const response = await api.get(`/api/trades?userId=${userId}`);
-        const allTrades = response.data?.data || [];
+        // Fetch today's notes
+        const journalRes = await api.get(`/api/journals?userId=${userId}&date=${todayKey}`);
+        if (journalRes.data?.data && journalRes.data.data.length > 0) {
+          const entry = journalRes.data.data[0];
+          if (entry.pre_market_note) {
+            setPreMarketNote(entry.pre_market_note);
+            setIsPreMarketSaved(true);
+          }
+          if (entry.post_market_note) {
+            setPostMarketNote(entry.post_market_note);
+            setIsPostMarketSaved(true);
+          }
+        }
+
+        // Fetch today's trades
+        const tradesRes = await api.get(`/api/trades?userId=${userId}`);
+        const allTrades = tradesRes.data?.data || [];
         const today = allTrades.filter(t => (t.date || "").slice(0, 10) === todayKey);
         setTodayTrades(today);
       } catch (error) {
         console.error(error);
       }
     };
-    fetchTrades();
+    fetchJournalData();
   }, [todayKey]);
 
+  const saveJournalToDB = async (type, note) => {
+    const userId = localStorage.getItem("userId") || localStorage.getItem("userEmail");
+    if (!userId) return;
+    try {
+      const payload = { userId, date: todayKey };
+      if (type === "pre") payload.pre_market_note = note;
+      if (type === "post") payload.post_market_note = note;
+      
+      // Keep existing data to not overwrite during upsert
+      if (type === "pre") payload.post_market_note = postMarketNote;
+      if (type === "post") payload.pre_market_note = preMarketNote;
+
+      await api.post("/api/journals", payload);
+    } catch (error) {
+      console.error("Failed to save note:", error);
+    }
+  };
+
   const savePreMarket = () => {
-    localStorage.setItem(`preMarket_${todayKey}`, preMarketNote);
+    saveJournalToDB("pre", preMarketNote);
     setIsPreMarketSaved(true);
   };
 
   const savePostMarket = () => {
-    localStorage.setItem(`postMarket_${todayKey}`, postMarketNote);
+    saveJournalToDB("post", postMarketNote);
     setIsPostMarketSaved(true);
   };
 

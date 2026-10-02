@@ -44,10 +44,30 @@ export const exportUserData = async (req, res) => {
         t.net_pl || 0,
       ]);
 
-      const csvContent = [
+      let csvContent = [
         headers.join(","),
         ...rows.map((r) => r.join(",")),
       ].join("\n");
+
+      // Fetch daily journals and append
+      const { data: journals } = await supabase
+        .from("daily_journals")
+        .select("*")
+        .eq("user_id", userId);
+        
+      if (journals && journals.length > 0) {
+         csvContent += "\n\n--- DAILY JOURNALS ---\n\n";
+         const jHeaders = ["Date", "Pre-Market Note", "Post-Market Note"];
+         const jRows = journals.map(j => [
+            j.date, 
+            `"${(j.pre_market_note || "").replace(/"/g, '""')}"`,
+            `"${(j.post_market_note || "").replace(/"/g, '""')}"`
+         ]);
+         csvContent += [
+            jHeaders.join(","),
+            ...jRows.map(r => r.join(","))
+         ].join("\n");
+      }
 
       res.setHeader("Content-Type", "text/csv");
       res.setHeader(

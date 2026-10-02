@@ -14,6 +14,7 @@ import tradeRoutes from "./routes/tradeRoutes.js";
 import supportRoutes from "./routes/supportRoutes.js";
 import subscriptionRoutes from "./routes/subscriptionRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
+import journalRoutes from "./routes/journalRoutes.js";
 
 const app = express();
 
@@ -44,6 +45,7 @@ app.use("/api/trades", exportRoutes); // <-- This handles your exports
 app.use("/api/support", supportRoutes);
 app.use("/api/subscriptions", subscriptionRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/journals", journalRoutes);
 
 // Health Check Endpoint
 app.get("/", (req, res) => {

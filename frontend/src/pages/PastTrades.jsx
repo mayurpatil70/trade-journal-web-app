@@ -14,7 +14,8 @@ import {
   PlusCircle,
   MoreHorizontal,
   Clock,
-  ArrowRight
+  ArrowRight,
+  Brain
 } from "lucide-react";
 
 export default function PastTrades() {
@@ -95,10 +96,10 @@ export default function PastTrades() {
              onChange={(e) => setResultFilter(e.target.value)}
              className="appearance-none bg-[#101216] border border-white/5 rounded-xl py-3 pl-4 pr-10 text-white text-[13px] focus:border-emerald-500/50 outline-none min-w-[140px]"
            >
-             <option value="">All Results</option>
-             <option value="win">Win ✓</option>
-             <option value="loss">Loss ✗</option>
-             <option value="be">Break-Even</option>
+             <option value="" className="bg-[#101216] text-white">All Results</option>
+             <option value="win" className="bg-[#101216] text-white">Win ✓</option>
+             <option value="loss" className="bg-[#101216] text-white">Loss ✗</option>
+             <option value="be" className="bg-[#101216] text-white">Break-Even</option>
            </select>
            <button className="px-4 py-3 bg-[#101216] border border-white/5 rounded-xl text-gray-400 hover:text-white transition-colors flex items-center gap-2 text-[13px]">
              <Filter className="w-4 h-4" /> More Filters

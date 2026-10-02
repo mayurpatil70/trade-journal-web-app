@@ -180,7 +180,7 @@ export default function AddTrade() {
                   <label className={labelClass}>Asset / Pair</label>
                   <div className="relative">
                     <select name="asset" value={formData.asset} onChange={handleChange} className={selectClass}>
-                      {assets.map(a => <option key={a} value={a}>{a}</option>)}
+                      {assets.map(a => <option key={a} value={a} className="bg-[#15181D] text-white">{a}</option>)}
                     </select>
                     <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
                   </div>
@@ -199,7 +199,7 @@ export default function AddTrade() {
                   <label className={labelClass}>Session</label>
                   <div className="relative">
                     <select name="session" value={formData.session} onChange={handleChange} className={selectClass}>
-                      {["London", "New York", "Asian", "Sydney", "Other"].map(s => <option key={s} value={s}>{s}</option>)}
+                      {["London", "New York", "Asian", "Sydney", "Other"].map(s => <option key={s} value={s} className="bg-[#15181D] text-white">{s}</option>)}
                     </select>
                     <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
                   </div>
@@ -304,7 +304,7 @@ export default function AddTrade() {
                   <label className={labelClass}>Strategy / Setup</label>
                   <div className="relative">
                     <select name="setup" value={formData.setup} onChange={handleChange} className={selectClass}>
-                      {setups.map(s => <option key={s} value={s}>{s}</option>)}
+                      {setups.map(s => <option key={s} value={s} className="bg-[#15181D] text-white">{s}</option>)}
                     </select>
                     <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
                   </div>
@@ -349,8 +349,8 @@ export default function AddTrade() {
                       <label className={labelClass}>{idx === 0 ? "Emotion Before Trade" : "Emotion After Trade"}</label>
                       <div className="relative">
                         <select name={field} value={formData[field]} onChange={handleChange} className={selectClass}>
-                          <option value="">Select emotion...</option>
-                          {emotions.map(e => <option key={e} value={e}>{e}</option>)}
+                          <option value="" className="bg-[#15181D] text-white">Select emotion...</option>
+                          {emotions.map(e => <option key={e} value={e} className="bg-[#15181D] text-white">{e}</option>)}
                         </select>
                         <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
                       </div>
