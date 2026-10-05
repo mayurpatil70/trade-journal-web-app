@@ -21,14 +21,25 @@ export const handleDiscordCallback = async (req, res) => {
   const userId = state;
 
   try {
+    const clientId = process.env.DISCORD_CLIENT_ID?.trim();
+    const clientSecret = process.env.DISCORD_CLIENT_SECRET?.trim();
+    const targetGuildId = process.env.DISCORD_GUILD_ID?.trim();
+    
+    // Construct redirectUri exactly how the frontend built it, depending on clientUrl
+    const redirectUri = `${clientUrl === "http://localhost:5173" ? "http://localhost:3000" : "https://forexnotes-web-app.onrender.com"}/api/discord/callback`;
+
+    if (!clientId || !clientSecret || !targetGuildId) {
+      throw new Error("Missing Discord OAuth environment variables");
+    }
+
     const tokenResponse = await axios.post(
       "https://discord.com/api/oauth2/token",
       new URLSearchParams({
-        client_id: process.env.DISCORD_CLIENT_ID.trim(),
-        client_secret: process.env.DISCORD_CLIENT_SECRET.trim(),
+        client_id: clientId,
+        client_secret: clientSecret,
         grant_type: "authorization_code",
         code: code,
-        redirect_uri: process.env.DISCORD_REDIRECT_URI.trim(),
+        redirect_uri: redirectUri,
       }),
       { headers: { "Content-Type": "application/x-www-form-urlencoded" } },
     );
@@ -42,10 +53,12 @@ export const handleDiscordCallback = async (req, res) => {
       },
     );
 
-    const targetGuildId = process.env.DISCORD_GUILD_ID.trim();
     const isMember = guildsResponse.data.some(
       (guild) => guild.id === targetGuildId,
     );
+    
+    console.log(`Checking membership. Target Guild: ${targetGuildId}`);
+    console.log(`User is in guilds:`, guildsResponse.data.map(g => g.id).join(", "));
 
     if (isMember) {
       console.log(
@@ -73,6 +86,7 @@ export const handleDiscordCallback = async (req, res) => {
       "Complete Discord Auth Error:",
       err.response?.data || err.message,
     );
-    return res.redirect(`${clientUrl}/link-discord?error=server_error`);
+    const detail = err.response?.data?.error_description || err.response?.data?.error || err.message;
+    return res.redirect(`${clientUrl}/link-discord?error=server_error&details=${encodeURIComponent(detail)}`);
   }
 };

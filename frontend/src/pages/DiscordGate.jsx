@@ -13,12 +13,13 @@ export default function DiscordGate() {
   // Check for error parameters redirected from your backend controller
   useEffect(() => {
     const error = searchParams.get("error");
+    const details = searchParams.get("details");
     if (error === "not_in_server") {
       setErrorMessage(
         "Access Denied: You are not a member of our Discord server yet!",
       );
     } else if (error === "auth_failed" || error === "server_error") {
-      setErrorMessage("Discord authentication failed. Please try again.");
+      setErrorMessage(`Discord authentication failed: ${details || "Please try again."}`);
     }
   }, [searchParams]);
 
