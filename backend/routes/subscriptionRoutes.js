@@ -250,6 +250,29 @@ router.post("/start-trial", requireAuth, async (req, res) => {
   if (!userId) return res.status(401).json({ error: "Unauthorized" });
 
   try {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("account_status, trial_ends_at")
+      .eq("id", userId)
+      .single();
+
+    if (profile.account_status === "expired" || profile.account_status === "active") {
+      return res.status(403).json({ error: "Trial already used or account active." });
+    }
+
+    // If trial ends at is more than 25 hours from now, or already in the past, don't allow restart
+    if (profile.trial_ends_at) {
+      const endsAt = new Date(profile.trial_ends_at).getTime();
+      const now = Date.now();
+      if (endsAt < now) {
+         return res.status(403).json({ error: "Trial already expired." });
+      }
+      // If they already clicked it and extended it
+      if (endsAt > now + 24 * 60 * 60 * 1000) {
+         return res.status(403).json({ error: "Trial already started." });
+      }
+    }
+
     const { error } = await supabase
       .from("profiles")
       .update({

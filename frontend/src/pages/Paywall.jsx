@@ -57,11 +57,16 @@ export default function Paywall() {
 
   const handleCryptoPayment = async (plan, price) => {
     if (!isConnected) {
-      const injectedConnector = connectors.find(c => c.id === 'injected' || c.id === 'metaMask' || c.name.toLowerCase().includes('trust')) || connectors[0];
-      if (injectedConnector) {
-        connect({ connector: injectedConnector });
+      const hasInjected = typeof window !== 'undefined' && window.ethereum;
+      const wcConnector = connectors.find(c => c.id === 'walletConnect');
+      const injectedConnector = connectors.find(c => c.id === 'injected' || c.id === 'metaMask') || connectors[0];
+      
+      const connectorToUse = hasInjected ? injectedConnector : (wcConnector || injectedConnector);
+      
+      if (connectorToUse) {
+        connect({ connector: connectorToUse });
       } else {
-        alert("No web3 wallet found. Please install MetaMask or TrustWallet.");
+        alert("Wallet connection failed. Please try again.");
       }
       return;
     }
@@ -130,9 +135,9 @@ export default function Paywall() {
           </div>
 
           <ul className="text-sm space-y-4 mb-8 text-gray-300">
-            <li className="flex items-center">✓ <span className="ml-3">2 Backtesting Sessions</span></li>
-            <li className="flex items-center">✓ <span className="ml-3">1 Indicator</span></li>
-            <li className="flex items-center">✓ <span className="ml-3">1 week Data Retention</span></li>
+            <li className="flex items-center">✓ <span className="ml-3">Full access to Trading Journal</span></li>
+            <li className="flex items-center">✓ <span className="ml-3">Analytics & Insights</span></li>
+            <li className="flex items-center">✓ <span className="ml-3">24 Hours Free Access</span></li>
           </ul>
 
           <button 
@@ -199,7 +204,15 @@ export default function Paywall() {
 
       </div>
       
-      <button className="mt-12 flex items-center gap-2 text-gray-400 hover:text-white transition-colors border border-gray-800 px-4 py-2 rounded-full">
+      <button 
+        onClick={() => {
+          localStorage.removeItem("userId");
+          localStorage.removeItem("token");
+          localStorage.removeItem("userEmail");
+          window.location.href = "/login";
+        }}
+        className="mt-12 flex items-center gap-2 text-gray-400 hover:text-white transition-colors border border-gray-800 px-4 py-2 rounded-full"
+      >
          <ArrowRight className="w-4 h-4 rotate-180" /> Logout
       </button>
     </div>
