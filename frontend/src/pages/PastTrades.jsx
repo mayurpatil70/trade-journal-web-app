@@ -15,7 +15,8 @@ import {
   MoreHorizontal,
   Clock,
   ArrowRight,
-  Brain
+  Brain,
+  Pencil
 } from "lucide-react";
 
 export default function PastTrades() {
@@ -195,9 +196,7 @@ export default function PastTrades() {
                    <h2 className="text-xl font-bold text-white">{selectedTrade.asset}</h2>
                    <span className="text-gray-500 text-sm">• {selectedTrade.date}</span>
                 </div>
-                <button onClick={() => setSelectedTrade(null)} className="p-2 bg-white/5 hover:bg-white/10 rounded-lg text-gray-400 transition-colors">
-                  <X className="w-4 h-4" />
-                </button>
+                <div className="flex items-center gap-2"><button onClick={() => navigate(`/add-trade?edit=${selectedTrade.id}`)} className="p-2 bg-white/5 hover:bg-white/10 rounded-lg text-emerald-400 transition-colors" title="Edit Trade"><Pencil className="w-4 h-4" /></button><button onClick={() => setSelectedTrade(null)} className="p-2 bg-white/5 hover:bg-white/10 rounded-lg text-gray-400 transition-colors"><X className="w-4 h-4" /></button></div>
              </div>
              
              {/* Body */}
@@ -289,3 +288,4 @@ const List = ({ className }) => (
     <line x1="3" y1="18" x2="3.01" y2="18"></line>
   </svg>
 );
+

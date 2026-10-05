@@ -1,0 +1,10 @@
+const fs = require('fs');
+let code = fs.readFileSync('D:/Tutorials/trade-journal/backend/controllers/exportController.js', 'utf8');
+const oldHeader = '\"Net P&L\",\n      ];';
+const newHeader = '\"Net P&L\",\n        \"Images\",\n      ];';
+code = code.replace(oldHeader, newHeader);
+const oldRows = 't.net_pl || 0,\n      ]);';
+const newRows = 't.net_pl || 0,\n        \"\"\n      ]);';
+code = code.replace(oldRows, newRows);
+fs.writeFileSync('D:/Tutorials/trade-journal/backend/controllers/exportController.js', code);
+console.log('Done');
