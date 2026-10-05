@@ -73,7 +73,7 @@ export default function AdminDashboard() {
         <p className="text-sm text-gray-500 font-medium">Loading Admin Center...</p>
       </div>
     );
-
+  }
 
   const { metrics = {}, recentOrders = [], accounts = [], withdrawals = [], affiliates = [] } = data || {};
 
@@ -399,3 +399,4 @@ export default function AdminDashboard() {
   );
 
 
+}

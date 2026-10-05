@@ -231,20 +231,27 @@ export default function Dashboard() {
 
         {/* AI Insight & Trading Health */}
         <div className="flex flex-col gap-6">
-          {/* Insight Card */}
-          <div className="bg-gradient-to-br from-[#102a3a] to-[#0A0B0D] border border-cyan-500/20 rounded-2xl p-6 relative overflow-hidden group">
-            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-              <Zap className="w-24 h-24 text-cyan-400" />
+          {/* Economic Calendar & Promotion Card */}
+          <div className="bg-gradient-to-br from-[#102a3a] to-[#0A0B0D] border border-cyan-500/20 rounded-2xl p-6 relative overflow-hidden group flex flex-col justify-between h-full">
+            <div>
+              <h3 className="text-[11px] font-semibold text-cyan-500 uppercase tracking-widest mb-3 flex items-center gap-2">
+                Economic Calendar
+              </h3>
+              <p className="text-gray-200 text-[13px] leading-relaxed mb-4 relative z-10">
+                Stay ahead of the markets. Track upcoming high-impact economic events before you execute your trades.
+              </p>
             </div>
-            <h3 className="text-[11px] font-semibold text-cyan-500 uppercase tracking-widest mb-3 flex items-center gap-2">
-              <Sparkles className="w-3 h-3" /> Journal Insight
-            </h3>
-            <p className="text-gray-200 text-[13px] leading-relaxed mb-4 relative z-10">
-              {insight.text}
-            </p>
-            <button className="text-[12px] font-semibold text-cyan-400 hover:text-cyan-300 flex items-center gap-1 transition-colors">
-              Review Analytics <ArrowRight className="w-3 h-3" />
-            </button>
+            <div className="mt-4 pt-4 border-t border-white/10 flex justify-between items-center relative z-10">
+              <span className="text-[11px] font-bold text-amber-400 flex items-center gap-1">
+                <Sparkles className="w-3 h-3" /> Get 10% Off with Affiliate
+              </span>
+              <button 
+                onClick={() => navigate("/news")}
+                className="text-[12px] font-semibold text-cyan-400 hover:text-cyan-300 flex items-center gap-1 transition-colors"
+              >
+                View Calendar <ArrowRight className="w-3 h-3" />
+              </button>
+            </div>
           </div>
 
           {/* Quick Stats / Trading Health */}

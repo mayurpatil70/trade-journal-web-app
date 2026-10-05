@@ -129,12 +129,6 @@ export default function MainLayout() {
       ],
     },
     {
-      label: "Plan",
-      items: [
-        { to: "/daily-journal", icon: Settings, label: "Daily Journal" },
-      ],
-    },
-    {
       label: "Tools",
       items: [
         { to: "/news", icon: Globe, label: "Economic Calendar" },

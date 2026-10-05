@@ -149,24 +149,6 @@ export default function PropFirm() {
               </p>
             </div>
           </div>
-
-          {/* Firm Preset Selector */}
-          <div className="flex flex-wrap gap-2">
-            {FIRM_PRESETS.map((firm) => (
-              <button
-                key={firm.name}
-                type="button"
-                onClick={() => handleFirmChange(firm.name)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all border ${
-                  selectedFirm === firm.name
-                    ? "bg-gradient-to-r from-red-500 to-amber-500 text-white border-transparent shadow-[0_0_15px_rgba(239,68,68,0.35)]"
-                    : "bg-white/40 dark:bg-white/5 border-gray-200 dark:border-white/10 text-gray-600 dark:text-gray-400 hover:border-red-500/50"
-                }`}
-              >
-                {firm.name}
-              </button>
-            ))}
-          </div>
         </div>
       </div>
 
