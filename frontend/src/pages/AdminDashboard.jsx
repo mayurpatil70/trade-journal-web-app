@@ -75,7 +75,7 @@ export default function AdminDashboard() {
     );
 
 
-  const { metrics, recentOrders, accounts, withdrawals, affiliates } = data;
+  const { metrics = {}, recentOrders = [], accounts = [], withdrawals = [], affiliates = [] } = data || {};
 
   const handleUpdateWithdrawal = async (id, status) => {
     try {
@@ -397,5 +397,5 @@ export default function AdminDashboard() {
       )}
     </div>
   );
-}
-}
+
+
