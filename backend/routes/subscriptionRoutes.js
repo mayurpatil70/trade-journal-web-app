@@ -246,15 +246,19 @@ router.get("/admin/pending", requireAuth, requireAdmin, async (req, res) => {
 
 // 6. Start Trial
 router.post("/start-trial", requireAuth, async (req, res) => {
-  const userId = req.user?.id || req.body.userId;
+  const userId = req.user?.id || req.body?.userId || req.userId;
   if (!userId) return res.status(401).json({ error: "Unauthorized" });
 
   try {
-    const { data: profile } = await supabase
+    const { data: profile, error } = await supabase
       .from("profiles")
       .select("account_status, trial_ends_at")
       .eq("id", userId)
       .single();
+
+    if (error || !profile) {
+       return res.status(404).json({ error: "Profile not found." });
+    }
 
     if (profile.account_status === "expired") {
       return res.status(403).json({ error: "Your free trial has already expired." });
