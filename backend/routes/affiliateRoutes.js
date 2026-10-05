@@ -6,10 +6,11 @@ const router = express.Router();
 
 router.get("/profile", requireAuth, async (req, res) => {
   try {
+    const userId = req.userId || req.body?.userId;
     const { data, error } = await supabase
       .from("profiles")
       .select("*")
-      .eq("id", req.user.id)
+      .eq("id", userId)
       .single();
 
     if (error) {
@@ -28,11 +29,12 @@ router.get("/profile", requireAuth, async (req, res) => {
 
 router.post("/withdraw", requireAuth, async (req, res) => {
   const { withdrawAddress } = req.body;
+  const userId = req.userId || req.body?.userId;
   try {
     const { data: profile } = await supabase
       .from("profiles")
       .select("wallet_balance")
-      .eq("id", req.user.id)
+      .eq("id", userId)
       .single();
 
     if (!profile || profile.wallet_balance < 25) {
@@ -40,14 +42,14 @@ router.post("/withdraw", requireAuth, async (req, res) => {
     }
 
     const { error: insertErr } = await supabase.from('withdrawals').insert([{
-      user_id: req.user.id,
+      user_id: userId,
       amount: profile.wallet_balance,
       wallet_address: withdrawAddress
     }]);
 
     if (insertErr) throw insertErr;
 
-    await supabase.from('profiles').update({ wallet_balance: 0 }).eq('id', req.user.id);
+    await supabase.from('profiles').update({ wallet_balance: 0 }).eq('id', userId);
 
     res.json({ success: true });
   } catch (error) {

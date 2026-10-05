@@ -8,8 +8,8 @@ const ERC20_ABI = [
 ];
 
 export const verifyCryptoPayment = async (req, res) => {
-  const { txHash, plan } = req.body;
-  const userId = req.user?.id || req.body.userId; // Depending on how requireAuth works
+  const { txHash, plan, referredBy } = req.body;
+  const userId = req.user?.id || req.body?.userId || req.userId;
   
   if (!userId) return res.status(401).json({ error: 'Unauthorized' });
 
@@ -60,15 +60,21 @@ export const verifyCryptoPayment = async (req, res) => {
     const newSubEndDate = new Date();
     newSubEndDate.setDate(newSubEndDate.getDate() + daysToAdd);
 
-    // Update User Subscription in Supabase
+    // Fetch user email just in case we need to insert
+    const { data: userRow } = await supabase.from('users').select('email').eq('id', userId).single();
+    const email = userRow?.email || `user-${userId}@forexnotes.in`;
+
+    // Upsert User Subscription in Supabase
     const { data: user, error: userErr } = await supabase
       .from('profiles')
-      .update({
+      .upsert({
+        id: userId,
+        email: email,
         current_plan: plan,
         subscription_ends_at: newSubEndDate,
-        account_status: 'active'
-      })
-      .eq('id', userId)
+        account_status: 'active',
+        ...(referredBy ? { referred_by: referredBy } : {})
+      }, { onConflict: 'id' })
       .select('referred_by')
       .single();
 
@@ -77,11 +83,12 @@ export const verifyCryptoPayment = async (req, res) => {
     }
 
     // Process Affiliate Commission
-    if (user && user.referred_by) {
+    const referrer = user?.referred_by || referredBy;
+    if (referrer) {
       const { data: affiliate } = await supabase
         .from('profiles')
         .select('id, wallet_balance')
-        .eq('referral_code', user.referred_by)
+        .eq('referral_code', referrer)
         .single();
 
       if (affiliate) {

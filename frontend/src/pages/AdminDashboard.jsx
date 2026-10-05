@@ -72,9 +72,18 @@ export default function AdminDashboard() {
         <p className="text-sm text-gray-500 font-medium">Loading Admin Center...</p>
       </div>
     );
-  }
+  const [activeTab, setActiveTab] = useState("overview");
 
-  const { metrics, recentOrders, accounts } = data;
+  const { metrics, recentOrders, accounts, withdrawals, affiliates } = data;
+
+  const handleUpdateWithdrawal = async (id, status) => {
+    try {
+      await api.put(`/api/admin/withdrawal/${id}`, { status });
+      fetchData();
+    } catch (error) {
+      alert("Failed to update withdrawal");
+    }
+  };
 
   return (
     <div className="w-full max-w-7xl mx-auto pb-16 px-4 md:px-8 mt-6 md:mt-8" style={{ fontFamily: "'Inter', sans-serif" }}>
@@ -89,7 +98,14 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* Stats */}
+      <div className="flex gap-4 border-b border-white/10 pb-4 mb-6">
+        <button onClick={() => setActiveTab("overview")} className={`text-sm font-bold uppercase tracking-wider ${activeTab === "overview" ? "text-emerald-400" : "text-gray-500 hover:text-white"}`}>Overview</button>
+        <button onClick={() => setActiveTab("affiliates")} className={`text-sm font-bold uppercase tracking-wider ${activeTab === "affiliates" ? "text-[#2f8df4]" : "text-gray-500 hover:text-white"}`}>Affiliates & Payouts</button>
+      </div>
+
+      {activeTab === "overview" && (
+        <>
+        {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
         {/* Revenue */}
         <div className="bg-[#0a0a0a]/60 backdrop-blur-xl border border-white/10 rounded-2xl p-6 shadow-xl">
@@ -290,6 +306,95 @@ export default function AdminDashboard() {
           </table>
         </div>
       </div>
+      </>)}
+      
+      {activeTab === "affiliates" && (
+        <div className="space-y-6">
+          <div className="bg-[#0a0a0a]/60 backdrop-blur-xl border border-white/10 rounded-2xl p-6 shadow-xl">
+            <h2 className="text-base font-bold text-white mb-5">Withdrawal Requests</h2>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="border-b border-white/5 text-[10px] font-bold text-gray-500 uppercase tracking-widest">
+                    <th className="pb-3 pr-4">Email</th>
+                    <th className="pb-3 pr-4">Amount</th>
+                    <th className="pb-3 pr-4">Wallet Address</th>
+                    <th className="pb-3 pr-4">Status</th>
+                    <th className="pb-3 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/5 text-xs">
+                  {withdrawals?.length > 0 ? withdrawals.map((w) => (
+                    <tr key={w.id} className="hover:bg-white/[0.02] transition-colors">
+                      <td className="py-3 pr-4 font-medium text-white">{w.users?.email || "Unknown"}</td>
+                      <td className="py-3 pr-4 text-emerald-400 font-bold">${w.amount}</td>
+                      <td className="py-3 pr-4 font-mono text-gray-400 text-[10px] break-all">{w.wallet_address}</td>
+                      <td className="py-3 pr-4">
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${w.status === "completed" ? "bg-emerald-500/10 text-emerald-400" : w.status === "rejected" ? "bg-red-500/10 text-red-400" : "bg-amber-500/10 text-amber-400"}`}>
+                          {w.status}
+                        </span>
+                      </td>
+                      <td className="py-3 text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <button onClick={() => window.open(`mailto:${w.users?.email}?subject=ForexNotes Affiliate Payout&body=Your withdrawal of $${w.amount} has been processed!`, "_blank")}
+                            className="bg-[#2f8df4]/10 text-[#2f8df4] hover:bg-[#2f8df4] hover:text-white border border-[#2f8df4]/20 px-3 py-1.5 rounded-xl text-[10px] uppercase font-bold transition-all">
+                            Email
+                          </button>
+                          {w.status === "pending" && (
+                            <>
+                              <button onClick={() => handleUpdateWithdrawal(w.id, "completed")}
+                                className="bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500 hover:text-white border border-emerald-500/20 px-3 py-1.5 rounded-xl text-[10px] uppercase font-bold transition-all">
+                                Paid
+                              </button>
+                              <button onClick={() => handleUpdateWithdrawal(w.id, "rejected")}
+                                className="bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white border border-red-500/20 px-3 py-1.5 rounded-xl text-[10px] uppercase font-bold transition-all">
+                                Unpaid
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  )) : (
+                    <tr>
+                      <td colSpan={5} className="py-10 text-center text-gray-600 text-sm">No withdrawal requests yet.</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          
+          <div className="bg-[#0a0a0a]/60 backdrop-blur-xl border border-white/10 rounded-2xl p-6 shadow-xl mt-6">
+            <h2 className="text-base font-bold text-white mb-5">All Affiliate Wallets</h2>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="border-b border-white/5 text-[10px] font-bold text-gray-500 uppercase tracking-widest">
+                    <th className="pb-3 pr-4">Email</th>
+                    <th className="pb-3 pr-4">Referral Code</th>
+                    <th className="pb-3 text-right">Wallet Balance</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/5 text-xs">
+                  {affiliates?.length > 0 ? affiliates.map((a) => (
+                    <tr key={a.id} className="hover:bg-white/[0.02] transition-colors">
+                      <td className="py-3 pr-4 font-medium text-white">{a.email || "Unknown"}</td>
+                      <td className="py-3 pr-4 font-mono text-gray-400">{a.referral_code}</td>
+                      <td className="py-3 text-right font-bold text-emerald-400">${a.wallet_balance} USDT</td>
+                    </tr>
+                  )) : (
+                    <tr>
+                      <td colSpan={3} className="py-10 text-center text-gray-600 text-sm">No affiliate balances.</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
+}
 }

@@ -30,6 +30,19 @@ router.get("/metrics", async (req, res) => {
       .select("*")
       .limit(10);
 
+    // 4. Get Withdrawals
+    const { data: withdrawals, error: withErr } = await supabase
+      .from("withdrawals")
+      .select("*, users:user_id(email)")
+      .order("created_at", { ascending: false });
+
+    // 5. Get Affiliate balances
+    const { data: affiliates, error: affErr } = await supabase
+      .from("profiles")
+      .select("id, email, wallet_balance, referral_code")
+      .gt("wallet_balance", 0)
+      .order("wallet_balance", { ascending: false });
+
     const metrics = {
       totalAccounts: accounts ? accounts.length : 0,
       activeAccounts: accounts ? accounts.length : 0,
@@ -43,7 +56,9 @@ router.get("/metrics", async (req, res) => {
       success: true, 
       metrics: metrics,
       recentOrders: payments || [],
-      accounts: accounts || [] // Mocking with users for now
+      accounts: accounts || [],
+      withdrawals: withdrawals || [],
+      affiliates: affiliates || []
     });
   } catch (error) {
     console.error("Admin metrics error:", error);
@@ -101,3 +116,20 @@ router.delete("/user/:userId", async (req, res) => {
 });
 
 export default router;
+// Update withdrawal status
+router.put("/withdrawal/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+    const { error } = await supabase
+      .from("withdrawals")
+      .update({ status })
+      .eq("id", id);
+      
+    if (error) throw error;
+    res.json({ success: true, message: "Withdrawal updated successfully." });
+  } catch (error) {
+    console.error("Withdrawal update error:", error);
+    res.status(500).json({ success: false, error: "Failed to update withdrawal." });
+  }
+});

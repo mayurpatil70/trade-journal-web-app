@@ -52,10 +52,10 @@ const LotSizeCalculator = lazy(() => import("./pages/TraderProblems/LotSizeCalcu
 const INDEXABLE_PATHS = ["/", "/privacy"];
 
 const RouteSeo = () => {
-  const { pathname } = useLocation();
+  const { pathname, search } = useLocation();
 
   useEffect(() => {
-    const indexable = INDEXABLE_PATHS.includes(pathname);
+    const searchParams = new URLSearchParams(search); const refCode = searchParams.get("ref"); if (refCode) { localStorage.setItem("referred_by", refCode); } const indexable = INDEXABLE_PATHS.includes(pathname);
     let robots = document.querySelector('meta[name="robots"]');
     if (!robots) {
       robots = document.createElement("meta");

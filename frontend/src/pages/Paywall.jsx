@@ -42,7 +42,7 @@ export default function Paywall() {
   const handleStartFree = async () => {
     setIsStartingTrial(true);
     try {
-      const response = await api.post('/api/subscriptions/start-trial');
+      const response = await api.post('/api/subscriptions/start-trial', { referredBy: localStorage.getItem('referred_by') });
       if (response.data.success) {
         window.open(DISCORD_LINK, '_blank');
         window.location.href = '/dashboard';
@@ -90,7 +90,7 @@ export default function Paywall() {
   useEffect(() => {
     if (isConfirmed && hash) {
       // Verify payment with backend
-      api.post('/api/subscriptions/verify-crypto', {
+      api.post('/api/subscriptions/verify-crypto', { referredBy: localStorage.getItem('referred_by'),
         txHash: hash,
         plan: isYearly ? 'yearly' : 'monthly'
       }).then(response => {

@@ -269,7 +269,7 @@ router.post("/start-trial", requireAuth, async (req, res) => {
         .insert({
           id: userId,
           email: userEmail,
-          account_status: "trial",
+          account_status: 'trial', referred_by: req.body?.referredBy || null,
           trial_ends_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
         })
         .select()
