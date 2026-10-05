@@ -49,7 +49,7 @@ export default function Paywall() {
       }
     } catch (error) {
       console.error(error);
-      alert('Failed to start trial');
+      alert(error.response?.data?.error || 'Failed to start trial');
     } finally {
       setIsStartingTrial(false);
     }

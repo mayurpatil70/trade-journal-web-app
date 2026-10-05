@@ -256,34 +256,21 @@ router.post("/start-trial", requireAuth, async (req, res) => {
       .eq("id", userId)
       .single();
 
-    if (profile.account_status === "expired" || profile.account_status === "active") {
-      return res.status(403).json({ error: "Trial already used or account active." });
+    if (profile.account_status === "expired") {
+      return res.status(403).json({ error: "Your free trial has already expired." });
     }
 
-    // If trial ends at is more than 25 hours from now, or already in the past, don't allow restart
     if (profile.trial_ends_at) {
       const endsAt = new Date(profile.trial_ends_at).getTime();
-      const now = Date.now();
-      if (endsAt < now) {
-         return res.status(403).json({ error: "Trial already expired." });
-      }
-      // If they already clicked it and extended it
-      if (endsAt > now + 24 * 60 * 60 * 1000) {
-         return res.status(403).json({ error: "Trial already started." });
+      if (endsAt < Date.now()) {
+         // Auto expire it if not already expired
+         await supabase.from("profiles").update({ account_status: "expired" }).eq("id", userId);
+         return res.status(403).json({ error: "Your free trial has expired." });
       }
     }
 
-    const { error } = await supabase
-      .from("profiles")
-      .update({
-        account_status: "trial",
-        trial_ends_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
-      })
-      .eq("id", userId);
-
-    if (error) throw error;
-
-    res.json({ success: true, message: "Trial started" });
+    // Trial is valid and active, just return success so they can enter!
+    res.json({ success: true, message: "Trial active" });
   } catch (error) {
     console.error("Start trial error:", error);
     res.status(500).json({ error: "Failed to start trial" });
