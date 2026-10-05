@@ -1,294 +1,176 @@
-// frontend/src/pages/Paywall.jsx
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import {
-  Lock,
-  ArrowRight,
-  CheckCircle,
-  Copy,
-  Loader2,
-  ShieldCheck,
-  Activity,
-} from "lucide-react";
-import api from "../api/axios";
+import { useState, useEffect } from 'react';
+import { useWriteContract, useWaitForTransactionReceipt, useAccount, useConnect } from 'wagmi';
+import { injected } from 'wagmi/connectors';
+import { parseUnits } from 'viem';
+import { Loader2, ArrowRight } from 'lucide-react';
+import api from '../api/axios'; // using their axios instance
+
+// BSC USDT Contract Address
+const USDT_ADDRESS = '0x55d398326f99059fF775485246999027B3197955';
+// Merchant Wallet from .env
+const MERCHANT_WALLET = import.meta.env.VITE_BEP20_ADDRESS;
+
+const ERC20_ABI = [
+  {
+    "constant": false,
+    "inputs": [
+      { "name": "_to", "type": "address" },
+      { "name": "_value", "type": "uint256" }
+    ],
+    "name": "transfer",
+    "outputs": [{ "name": "", "type": "bool" }],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+];
 
 export default function Paywall() {
-  const navigate = useNavigate();
-  const [step, setStep] = useState(1);
-  const [config, setConfig] = useState(null);
-  const [chain, setChain] = useState("BEP20");
-  const [txHash, setTxHash] = useState("");
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [copied, setCopied] = useState("");
+  const [isYearly, setIsYearly] = useState(false);
+  const { isConnected } = useAccount();
+  const { connect } = useConnect();
+  
+  const { data: hash, writeContract, error: writeError } = useWriteContract();
+  
+  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
+    hash,
+  });
+
+  const handleCryptoPayment = async (plan, price) => {
+    if (!isConnected) {
+      connect({ connector: injected() });
+      return;
+    }
+    
+    try {
+      // 18 decimals for BSC USDT
+      const amount = parseUnits(price.toString(), 18);
+      
+      writeContract({
+        address: USDT_ADDRESS,
+        abi: ERC20_ABI,
+        functionName: 'transfer',
+        args: [MERCHANT_WALLET, amount],
+      });
+    } catch (error) {
+      console.error(error);
+      alert('Transaction initialization failed.');
+    }
+  };
 
   useEffect(() => {
-    // Fetch wallet addresses and price from backend
-    const fetchConfig = async () => {
-      try {
-        const res = await api.get("/api/subscriptions/config");
-        setConfig(res.data);
-      } catch (err) {
-        console.error("Failed to load payment config", err);
-      }
-    };
-    fetchConfig();
-  }, []);
-
-  const handleCopy = async (text, field) => {
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopied(field);
-      setTimeout(() => setCopied(""), 2000);
-    } catch (err) {
-      console.error("Copy failed");
-    }
-  };
-
-  const handleVerify = async () => {
-    if (txHash.length < 10)
-      return alert("Please enter a valid Transaction Hash.");
-    setIsProcessing(true);
-    const userId =
-      localStorage.getItem("userId") || localStorage.getItem("userEmail");
-
-    try {
-      const submitData = new FormData();
-      submitData.append("userId", userId);
-      submitData.append("txHash", txHash.trim());
-      submitData.append("chain", chain);
-      const fileInput = document.getElementById("payment-screenshot");
-      if (fileInput && fileInput.files[0]) {
-        submitData.append("screenshot", fileInput.files[0]);
-      } else {
-        return alert("Please upload a payment screenshot.");
-      }
-
-      const res = await api.post("/api/subscriptions/verify", submitData, {
-        headers: { "Content-Type": "multipart/form-data" },
+    if (isConfirmed && hash) {
+      // Verify payment with backend
+      api.post('/api/subscriptions/verify-crypto', {
+        txHash: hash,
+        plan: isYearly ? 'yearly' : 'monthly'
+      }).then(response => {
+        if(response.data.success) {
+          window.location.href = '/dashboard';
+        }
+      }).catch(err => {
+         console.error(err);
+         alert("Payment confirmed on chain, but verification failed. Contact support.");
       });
-
-      setStep(3); // Success/Pending Screen
-    } catch (error) {
-      alert(
-        error.response?.data?.error ||
-          "Payment verification failed. If you just sent it, wait 60 seconds for block confirmations.",
-      );
-    } finally {
-      setIsProcessing(false);
     }
-  };
-
-  if (!config) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-[#0a0a0a]">
-        <Loader2 className="w-8 h-8 text-[#2f8df4] animate-spin" />
-      </div>
-    );
-  }
-
-  const PAY_ADDRESS = config.wallets[chain];
+  }, [isConfirmed, hash, isYearly]);
 
   return (
-    <div
-      className="min-h-screen flex items-center justify-center bg-[#0a0a0a] p-4 font-sans"
-      style={{ fontFamily: "'Inter', sans-serif" }}
-    >
-      <div className="w-full max-w-md">
-        <div className="flex flex-col items-center justify-center mb-8">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-blue-500/20 mb-4">
-            <Activity className="w-7 h-7 text-white" />
-          </div>
-          <h1 className="text-2xl font-black text-white tracking-tight">
-            Forex Notes
-          </h1>
-          <p className="text-sm text-gray-400 font-medium">
-            The Ultimate Trade Journal
-          </p>
-        </div>
-
-        <div className="bg-[#121418] border border-white/10 rounded-2xl shadow-2xl overflow-hidden relative">
-          <div className="p-6 bg-gradient-to-b from-white/5 to-transparent border-b border-white/5 flex flex-col items-center text-center">
-            <div className="w-12 h-12 bg-blue-500/10 rounded-full flex items-center justify-center mb-3">
-              <Lock className="w-5 h-5 text-blue-400" />
-            </div>
-            <h2 className="text-xl font-bold text-white mb-1">
-              Lifetime Access
-            </h2>
-            <p className="text-xs text-gray-400">
-              Unlock the journal, AI coach, and analytics.
-            </p>
-          </div>
-
-          <div className="p-6 space-y-6">
-            {step === 1 && (
-              <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4">
-                <div className="text-center">
-                  <span className="text-4xl font-black text-white">
-                    ${config.price.toFixed(2)}
-                  </span>
-                  <span className="text-gray-500 text-sm ml-1">USDT</span>
-                  <p className="text-[10px] text-emerald-500 font-bold uppercase tracking-widest mt-2">
-                    One-time payment
-                  </p>
-                </div>
-
-                <div className="space-y-3">
-                  <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">
-                    Select Payment Network
-                  </label>
-                  {[
-                    {
-                      id: "BEP20",
-                      label: "USDT (BNB Chain)",
-                      hint: "Standard BSC network",
-                    },
-                  ].map((c) => (
-                    <button
-                      key={c.id}
-                      onClick={() => setChain(c.id)}
-                      className={`w-full flex items-center justify-between p-4 border rounded-xl transition-all ${
-                        chain === c.id
-                          ? "border-blue-500 bg-blue-500/10 ring-1 ring-blue-500"
-                          : "border-white/10 hover:border-white/20 bg-black/20"
-                      }`}
-                    >
-                      <span className="text-sm font-bold text-white">
-                        {c.label}
-                      </span>
-                      <span className="text-xs text-gray-500">{c.hint}</span>
-                    </button>
-                  ))}
-                </div>
-
-                <button
-                  onClick={() => setStep(2)}
-                  className="w-full py-4 bg-blue-500 hover:bg-blue-600 text-white font-bold text-sm rounded-xl transition-all shadow-lg shadow-blue-500/25 flex items-center justify-center gap-2"
-                >
-                  Continue to Payment <ArrowRight className="w-4 h-4" />
-                </button>
-              </div>
-            )}
-
-            {step === 2 && (
-              <div className="space-y-6 animate-in slide-in-from-right-4">
-                <div className="bg-black/40 border border-white/5 rounded-xl p-4 text-center">
-                  <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">
-                    Send Exactly
-                  </p>
-                  <div className="flex items-center justify-center gap-3">
-                    <span className="text-3xl font-black text-white">
-                      {config.price.toFixed(2)} USDT
-                    </span>
-                    <button
-                      onClick={() => handleCopy(config.price.toString(), "amt")}
-                      className="p-1.5 text-gray-400 hover:text-white bg-white/5 rounded-md transition-colors"
-                    >
-                      {copied === "amt" ? (
-                        <CheckCircle className="w-4 h-4 text-emerald-500" />
-                      ) : (
-                        <Copy className="w-4 h-4" />
-                      )}
-                    </button>
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex justify-between">
-                    To Address ({chain}){" "}
-                    <span className="text-red-400">
-                      Do not send via other networks
-                    </span>
-                  </p>
-                  <div className="flex items-center gap-2 bg-black/40 border border-white/5 rounded-xl p-1.5 pl-4">
-                    <span className="text-xs font-mono text-white truncate flex-1">
-                      {PAY_ADDRESS}
-                    </span>
-                    <button
-                      onClick={() => handleCopy(PAY_ADDRESS, "addr")}
-                      className="px-4 py-2 bg-blue-500/20 text-blue-400 font-bold text-xs rounded-lg hover:bg-blue-500/30 transition-colors"
-                    >
-                      {copied === "addr" ? "Copied" : "Copy"}
-                    </button>
-                  </div>
-                </div>
-
-                <div className="bg-blue-500/10 border border-blue-500/20 p-3 rounded-xl mb-4">
-                  <p className="text-[10px] font-bold text-blue-400 uppercase tracking-widest mb-2">
-                    Payment Guidelines
-                  </p>
-                  <p className="text-xs text-white">
-                    Binance -{">"} Send/Withdraw -{">"} USDT(TetherUS) -{">"}{" "}
-                    Paste BEP20 Address -{">"} Select BNB Smart Chain (BEP20) -
-                    {">"} CONFIRM -{">"} COPY TXID &amp; SCREENSHOT
-                  </p>
-                </div>
-
-                <div className="pt-4 border-t border-white/5 space-y-2">
-                  <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">
-                    Payment Screenshot
-                  </label>
-                  <input
-                    id="payment-screenshot"
-                    type="file"
-                    accept="image/*"
-                    className="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-blue-500/20 file:text-blue-400 hover:file:bg-blue-500/30 transition-all cursor-pointer"
-                  />
-                </div>
-
-                <div className="pt-4 border-t border-white/5 space-y-2">
-                  <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">
-                    Transaction Hash (TXID)
-                  </label>
-                  <input
-                    type="text"
-                    value={txHash}
-                    onChange={(e) => setTxHash(e.target.value)}
-                    placeholder="Paste TXID..."
-                    className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3.5 text-sm font-mono text-white focus:border-blue-500 outline-none transition-colors"
-                  />
-                </div>
-
-                <button
-                  onClick={handleVerify}
-                  disabled={isProcessing || txHash.trim().length < 10}
-                  className="w-full py-4 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm rounded-xl transition-all shadow-lg shadow-emerald-500/25 flex items-center justify-center gap-2 disabled:opacity-50"
-                >
-                  {isProcessing ? (
-                    <>
-                      <Loader2 className="w-5 h-5 animate-spin" /> Verifying
-                      On-Chain...
-                    </>
-                  ) : (
-                    "Verify Payment"
-                  )}
-                </button>
-
-                <button
-                  onClick={() => setStep(1)}
-                  className="w-full text-xs font-bold text-gray-500 hover:text-white transition-colors"
-                >
-                  ← Back to Network Selection
-                </button>
-              </div>
-            )}
-
-            {step === 3 && (
-              <div className="py-8 flex flex-col items-center text-center space-y-4 animate-in zoom-in-95">
-                <div className="w-20 h-20 bg-yellow-500/10 rounded-full flex items-center justify-center border border-yellow-500/20 mb-2">
-                  <ShieldCheck className="w-10 h-10 text-yellow-500" />
-                </div>
-                <h3 className="text-2xl font-black text-white">
-                  Payment Pending Verification
-                </h3>
-                <p className="text-sm text-gray-400">
-                  Your payment has been submitted. Our admin team will verify it shortly. You will get access once verified.
-                </p>
-                <Loader2 className="w-6 h-6 text-yellow-500 animate-spin mt-4" />
-              </div>
-            )}
-          </div>
-        </div>
+    <div className="min-h-screen bg-[#0A0A0A] text-white flex flex-col items-center pt-20">
+      <h1 className="text-4xl font-bold mb-4">Let's setup your subscription!</h1>
+      <p className="text-gray-400 mb-8">Please select the plan you want for your subscription.</p>
+      
+      {/* Toggle */}
+      <div className="flex space-x-2 bg-black/40 p-1 rounded-full border border-white/10 mb-10">
+        <button 
+          className={`px-6 py-2 rounded-full transition-colors ${!isYearly ? 'bg-blue-600 text-white font-medium' : 'text-gray-400 hover:text-white'}`}
+          onClick={() => setIsYearly(false)}
+        >Monthly</button>
+        <button 
+          className={`px-6 py-2 rounded-full transition-colors ${isYearly ? 'bg-blue-600 text-white font-medium' : 'text-gray-400 hover:text-white'}`}
+          onClick={() => setIsYearly(true)}
+        >Yearly</button>
       </div>
+
+      {/* Pricing Cards */}
+      <div className="flex flex-col md:flex-row gap-6 max-w-5xl w-full px-4 justify-center">
+        
+        {/* Beginner (Free) Card */}
+        <div className="bg-black/20 border border-white/5 p-8 rounded-2xl w-full md:w-80 flex flex-col">
+          <h2 className="text-lg font-medium text-white mb-8">Beginner</h2>
+          
+          <div className="flex-1 flex flex-col justify-center items-center py-10">
+             <h3 className="text-4xl font-bold mb-4">Free</h3>
+             <p className="text-gray-500 text-sm">Start improving your trading skills</p>
+          </div>
+
+          <ul className="text-sm space-y-4 mb-8 text-gray-300">
+            <li className="flex items-center">✓ <span className="ml-3">2 Backtesting Sessions</span></li>
+            <li className="flex items-center">✓ <span className="ml-3">1 Indicator</span></li>
+            <li className="flex items-center">✓ <span className="ml-3">1 week Data Retention</span></li>
+          </ul>
+
+          <button 
+            className="w-full py-3 rounded-full font-medium border border-white/20 text-white hover:bg-white/5 transition-all"
+          >
+            Start For Free
+          </button>
+        </div>
+
+        {/* Pro Card (The focus) */}
+        <div className="bg-[#0A0A0A] border border-white/10 p-8 rounded-2xl w-full md:w-80 flex flex-col relative overflow-hidden">
+          {/* Subtle glow effect in the background */}
+          <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 blur-3xl rounded-full pointer-events-none"></div>
+
+          <h2 className="text-lg font-medium text-white mb-4">Pro</h2>
+          
+          {isYearly ? (
+            <>
+              <div className="flex items-end gap-1 mb-2">
+                 <h3 className="text-4xl font-bold text-white">$117</h3>
+                 <span className="text-gray-400 text-sm mb-1">/yearly</span>
+              </div>
+              <p className="text-gray-500 text-xs line-through mb-4">$168/yearly</p>
+              <div className="bg-blue-600 text-white text-center py-2 rounded-md mb-6 font-medium text-sm">Save 30% a year!</div>
+            </>
+          ) : (
+            <>
+              <div className="flex items-end gap-1 mb-2">
+                 <h3 className="text-4xl font-bold text-white">$14</h3>
+                 <span className="text-gray-400 text-sm mb-1">/monthly</span>
+              </div>
+              <p className="text-gray-500 text-xs line-through mb-4">$19/monthly</p>
+              <div className="bg-blue-600 text-white text-center py-2 rounded-md mb-6 font-medium text-sm">Save 25% a month!</div>
+            </>
+          )}
+
+          <p className="text-xs text-gray-400 mb-6">Everything you need to achieve profitability</p>
+
+          <ul className="text-sm space-y-4 mb-8 text-gray-300 flex-1">
+            <li className="flex items-center">∞ <span className="ml-3">Backtesting Sessions</span></li>
+            <li className="flex items-center">∞ <span className="ml-3">Indicators</span></li>
+            <li className="flex items-center">∞ <span className="ml-3">Data Retention</span></li>
+            <li className="flex items-center">∞ <span className="ml-3">Charts</span></li>
+          </ul>
+
+          <button 
+            onClick={() => handleCryptoPayment(isYearly ? 'yearly' : 'monthly', isYearly ? 117 : 14)}
+            disabled={isConfirming}
+            className="w-full py-3 rounded-full font-bold shadow-[0_0_15px_rgba(234,179,8,0.5)] bg-yellow-500 text-black hover:bg-yellow-400 transition-all disabled:opacity-50 mt-auto"
+          >
+            {isConfirming ? (
+               <span className="flex items-center justify-center gap-2"><Loader2 className="w-4 h-4 animate-spin"/> Confirming...</span>
+            ) : !isConnected ? 'Connect Wallet' : 'Pay with Crypto (BEP20)'}
+          </button>
+          
+          {writeError && <p className="text-red-500 mt-3 text-xs text-center">{writeError.shortMessage || writeError.message}</p>}
+        </div>
+
+      </div>
+      
+      <button className="mt-12 flex items-center gap-2 text-gray-400 hover:text-white transition-colors border border-gray-800 px-4 py-2 rounded-full">
+         <ArrowRight className="w-4 h-4 rotate-180" /> Logout
+      </button>
     </div>
   );
 }

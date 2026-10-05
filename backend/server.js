@@ -15,6 +15,7 @@ import supportRoutes from "./routes/supportRoutes.js";
 import subscriptionRoutes from "./routes/subscriptionRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import journalRoutes from "./routes/journalRoutes.js";
+import affiliateRoutes from "./routes/affiliateRoutes.js";
 
 const app = express();
 
@@ -46,6 +47,7 @@ app.use("/api/support", supportRoutes);
 app.use("/api/subscriptions", subscriptionRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/journals", journalRoutes);
+app.use("/api/affiliate", affiliateRoutes);
 
 // Health Check Endpoint
 app.get("/", (req, res) => {

@@ -12,7 +12,7 @@ import {
   Users,
   Upload,
   Settings,
-  Headphones,
+  Headphones, Wallet,
   Menu,
   X,
   LogOut,
@@ -148,6 +148,7 @@ export default function MainLayout() {
         { to: "/accounts", icon: Users, label: "Accounts" },
         { to: "/settings", icon: Settings, label: "Settings" },
         { to: "/support", icon: Headphones, label: "Support" },
+        { to: "/affiliate", icon: Wallet, label: "Affiliate" },
       ],
     },
   ];

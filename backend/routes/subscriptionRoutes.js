@@ -233,4 +233,4 @@ router.get("/admin/pending", requireAuth, requireAdmin, async (req, res) => {
   }
 });
 
-export default router;
+import { verifyCryptoPayment } from "../controllers/paymentController.js";`nrouter.post("/verify-crypto", requireAuth, verifyCryptoPayment);`nexport default router;

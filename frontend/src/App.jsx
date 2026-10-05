@@ -33,6 +33,7 @@ const PropAccounts = lazy(() => import("./pages/PropAccounts.jsx"));
 const Settings = lazy(() => import("./pages/Settings.jsx"));
 const Profile = lazy(() => import("./pages/Profile.jsx"));
 const Support = lazy(() => import("./pages/Support.jsx"));
+const AffiliateDashboard = lazy(() => import("./pages/AffiliateDashboard.jsx"));
 const AdminDashboard = lazy(() => import("./pages/AdminDashboard.jsx"));
 
 // New Premium Workspaces
@@ -149,6 +150,7 @@ function App() {
                   <Route path="settings" element={<Settings />} />
                   <Route path="profile" element={<Profile />} />
                   <Route path="support" element={<Support />} />
+                  <Route path="affiliate" element={<AffiliateDashboard />} />
                   <Route path="admin" element={<AdminDashboard />} />
 
                   <Route path="calculator" element={<CalculatorLayout />}>
