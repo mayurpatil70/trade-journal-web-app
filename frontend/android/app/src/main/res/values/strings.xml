@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Forex Notes</string>
+    <string name="title_activity_main">Forex Notes</string>
+    <string name="package_name">in.forexnotes.app</string>
+    <string name="custom_url_scheme">in.forexnotes.app</string>
+</resources>

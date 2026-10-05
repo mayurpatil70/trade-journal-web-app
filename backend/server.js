@@ -27,6 +27,8 @@ app.use(
       "https://forexnotes.vercel.app",
       "https://www.forexnotes.in",
       "https://forexnotes.in",
+      "capacitor://localhost",
+      "http://localhost",
       "",
     ],
     credentials: true,
@@ -69,3 +71,4 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
+

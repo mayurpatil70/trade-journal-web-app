@@ -372,7 +372,7 @@ export default function MainLayout() {
               </div>
             </div>
           </div>
-        )}}
+        )}
 
       {isMobileMenuOpen && (
         <div
