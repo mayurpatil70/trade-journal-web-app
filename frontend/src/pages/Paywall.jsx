@@ -27,8 +27,9 @@ const ERC20_ABI = [
 
 export default function Paywall() {
   const [isYearly, setIsYearly] = useState(false);
+  const [isStartingTrial, setIsStartingTrial] = useState(false);
   const { isConnected } = useAccount();
-  const { connect } = useConnect();
+  const { connectors, connect, error: connectError } = useConnect();
   
   const { data: hash, writeContract, error: writeError } = useWriteContract();
   
@@ -36,9 +37,32 @@ export default function Paywall() {
     hash,
   });
 
+  const DISCORD_LINK = "https://discord.gg/Ajaw3AjfWE";
+
+  const handleStartFree = async () => {
+    setIsStartingTrial(true);
+    try {
+      const response = await api.post('/api/subscriptions/start-trial');
+      if (response.data.success) {
+        window.open(DISCORD_LINK, '_blank');
+        window.location.href = '/dashboard';
+      }
+    } catch (error) {
+      console.error(error);
+      alert('Failed to start trial');
+    } finally {
+      setIsStartingTrial(false);
+    }
+  };
+
   const handleCryptoPayment = async (plan, price) => {
     if (!isConnected) {
-      connect({ connector: injected() });
+      const injectedConnector = connectors.find(c => c.id === 'injected' || c.id === 'metaMask' || c.name.toLowerCase().includes('trust')) || connectors[0];
+      if (injectedConnector) {
+        connect({ connector: injectedConnector });
+      } else {
+        alert("No web3 wallet found. Please install MetaMask or TrustWallet.");
+      }
       return;
     }
     
@@ -66,6 +90,7 @@ export default function Paywall() {
         plan: isYearly ? 'yearly' : 'monthly'
       }).then(response => {
         if(response.data.success) {
+          window.open(DISCORD_LINK, '_blank');
           window.location.href = '/dashboard';
         }
       }).catch(err => {
@@ -111,9 +136,11 @@ export default function Paywall() {
           </ul>
 
           <button 
-            className="w-full py-3 rounded-full font-medium border border-white/20 text-white hover:bg-white/5 transition-all"
+            onClick={handleStartFree}
+            disabled={isStartingTrial}
+            className="w-full py-3 rounded-full font-medium border border-white/20 text-white hover:bg-white/5 transition-all disabled:opacity-50"
           >
-            Start For Free
+            {isStartingTrial ? <Loader2 className="w-5 h-5 animate-spin mx-auto"/> : 'Start For Free'}
           </button>
         </div>
 
@@ -163,7 +190,11 @@ export default function Paywall() {
             ) : !isConnected ? 'Connect Wallet' : 'Pay with Crypto (BEP20)'}
           </button>
           
-          {writeError && <p className="text-red-500 mt-3 text-xs text-center">{writeError.shortMessage || writeError.message}</p>}
+          {(writeError || connectError) && (
+            <p className="text-red-500 mt-3 text-xs text-center">
+              {writeError?.shortMessage || writeError?.message || connectError?.shortMessage || connectError?.message}
+            </p>
+          )}
         </div>
 
       </div>

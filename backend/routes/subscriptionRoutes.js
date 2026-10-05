@@ -51,16 +51,27 @@ router.get("/status/:userId", async (req, res) => {
       return res.json({ success: true, hasPaid: true });
     }
 
-    const { data, error } = await supabase
-      .from("journal_subscriptions")
-      .select("status")
-      .eq("user_id", req.params.userId)
-      .eq("status", "paid")
-      .maybeSingle();
+    const { data: profile, error } = await supabase
+      .from("profiles")
+      .select("trial_ends_at, subscription_ends_at")
+      .eq("id", req.params.userId)
+      .single();
 
     if (error && error.code !== "PGRST116") throw error;
 
-    res.json({ success: true, hasPaid: !!data });
+    let hasPaid = false;
+    const now = new Date();
+    
+    if (profile) {
+      const trialEnds = profile.trial_ends_at ? new Date(profile.trial_ends_at) : null;
+      const subEnds = profile.subscription_ends_at ? new Date(profile.subscription_ends_at) : null;
+      
+      if ((subEnds && subEnds > now) || (trialEnds && trialEnds > now)) {
+        hasPaid = true;
+      }
+    }
+
+    res.json({ success: true, hasPaid });
   } catch (error) {
     console.error("Status check error:", error);
     res
@@ -233,4 +244,29 @@ router.get("/admin/pending", requireAuth, requireAdmin, async (req, res) => {
   }
 });
 
-import { verifyCryptoPayment } from "../controllers/paymentController.js";`nrouter.post("/verify-crypto", requireAuth, verifyCryptoPayment);`nexport default router;
+// 6. Start Trial
+router.post("/start-trial", requireAuth, async (req, res) => {
+  const userId = req.user?.id || req.body.userId;
+  if (!userId) return res.status(401).json({ error: "Unauthorized" });
+
+  try {
+    const { error } = await supabase
+      .from("profiles")
+      .update({
+        account_status: "trial",
+        trial_ends_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+      })
+      .eq("id", userId);
+
+    if (error) throw error;
+
+    res.json({ success: true, message: "Trial started" });
+  } catch (error) {
+    console.error("Start trial error:", error);
+    res.status(500).json({ error: "Failed to start trial" });
+  }
+});
+
+import { verifyCryptoPayment } from "../controllers/paymentController.js";
+router.post("/verify-crypto", requireAuth, verifyCryptoPayment);
+export default router;
