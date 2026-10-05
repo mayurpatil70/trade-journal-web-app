@@ -12,6 +12,7 @@ import {
 import api from "../api/axios";
 
 export default function AdminDashboard() {
+  const [activeTab, setActiveTab] = useState('overview');
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState({
     metrics: { totalRevenue: 0, paidOrdersCount: 0, activeAccounts: 0 },
@@ -72,7 +73,7 @@ export default function AdminDashboard() {
         <p className="text-sm text-gray-500 font-medium">Loading Admin Center...</p>
       </div>
     );
-  const [activeTab, setActiveTab] = useState("overview");
+
 
   const { metrics, recentOrders, accounts, withdrawals, affiliates } = data;
 
