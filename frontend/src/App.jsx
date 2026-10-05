@@ -82,23 +82,29 @@ const AuthGuard = () => {
 
 // GUARD 2: The Paywall Enforcer
 const PaywallGuard = () => {
-  const [hasPaid, setHasPaid] = useState(null);
+  const [access, setAccess] = useState(null); // null = loading, 'allow', 'paywall', 'discord'
 
   useEffect(() => {
     const checkStatus = async () => {
-      const userId =
-        localStorage.getItem("userId") || localStorage.getItem("userEmail");
+      const userId = localStorage.getItem("userId") || localStorage.getItem("userEmail");
       try {
         const response = await api.get(`/api/subscriptions/status/${userId}`);
-        setHasPaid(response.data.hasPaid);
+        const { hasPaid, discordVerified } = response.data;
+        if (!discordVerified) {
+          setAccess('discord');
+        } else if (!hasPaid) {
+          setAccess('paywall');
+        } else {
+          setAccess('allow');
+        }
       } catch (error) {
-        setHasPaid(false);
+        setAccess('paywall');
       }
     };
     checkStatus();
   }, []);
 
-  if (hasPaid === null) {
+  if (access === null) {
     return (
       <div className="flex h-screen bg-[#0a0a0a] items-center justify-center">
         <Loader2 className="w-8 h-8 text-[#2f8df4] animate-spin" />
@@ -106,8 +112,10 @@ const PaywallGuard = () => {
     );
   }
 
-  // Trap them at the paywall if not paid
-  return hasPaid ? <Outlet /> : <Navigate to="/paywall" replace />;
+  if (access === 'discord') return <Navigate to="/link-discord" replace />;
+  if (access === 'paywall') return <Navigate to="/paywall" replace />;
+  
+  return <Outlet />;
 };
 
 function App() {

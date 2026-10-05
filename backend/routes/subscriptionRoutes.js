@@ -43,12 +43,12 @@ router.get("/status/:userId", async (req, res) => {
   try {
     const { data: user } = await supabase
       .from("users")
-      .select("email")
+      .select("email, discord_verified")
       .eq("id", req.params.userId)
       .maybeSingle();
 
     if (user && user.email === process.env.ADMIN_EMAIL) {
-      return res.json({ success: true, hasPaid: true });
+      return res.json({ success: true, hasPaid: true, discordVerified: true });
     }
 
     const { data: profile, error } = await supabase
@@ -71,7 +71,7 @@ router.get("/status/:userId", async (req, res) => {
       }
     }
 
-    res.json({ success: true, hasPaid });
+    res.json({ success: true, hasPaid, discordVerified: user?.discord_verified || false });
   } catch (error) {
     console.error("Status check error:", error);
     res
@@ -261,7 +261,7 @@ router.post("/start-trial", requireAuth, async (req, res) => {
     // Create profile if it's completely missing
     if (!profile) {
       // Fetch email from users table
-      const { data: userRow } = await supabase.from("users").select("email").eq("id", userId).single();
+      const { data: userRow } = await supabase.from("users").select("email, discord_verified").eq("id", userId).single();
       const userEmail = userRow?.email || `user-${userId}@forexnotes.in`;
 
       const { data: newProfile, error: insertErr } = await supabase

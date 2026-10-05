@@ -44,7 +44,7 @@ export default function Paywall() {
     try {
       const response = await api.post('/api/subscriptions/start-trial', { referredBy: localStorage.getItem('referred_by') });
       if (response.data.success) {
-        window.open(DISCORD_LINK, '_blank');
+        
         window.location.href = '/dashboard';
       }
     } catch (error) {
@@ -95,7 +95,7 @@ export default function Paywall() {
         plan: isYearly ? 'yearly' : 'monthly'
       }).then(response => {
         if(response.data.success) {
-          window.open(DISCORD_LINK, '_blank');
+          
           window.location.href = '/dashboard';
         }
       }).catch(err => {

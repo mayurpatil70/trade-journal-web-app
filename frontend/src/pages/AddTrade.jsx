@@ -215,7 +215,7 @@ export default function AddTrade() {
                     <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
                   </div>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-6">
                   <div>
                     <label className={labelClass}>Date</label>
                     <input type="date" name="date" value={formData.date} onChange={handleChange} className={`${inputClass} [color-scheme:dark]`} required />
