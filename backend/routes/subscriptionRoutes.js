@@ -250,14 +250,33 @@ router.post("/start-trial", requireAuth, async (req, res) => {
   if (!userId) return res.status(401).json({ error: "Unauthorized" });
 
   try {
-    const { data: profile, error } = await supabase
+    let { data: profile, error } = await supabase
       .from("profiles")
       .select("account_status, trial_ends_at")
       .eq("id", userId)
-      .single();
+      .maybeSingle();
 
-    if (error || !profile) {
-       return res.status(404).json({ error: "Profile not found." });
+    if (error && error.code !== 'PGRST116') throw error;
+
+    // Create profile if it's completely missing
+    if (!profile) {
+      // Fetch email from users table
+      const { data: userRow } = await supabase.from("users").select("email").eq("id", userId).single();
+      const userEmail = userRow?.email || `user-${userId}@forexnotes.in`;
+
+      const { data: newProfile, error: insertErr } = await supabase
+        .from("profiles")
+        .insert({
+          id: userId,
+          email: userEmail,
+          account_status: "trial",
+          trial_ends_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+        })
+        .select()
+        .single();
+
+      if (insertErr) throw insertErr;
+      profile = newProfile;
     }
 
     if (profile.account_status === "expired") {
