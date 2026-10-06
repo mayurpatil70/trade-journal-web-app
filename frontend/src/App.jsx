@@ -35,6 +35,7 @@ const Profile = lazy(() => import("./pages/Profile.jsx"));
 const Support = lazy(() => import("./pages/Support.jsx"));
 const AffiliateDashboard = lazy(() => import("./pages/AffiliateDashboard.jsx"));
 const AdminDashboard = lazy(() => import("./pages/AdminDashboard.jsx"));
+const Charts = lazy(() => import("./pages/Charts.jsx"));
 
 // New Premium Workspaces
 const Analytics = lazy(() => import("./pages/Analytics.jsx"));
@@ -167,6 +168,7 @@ function App() {
                   <Route path="support" element={<Support />} />
                   <Route path="affiliate" element={<AffiliateDashboard />} />
                   <Route path="admin" element={<AdminDashboard />} />
+                  <Route path="charts" element={<Charts />} />
                   <Route path="sessions" element={<Sessions />} />
                   <Route path="backtest/:id" element={<Backtest />} />
                   <Route path="backtest" element={<Navigate to="/sessions" replace />} />

@@ -134,6 +134,7 @@ export default function MainLayout() {
     {
       label: "Tools",
       items: [
+        { to: "/charts", icon: Activity, label: "Live Charts" },
         { to: "/sessions", icon: Zap, label: "Setup Backtesting" },
         { to: "/news", icon: Globe, label: "Economic Calendar" },
         {

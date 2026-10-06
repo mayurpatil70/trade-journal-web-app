@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { createChart } from 'lightweight-charts';
 import { Button } from '@/components/ui/button';
-import { Play, Square, StepForward, ChevronLeft, Loader2 } from 'lucide-react';
+import { Play, Square, StepForward, ChevronLeft, Loader2, Search, X } from 'lucide-react';
 
 export default function Backtest() {
   const { id } = useParams();
@@ -19,7 +19,13 @@ export default function Backtest() {
 
   // Session State
   const [session, setSession] = useState(null);
+  const [activeSymbol, setActiveSymbol] = useState('');
   const [tradeHistory, setTradeHistory] = useState([]);
+  
+  // Symbol Search Modal
+  const [showSearch, setShowSearch] = useState(false);
+  const [searchInput, setSearchInput] = useState('');
+  const popularSymbols = ['BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT', 'XRPUSDT', 'ADAUSDT'];
   
   // MT5 Panel State
   const [lotSize, setLotSize] = useState('1.00');
@@ -45,13 +51,17 @@ export default function Backtest() {
       if (s) foundSession = s;
     }
     setSession(foundSession);
+    setActiveSymbol(foundSession.pair.replace('/', ''));
+  }, [id]);
 
-    // 2. Fetch Market Data (Binance 1h limit 1000)
+  useEffect(() => {
+    if (!activeSymbol) return;
+    
     const fetchBinance = async () => {
       setLoading(true);
       try {
-        const symbol = foundSession.pair.replace('/', '');
-        const response = await fetch(`https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=1h&limit=1000`);
+        const response = await fetch(`https://api.binance.com/api/v3/klines?symbol=${activeSymbol}&interval=1h&limit=1000`);
+        if (!response.ok) throw new Error("Symbol not found");
         const json = await response.json();
         const formattedData = json.map(d => ({
           time: d[0] / 1000, 
@@ -62,15 +72,20 @@ export default function Backtest() {
         }));
         
         setData(formattedData);
-        setCurrentIndex(200); // start at index 200
+        setCurrentIndex(200); 
+        setActiveTrade(null); // Reset trades on symbol switch
       } catch(e) {
         console.error(e);
+        // Fallback if symbol is invalid
+        if (data.length === 0) {
+           alert("Symbol not found on Binance Data Source (Use formatting like BTCUSDT)");
+        }
       } finally {
         setLoading(false);
       }
     };
     fetchBinance();
-  }, [id]);
+  }, [activeSymbol]);
 
   // Update Overlay Function
   const updateOverlayPosition = useCallback(() => {
@@ -83,8 +98,6 @@ export default function Backtest() {
     const slY = seriesInstance.current.priceToCoordinate(activeTrade.sl);
     const entryY = seriesInstance.current.priceToCoordinate(activeTrade.entry);
     
-    // Convert time to X coordinate. It returns null if the time is outside the visible range, but we want it to scroll offscreen.
-    // If it's null, we just hide the overlay for now to prevent errors, or we clamp it.
     let startX = chartInstance.current.timeScale().timeToCoordinate(activeTrade.entryTime);
     
     if (tpY !== null && slY !== null && entryY !== null && startX !== null) {
@@ -112,10 +125,11 @@ export default function Backtest() {
 
     const chart = createChart(chartContainerRef.current, {
       layout: { background: { type: 'solid', color: '#131722' }, textColor: '#d1d4dc' },
-      grid: { vertLines: { color: '#2B3139' }, horzLines: { color: '#2B3139' } },
+      grid: { vertLines: { color: '#2B3139', style: 1 }, horzLines: { color: '#2B3139', style: 1 } },
       width: chartContainerRef.current.clientWidth,
       height: chartContainerRef.current.clientHeight,
-      timeScale: { timeVisible: true, secondsVisible: false }
+      timeScale: { timeVisible: true, secondsVisible: false, borderColor: '#2B3139' },
+      rightPriceScale: { borderColor: '#2B3139' }
     });
 
     const candlestickSeries = chart.addCandlestickSeries({
@@ -126,7 +140,6 @@ export default function Backtest() {
     chartInstance.current = chart;
     seriesInstance.current = candlestickSeries;
     
-    // Initial data
     const visibleData = data.slice(0, currentIndex);
     candlestickSeries.setData(visibleData);
     
@@ -242,31 +255,88 @@ export default function Backtest() {
     }
   };
 
+  const changeSymbol = (sym) => {
+    setActiveSymbol(sym);
+    setShowSearch(false);
+    setSearchInput('');
+  };
+
   return (
-    <div className="flex flex-col h-screen bg-[#131722] text-white overflow-hidden font-sans">
+    <div className="flex flex-col h-screen bg-[#131722] text-white overflow-hidden font-sans relative">
       
+      {/* Symbol Search Modal Overlay */}
+      {showSearch && (
+        <div className="absolute inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-start justify-center pt-24">
+           <div className="bg-[#1E222D] w-full max-w-md rounded-xl shadow-2xl border border-white/10 overflow-hidden flex flex-col">
+             <div className="flex items-center p-3 border-b border-white/10">
+                <Search className="w-5 h-5 text-gray-400 mr-2" />
+                <input 
+                  autoFocus
+                  type="text" 
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value.toUpperCase())}
+                  placeholder="Symbol Search (e.g. ETHUSDT)" 
+                  className="flex-1 bg-transparent text-lg text-white outline-none placeholder:text-gray-500 font-bold"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && searchInput) changeSymbol(searchInput);
+                  }}
+                />
+                <button onClick={() => setShowSearch(false)} className="p-1 hover:bg-white/10 rounded-md text-gray-400">
+                  <X className="w-5 h-5" />
+                </button>
+             </div>
+             <div className="flex p-2 gap-2 border-b border-white/5 bg-[#131722]/50">
+               <button className="px-3 py-1 bg-white/10 text-xs rounded-full font-bold">Crypto</button>
+             </div>
+             <div className="p-2 space-y-1">
+               {popularSymbols.filter(s => s.includes(searchInput)).map(sym => (
+                 <button 
+                   key={sym} 
+                   onClick={() => changeSymbol(sym)}
+                   className="w-full text-left px-4 py-2 hover:bg-white/5 rounded-lg flex items-center justify-between"
+                 >
+                   <span className="font-bold">{sym}</span>
+                   <span className="text-xs text-gray-500">Binance</span>
+                 </button>
+               ))}
+             </div>
+           </div>
+        </div>
+      )}
+
       {/* Top Session Header */}
       <div className="h-14 border-b border-white/10 bg-[#131722] flex items-center justify-between px-4 shrink-0 z-20 relative">
         <div className="flex items-center gap-4">
            <button onClick={() => navigate('/sessions')} className="p-1.5 hover:bg-white/10 rounded-md text-gray-400 hover:text-white transition-colors">
              <ChevronLeft className="w-5 h-5" />
            </button>
-           <div>
-             <div className="text-sm font-bold">{session?.name || 'Loading Session...'}</div>
-             <div className="text-[10px] text-gray-500">{session?.pair} • Dynamic Overlay Engine</div>
-           </div>
+           
+           {/* Asset Switcher Button */}
+           <button 
+             onClick={() => setShowSearch(true)} 
+             className="flex items-center gap-2 hover:bg-white/5 px-2 py-1 rounded-md transition-colors"
+           >
+             <div className="w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center font-bold text-[10px]">
+               {activeSymbol.substring(0, 1)}
+             </div>
+             <div className="text-left">
+               <div className="text-lg font-bold leading-tight">{activeSymbol}</div>
+               <div className="text-[10px] text-gray-500 leading-tight">Binance • Custom Engine</div>
+             </div>
+           </button>
         </div>
+
         <div className="flex items-center gap-3">
            <div className="flex items-center gap-1 bg-[#1E222D] p-1 rounded-lg">
-             <Button size="sm" variant={isPlaying ? "destructive" : "secondary"} className="h-7 px-3 bg-[#2962FF] hover:bg-[#1E4CDB] border-none text-white text-xs rounded-md" onClick={() => setIsPlaying(!isPlaying)}>
-               {isPlaying ? <Square className="w-3 h-3 mr-1" /> : <Play className="w-3 h-3 mr-1" />}
+             <Button size="sm" variant={isPlaying ? "destructive" : "secondary"} className="h-7 px-4 bg-[#2962FF] hover:bg-[#1E4CDB] border-none text-white text-xs rounded-md shadow-lg" onClick={() => setIsPlaying(!isPlaying)}>
+               {isPlaying ? <Square className="w-3 h-3 mr-2" /> : <Play className="w-3 h-3 mr-2" />}
                {isPlaying ? "Pause" : "Play"}
              </Button>
              <Button size="sm" variant="secondary" className="h-7 px-3 bg-[#2B3139] hover:bg-[#363C4E] border-none text-white text-xs rounded-md" onClick={stepForward} disabled={isPlaying}>
-               <StepForward className="w-3 h-3" />
+               <StepForward className="w-4 h-4" />
              </Button>
            </div>
-           <div className="text-sm font-mono bg-[#1E222D] px-4 py-1.5 rounded-lg border border-white/5 font-bold">
+           <div className="text-sm font-mono bg-[#1E222D] px-4 py-1.5 rounded-lg border border-white/5 font-bold shadow-inner">
              Bal: <span className={(session?.balance || 0) >= 10000 ? "text-emerald-400" : "text-red-400"}>${(session?.balance || 0).toFixed(2)}</span>
            </div>
         </div>
@@ -286,10 +356,10 @@ export default function Backtest() {
                
                {/* CUSTOM LONG/SHORT POSITION HTML OVERLAY */}
                {overlayTop && activeTrade && overlayLeft !== null && (
-                 <div className="absolute z-10 pointer-events-none" style={{ left: overlayLeft, width: 200, top: 0, bottom: 0, opacity: 0.8 }}>
+                 <div className="absolute z-10 pointer-events-none" style={{ left: overlayLeft, width: 200, top: 0, bottom: 0, opacity: 0.85 }}>
                     {/* Top Region */}
                     <div 
-                      className="absolute left-0 right-0 border-b border-t border-r border-solid"
+                      className="absolute left-0 right-0 border-b border-t border-r border-solid shadow-[0_0_20px_rgba(0,0,0,0.2)] backdrop-blur-[1px]"
                       style={{ 
                         top: overlayTop.top, 
                         height: overlayTop.height, 
@@ -297,14 +367,14 @@ export default function Backtest() {
                         borderColor: overlayTop.border 
                       }}
                     >
-                      <div className="absolute -left-12 top-0 bg-[#1E222D] text-[9px] px-1 rounded shadow" style={{ color: overlayTop.border }}>
+                      <div className="absolute -left-14 top-0 bg-[#1E222D] text-[10px] px-1.5 py-0.5 rounded shadow-lg font-mono font-bold" style={{ color: overlayTop.border }}>
                         {activeTrade.type === 'Buy' ? activeTrade.tp.toFixed(2) : activeTrade.sl.toFixed(2)}
                       </div>
                     </div>
                     
                     {/* Bottom Region */}
                     <div 
-                      className="absolute left-0 right-0 border-b border-t border-r border-solid"
+                      className="absolute left-0 right-0 border-b border-t border-r border-solid shadow-[0_0_20px_rgba(0,0,0,0.2)] backdrop-blur-[1px]"
                       style={{ 
                         top: overlayBottom.top, 
                         height: overlayBottom.height, 
@@ -312,17 +382,17 @@ export default function Backtest() {
                         borderColor: overlayBottom.border 
                       }}
                     >
-                      <div className="absolute -left-12 bottom-0 bg-[#1E222D] text-[9px] px-1 rounded shadow" style={{ color: overlayBottom.border }}>
+                      <div className="absolute -left-14 bottom-0 bg-[#1E222D] text-[10px] px-1.5 py-0.5 rounded shadow-lg font-mono font-bold" style={{ color: overlayBottom.border }}>
                         {activeTrade.type === 'Buy' ? activeTrade.sl.toFixed(2) : activeTrade.tp.toFixed(2)}
                       </div>
                     </div>
 
                     {/* Entry Line */}
                     <div 
-                      className="absolute left-0 right-0 h-0 border-t border-gray-400"
+                      className="absolute left-0 right-0 h-0 border-t-2 border-gray-400"
                       style={{ top: overlayMiddle }}
                     >
-                      <div className="absolute -left-12 -top-2 bg-[#1E222D] text-[9px] px-1 rounded text-white shadow">
+                      <div className="absolute -left-14 -top-2.5 bg-[#1E222D] text-[10px] px-1.5 py-0.5 rounded text-white shadow-lg font-mono font-bold border border-white/10">
                         {activeTrade.entry.toFixed(2)}
                       </div>
                     </div>
@@ -332,28 +402,31 @@ export default function Backtest() {
           )}
         </div>
         
-        {/* Right Sidebar - MT5 Style Punch Trade */}
-        <div className="w-full md:w-[320px] border-t md:border-t-0 md:border-l border-white/10 bg-[#101216] flex flex-col shrink-0 z-20">
+        {/* Right Sidebar - Improved UI */}
+        <div className="w-full md:w-[340px] border-t md:border-t-0 md:border-l border-[#2B3139] bg-[#1E222D] flex flex-col shrink-0 z-20 shadow-2xl">
            
-           <div className="p-4 border-b border-white/5">
-              <div className="flex justify-between items-center mb-4">
-                 <div className="text-xs font-bold text-gray-400 uppercase tracking-widest">Execution</div>
-                 <div className="text-xl font-mono font-bold text-white tracking-tighter">
+           <div className="p-5 border-b border-[#2B3139] bg-[#131722]/50">
+              <div className="flex justify-between items-center mb-5">
+                 <div className="text-xs font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                   <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                   Order Panel
+                 </div>
+                 <div className="text-2xl font-mono font-bold text-white tracking-tighter">
                     {currentPrice.toFixed(2)}
                  </div>
               </div>
 
               {/* MT5 Style Execution Buttons */}
-              <div className="grid grid-cols-3 gap-2 mb-4 bg-[#1E222D] p-2 rounded-xl border border-white/5 items-center">
+              <div className="flex gap-2 mb-4 items-stretch">
                  <button 
                    onClick={() => executeTrade('Sell')}
                    disabled={activeTrade !== null}
-                   className="col-span-1 py-3 bg-[#F23645] hover:bg-[#C22B37] text-white font-bold rounded-lg text-sm shadow-[0_0_15px_rgba(242,54,69,0.3)] disabled:opacity-50 transition-all flex flex-col items-center justify-center"
+                   className="flex-1 py-4 bg-[#F23645] hover:bg-[#D92B38] text-white font-bold rounded-lg text-lg shadow-[0_4px_14px_0_rgba(242,54,69,0.39)] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                  >
-                   <span>SELL</span>
+                   SELL
                  </button>
                  
-                 <div className="col-span-1 text-center">
+                 <div className="w-24 bg-[#131722] rounded-lg border border-[#2B3139] flex flex-col items-center justify-center p-1">
                    <input 
                      type="number" 
                      value={lotSize} 
@@ -361,68 +434,78 @@ export default function Backtest() {
                      className="w-full bg-transparent text-center text-lg font-bold text-white focus:outline-none"
                      step="0.01"
                    />
-                   <div className="text-[10px] text-gray-500 font-bold uppercase">Lots</div>
+                   <div className="text-[9px] text-gray-500 font-bold uppercase">Lots</div>
                  </div>
 
                  <button 
                    onClick={() => executeTrade('Buy')}
                    disabled={activeTrade !== null}
-                   className="col-span-1 py-3 bg-[#089981] hover:bg-[#067A67] text-white font-bold rounded-lg text-sm shadow-[0_0_15px_rgba(8,153,129,0.3)] disabled:opacity-50 transition-all flex flex-col items-center justify-center"
+                   className="flex-1 py-4 bg-[#089981] hover:bg-[#067A67] text-white font-bold rounded-lg text-lg shadow-[0_4px_14px_0_rgba(8,153,129,0.39)] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                  >
-                   <span>BUY</span>
+                   BUY
                  </button>
               </div>
               
               <div className="grid grid-cols-2 gap-3 mb-2">
-                 <div className="bg-[#1E222D] rounded-lg p-2 border border-white/5">
-                   <div className="text-[10px] text-gray-500 font-bold uppercase mb-1">SL Price</div>
-                   <input 
-                     type="number" 
-                     placeholder="Auto"
-                     value={slPrice}
-                     onChange={(e) => setSlPrice(e.target.value)}
-                     className="w-full bg-transparent text-[#F23645] font-mono text-sm focus:outline-none"
-                   />
-                 </div>
-                 <div className="bg-[#1E222D] rounded-lg p-2 border border-white/5">
-                   <div className="text-[10px] text-gray-500 font-bold uppercase mb-1">TP Price</div>
+                 <div className="bg-[#131722] rounded-lg p-3 border border-[#2B3139] hover:border-gray-600 transition-colors">
+                   <div className="text-[10px] text-gray-500 font-bold uppercase mb-1">Take Profit</div>
                    <input 
                      type="number" 
                      placeholder="Auto"
                      value={tpPrice}
                      onChange={(e) => setTpPrice(e.target.value)}
-                     className="w-full bg-transparent text-[#089981] font-mono text-sm focus:outline-none"
+                     className="w-full bg-transparent text-[#089981] font-mono text-base focus:outline-none font-bold placeholder:text-gray-700"
+                   />
+                 </div>
+                 <div className="bg-[#131722] rounded-lg p-3 border border-[#2B3139] hover:border-gray-600 transition-colors">
+                   <div className="text-[10px] text-gray-500 font-bold uppercase mb-1">Stop Loss</div>
+                   <input 
+                     type="number" 
+                     placeholder="Auto"
+                     value={slPrice}
+                     onChange={(e) => setSlPrice(e.target.value)}
+                     className="w-full bg-transparent text-[#F23645] font-mono text-base focus:outline-none font-bold placeholder:text-gray-700"
                    />
                  </div>
               </div>
               
               {activeTrade && (
-                <div className="mt-4 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg flex items-center justify-between">
+                <div className="mt-4 p-4 bg-[#2962FF]/10 border border-[#2962FF]/30 rounded-lg flex items-center justify-between">
                    <div>
-                     <div className={`font-bold text-xs ${activeTrade.type === 'Buy' ? 'text-[#089981]' : 'text-[#F23645]'}`}>
-                       ACTIVE {activeTrade.type.toUpperCase()} RUNNING
+                     <div className={`font-bold text-sm ${activeTrade.type === 'Buy' ? 'text-[#089981]' : 'text-[#F23645]'}`}>
+                       {activeTrade.type.toUpperCase()} TRADE OPEN
                      </div>
-                     <div className="text-[10px] text-blue-300 mt-1">Overlay drawn on chart</div>
+                     <div className="text-[10px] text-blue-300 mt-1 flex items-center gap-1">
+                       <Play className="w-3 h-3" /> Hit Play to simulate
+                     </div>
                    </div>
-                   <button onClick={() => checkTradeExit({ high: 0, low: 0 })} className="px-3 py-1.5 bg-[#1E222D] hover:bg-red-500/20 text-xs text-red-400 rounded-md transition-colors font-bold">
+                   <button onClick={() => checkTradeExit({ high: 0, low: 0 })} className="px-4 py-2 bg-[#131722] hover:bg-red-500/20 text-xs text-red-400 rounded-md transition-colors font-bold border border-red-500/20 hover:border-red-500/50">
                      CLOSE
                    </button>
                 </div>
               )}
            </div>
 
-           <div className="flex-1 overflow-y-auto p-4 flex flex-col bg-[#0A0B0D]">
-              <h3 className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-3">Session History</h3>
-              <div className="space-y-2">
+           <div className="flex-1 overflow-y-auto p-5 flex flex-col bg-[#131722]">
+              <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4">Trade Journal</h3>
+              <div className="space-y-3">
                 {tradeHistory.length === 0 ? (
-                  <p className="text-xs text-gray-600 text-center py-6">No trades yet.</p>
+                  <div className="flex flex-col items-center justify-center py-10 opacity-30">
+                    <div className="w-12 h-12 rounded-full border-2 border-dashed border-gray-500 mb-3"></div>
+                    <p className="text-xs text-gray-500 font-bold">No positions executed yet.</p>
+                  </div>
                 ) : (
                   tradeHistory.map((trade, i) => (
-                    <div key={i} className="flex justify-between items-center p-2 rounded-lg bg-[#15181D] border border-white/5">
-                      <div className={`font-bold text-[10px] uppercase px-1.5 py-0.5 rounded ${trade.type === 'Buy' ? 'bg-[#089981]/10 text-[#089981]' : 'bg-[#F23645]/10 text-[#F23645]'}`}>
-                        {trade.type}
+                    <div key={i} className="flex justify-between items-center p-3 rounded-lg bg-[#1E222D] border border-white/5 hover:border-white/10 transition-colors">
+                      <div>
+                        <div className={`font-bold text-xs uppercase px-2 py-0.5 rounded-sm inline-block mb-1 ${trade.type === 'Buy' ? 'bg-[#089981]/20 text-[#089981]' : 'bg-[#F23645]/20 text-[#F23645]'}`}>
+                          {trade.type} {trade.lots}
+                        </div>
+                        <div className="text-[10px] text-gray-500 font-mono">
+                          Entry: {trade.entry.toFixed(2)}
+                        </div>
                       </div>
-                      <div className={`font-mono font-bold text-xs ${trade.pnl >= 0 ? 'text-[#089981]' : 'text-[#F23645]'}`}>
+                      <div className={`font-mono font-bold text-sm ${trade.pnl >= 0 ? 'text-[#089981]' : 'text-[#F23645]'}`}>
                         {trade.pnl >= 0 ? '+' : ''}{trade.pnl.toFixed(2)}
                       </div>
                     </div>
