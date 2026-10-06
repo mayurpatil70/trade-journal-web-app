@@ -12,7 +12,8 @@ import {
   Users,
   Upload,
   Settings,
-  Headphones, Wallet,
+  Headphones,
+  Wallet,
   Menu,
   X,
   LogOut,
@@ -50,14 +51,16 @@ const NavItem = ({
         isDisabled
           ? "opacity-50 cursor-not-allowed text-gray-500"
           : isActive
-          ? "bg-[#1B2027] text-white border border-white/5 shadow-sm"
-          : "text-gray-400 hover:bg-[#15181D] hover:text-gray-200 border border-transparent"
+            ? "bg-[#1B2027] text-white border border-white/5 shadow-sm"
+            : "text-gray-400 hover:bg-[#15181D] hover:text-gray-200 border border-transparent"
       }`}
     >
       <div className="flex items-center gap-3">
         <Icon
           className={`w-[18px] h-[18px] transition-colors ${
-            isActive ? "text-cyan-400" : "text-gray-500 group-hover:text-gray-300"
+            isActive
+              ? "text-cyan-400"
+              : "text-gray-500 group-hover:text-gray-300"
           }`}
           strokeWidth={isActive ? 2.5 : 2}
         />
@@ -86,16 +89,16 @@ export default function MainLayout() {
     document.documentElement.classList.add("dark");
     document.body.style.backgroundColor = "#0A0B0D";
     document.body.style.color = "#FFFFFF";
-    
+
     // Command Palette listener
     const handleKeyDown = (e) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
         e.preventDefault();
         setIsSearchOpen(true);
       }
     };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, [location.pathname]);
 
   const handleLogout = () => {
@@ -114,8 +117,8 @@ export default function MainLayout() {
     {
       label: "Trade",
       items: [
-        { to: "/dashboard", icon: LayoutDashboard, label: "Command Center" },
-        { to: "/add-trade", icon: PlusCircle, label: "Log Trade" },
+        { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
+        { to: "/add-trade", icon: PlusCircle, label: "Add Trade" },
         { to: "/trades", icon: List, label: "Past Trades" },
         { to: "/calendar", icon: CalendarIcon, label: "Calendar" },
       ],
@@ -124,17 +127,21 @@ export default function MainLayout() {
       label: "Analyze",
       items: [
         { to: "/analytics", icon: Activity, label: "Strategy Analytics" },
-        { to: "/psychology", icon: User, label: "Psychology" },
+        { to: "/psychology", icon: User, label: "Psychology Lab" },
         { to: "/mistakes", icon: ShieldCheck, label: "Mistake Lab" },
       ],
     },
     {
       label: "Tools",
       items: [
-        { to: "/backtest", icon: Zap, label: "Backtest" },
+        { to: "/backtest", icon: Zap, label: "Setup Backtesting" },
         { to: "/news", icon: Globe, label: "Economic Calendar" },
-        { to: "/calculator/lot-size", icon: CalculatorIcon, label: "Lot Calculator" },
-        { to: "/calculator/prop-firm", icon: CalculatorIcon, label: "Funded Guardian" },
+        {
+          to: "/calculator/lot-size",
+          icon: CalculatorIcon,
+          label: "Calculators",
+        },
+        // { to: "/calculator/prop-firm", icon: CalculatorIcon, label: "Funded Guardian" },
       ],
     },
     {
@@ -187,8 +194,13 @@ export default function MainLayout() {
               Forex Notes
             </span>
           </div>
-          <button onClick={() => setIsSearchOpen(true)} className="p-1.5 text-gray-500 hover:text-gray-300 rounded-md hover:bg-white/5 transition-colors">
-            <span className="text-[10px] font-mono border border-gray-700 px-1 rounded">⌘K</span>
+          <button
+            onClick={() => setIsSearchOpen(true)}
+            className="p-1.5 text-gray-500 hover:text-gray-300 rounded-md hover:bg-white/5 transition-colors"
+          >
+            <span className="text-[10px] font-mono border border-gray-700 px-1 rounded">
+              ⌘K
+            </span>
           </button>
         </div>
 
@@ -216,7 +228,9 @@ export default function MainLayout() {
           ))}
 
           {/* ADMIN BYPASS MENU */}
-          { ["noballondesk@gmail.com", "akpatil51340@gmail.com"].includes(localStorage.getItem("userEmail")) && (
+          {["noballondesk@gmail.com", "akpatil51340@gmail.com"].includes(
+            localStorage.getItem("userEmail"),
+          ) && (
             <div className="pt-5 mt-5 border-t border-white/5">
               <p className="px-3 text-[10px] font-semibold text-emerald-500/70 uppercase tracking-widest mb-2.5">
                 Admin
@@ -299,81 +313,151 @@ export default function MainLayout() {
 
       {/* Command Palette Overlay (Mock) */}
       {isSearchOpen && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center pt-[15vh] p-4 bg-black/50 backdrop-blur-sm animate-in fade-in" onClick={() => setIsSearchOpen(false)}>
-          <div className="w-full max-w-xl bg-[#101216] border border-white/10 rounded-2xl shadow-2xl overflow-hidden" onClick={e => e.stopPropagation()}>
-             <div className="flex items-center px-4 py-3 border-b border-white/5">
-                <Sparkles className="w-5 h-5 text-gray-400 mr-3" />
-                <input type="text" placeholder="Search trades, analytics, or actions..." autoFocus className="flex-1 bg-transparent border-none outline-none text-white placeholder-gray-500 text-[15px]" />
-                <button onClick={() => setIsSearchOpen(false)} className="px-2 py-1 bg-white/5 text-gray-400 text-[10px] rounded hover:bg-white/10">ESC</button>
-             </div>
-             <div className="p-2">
-                <p className="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Quick Actions</p>
-                <button onClick={() => { navigate('/add-trade'); setIsSearchOpen(false); }} className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-gray-300 hover:bg-white/5 rounded-lg transition-colors text-left">
-                  <PlusCircle className="w-4 h-4 text-cyan-400" /> Log a new trade
-                </button>
-                <button onClick={() => { navigate('/dashboard'); setIsSearchOpen(false); }} className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-gray-300 hover:bg-white/5 rounded-lg transition-colors text-left">
-                  <LayoutDashboard className="w-4 h-4 text-emerald-400" /> Go to Command Center
-                </button>
-             </div>
+        <div
+          className="fixed inset-0 z-50 flex items-start justify-center pt-[15vh] p-4 bg-black/50 backdrop-blur-sm animate-in fade-in"
+          onClick={() => setIsSearchOpen(false)}
+        >
+          <div
+            className="w-full max-w-xl bg-[#101216] border border-white/10 rounded-2xl shadow-2xl overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center px-4 py-3 border-b border-white/5">
+              <Sparkles className="w-5 h-5 text-gray-400 mr-3" />
+              <input
+                type="text"
+                placeholder="Search trades, analytics, or actions..."
+                autoFocus
+                className="flex-1 bg-transparent border-none outline-none text-white placeholder-gray-500 text-[15px]"
+              />
+              <button
+                onClick={() => setIsSearchOpen(false)}
+                className="px-2 py-1 bg-white/5 text-gray-400 text-[10px] rounded hover:bg-white/10"
+              >
+                ESC
+              </button>
+            </div>
+            <div className="p-2">
+              <p className="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                Quick Actions
+              </p>
+              <button
+                onClick={() => {
+                  navigate("/add-trade");
+                  setIsSearchOpen(false);
+                }}
+                className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-gray-300 hover:bg-white/5 rounded-lg transition-colors text-left"
+              >
+                <PlusCircle className="w-4 h-4 text-cyan-400" /> Log a new trade
+              </button>
+              <button
+                onClick={() => {
+                  navigate("/dashboard");
+                  setIsSearchOpen(false);
+                }}
+                className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-gray-300 hover:bg-white/5 rounded-lg transition-colors text-left"
+              >
+                <LayoutDashboard className="w-4 h-4 text-emerald-400" /> Go to
+                Command Center
+              </button>
+            </div>
           </div>
         </div>
       )}
 
       {/* Subscription Modal */}
       {isSubscriptionOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-200">
-            <div className="relative w-full max-w-2xl bg-[#101216] border border-white/10 rounded-2xl shadow-2xl p-6 sm:p-8">
-              <button
-                onClick={() => setIsSubscriptionOpen(false)}
-                className="absolute top-4 right-4 p-2 rounded-lg bg-white/5 text-gray-400 hover:text-white transition-colors"
-              >
-                <X className="w-4 h-4" />
-              </button>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="relative w-full max-w-2xl bg-[#101216] border border-white/10 rounded-2xl shadow-2xl p-6 sm:p-8">
+            <button
+              onClick={() => setIsSubscriptionOpen(false)}
+              className="absolute top-4 right-4 p-2 rounded-lg bg-white/5 text-gray-400 hover:text-white transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
 
-              <div className="text-center mb-8">
-                <h3 className="text-2xl font-bold text-white tracking-tight">Upgrade Subscription</h3>
-                <p className="text-gray-400 text-sm mt-2">Unlock Pro Workspace Features</p>
-              </div>
+            <div className="text-center mb-8">
+              <h3 className="text-2xl font-bold text-white tracking-tight">
+                Upgrade Subscription
+              </h3>
+              <p className="text-gray-400 text-sm mt-2">
+                Unlock Pro Workspace Features
+              </p>
+            </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {localStorage.getItem("subscriptionType") !== "monthly" && localStorage.getItem("subscriptionType") !== "yearly" && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {localStorage.getItem("subscriptionType") !== "monthly" &&
+                localStorage.getItem("subscriptionType") !== "yearly" && (
                   <div className="p-6 bg-[#15181D] rounded-xl border border-white/5 hover:border-emerald-500/50 transition-all flex flex-col">
-                    <h4 className="text-lg font-bold text-white">Monthly Plan</h4>
-                    <p className="text-2xl font-bold text-emerald-400 mt-2">$29<span className="text-sm text-gray-500">/mo</span></p>
+                    <h4 className="text-lg font-bold text-white">
+                      Monthly Plan
+                    </h4>
+                    <p className="text-2xl font-bold text-emerald-400 mt-2">
+                      $29<span className="text-sm text-gray-500">/mo</span>
+                    </p>
                     <ul className="mt-4 space-y-2 text-sm text-gray-300 flex-1">
-                      <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-400" /> Advanced Execution & Analytics</li>
-                      <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-400" /> Deep Psychology Tracking</li>
-                      <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-400" /> Performance Intelligence</li>
+                      <li className="flex items-center gap-2">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-400" />{" "}
+                        Advanced Execution & Analytics
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-400" />{" "}
+                        Deep Psychology Tracking
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-400" />{" "}
+                        Performance Intelligence
+                      </li>
                     </ul>
-                    <button className="w-full mt-6 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-lg">Upgrade Monthly</button>
-                  </div>
-                )}
-                
-                {localStorage.getItem("subscriptionType") !== "yearly" && (
-                  <div className="p-6 bg-[#15181D] rounded-xl border border-cyan-500/30 hover:border-cyan-500/70 transition-all flex flex-col relative">
-                    <div className="absolute top-0 right-0 bg-cyan-500 text-black text-[10px] font-bold px-2 py-1 rounded-bl-lg rounded-tr-xl">SAVE 20%</div>
-                    <h4 className="text-lg font-bold text-white">Yearly Plan</h4>
-                    <p className="text-2xl font-bold text-cyan-400 mt-2">$279<span className="text-sm text-gray-500">/yr</span></p>
-                    <ul className="mt-4 space-y-2 text-sm text-gray-300 flex-1">
-                      <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-cyan-400" /> All Monthly Features</li>
-                      <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-cyan-400" /> 2 Months Free</li>
-                      <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-cyan-400" /> Priority Support</li>
-                    </ul>
-                    <button className="w-full mt-6 py-2 bg-cyan-600 hover:bg-cyan-500 text-white font-semibold rounded-lg">Upgrade Yearly</button>
+                    <button className="w-full mt-6 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-lg">
+                      Upgrade Monthly
+                    </button>
                   </div>
                 )}
 
-                {localStorage.getItem("subscriptionType") === "yearly" && (
-                  <div className="col-span-1 md:col-span-2 p-6 bg-[#15181D] rounded-xl border border-emerald-500/50 text-center">
-                    <ShieldCheck className="w-12 h-12 text-emerald-400 mx-auto mb-4" />
-                    <h4 className="text-xl font-bold text-white">Pro Workspace Active</h4>
-                    <p className="text-gray-400 mt-2">You are currently on the Yearly Plan.</p>
+              {localStorage.getItem("subscriptionType") !== "yearly" && (
+                <div className="p-6 bg-[#15181D] rounded-xl border border-cyan-500/30 hover:border-cyan-500/70 transition-all flex flex-col relative">
+                  <div className="absolute top-0 right-0 bg-cyan-500 text-black text-[10px] font-bold px-2 py-1 rounded-bl-lg rounded-tr-xl">
+                    SAVE 20%
                   </div>
-                )}
-              </div>
+                  <h4 className="text-lg font-bold text-white">Yearly Plan</h4>
+                  <p className="text-2xl font-bold text-cyan-400 mt-2">
+                    $279<span className="text-sm text-gray-500">/yr</span>
+                  </p>
+                  <ul className="mt-4 space-y-2 text-sm text-gray-300 flex-1">
+                    <li className="flex items-center gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-cyan-400" /> All
+                      Monthly Features
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-cyan-400" /> 2
+                      Months Free
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-cyan-400" />{" "}
+                      Priority Support
+                    </li>
+                  </ul>
+                  <button className="w-full mt-6 py-2 bg-cyan-600 hover:bg-cyan-500 text-white font-semibold rounded-lg">
+                    Upgrade Yearly
+                  </button>
+                </div>
+              )}
+
+              {localStorage.getItem("subscriptionType") === "yearly" && (
+                <div className="col-span-1 md:col-span-2 p-6 bg-[#15181D] rounded-xl border border-emerald-500/50 text-center">
+                  <ShieldCheck className="w-12 h-12 text-emerald-400 mx-auto mb-4" />
+                  <h4 className="text-xl font-bold text-white">
+                    Pro Workspace Active
+                  </h4>
+                  <p className="text-gray-400 mt-2">
+                    You are currently on the Yearly Plan.
+                  </p>
+                </div>
+              )}
             </div>
           </div>
-        )}
+        </div>
+      )}
 
       {isMobileMenuOpen && (
         <div
@@ -386,4 +470,3 @@ export default function MainLayout() {
     </div>
   );
 }
-
