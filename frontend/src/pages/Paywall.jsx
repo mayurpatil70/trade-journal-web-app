@@ -207,3 +207,29 @@ export default function Paywall() {
         {(subType === 'yearly') && (
           <div className="bg-[#0A0A0A] border border-blue-500/30 p-8 rounded-2xl w-full md:w-80 flex flex-col relative overflow-hidden shadow-[0_0_30px_rgba(37,99,235,0.15)] mx-auto">
             <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/20 blur-3xl rounded-full pointer-events-none"></div>
+            <h2 className="text-lg font-medium text-white mb-4">Extend Pro Yearly</h2>
+            <div className="flex items-end gap-1 mb-2">
+               <h3 className="text-4xl font-bold text-white">$117</h3>
+               <span className="text-gray-400 text-sm mb-1">/yearly</span>
+            </div>
+            <p className="text-gray-500 text-xs mb-4">Add another 365 days to your active plan</p>
+            
+            <ul className="text-sm space-y-4 mb-8 text-gray-300 flex-1 mt-6">
+              <li className="flex items-center">✓ <span className="ml-3">Keep all Pro features</span></li>
+              <li className="flex items-center">✓ <span className="ml-3">Uninterrupted access</span></li>
+              <li className="flex items-center">✓ <span className="ml-3">Lock in current pricing</span></li>
+            </ul>
+
+            <button 
+              onClick={() => handleCryptoPayment('yearly', 117)}
+              className="w-full mt-auto py-3 rounded-full font-medium bg-blue-600 hover:bg-blue-700 text-white transition-colors shadow-lg shadow-blue-500/25"
+            >
+              Renew Subscription
+            </button>
+          </div>
+        )}
+
+      </div>
+    </div>
+  );
+}
