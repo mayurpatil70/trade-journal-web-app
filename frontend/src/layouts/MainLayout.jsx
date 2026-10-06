@@ -264,7 +264,7 @@ export default function MainLayout() {
               <button
                 onClick={() => {
                   setIsProfileOpen(false);
-                  setIsSubscriptionOpen(true);
+                  navigate('/paywall');
                 }}
                 className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-emerald-400 hover:bg-emerald-400/10 transition-colors text-left border-t border-white/5"
               >
@@ -365,89 +365,13 @@ export default function MainLayout() {
         </div>
       )}
 
-      {/* Subscription Modal */}
-      {isSubscriptionOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="relative w-full max-w-2xl bg-[#101216] border border-white/10 rounded-2xl shadow-2xl p-6 sm:p-8">
-            <button
-              onClick={() => setIsSubscriptionOpen(false)}
-              className="absolute top-4 right-4 p-2 rounded-lg bg-white/5 text-gray-400 hover:text-white transition-colors"
-            >
-              <X className="w-4 h-4" />
-            </button>
-
-            <div className="text-center mb-8">
-              <h3 className="text-2xl font-bold text-white tracking-tight">
-                Upgrade Subscription
-              </h3>
-              <p className="text-gray-400 text-sm mt-2">
-                Unlock Pro Workspace Features
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {localStorage.getItem("subscriptionType") !== "monthly" &&
-                localStorage.getItem("subscriptionType") !== "yearly" && (
-                  <div className="p-6 bg-[#15181D] rounded-xl border border-white/5 hover:border-emerald-500/50 transition-all flex flex-col">
-                    <h4 className="text-lg font-bold text-white">
-                      Monthly Plan
-                    </h4>
-                    <p className="text-2xl font-bold text-emerald-400 mt-2">
-                      $29<span className="text-sm text-gray-500">/mo</span>
-                    </p>
-                    <ul className="mt-4 space-y-2 text-sm text-gray-300 flex-1">
-                      <li className="flex items-center gap-2">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-400" />{" "}
-                        Advanced Execution & Analytics
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-400" />{" "}
-                        Deep Psychology Tracking
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-400" />{" "}
-                        Performance Intelligence
-                      </li>
-                    </ul>
-                    <button className="w-full mt-6 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-lg">
-                      Upgrade Monthly
-                    </button>
-                  </div>
-                )}
-
-              {localStorage.getItem("subscriptionType") !== "yearly" && (
-                <div className="p-6 bg-[#15181D] rounded-xl border border-cyan-500/30 hover:border-cyan-500/70 transition-all flex flex-col relative">
-                  <div className="absolute top-0 right-0 bg-cyan-500 text-black text-[10px] font-bold px-2 py-1 rounded-bl-lg rounded-tr-xl">
-                    SAVE 20%
-                  </div>
-                  <h4 className="text-lg font-bold text-white">Yearly Plan</h4>
-                  <p className="text-2xl font-bold text-cyan-400 mt-2">
-                    $279<span className="text-sm text-gray-500">/yr</span>
-                  </p>
-                  <ul className="mt-4 space-y-2 text-sm text-gray-300 flex-1">
-                    <li className="flex items-center gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-cyan-400" /> All
-                      Monthly Features
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-cyan-400" /> 2
-                      Months Free
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-cyan-400" />{" "}
-                      Priority Support
-                    </li>
-                  </ul>
-                  <button className="w-full mt-6 py-2 bg-cyan-600 hover:bg-cyan-500 text-white font-semibold rounded-lg">
-                    Upgrade Yearly
-                  </button>
+                  </h4>
                 </div>
               )}
-
-              {localStorage.getItem("subscriptionType") === "yearly" && (
-                <div className="col-span-1 md:col-span-2 p-6 bg-[#15181D] rounded-xl border border-emerald-500/50 text-center">
-                  <ShieldCheck className="w-12 h-12 text-emerald-400 mx-auto mb-4" />
-                  <h4 className="text-xl font-bold text-white">
+            </div>
+          </div>
+        </div>
+      )}
                     Pro Workspace Active
                   </h4>
                   <p className="text-gray-400 mt-2">
