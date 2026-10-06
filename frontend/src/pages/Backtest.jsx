@@ -199,9 +199,10 @@ export default function Backtest() {
     let takeProfit = parseFloat(tpPrice);
     const lots = parseFloat(lotSize) || 1;
     
-    const dist = currentPrice * 0.01;
-    if (!stopLoss) stopLoss = type === 'Buy' ? currentPrice - dist : currentPrice + dist;
-    if (!takeProfit) takeProfit = type === 'Buy' ? currentPrice + dist : currentPrice - dist;
+    if (!stopLoss || !takeProfit) {
+      alert("Please enter exact SL and TP prices to execute the trade.");
+      return;
+    }
     
     const entryTime = data[currentIndex - 1].time;
 
@@ -213,9 +214,6 @@ export default function Backtest() {
       lots,
       entryTime
     });
-    
-    setSlPrice(stopLoss.toFixed(2));
-    setTpPrice(takeProfit.toFixed(2));
   };
   
   const checkTradeExit = (candle) => {
@@ -244,15 +242,19 @@ export default function Backtest() {
     if (closed) {
       setSession(prev => {
         const newBal = prev.balance + pnl;
-        const saved = JSON.parse(localStorage.getItem('backtest_sessions') || '[]');
-        const updated = saved.map(s => s.id === id ? { ...s, balance: newBal } : s);
-        localStorage.setItem('backtest_sessions', JSON.stringify(updated));
         return { ...prev, balance: newBal };
       });
       setTradeHistory(prev => [{ ...activeTrade, pnl }, ...prev]);
       setActiveTrade(null);
       setOverlayTop(null);
     }
+  };
+
+  const saveSession = () => {
+    const saved = JSON.parse(localStorage.getItem('backtest_sessions') || '[]');
+    const updated = saved.map(s => s.id === id ? { ...session } : s);
+    localStorage.setItem('backtest_sessions', JSON.stringify(updated));
+    alert("Session saved successfully!");
   };
 
   const changeSymbol = (sym) => {
@@ -339,6 +341,9 @@ export default function Backtest() {
            <div className="text-sm font-mono bg-[#1E222D] px-4 py-1.5 rounded-lg border border-white/5 font-bold shadow-inner">
              Bal: <span className={(session?.balance || 0) >= 10000 ? "text-emerald-400" : "text-red-400"}>${(session?.balance || 0).toFixed(2)}</span>
            </div>
+           <Button size="sm" variant="secondary" className="h-7 px-3 bg-[#089981] hover:bg-[#067A67] border-none text-white text-xs rounded-md shadow-lg font-bold" onClick={saveSession}>
+             Save Session
+           </Button>
         </div>
       </div>
 
