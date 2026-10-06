@@ -21,13 +21,29 @@ export default function Login() {
     setErrorMessage("");
 
     try {
-      await api.post("/api/auth/login", { email });
+      // First attempt
+      try {
+        await api.post("/api/auth/login", { email });
+      } catch (firstError) {
+        console.warn("First login attempt failed, retrying...", firstError);
+        // Second attempt (retry)
+        await new Promise(resolve => setTimeout(resolve, 1000)); // wait 1s before retry
+        await api.post("/api/auth/login", { email });
+      }
       setStatus("success");
     } catch (error) {
+      console.error("Login completely failed:", error);
       setStatus("error");
-      setErrorMessage(
-        error.response?.data?.error || "Failed to send login link.",
-      );
+      
+      // Provide a more user-friendly error message
+      const serverError = error.response?.data?.error;
+      if (serverError) {
+         setErrorMessage(serverError);
+      } else if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
+         setErrorMessage("The server took too long to respond. Please try again.");
+      } else {
+         setErrorMessage("Network issue. Please check your connection and try again.");
+      }
     }
   };
 
