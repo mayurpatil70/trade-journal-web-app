@@ -363,27 +363,6 @@ export default function MainLayout() {
             </div>
           </div>
         </div>
-      )}
-
-                  </h4>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-                    Pro Workspace Active
-                  </h4>
-                  <p className="text-gray-400 mt-2">
-                    You are currently on the Yearly Plan.
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
       {isMobileMenuOpen && (
         <div
           className="fixed inset-0 bg-black/60 z-20 md:hidden backdrop-blur-sm"
