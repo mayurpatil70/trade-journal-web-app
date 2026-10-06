@@ -137,6 +137,8 @@ export default function MainLayout() {
         { to: "/charts", icon: Activity, label: "Live Charts" },
         { to: "/sessions", icon: Zap, label: "Setup Backtesting" },
         { to: "/news", icon: Globe, label: "Economic Calendar" },
+        { to: "/trading-bot", icon: Activity, label: "Trading Bot", isBeta: true },
+        { to: "/setup", icon: Settings, label: "Bot Setup" },
         {
           to: "/calculator/lot-size",
           icon: CalculatorIcon,
