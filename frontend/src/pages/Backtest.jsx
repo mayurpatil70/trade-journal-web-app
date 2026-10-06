@@ -25,21 +25,19 @@ export default function Backtest() {
   // Symbol Search Modal
   const [showSearch, setShowSearch] = useState(false);
   const [searchInput, setSearchInput] = useState('');
-  const popularSymbols = ['BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT', 'XRPUSDT', 'ADAUSDT'];
+  const popularSymbols = ['BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'XRPUSDT', 'XAUUSD', 'EURUSD', 'GBPUSD'];
   
   // MT5 Panel State
   const [lotSize, setLotSize] = useState('1.00');
   const [slPrice, setSlPrice] = useState('');
   const [tpPrice, setTpPrice] = useState('');
   
-  // Active Trade (Long/Short Overlay)
+  // Active Trade State
   const [activeTrade, setActiveTrade] = useState(null); 
+  const [livePnl, setLivePnl] = useState(0);
   
-  // Overlay Coordinates State
-  const [overlayTop, setOverlayTop] = useState(null);
-  const [overlayBottom, setOverlayBottom] = useState(null);
-  const [overlayMiddle, setOverlayMiddle] = useState(null);
-  const [overlayLeft, setOverlayLeft] = useState(null);
+  // Price Line References for Chart
+  const priceLinesRef = useRef({ entry: null, sl: null, tp: null });
 
   useEffect(() => {
     // 1. Fetch Session
@@ -57,67 +55,61 @@ export default function Backtest() {
   useEffect(() => {
     if (!activeSymbol) return;
     
-    const fetchBinance = async () => {
+    const fetchData = async () => {
       setLoading(true);
       try {
-        const response = await fetch(`https://api.binance.com/api/v3/klines?symbol=${activeSymbol}&interval=1h&limit=1000`);
-        if (!response.ok) throw new Error("Symbol not found");
-        const json = await response.json();
-        const formattedData = json.map(d => ({
-          time: d[0] / 1000, 
-          open: parseFloat(d[1]),
-          high: parseFloat(d[2]),
-          low: parseFloat(d[3]),
-          close: parseFloat(d[4]),
-        }));
-        
-        setData(formattedData);
+        // If Crypto, use Binance Free API
+        if (activeSymbol.includes('USDT')) {
+          const response = await fetch(`https://api.binance.com/api/v3/klines?symbol=${activeSymbol}&interval=1h&limit=1000`);
+          if (!response.ok) throw new Error("Symbol not found");
+          const json = await response.json();
+          const formattedData = json.map(d => ({
+            time: d[0] / 1000, 
+            open: parseFloat(d[1]),
+            high: parseFloat(d[2]),
+            low: parseFloat(d[3]),
+            close: parseFloat(d[4]),
+          }));
+          setData(formattedData);
+        } else {
+          // Mock data for Forex/Gold since free public APIs block CORS for these assets
+          const mockData = [];
+          let currentPrice = activeSymbol === 'XAUUSD' ? 2400 : 1.1000;
+          let time = Math.floor(Date.now() / 1000) - (1000 * 3600);
+          for (let i = 0; i < 1000; i++) {
+            const volatility = activeSymbol === 'XAUUSD' ? 5 : 0.002;
+            const open = currentPrice;
+            const high = open + (Math.random() * volatility);
+            const low = open - (Math.random() * volatility);
+            const close = low + (Math.random() * (high - low));
+            mockData.push({ time, open, high, low, close });
+            currentPrice = close;
+            time += 3600;
+          }
+          setData(mockData);
+        }
+
         setCurrentIndex(200); 
-        setActiveTrade(null); // Reset trades on symbol switch
+        
+        // Reset Trade & Price Lines on Symbol Switch
+        setActiveTrade(null);
+        setLivePnl(0);
+        if (seriesInstance.current) {
+          if (priceLinesRef.current.entry) seriesInstance.current.removePriceLine(priceLinesRef.current.entry);
+          if (priceLinesRef.current.sl) seriesInstance.current.removePriceLine(priceLinesRef.current.sl);
+          if (priceLinesRef.current.tp) seriesInstance.current.removePriceLine(priceLinesRef.current.tp);
+          priceLinesRef.current = { entry: null, sl: null, tp: null };
+        }
+
       } catch(e) {
         console.error(e);
-        // Fallback if symbol is invalid
-        if (data.length === 0) {
-           alert("Symbol not found on Binance Data Source (Use formatting like BTCUSDT)");
-        }
+        alert("Error fetching data for symbol.");
       } finally {
         setLoading(false);
       }
     };
-    fetchBinance();
+    fetchData();
   }, [activeSymbol]);
-
-  // Update Overlay Function
-  const updateOverlayPosition = useCallback(() => {
-    if (!activeTrade || !chartInstance.current || !seriesInstance.current || data.length === 0) {
-      setOverlayTop(null);
-      return;
-    }
-    
-    const tpY = seriesInstance.current.priceToCoordinate(activeTrade.tp);
-    const slY = seriesInstance.current.priceToCoordinate(activeTrade.sl);
-    const entryY = seriesInstance.current.priceToCoordinate(activeTrade.entry);
-    
-    let startX = chartInstance.current.timeScale().timeToCoordinate(activeTrade.entryTime);
-    
-    if (tpY !== null && slY !== null && entryY !== null && startX !== null) {
-      let topRegion, bottomRegion;
-      if (activeTrade.type === 'Buy') {
-         topRegion = { top: tpY, height: entryY - tpY, color: 'rgba(8, 153, 129, 0.2)', border: '#089981' };
-         bottomRegion = { top: entryY, height: slY - entryY, color: 'rgba(242, 54, 69, 0.2)', border: '#F23645' };
-      } else {
-         topRegion = { top: slY, height: entryY - slY, color: 'rgba(242, 54, 69, 0.2)', border: '#F23645' };
-         bottomRegion = { top: entryY, height: tpY - entryY, color: 'rgba(8, 153, 129, 0.2)', border: '#089981' };
-      }
-      
-      setOverlayTop(topRegion);
-      setOverlayBottom(bottomRegion);
-      setOverlayMiddle(entryY);
-      setOverlayLeft(startX);
-    } else {
-      setOverlayTop(null);
-    }
-  }, [activeTrade, data]);
 
   // Init Chart
   useEffect(() => {
@@ -143,13 +135,14 @@ export default function Backtest() {
     const visibleData = data.slice(0, currentIndex);
     candlestickSeries.setData(visibleData);
     
-    chart.subscribeCrosshairMove(updateOverlayPosition);
-    chart.timeScale().subscribeVisibleTimeRangeChange(updateOverlayPosition);
+    // Re-draw price lines if trade was active (e.g. component re-mounted, rare but safe)
+    if (activeTrade) {
+      drawPriceLines(activeTrade.entry, activeTrade.sl, activeTrade.tp);
+    }
     
     const handleResize = () => {
       if (chartContainerRef.current) {
         chart.applyOptions({ width: chartContainerRef.current.clientWidth, height: chartContainerRef.current.clientHeight });
-        updateOverlayPosition();
       }
     };
     window.addEventListener('resize', handleResize);
@@ -172,7 +165,6 @@ export default function Backtest() {
       
       if (activeTrade) {
          checkTradeExit(currentCandle);
-         updateOverlayPosition(); 
       }
 
       if (isPlaying) {
@@ -180,7 +172,7 @@ export default function Backtest() {
         return () => clearTimeout(timer);
       }
     }
-  }, [currentIndex, isPlaying, activeTrade, updateOverlayPosition]);
+  }, [currentIndex, isPlaying, activeTrade]);
 
   const stepForward = () => {
     if (currentIndex < data.length) {
@@ -191,6 +183,43 @@ export default function Backtest() {
   };
 
   const currentPrice = data.length > 0 && currentIndex > 0 ? data[currentIndex - 1].close : 0;
+
+  const drawPriceLines = (entry, sl, tp) => {
+    if (!seriesInstance.current) return;
+    
+    priceLinesRef.current.entry = seriesInstance.current.createPriceLine({
+        price: entry,
+        color: '#2962FF',
+        lineWidth: 2,
+        lineStyle: 0,
+        title: 'ENTRY',
+        axisLabelVisible: true,
+    });
+    priceLinesRef.current.sl = seriesInstance.current.createPriceLine({
+        price: sl,
+        color: '#F23645',
+        lineWidth: 2,
+        lineStyle: 2,
+        title: 'SL',
+        axisLabelVisible: true,
+    });
+    priceLinesRef.current.tp = seriesInstance.current.createPriceLine({
+        price: tp,
+        color: '#089981',
+        lineWidth: 2,
+        lineStyle: 2,
+        title: 'TP',
+        axisLabelVisible: true,
+    });
+  };
+
+  const removePriceLines = () => {
+    if (!seriesInstance.current) return;
+    if (priceLinesRef.current.entry) seriesInstance.current.removePriceLine(priceLinesRef.current.entry);
+    if (priceLinesRef.current.sl) seriesInstance.current.removePriceLine(priceLinesRef.current.sl);
+    if (priceLinesRef.current.tp) seriesInstance.current.removePriceLine(priceLinesRef.current.tp);
+    priceLinesRef.current = { entry: null, sl: null, tp: null };
+  };
 
   const executeTrade = (type) => {
     if (activeTrade || currentPrice === 0) return; 
@@ -214,39 +243,51 @@ export default function Backtest() {
       lots,
       entryTime
     });
+    
+    setLivePnl(0);
+    drawPriceLines(currentPrice, stopLoss, takeProfit);
   };
   
   const checkTradeExit = (candle) => {
     let closed = false;
-    let pnl = 0;
+    let finalPnl = 0;
     const multiplier = activeTrade.lots * 1000;
 
+    // Calculate LIVE PNL based on candle close
+    const currentLivePnl = activeTrade.type === 'Buy' 
+      ? (candle.close - activeTrade.entry) * multiplier 
+      : (activeTrade.entry - candle.close) * multiplier;
+      
+    setLivePnl(currentLivePnl);
+
+    // Check hit conditions based on wicks (high/low)
     if (activeTrade.type === 'Buy') {
       if (candle.low <= activeTrade.sl) {
         closed = true;
-        pnl = - (activeTrade.entry - activeTrade.sl) * multiplier;
+        finalPnl = - (activeTrade.entry - activeTrade.sl) * multiplier;
       } else if (candle.high >= activeTrade.tp) {
         closed = true;
-        pnl = (activeTrade.tp - activeTrade.entry) * multiplier;
+        finalPnl = (activeTrade.tp - activeTrade.entry) * multiplier;
       }
     } else {
       if (candle.high >= activeTrade.sl) {
         closed = true;
-        pnl = - (activeTrade.sl - activeTrade.entry) * multiplier;
+        finalPnl = - (activeTrade.sl - activeTrade.entry) * multiplier;
       } else if (candle.low <= activeTrade.tp) {
         closed = true;
-        pnl = (activeTrade.entry - activeTrade.tp) * multiplier;
+        finalPnl = (activeTrade.entry - activeTrade.tp) * multiplier;
       }
     }
 
     if (closed) {
       setSession(prev => {
-        const newBal = prev.balance + pnl;
+        const newBal = prev.balance + finalPnl;
         return { ...prev, balance: newBal };
       });
-      setTradeHistory(prev => [{ ...activeTrade, pnl }, ...prev]);
+      setTradeHistory(prev => [{ ...activeTrade, pnl: finalPnl }, ...prev]);
       setActiveTrade(null);
-      setOverlayTop(null);
+      setLivePnl(0);
+      removePriceLines();
     }
   };
 
@@ -277,7 +318,7 @@ export default function Backtest() {
                   type="text" 
                   value={searchInput}
                   onChange={(e) => setSearchInput(e.target.value.toUpperCase())}
-                  placeholder="Symbol Search (e.g. ETHUSDT)" 
+                  placeholder="Symbol Search (e.g. XAUUSD)" 
                   className="flex-1 bg-transparent text-lg text-white outline-none placeholder:text-gray-500 font-bold"
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' && searchInput) changeSymbol(searchInput);
@@ -288,7 +329,7 @@ export default function Backtest() {
                 </button>
              </div>
              <div className="flex p-2 gap-2 border-b border-white/5 bg-[#131722]/50">
-               <button className="px-3 py-1 bg-white/10 text-xs rounded-full font-bold">Crypto</button>
+               <button className="px-3 py-1 bg-white/10 text-xs rounded-full font-bold">All Assets</button>
              </div>
              <div className="p-2 space-y-1">
                {popularSymbols.filter(s => s.includes(searchInput)).map(sym => (
@@ -298,7 +339,7 @@ export default function Backtest() {
                    className="w-full text-left px-4 py-2 hover:bg-white/5 rounded-lg flex items-center justify-between"
                  >
                    <span className="font-bold">{sym}</span>
-                   <span className="text-xs text-gray-500">Binance</span>
+                   <span className="text-xs text-gray-500">{sym.includes('USDT') ? 'Binance' : 'Forex/Metals API'}</span>
                  </button>
                ))}
              </div>
@@ -323,7 +364,7 @@ export default function Backtest() {
              </div>
              <div className="text-left">
                <div className="text-lg font-bold leading-tight">{activeSymbol}</div>
-               <div className="text-[10px] text-gray-500 leading-tight">Binance • Custom Engine</div>
+               <div className="text-[10px] text-gray-500 leading-tight">Data Feed • Pro Engine</div>
              </div>
            </button>
         </div>
@@ -349,61 +390,14 @@ export default function Backtest() {
 
       <div className="flex flex-col md:flex-row flex-1 overflow-hidden relative">
         
-        {/* Center Chart with Custom HTML Overlay */}
+        {/* Center Chart */}
         <div className="flex-1 relative flex flex-col min-h-[40vh] md:min-h-0 bg-[#131722] overflow-hidden">
           {loading ? (
             <div className="absolute inset-0 flex items-center justify-center bg-[#131722] z-10">
               <Loader2 className="w-8 h-8 animate-spin text-[#2962FF]" />
             </div>
           ) : (
-             <>
-               <div ref={chartContainerRef} className="absolute inset-0 w-full h-full" />
-               
-               {/* CUSTOM LONG/SHORT POSITION HTML OVERLAY */}
-               {overlayTop && activeTrade && overlayLeft !== null && (
-                 <div className="absolute z-10 pointer-events-none" style={{ left: overlayLeft, width: 200, top: 0, bottom: 0, opacity: 0.85 }}>
-                    {/* Top Region */}
-                    <div 
-                      className="absolute left-0 right-0 border-b border-t border-r border-solid shadow-[0_0_20px_rgba(0,0,0,0.2)] backdrop-blur-[1px]"
-                      style={{ 
-                        top: overlayTop.top, 
-                        height: overlayTop.height, 
-                        backgroundColor: overlayTop.color,
-                        borderColor: overlayTop.border 
-                      }}
-                    >
-                      <div className="absolute -left-14 top-0 bg-[#1E222D] text-[10px] px-1.5 py-0.5 rounded shadow-lg font-mono font-bold" style={{ color: overlayTop.border }}>
-                        {activeTrade.type === 'Buy' ? activeTrade.tp.toFixed(2) : activeTrade.sl.toFixed(2)}
-                      </div>
-                    </div>
-                    
-                    {/* Bottom Region */}
-                    <div 
-                      className="absolute left-0 right-0 border-b border-t border-r border-solid shadow-[0_0_20px_rgba(0,0,0,0.2)] backdrop-blur-[1px]"
-                      style={{ 
-                        top: overlayBottom.top, 
-                        height: overlayBottom.height, 
-                        backgroundColor: overlayBottom.color,
-                        borderColor: overlayBottom.border 
-                      }}
-                    >
-                      <div className="absolute -left-14 bottom-0 bg-[#1E222D] text-[10px] px-1.5 py-0.5 rounded shadow-lg font-mono font-bold" style={{ color: overlayBottom.border }}>
-                        {activeTrade.type === 'Buy' ? activeTrade.sl.toFixed(2) : activeTrade.tp.toFixed(2)}
-                      </div>
-                    </div>
-
-                    {/* Entry Line */}
-                    <div 
-                      className="absolute left-0 right-0 h-0 border-t-2 border-gray-400"
-                      style={{ top: overlayMiddle }}
-                    >
-                      <div className="absolute -left-14 -top-2.5 bg-[#1E222D] text-[10px] px-1.5 py-0.5 rounded text-white shadow-lg font-mono font-bold border border-white/10">
-                        {activeTrade.entry.toFixed(2)}
-                      </div>
-                    </div>
-                 </div>
-               )}
-             </>
+            <div ref={chartContainerRef} className="absolute inset-0 w-full h-full" />
           )}
         </div>
         
@@ -417,7 +411,7 @@ export default function Backtest() {
                    Order Panel
                  </div>
                  <div className="text-2xl font-mono font-bold text-white tracking-tighter">
-                    {currentPrice.toFixed(2)}
+                    {currentPrice.toFixed(activeSymbol === 'XAUUSD' ? 2 : 5)}
                  </div>
               </div>
 
@@ -456,7 +450,6 @@ export default function Backtest() {
                    <div className="text-[10px] text-gray-500 font-bold uppercase mb-1">Take Profit</div>
                    <input 
                      type="number" 
-                     placeholder="Auto"
                      value={tpPrice}
                      onChange={(e) => setTpPrice(e.target.value)}
                      className="w-full bg-transparent text-[#089981] font-mono text-base focus:outline-none font-bold placeholder:text-gray-700"
@@ -466,7 +459,6 @@ export default function Backtest() {
                    <div className="text-[10px] text-gray-500 font-bold uppercase mb-1">Stop Loss</div>
                    <input 
                      type="number" 
-                     placeholder="Auto"
                      value={slPrice}
                      onChange={(e) => setSlPrice(e.target.value)}
                      className="w-full bg-transparent text-[#F23645] font-mono text-base focus:outline-none font-bold placeholder:text-gray-700"
@@ -475,18 +467,27 @@ export default function Backtest() {
               </div>
               
               {activeTrade && (
-                <div className="mt-4 p-4 bg-[#2962FF]/10 border border-[#2962FF]/30 rounded-lg flex items-center justify-between">
-                   <div>
-                     <div className={`font-bold text-sm ${activeTrade.type === 'Buy' ? 'text-[#089981]' : 'text-[#F23645]'}`}>
-                       {activeTrade.type.toUpperCase()} TRADE OPEN
+                <div className="mt-4 p-4 bg-[#2962FF]/10 border border-[#2962FF]/30 rounded-lg flex flex-col gap-3">
+                   <div className="flex items-center justify-between border-b border-[#2962FF]/20 pb-3">
+                     <div>
+                       <div className={`font-bold text-sm ${activeTrade.type === 'Buy' ? 'text-[#089981]' : 'text-[#F23645]'}`}>
+                         {activeTrade.type.toUpperCase()} TRADE OPEN
+                       </div>
+                       <div className="text-[10px] text-blue-300 mt-1 flex items-center gap-1">
+                         <Play className="w-3 h-3" /> Live Tracking Active
+                       </div>
                      </div>
-                     <div className="text-[10px] text-blue-300 mt-1 flex items-center gap-1">
-                       <Play className="w-3 h-3" /> Hit Play to simulate
-                     </div>
+                     <button onClick={() => checkTradeExit({ high: 0, low: 0, close: activeTrade.entry })} className="px-4 py-2 bg-[#131722] hover:bg-red-500/20 text-xs text-red-400 rounded-md transition-colors font-bold border border-red-500/20 hover:border-red-500/50">
+                       CLOSE
+                     </button>
                    </div>
-                   <button onClick={() => checkTradeExit({ high: 0, low: 0 })} className="px-4 py-2 bg-[#131722] hover:bg-red-500/20 text-xs text-red-400 rounded-md transition-colors font-bold border border-red-500/20 hover:border-red-500/50">
-                     CLOSE
-                   </button>
+                   
+                   <div className="flex justify-between items-center">
+                     <span className="text-xs text-gray-400 font-bold uppercase tracking-wider">Running PNL</span>
+                     <span className={`text-xl font-mono font-bold ${livePnl >= 0 ? 'text-[#089981]' : 'text-[#F23645]'}`}>
+                        {livePnl >= 0 ? '+' : ''}{livePnl.toFixed(2)}
+                     </span>
+                   </div>
                 </div>
               )}
            </div>
@@ -507,7 +508,7 @@ export default function Backtest() {
                           {trade.type} {trade.lots}
                         </div>
                         <div className="text-[10px] text-gray-500 font-mono">
-                          Entry: {trade.entry.toFixed(2)}
+                          Entry: {trade.entry.toFixed(5)}
                         </div>
                       </div>
                       <div className={`font-mono font-bold text-sm ${trade.pnl >= 0 ? 'text-[#089981]' : 'text-[#F23645]'}`}>
