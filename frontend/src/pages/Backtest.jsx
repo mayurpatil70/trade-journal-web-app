@@ -5,7 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { 
   Play, StepForward, Square, ArrowRightLeft, Loader2, 
   MousePointer2, Pencil, Minus, MoveDiagonal, 
-  Layers, Search, ShieldCheck, Crosshair
+  Layers, Search, ShieldCheck, Crosshair, Type, 
+  Navigation, Maximize2, SplitSquareHorizontal, CircleDot
 } from 'lucide-react';
 
 const ASSETS = [
@@ -27,8 +28,11 @@ const DRAWING_TOOLS = [
   { id: 'pointer', icon: MousePointer2, name: 'Cursor' },
   { id: 'horizontalStraightLine', icon: Minus, name: 'Horizontal Line' },
   { id: 'rayLine', icon: MoveDiagonal, name: 'Trend Line' },
+  { id: 'arrowLine', icon: Navigation, name: 'Arrow' },
+  { id: 'priceLine', icon: Crosshair, name: 'Price Level' },
+  { id: 'priceChannelLine', icon: SplitSquareHorizontal, name: 'Parallel Channel' },
   { id: 'fibonacciLine', icon: Layers, name: 'Fibonacci Retracement' },
-  { id: 'priceLine', icon: Crosshair, name: 'Price Level' }
+  { id: 'fibonacciCircle', icon: CircleDot, name: 'Fibonacci Circle' }
 ];
 
 export default function Backtest() {
