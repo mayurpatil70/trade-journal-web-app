@@ -167,9 +167,9 @@ function App() {
                   <Route path="support" element={<Support />} />
                   <Route path="affiliate" element={<AffiliateDashboard />} />
                   <Route path="admin" element={<AdminDashboard />} />
-                  <Route path="backtest/sessions" element={<Sessions />} />
+                  <Route path="sessions" element={<Sessions />} />
                   <Route path="backtest/:id" element={<Backtest />} />
-                  <Route path="backtest" element={<Navigate to="/backtest/sessions" replace />} />
+                  <Route path="backtest" element={<Navigate to="/sessions" replace />} />
 
                   <Route path="calculator" element={<CalculatorLayout />}>
                     <Route index element={<Navigate to="lot-size" replace />} />
