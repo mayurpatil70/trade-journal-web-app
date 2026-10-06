@@ -41,6 +41,7 @@ const Analytics = lazy(() => import("./pages/Analytics.jsx"));
 const Psychology = lazy(() => import("./pages/Psychology.jsx"));
 const Mistakes = lazy(() => import("./pages/Mistakes.jsx"));
 const Backtest = lazy(() => import("./pages/Backtest.jsx"));
+const Sessions = lazy(() => import("./pages/Sessions.jsx"));
 
 const MainLayout = lazy(() => import("./layouts/MainLayout.jsx"));
 const PreTradeGate = lazy(() => import("./components/PreTradeGate.jsx"));
@@ -159,6 +160,8 @@ function App() {
                   <Route path="support" element={<Support />} />
                   <Route path="affiliate" element={<AffiliateDashboard />} />
                   <Route path="admin" element={<AdminDashboard />} />
+                  <Route path="sessions" element={<Sessions />} />
+                  <Route path="backtest/:id" element={<Backtest />} />
                   <Route path="backtest" element={<Backtest />} />
 
                   <Route path="calculator" element={<CalculatorLayout />}>

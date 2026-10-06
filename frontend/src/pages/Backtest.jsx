@@ -1,177 +1,399 @@
-import React, { useState } from 'react';
-import { AdvancedRealTimeChart } from 'react-ts-tradingview-widgets';
+import React, { useEffect, useRef, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { init, dispose } from 'klinecharts';
 import { Button } from '@/components/ui/button';
-import { ShieldCheck, Crosshair, Calculator } from 'lucide-react';
+import { 
+  Play, StepForward, Square, Loader2, 
+  MousePointer2, Minus, MoveDiagonal, 
+  Layers, Crosshair, Navigation, SplitSquareHorizontal, CircleDot, ChevronLeft
+} from 'lucide-react';
+
+const DRAWING_TOOLS = [
+  { id: 'pointer', icon: MousePointer2, name: 'Cursor' },
+  { id: 'horizontalStraightLine', icon: Minus, name: 'Horizontal Line' },
+  { id: 'rayLine', icon: MoveDiagonal, name: 'Trend Line' },
+  { id: 'arrowLine', icon: Navigation, name: 'Arrow' },
+  { id: 'priceLine', icon: Crosshair, name: 'Price Level' },
+  { id: 'priceChannelLine', icon: SplitSquareHorizontal, name: 'Parallel Channel' },
+  { id: 'fibonacciLine', icon: Layers, name: 'Fibonacci Retracement' },
+  { id: 'fibonacciCircle', icon: CircleDot, name: 'Fibonacci Circle' }
+];
 
 export default function Backtest() {
-  const [balance, setBalance] = useState(10000);
-  const [tradeHistory, setTradeHistory] = useState([]);
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const chartContainerRef = useRef(null);
+  const chartRef = useRef(null);
   
-  // Virtual Trade Form
-  const [direction, setDirection] = useState('Buy');
-  const [entry, setEntry] = useState('');
-  const [sl, setSl] = useState('');
-  const [tp, setTp] = useState('');
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  
+  const [activeTool, setActiveTool] = useState('pointer');
+  const [currentIndex, setCurrentIndex] = useState(0); 
+  const [isPlaying, setIsPlaying] = useState(false);
+  
+  // Session State
+  const [session, setSession] = useState(null);
+  const [openTrade, setOpenTrade] = useState(null);
+  const [tradeHistory, setTradeHistory] = useState([]);
 
-  const handleLogTrade = (e) => {
-    e.preventDefault();
-    if (!entry || !sl || !tp) return;
+  // MT5 Panel State
+  const [lotSize, setLotSize] = useState('1.00');
+  const [slPrice, setSlPrice] = useState('');
+  const [tpPrice, setTpPrice] = useState('');
+
+  // 1. Fetch Session Data & Market Data
+  useEffect(() => {
+    const fetchSession = async () => {
+      setLoading(true);
+      // Fetch session from local storage or API
+      const saved = localStorage.getItem('backtest_sessions');
+      let foundSession = { name: 'Demo Session', pair: 'BTCUSDT', balance: 10000 };
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        const s = parsed.find(x => x.id === id);
+        if (s) foundSession = s;
+      }
+      setSession(foundSession);
+
+      // Fetch binance historical data (1 year of 1h candles)
+      try {
+        const response = await fetch(`https://api.binance.com/api/v3/klines?symbol=${foundSession.pair.replace('/','')}&interval=1h&limit=1000`);
+        const json = await response.json();
+        
+        const formattedData = json.map(d => ({
+          timestamp: d[0],
+          open: parseFloat(d[1]),
+          high: parseFloat(d[2]),
+          low: parseFloat(d[3]),
+          close: parseFloat(d[4]),
+          volume: parseFloat(d[5]),
+        }));
+        
+        setData(formattedData);
+        setCurrentIndex(200); // Start showing first 200 candles
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchSession();
+  }, [id]);
+
+  // 2. Initialize Klinecharts (v9)
+  useEffect(() => {
+    if (!chartContainerRef.current || data.length === 0) return;
+
+    // Capture the current ref value for safe cleanup
+    const container = chartContainerRef.current;
+
+    const chart = init(container, {
+      grid: {
+        horizontal: { color: '#1B2027', size: 1, style: 'dashed' },
+        vertical: { color: '#1B2027', size: 1, style: 'dashed' }
+      },
+      candle: {
+        type: 'candle_solid',
+        bar: {
+          upColor: '#089981',
+          downColor: '#F23645',
+          noChangeColor: '#888888',
+          upBorderColor: '#089981',
+          downBorderColor: '#F23645',
+          noChangeBorderColor: '#888888',
+          upWickColor: '#089981',
+          downWickColor: '#F23645',
+          noChangeWickColor: '#888888'
+        }
+      },
+      yAxis: { tickText: { color: '#787B86' }, axisLine: { color: '#2b2b43' } },
+      xAxis: { tickText: { color: '#787B86' }, axisLine: { color: '#2b2b43' } }
+    });
+
+    chart.setStyles({ pane: { background: '#131722' } });
+    chartRef.current = chart;
     
-    const entryPrice = parseFloat(entry);
-    const stopLoss = parseFloat(sl);
-    const takeProfit = parseFloat(tp);
-    
-    // Assume 1 standard lot for simplicity, or we calculate based on a fixed risk
-    // Simple math: (Exit - Entry) / Entry * PositionSize
-    // Let's assume a fixed position size of $1000
-    const positionSize = 1000;
-    
-    // Calculate PnL based on hitting TP
-    let pnl = 0;
-    if (direction === 'Buy') {
-       pnl = ((takeProfit - entryPrice) / entryPrice) * positionSize;
+    const visibleData = data.slice(0, currentIndex);
+    chart.applyNewData(visibleData);
+
+    return () => {
+      // FIX: Check if container still exists before disposing to prevent crash on mobile
+      if (container) {
+        dispose(container);
+      }
+      chartRef.current = null;
+    };
+  }, [data]); // Only re-init when full data changes
+  
+  // 3. Playback Engine
+  useEffect(() => {
+    if (chartRef.current && data.length > 0) {
+      const visibleData = data.slice(0, currentIndex);
+      chartRef.current.applyNewData(visibleData);
+      
+      const currentCandle = visibleData[visibleData.length - 1];
+      if (openTrade) checkTradeExit(currentCandle);
+      
+      if (isPlaying) {
+        const timer = setTimeout(stepForward, 300);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [currentIndex, isPlaying]);
+
+  const stepForward = () => {
+    if (currentIndex < data.length) {
+      setCurrentIndex(prev => prev + 1);
     } else {
-       pnl = ((entryPrice - takeProfit) / entryPrice) * positionSize;
+      setIsPlaying(false);
+    }
+  };
+
+  // 4. Execution Logic
+  const currentPrice = data.length > 0 && currentIndex > 0 ? data[currentIndex - 1].close : 0;
+
+  const executeTrade = (type) => {
+    if (openTrade || currentPrice === 0) return; 
+    
+    // Default SL/TP if left blank
+    const slDist = currentPrice * 0.01;
+    const tpDist = currentPrice * 0.02;
+    
+    const finalSl = slPrice ? parseFloat(slPrice) : (type === 'Buy' ? currentPrice - slDist : currentPrice + slDist);
+    const finalTp = tpPrice ? parseFloat(tpPrice) : (type === 'Buy' ? currentPrice + tpDist : currentPrice - tpDist);
+    
+    const trade = {
+      type,
+      entryPrice: currentPrice,
+      sl: finalSl,
+      tp: finalTp,
+      lots: parseFloat(lotSize) || 1
+    };
+    
+    setOpenTrade(trade);
+    
+    // Draw MT5 style visual lines on chart
+    if (chartRef.current) {
+       chartRef.current.createOverlay({
+         name: 'priceLine', extendData: `${type} ${trade.lots}`, points: [{ value: currentPrice }],
+         styles: { line: { color: type === 'Buy' ? '#089981' : '#F23645' } }
+       });
+       chartRef.current.createOverlay({
+         name: 'priceLine', extendData: 'SL', points: [{ value: finalSl }],
+         styles: { line: { color: '#F23645' } }
+       });
+       chartRef.current.createOverlay({
+         name: 'priceLine', extendData: 'TP', points: [{ value: finalTp }],
+         styles: { line: { color: '#089981' } }
+       });
+    }
+  };
+  
+  const checkTradeExit = (candle) => {
+    let closed = false;
+    let pnl = 0;
+    
+    // Very simplified multiplier for display
+    const multiplier = openTrade.lots * 1000;
+
+    if (openTrade.type === 'Buy') {
+      if (candle.low <= openTrade.sl) {
+        closed = true;
+        pnl = - (openTrade.entryPrice - openTrade.sl) * multiplier;
+      } else if (candle.high >= openTrade.tp) {
+        closed = true;
+        pnl = (openTrade.tp - openTrade.entryPrice) * multiplier;
+      }
+    } else {
+      if (candle.high >= openTrade.sl) {
+        closed = true;
+        pnl = - (openTrade.sl - openTrade.entryPrice) * multiplier;
+      } else if (candle.low <= openTrade.tp) {
+        closed = true;
+        pnl = (openTrade.entryPrice - openTrade.tp) * multiplier;
+      }
     }
 
-    const trade = {
-      type: direction,
-      entryPrice,
-      sl: stopLoss,
-      tp: takeProfit,
-      finalPnl: pnl
-    };
+    if (closed) {
+      setSession(prev => {
+        const newBal = prev.balance + pnl;
+        // Update local storage
+        const saved = JSON.parse(localStorage.getItem('backtest_sessions') || '[]');
+        const updated = saved.map(s => s.id === id ? { ...s, balance: newBal } : s);
+        localStorage.setItem('backtest_sessions', JSON.stringify(updated));
+        return { ...prev, balance: newBal };
+      });
+      setTradeHistory(prev => [{ ...openTrade, pnl }, ...prev]);
+      setOpenTrade(null);
+      if (chartRef.current) chartRef.current.removeOverlay();
+    }
+  };
 
-    setBalance(prev => prev + pnl);
-    setTradeHistory(prev => [trade, ...prev]);
+  const handleToolClick = (toolId) => {
+    setActiveTool(toolId);
+    if (!chartRef.current) return;
+    if (toolId === 'pointer') return;
     
-    // Reset form
-    setEntry('');
-    setSl('');
-    setTp('');
+    chartRef.current.createOverlay({
+      name: toolId,
+      onDrawEnd: function () { setActiveTool('pointer'); }
+    });
   };
 
   return (
-    <div className="flex flex-col h-screen bg-[#0A0B0D] text-white pt-14 md:pt-0 overflow-hidden font-sans">
+    <div className="flex flex-col h-screen bg-[#131722] text-white overflow-hidden font-sans">
       
-      {/* Top Warning/Info Bar */}
-      <div className="h-10 bg-indigo-500/10 border-b border-indigo-500/20 flex items-center justify-center px-4 shrink-0 text-xs text-indigo-300 font-medium tracking-wide">
-        Full TradingView Data Feed Active (Free Crypto & Forex Data) • Use chart tools to measure, then log your simulated outcome in the execution panel.
+      {/* Top Session Header */}
+      <div className="h-14 border-b border-white/10 bg-[#131722] flex items-center justify-between px-4 shrink-0">
+        <div className="flex items-center gap-4">
+           <button onClick={() => navigate('/sessions')} className="p-1.5 hover:bg-white/10 rounded-md text-gray-400 hover:text-white transition-colors">
+             <ChevronLeft className="w-5 h-5" />
+           </button>
+           <div>
+             <div className="text-sm font-bold">{session?.name || 'Loading Session...'}</div>
+             <div className="text-[10px] text-gray-500">{session?.pair} • {session?.date}</div>
+           </div>
+        </div>
+        <div className="flex items-center gap-3">
+           <div className="flex items-center gap-1 bg-[#1E222D] p-1 rounded-lg">
+             <Button size="sm" variant={isPlaying ? "destructive" : "secondary"} className="h-7 px-3 bg-[#2962FF] hover:bg-[#1E4CDB] border-none text-white text-xs rounded-md" onClick={() => setIsPlaying(!isPlaying)}>
+               {isPlaying ? <Square className="w-3 h-3 mr-1" /> : <Play className="w-3 h-3 mr-1" />}
+               {isPlaying ? "Pause" : "Play"}
+             </Button>
+             <Button size="sm" variant="secondary" className="h-7 px-3 bg-[#2B3139] hover:bg-[#363C4E] border-none text-white text-xs rounded-md" onClick={stepForward} disabled={isPlaying}>
+               <StepForward className="w-3 h-3" />
+             </Button>
+           </div>
+           <div className="text-sm font-mono bg-[#1E222D] px-4 py-1.5 rounded-lg border border-white/5 font-bold">
+             Bal: <span className={session?.balance >= 10000 ? "text-emerald-400" : "text-red-400"}>${session?.balance?.toFixed(2)}</span>
+           </div>
+        </div>
       </div>
 
-      <div className="flex flex-col md:flex-row flex-1 overflow-hidden">
+      <div className="flex flex-col md:flex-row flex-1 overflow-hidden relative">
         
-        {/* Center Chart - TradingView Advanced Widget */}
-        <div className="flex-1 bg-[#131722] relative flex flex-col min-h-[50vh]">
-          <AdvancedRealTimeChart 
-             theme="dark" 
-             symbol="BINANCE:BTCUSD" // Default
-             interval="60" 
-             timezone="Etc/UTC" 
-             style="1" 
-             locale="en" 
-             enable_publishing={false} 
-             allow_symbol_change={true}
-             container_id="tv_chart_container"
-             width="100%"
-             height="100%"
-             hide_side_toolbar={false} // Gives them all the drawing tools!
-             withdateranges={true}
-          />
+        {/* Left Toolbar (TV Clone) - Hidden on mobile, visible on md+ */}
+        <div className="hidden md:flex w-14 border-r border-white/10 bg-[#131722] flex-col items-center py-4 gap-3 shrink-0">
+           {DRAWING_TOOLS.map(tool => (
+             <button
+               key={tool.id}
+               onClick={() => handleToolClick(tool.id)}
+               className={`p-2 rounded-lg transition-colors group relative ${activeTool === tool.id ? 'bg-[#2962FF]/20 text-[#2962FF]' : 'text-gray-400 hover:text-gray-200 hover:bg-[#2B3139]'}`}
+               title={tool.name}
+             >
+               <tool.icon className="w-5 h-5" />
+             </button>
+           ))}
+           <div className="w-8 h-px bg-white/10 my-2" />
+           <button onClick={() => { if(chartRef.current) chartRef.current.removeOverlay() }} className="p-2 rounded-lg text-gray-400 hover:text-red-400 hover:bg-[#2B3139] transition-colors" title="Clear Drawings">
+             <Crosshair className="w-5 h-5" />
+           </button>
+        </div>
+
+        {/* Center Chart */}
+        <div className="flex-1 relative flex flex-col min-h-[40vh] md:min-h-0">
+          {loading ? (
+            <div className="absolute inset-0 flex items-center justify-center bg-[#131722] z-10">
+              <Loader2 className="w-8 h-8 animate-spin text-[#2962FF]" />
+            </div>
+          ) : (
+             <div ref={chartContainerRef} className="absolute inset-0 w-full h-full" />
+          )}
         </div>
         
-        {/* Right Sidebar (Execution & History) */}
-        <div className="w-full md:w-80 border-t md:border-t-0 md:border-l border-white/10 bg-[#131722] flex flex-col shrink-0">
+        {/* Right Sidebar - MT5 Style Punch Trade */}
+        <div className="w-full md:w-[320px] border-t md:border-t-0 md:border-l border-white/10 bg-[#101216] flex flex-col shrink-0">
            
-           <div className="p-5 border-b border-white/10">
-              <div className="flex items-center justify-between mb-6">
-                 <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2"><Calculator className="w-4 h-4 text-cyan-400" /> Virtual Execution</h3>
-                 <div className="text-sm font-mono bg-[#1E222D] px-3 py-1 rounded-md border border-white/5 font-bold">
-                   <span className={balance >= 10000 ? "text-emerald-400" : "text-red-400"}>${balance.toFixed(2)}</span>
+           <div className="p-4 border-b border-white/5">
+              <div className="flex justify-between items-center mb-4">
+                 <div className="text-xs font-bold text-gray-400 uppercase tracking-widest">Execution</div>
+                 <div className="text-xl font-mono font-bold text-white tracking-tighter">
+                    {currentPrice.toFixed(2)}
                  </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-2 mb-4">
-                <Button 
-                  className={`w-full h-9 rounded-lg text-sm font-bold border-none ${direction === 'Buy' ? 'bg-[#089981] text-white shadow-lg shadow-[#089981]/20' : 'bg-[#1E222D] text-gray-400 hover:text-white hover:bg-white/5'}`}
-                  onClick={() => setDirection('Buy')}
-                >
-                  Long
-                </Button>
-                <Button 
-                  className={`w-full h-9 rounded-lg text-sm font-bold border-none ${direction === 'Sell' ? 'bg-[#F23645] text-white shadow-lg shadow-[#F23645]/20' : 'bg-[#1E222D] text-gray-400 hover:text-white hover:bg-white/5'}`}
-                  onClick={() => setDirection('Sell')}
-                >
-                  Short
-                </Button>
+              {/* MT5 Style Execution Buttons */}
+              <div className="grid grid-cols-3 gap-2 mb-4 bg-[#1E222D] p-2 rounded-xl border border-white/5 items-center">
+                 <button 
+                   onClick={() => executeTrade('Sell')}
+                   disabled={openTrade !== null}
+                   className="col-span-1 py-3 bg-[#F23645] hover:bg-[#C22B37] text-white font-bold rounded-lg text-sm shadow-[0_0_15px_rgba(242,54,69,0.3)] disabled:opacity-50 transition-all flex flex-col items-center justify-center"
+                 >
+                   <span>SELL</span>
+                 </button>
+                 
+                 <div className="col-span-1 text-center">
+                   <input 
+                     type="number" 
+                     value={lotSize} 
+                     onChange={(e) => setLotSize(e.target.value)}
+                     className="w-full bg-transparent text-center text-lg font-bold text-white focus:outline-none"
+                     step="0.01"
+                   />
+                   <div className="text-[10px] text-gray-500 font-bold uppercase">Lots</div>
+                 </div>
+
+                 <button 
+                   onClick={() => executeTrade('Buy')}
+                   disabled={openTrade !== null}
+                   className="col-span-1 py-3 bg-[#089981] hover:bg-[#067A67] text-white font-bold rounded-lg text-sm shadow-[0_0_15px_rgba(8,153,129,0.3)] disabled:opacity-50 transition-all flex flex-col items-center justify-center"
+                 >
+                   <span>BUY</span>
+                 </button>
               </div>
               
-              <form onSubmit={handleLogTrade} className="space-y-3">
-                 <div>
-                    <label className="text-[10px] text-gray-500 uppercase font-bold mb-1 block">Entry Price</label>
-                    <input 
-                      type="number" 
-                      step="any"
-                      required
-                      value={entry}
-                      onChange={e => setEntry(e.target.value)}
-                      className="w-full bg-[#1E222D] border border-white/10 rounded-lg p-2 text-sm text-white focus:outline-none focus:border-cyan-500 transition-colors"
-                      placeholder="0.00"
-                    />
+              <div className="grid grid-cols-2 gap-3 mb-2">
+                 <div className="bg-[#1E222D] rounded-lg p-2 border border-white/5">
+                   <div className="text-[10px] text-gray-500 font-bold uppercase mb-1">SL Price</div>
+                   <input 
+                     type="number" 
+                     placeholder="Auto"
+                     value={slPrice}
+                     onChange={(e) => setSlPrice(e.target.value)}
+                     className="w-full bg-transparent text-[#F23645] font-mono text-sm focus:outline-none"
+                   />
                  </div>
-                 <div className="grid grid-cols-2 gap-3">
-                    <div>
-                       <label className="text-[10px] text-gray-500 uppercase font-bold mb-1 block">Stop Loss</label>
-                       <input 
-                         type="number" 
-                         step="any"
-                         required
-                         value={sl}
-                         onChange={e => setSl(e.target.value)}
-                         className="w-full bg-[#1E222D] border border-white/10 rounded-lg p-2 text-sm text-[#F23645] font-mono focus:outline-none focus:border-cyan-500 transition-colors"
-                         placeholder="0.00"
-                       />
-                    </div>
-                    <div>
-                       <label className="text-[10px] text-gray-500 uppercase font-bold mb-1 block">Take Profit</label>
-                       <input 
-                         type="number" 
-                         step="any"
-                         required
-                         value={tp}
-                         onChange={e => setTp(e.target.value)}
-                         className="w-full bg-[#1E222D] border border-white/10 rounded-lg p-2 text-sm text-[#089981] font-mono focus:outline-none focus:border-cyan-500 transition-colors"
-                         placeholder="0.00"
-                       />
-                    </div>
+                 <div className="bg-[#1E222D] rounded-lg p-2 border border-white/5">
+                   <div className="text-[10px] text-gray-500 font-bold uppercase mb-1">TP Price</div>
+                   <input 
+                     type="number" 
+                     placeholder="Auto"
+                     value={tpPrice}
+                     onChange={(e) => setTpPrice(e.target.value)}
+                     className="w-full bg-transparent text-[#089981] font-mono text-sm focus:outline-none"
+                   />
                  </div>
-                 <Button type="submit" className="w-full mt-2 bg-cyan-600 hover:bg-cyan-500 text-white font-bold h-10 shadow-lg shadow-cyan-600/20">
-                   Log Virtual Trade (TP Hit)
-                 </Button>
-              </form>
+              </div>
+              
+              {openTrade && (
+                <div className="mt-4 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg flex items-center justify-between">
+                   <div>
+                     <div className={`font-bold text-xs ${openTrade.type === 'Buy' ? 'text-[#089981]' : 'text-[#F23645]'}`}>
+                       ACTIVE {openTrade.type.toUpperCase()}
+                     </div>
+                     <div className="text-[10px] text-blue-300 mt-1">Play chart to hit SL/TP</div>
+                   </div>
+                   <button onClick={() => checkTradeExit({ high: 0, low: 0 })} className="px-3 py-1.5 bg-[#1E222D] hover:bg-red-500/20 text-xs text-red-400 rounded-md transition-colors font-bold">
+                     CLOSE
+                   </button>
+                </div>
+              )}
            </div>
 
            <div className="flex-1 overflow-y-auto p-4 flex flex-col bg-[#0A0B0D]">
-              <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Simulated History</h3>
-              
-              <div className="space-y-2 flex-1">
+              <h3 className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-3">Session History</h3>
+              <div className="space-y-2">
                 {tradeHistory.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center h-full opacity-50 pt-10">
-                     <ShieldCheck className="w-10 h-10 text-gray-600 mb-3" />
-                     <p className="text-xs text-gray-500 text-center">Use the drawing tools to measure setups, then log them here.</p>
-                  </div>
+                  <p className="text-xs text-gray-600 text-center py-6">No trades yet.</p>
                 ) : (
                   tradeHistory.map((trade, i) => (
-                    <div key={i} className="flex justify-between items-center p-3 rounded-xl bg-[#131722] border border-white/5 text-sm hover:bg-[#1E222D] transition-colors">
-                      <div>
-                        <span className={`font-bold text-[11px] uppercase tracking-wider px-2 py-0.5 rounded bg-white/5 ${trade.type === 'Buy' ? 'text-[#089981]' : 'text-[#F23645]'}`}>{trade.type}</span>
-                        <div className="text-[10px] text-gray-500 font-mono mt-1.5 flex items-center gap-2">
-                           <span>IN: {trade.entryPrice.toFixed(2)}</span>
-                           <span>OUT: {trade.tp.toFixed(2)}</span>
-                        </div>
+                    <div key={i} className="flex justify-between items-center p-2 rounded-lg bg-[#15181D] border border-white/5">
+                      <div className={`font-bold text-[10px] uppercase px-1.5 py-0.5 rounded ${trade.type === 'Buy' ? 'bg-[#089981]/10 text-[#089981]' : 'bg-[#F23645]/10 text-[#F23645]'}`}>
+                        {trade.type}
                       </div>
-                      <div className={`font-mono font-bold text-[13px] ${trade.finalPnl >= 0 ? 'text-[#089981]' : 'text-[#F23645]'}`}>
-                        {trade.finalPnl >= 0 ? '+' : ''}{trade.finalPnl.toFixed(2)}
+                      <div className={`font-mono font-bold text-xs ${trade.pnl >= 0 ? 'text-[#089981]' : 'text-[#F23645]'}`}>
+                        {trade.pnl >= 0 ? '+' : ''}{trade.pnl.toFixed(2)}
                       </div>
                     </div>
                   ))
