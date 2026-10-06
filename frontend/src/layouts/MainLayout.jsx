@@ -363,6 +363,7 @@ export default function MainLayout() {
             </div>
           </div>
         </div>
+      )}
       {isMobileMenuOpen && (
         <div
           className="fixed inset-0 bg-black/60 z-20 md:hidden backdrop-blur-sm"
