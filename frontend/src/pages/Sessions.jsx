@@ -40,7 +40,7 @@ export default function Sessions() {
     };
     const updated = [newSession, ...sessions];
     setSessions(updated);
-    localStorage.setItem('backtest_sessions', JSON.stringify(updated));
+    // Removed auto-save to localStorage here as requested
     navigate(`/backtest/${newSession.id}`);
   };
 

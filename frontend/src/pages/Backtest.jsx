@@ -42,12 +42,20 @@ export default function Backtest() {
 
   useEffect(() => {
     const saved = localStorage.getItem('backtest_sessions');
-    let foundSession = { id: 'demo', name: 'Demo Session', pair: 'NQ1', balance: 100000 };
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      const s = parsed.find(x => x.id === id);
-      if (s) foundSession = s;
+    let parsed = [];
+    if (saved) parsed = JSON.parse(saved);
+    
+    let foundSession = parsed.find(x => x.id === id);
+    if (!foundSession) {
+      // Create unsaved temporary session
+      foundSession = { 
+        id, 
+        name: `New Session ${new Date().toLocaleDateString()}`, 
+        pair: 'NQ1', 
+        balance: 100000 
+      };
     }
+    
     setSession(foundSession);
     setActiveSymbol(foundSession.pair.replace('/', ''));
   }, [id]);
@@ -285,8 +293,13 @@ export default function Backtest() {
   const saveSession = () => {
     if (!session) return;
     const saved = JSON.parse(localStorage.getItem('backtest_sessions') || '[]');
-    const updated = saved.map(s => s.id === id ? { ...session } : s);
-    localStorage.setItem('backtest_sessions', JSON.stringify(updated));
+    const existingIndex = saved.findIndex(s => s.id === id);
+    if (existingIndex >= 0) {
+        saved[existingIndex] = { ...session };
+    } else {
+        saved.push({ ...session });
+    }
+    localStorage.setItem('backtest_sessions', JSON.stringify(saved));
     alert("Session saved successfully to your browser data!");
   };
 
