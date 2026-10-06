@@ -7,6 +7,8 @@ export default function Mistakes() {
   const navigate = useNavigate();
   const [trades, setTrades] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   useEffect(() => {
     const fetchTrades = async () => {
@@ -109,9 +111,9 @@ export default function Mistakes() {
                 <h2 className="text-sm font-semibold text-white">Rule Break Log</h2>
              </div>
              <div className="p-5">
-                {unforcedErrors.length === 0 ? <p className="text-sm text-gray-500">No unforced errors logged.</p> : (
+               {unforcedErrors.length === 0 ? <p className="text-sm text-gray-500">No unforced errors logged.</p> : (
                    <div className="space-y-3">
-                      {unforcedErrors.map((t, i) => (
+                      {unforcedErrors.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((t, i) => (
                         <div key={i} className="bg-[#15181D] border border-red-500/10 rounded-xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
                            <div>
                               <div className="flex items-center gap-2 mb-1">
@@ -127,6 +129,29 @@ export default function Mistakes() {
                            </div>
                         </div>
                       ))}
+                      
+                      {/* Pagination Controls */}
+                      {Math.ceil(unforcedErrors.length / itemsPerPage) > 1 && (
+                        <div className="flex justify-center items-center gap-4 mt-6 pt-4 border-t border-white/5">
+                          <button 
+                            disabled={currentPage === 1}
+                            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                            className="px-3 py-1.5 bg-[#101216] border border-white/5 rounded-lg text-xs text-gray-300 hover:bg-white/5 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                          >
+                            Prev
+                          </button>
+                          <span className="text-xs text-gray-400">
+                            Page <strong className="text-white">{currentPage}</strong> of {Math.ceil(unforcedErrors.length / itemsPerPage)}
+                          </span>
+                          <button 
+                            disabled={currentPage === Math.ceil(unforcedErrors.length / itemsPerPage)}
+                            onClick={() => setCurrentPage(prev => Math.min(prev + 1, Math.ceil(unforcedErrors.length / itemsPerPage)))}
+                            className="px-3 py-1.5 bg-[#101216] border border-white/5 rounded-lg text-xs text-gray-300 hover:bg-white/5 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                          >
+                            Next
+                          </button>
+                        </div>
+                      )}
                    </div>
                 )}
              </div>

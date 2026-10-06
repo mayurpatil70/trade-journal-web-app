@@ -61,6 +61,20 @@ export default function PastTrades() {
     return matchesSearch && matchesResult;
   });
 
+  // Pagination logic
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+  
+  // Reset to first page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, resultFilter]);
+
+  const indexOfLastTrade = currentPage * itemsPerPage;
+  const indexOfFirstTrade = indexOfLastTrade - itemsPerPage;
+  const currentTrades = filteredTrades.slice(indexOfFirstTrade, indexOfLastTrade);
+  const totalPages = Math.ceil(filteredTrades.length / itemsPerPage);
+
   return (
     <div className="w-full max-w-7xl mx-auto font-sans pb-24 px-4 md:px-8 mt-6">
       
@@ -130,55 +144,80 @@ export default function PastTrades() {
             <p className="text-gray-500 text-sm">Adjust your filters or log a new trade.</p>
           </div>
         ) : (
-          filteredTrades.map((t, idx) => {
-            const r = parseFloat(t.r_multiple || 0);
-            const isWin = r >= 0;
-            const hasImages = t.images && t.images.length > 0;
-            
-            return (
-              <div
-                key={idx}
-                onClick={() => setSelectedTrade(t)}
-                className="bg-[#101216] border border-white/5 rounded-xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:border-white/10 hover:bg-[#15181D] transition-all cursor-pointer group"
-              >
-                {/* Left: Asset & Time */}
-                <div className="flex items-center gap-4 md:w-[25%]">
-                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center font-bold text-xs border ${t.direction === "LONG" ? "bg-cyan-500/10 text-cyan-400 border-cyan-500/20" : "bg-purple-500/10 text-purple-400 border-purple-500/20"}`}>
-                    {t.direction === "LONG" ? "▲" : "▼"}
+          <>
+            {currentTrades.map((t, idx) => {
+              const r = parseFloat(t.r_multiple || 0);
+              const isWin = r >= 0;
+              const hasImages = t.images && t.images.length > 0;
+              
+              return (
+                <div
+                  key={idx}
+                  onClick={() => setSelectedTrade(t)}
+                  className="bg-[#101216] border border-white/5 rounded-xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:border-white/10 hover:bg-[#15181D] transition-all cursor-pointer group"
+                >
+                  {/* Left: Asset & Time */}
+                  <div className="flex items-center gap-4 md:w-[25%]">
+                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center font-bold text-xs border ${t.direction === "LONG" ? "bg-cyan-500/10 text-cyan-400 border-cyan-500/20" : "bg-purple-500/10 text-purple-400 border-purple-500/20"}`}>
+                      {t.direction === "LONG" ? "▲" : "▼"}
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-white text-[15px]">{t.asset}</h3>
+                      <p className="text-[11px] text-gray-500 flex items-center gap-1.5 mt-0.5">
+                        <Clock className="w-3 h-3" /> {t.date} {t.time && `• ${t.time}`}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="font-semibold text-white text-[15px]">{t.asset}</h3>
-                    <p className="text-[11px] text-gray-500 flex items-center gap-1.5 mt-0.5">
-                      <Clock className="w-3 h-3" /> {t.date} {t.time && `• ${t.time}`}
-                    </p>
-                  </div>
-                </div>
 
-                {/* Middle: Setup & Session */}
-                <div className="flex-1 grid grid-cols-2 gap-4 border-t md:border-t-0 md:border-l border-white/5 pt-3 md:pt-0 md:pl-6">
-                   <div>
-                     <p className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Setup</p>
-                     <p className="text-[13px] text-gray-300 font-medium">{t.setup || "—"}</p>
-                   </div>
-                   <div>
-                     <p className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Session</p>
-                     <p className="text-[13px] text-gray-300 font-medium">{t.session || "—"}</p>
-                   </div>
+                  {/* Middle: Setup & Session */}
+                  <div className="flex-1 grid grid-cols-2 gap-4 border-t md:border-t-0 md:border-l border-white/5 pt-3 md:pt-0 md:pl-6">
+                     <div>
+                       <p className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Setup</p>
+                       <p className="text-[13px] text-gray-300 font-medium">{t.setup || "—"}</p>
+                     </div>
+                     <div>
+                       <p className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Session</p>
+                       <p className="text-[13px] text-gray-300 font-medium">{t.session || "—"}</p>
+                     </div>
+                  </div>
+                  
+                  {/* Right: R-Multiple & Media */}
+                  <div className="flex items-center justify-between md:justify-end gap-6 border-t md:border-t-0 md:border-l border-white/5 pt-3 md:pt-0 md:pl-6 md:w-[25%]">
+                     <div className="flex items-center gap-2">
+                        {hasImages && <ImageIcon className="w-4 h-4 text-gray-600 group-hover:text-emerald-400 transition-colors" />}
+                     </div>
+                     <div className={`px-3 py-1.5 rounded-lg border text-sm font-bold ${isWin ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : "bg-red-500/10 text-red-400 border-red-500/20"}`}>
+                       {isWin ? "+" : ""}{r.toFixed(2)}R
+                     </div>
+                     <ChevronRight className="w-5 h-5 text-gray-600 group-hover:text-white transition-colors hidden md:block" />
+                  </div>
                 </div>
-                
-                {/* Right: R-Multiple & Media */}
-                <div className="flex items-center justify-between md:justify-end gap-6 border-t md:border-t-0 md:border-l border-white/5 pt-3 md:pt-0 md:pl-6 md:w-[25%]">
-                   <div className="flex items-center gap-2">
-                      {hasImages && <ImageIcon className="w-4 h-4 text-gray-600 group-hover:text-emerald-400 transition-colors" />}
-                   </div>
-                   <div className={`px-3 py-1.5 rounded-lg border text-sm font-bold ${isWin ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : "bg-red-500/10 text-red-400 border-red-500/20"}`}>
-                     {isWin ? "+" : ""}{r.toFixed(2)}R
-                   </div>
-                   <ChevronRight className="w-5 h-5 text-gray-600 group-hover:text-white transition-colors hidden md:block" />
-                </div>
+              );
+            })}
+            
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+              <div className="flex justify-center items-center gap-4 mt-8 pt-4">
+                <button 
+                  disabled={currentPage === 1}
+                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                  className="px-4 py-2 bg-[#101216] border border-white/5 rounded-lg text-sm text-gray-300 hover:bg-white/5 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  Previous
+                </button>
+                <span className="text-sm text-gray-400">
+                  Page <strong className="text-white">{currentPage}</strong> of {totalPages}
+                </span>
+                <button 
+                  disabled={currentPage === totalPages}
+                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                  className="px-4 py-2 bg-[#101216] border border-white/5 rounded-lg text-sm text-gray-300 hover:bg-white/5 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  Next
+                </button>
               </div>
-            );
-          })
+            )}
+          </>
         )}
       </div>
 
