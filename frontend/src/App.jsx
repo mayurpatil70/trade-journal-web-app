@@ -153,6 +153,8 @@ function App() {
 
               {/* Guard 2: Must be logged in AND Paid (or Admin) */}
               <Route element={<PaywallGuard />}>
+                <Route path="/backtest/:id" element={<Backtest />} />
+                <Route path="/backtest" element={<Navigate to="/sessions" replace />} />
                 <Route path="/" element={<MainLayout />}>
                   <Route path="dashboard" element={<Dashboard />} />
                   <Route path="add-trade" element={<AddTrade />} />
@@ -170,9 +172,7 @@ function App() {
                   <Route path="admin" element={<AdminDashboard />} />
                   <Route path="charts" element={<Charts />} />
                   <Route path="sessions" element={<Sessions />} />
-                  <Route path="backtest/:id" element={<Backtest />} />
-                  <Route path="backtest" element={<Navigate to="/sessions" replace />} />
-
+                  
                   <Route path="calculator" element={<CalculatorLayout />}>
                     <Route index element={<Navigate to="lot-size" replace />} />
                     <Route path="lot-size" element={<LotSizeCalculator />} />
