@@ -163,18 +163,61 @@ export default function Backtest() {
 
   const currentPrice = data.length > 0 && currentIndex > 0 ? data[currentIndex - 1].close : 0;
 
-  const drawPriceLines = (entry, sl, tp) => {
-    if (!seriesInstance.current) return;
+  const drawPreviewLines = useCallback(() => {
+    if (!seriesInstance.current || !currentPrice) return;
     
-    priceLinesRef.current.entry = seriesInstance.current.createPriceLine({
-        price: entry, color: '#2962FF', lineWidth: 1, lineStyle: 0, title: 'Entry', axisLabelVisible: true,
-    });
-    priceLinesRef.current.sl = seriesInstance.current.createPriceLine({
-        price: sl, color: '#F23645', lineWidth: 1, lineStyle: 2, title: 'SL', axisLabelVisible: true,
-    });
-    priceLinesRef.current.tp = seriesInstance.current.createPriceLine({
-        price: tp, color: '#089981', lineWidth: 1, lineStyle: 2, title: 'TP', axisLabelVisible: true,
-    });
+    // Preview Entry
+    let ep = parseFloat(entryPrice);
+    if (!ep) ep = currentPrice;
+
+    if (priceLinesRef.current.entry) {
+        priceLinesRef.current.entry.applyOptions({ price: ep });
+    } else {
+        priceLinesRef.current.entry = seriesInstance.current.createPriceLine({
+            price: ep, color: '#2962FF', lineWidth: 1, lineStyle: 0, title: 'Entry', axisLabelVisible: true,
+        });
+    }
+
+    // Preview SL
+    let sl = parseFloat(slPrice);
+    if (sl) {
+        if (priceLinesRef.current.sl) {
+            priceLinesRef.current.sl.applyOptions({ price: sl });
+        } else {
+            priceLinesRef.current.sl = seriesInstance.current.createPriceLine({
+                price: sl, color: '#F23645', lineWidth: 1, lineStyle: 2, title: 'SL', axisLabelVisible: true,
+            });
+        }
+    } else if (priceLinesRef.current.sl) {
+        seriesInstance.current.removePriceLine(priceLinesRef.current.sl);
+        priceLinesRef.current.sl = null;
+    }
+
+    // Preview TP
+    let tp = parseFloat(tpPrice);
+    if (tp) {
+        if (priceLinesRef.current.tp) {
+            priceLinesRef.current.tp.applyOptions({ price: tp });
+        } else {
+            priceLinesRef.current.tp = seriesInstance.current.createPriceLine({
+                price: tp, color: '#089981', lineWidth: 1, lineStyle: 2, title: 'TP', axisLabelVisible: true,
+            });
+        }
+    } else if (priceLinesRef.current.tp) {
+        seriesInstance.current.removePriceLine(priceLinesRef.current.tp);
+        priceLinesRef.current.tp = null;
+    }
+  }, [entryPrice, slPrice, tpPrice, currentPrice]);
+
+  useEffect(() => {
+      if (!activeTrade) {
+          drawPreviewLines();
+      }
+  }, [entryPrice, slPrice, tpPrice, currentPrice, activeTrade, drawPreviewLines]);
+
+  const drawPriceLines = (entry, sl, tp) => {
+    // Solidify lines on trade execute
+    drawPreviewLines();
   };
 
   const removePriceLines = () => {
@@ -189,6 +232,7 @@ export default function Backtest() {
     if (activeTrade || currentPrice === 0) return; 
     let stopLoss = parseFloat(slPrice);
     let takeProfit = parseFloat(tpPrice);
+    let entryP = parseFloat(entryPrice) || currentPrice;
     const lots = parseFloat(units) || 60;
     
     if (!stopLoss || !takeProfit) {
@@ -198,7 +242,7 @@ export default function Backtest() {
 
     setActiveTrade({
       type: tradeMode,
-      entry: currentPrice,
+      entry: entryP,
       sl: stopLoss,
       tp: takeProfit,
       lots,
@@ -206,7 +250,6 @@ export default function Backtest() {
     });
     
     setLivePnl(0);
-    drawPriceLines(currentPrice, stopLoss, takeProfit);
   };
   
   const checkTradeExit = (candle) => {
@@ -237,6 +280,14 @@ export default function Backtest() {
       setLivePnl(0);
       removePriceLines();
     }
+  };
+
+  const saveSession = () => {
+    if (!session) return;
+    const saved = JSON.parse(localStorage.getItem('backtest_sessions') || '[]');
+    const updated = saved.map(s => s.id === id ? { ...session } : s);
+    localStorage.setItem('backtest_sessions', JSON.stringify(updated));
+    alert("Session saved successfully to your browser data!");
   };
 
   // FX Replay Specific Calcs
@@ -284,6 +335,9 @@ export default function Backtest() {
              Text <Settings className="w-3 h-3" />
            </button>
            <div className="h-4 w-px bg-[#1B1C20] mx-1"></div>
+           <button onClick={saveSession} className="px-3 py-1 bg-[#2962FF] hover:bg-[#1E4CDB] text-white font-bold rounded text-xs shadow-sm ml-2 mr-2">
+             Save Session
+           </button>
            <button className="p-1.5 hover:bg-[#1B1C20] rounded text-[#787B86]"><Settings className="w-4 h-4" /></button>
            <button className="p-1.5 hover:bg-[#1B1C20] rounded text-[#787B86]"><Camera className="w-4 h-4" /></button>
            <button className="p-1.5 hover:bg-[#1B1C20] rounded text-[#787B86]"><Maximize className="w-4 h-4" /></button>
