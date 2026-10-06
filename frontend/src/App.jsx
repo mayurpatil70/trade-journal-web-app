@@ -88,6 +88,13 @@ const PaywallGuard = () => {
   useEffect(() => {
     const checkStatus = async () => {
       const userId = localStorage.getItem("userId") || localStorage.getItem("userEmail");
+      
+      // ADMIN BYPASS
+      if (userId === "noballondesk@gmail.com" || userId === "akpatil51340@gmail.com") {
+        setAccess('allow');
+        return;
+      }
+
       try {
         const response = await api.get(`/api/subscriptions/status/${userId}`);
         const { hasPaid, discordVerified } = response.data;
