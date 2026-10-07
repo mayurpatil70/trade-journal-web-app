@@ -317,7 +317,7 @@ export default function LandingPage() {
             justifyContent: "space-between",
           }}>
             {/* Logo */}
-            <Link to="/" style={{ display: "flex", alignItems: "center" }}><img src="/logo3d.png" alt="ForexNotes" style={{ height: "48px", objectFit: "contain", filter: "drop-shadow(0 0 16px rgba(16,185,129,0.6))" }} /></Link>
+            <Link to="/" style={{ display: "flex", alignItems: "center" }}><img src="/logo3d.png" alt="Logo" style={{ width: "44px", height: "44px", objectFit: "contain", filter: "drop-shadow(0 0 12px rgba(16,185,129,0.8))" }} /></Link>
 
             {/* Nav Links */}
             <nav style={{ display: "flex", gap: "32px", alignItems: "center" }}>

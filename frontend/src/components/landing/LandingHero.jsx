@@ -165,7 +165,7 @@ export default function LandingHero() {
                 }}
               >
                 <Zap size={16} />
-                Unlock Lifetime Access — $11Access Now
+                Unlock Your Access Now
                 <ArrowRight size={16} />
               </Link>
               <a

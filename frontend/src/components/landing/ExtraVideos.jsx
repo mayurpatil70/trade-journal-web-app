@@ -52,7 +52,7 @@ export default function ExtraVideos() {
         contentWrapRef.current,
         {
           scale: 0.8,
-          rotateX: 15,
+          rotateX: 0,
           y: 60,
           opacity: 0,
         },
@@ -93,9 +93,9 @@ export default function ExtraVideos() {
           display: 'flex', 
           flexDirection: 'column', 
           gap: '32px',
-          transformStyle: 'preserve-3d',
-          perspective: '1200px',
-          perspectiveOrigin: '50% 40%',
+          
+          
+          
           willChange: 'transform'
         }}
       >
