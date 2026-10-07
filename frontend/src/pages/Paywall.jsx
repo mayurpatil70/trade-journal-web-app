@@ -179,11 +179,11 @@ export default function Paywall() {
             <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/20 blur-3xl rounded-full pointer-events-none"></div>
             <h2 className="text-lg font-medium text-white mb-4">Pro Yearly</h2>
             <div className="flex items-end gap-1 mb-2">
-               <h3 className="text-4xl font-bold text-white">$117</h3>
+               <h3 className="text-4xl font-bold text-white">$114</h3>
                <span className="text-gray-400 text-sm mb-1">/yearly</span>
             </div>
-            <p className="text-gray-500 text-xs line-through mb-4">$168/yearly</p>
-            <div className="bg-emerald-600 text-white text-center py-2 rounded-md mb-6 font-medium text-sm">Save 30% a year!</div>
+            <p className="text-gray-500 text-xs line-through mb-4">$228/yearly</p>
+            <div className="bg-emerald-600 text-white text-center py-2 rounded-md mb-6 font-medium text-sm">Save 50% a year!</div>
             <p className="text-xs text-gray-400 mb-6">Everything you need to achieve profitability</p>
 
             <ul className="text-sm space-y-4 mb-8 text-gray-300 flex-1">
@@ -195,7 +195,7 @@ export default function Paywall() {
             </ul>
 
             <button 
-              onClick={() => handleCryptoPayment('yearly', 117)}
+              onClick={() => handleCryptoPayment('yearly', 114)}
               className="w-full mt-auto py-3 rounded-full font-medium bg-emerald-600 hover:bg-blue-700 text-white transition-colors shadow-lg shadow-emerald-500/25"
             >
               Upgrade Yearly
@@ -209,7 +209,7 @@ export default function Paywall() {
             <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/20 blur-3xl rounded-full pointer-events-none"></div>
             <h2 className="text-lg font-medium text-white mb-4">Extend Pro Yearly</h2>
             <div className="flex items-end gap-1 mb-2">
-               <h3 className="text-4xl font-bold text-white">$117</h3>
+               <h3 className="text-4xl font-bold text-white">$114</h3>
                <span className="text-gray-400 text-sm mb-1">/yearly</span>
             </div>
             <p className="text-gray-500 text-xs mb-4">Add another 365 days to your active plan</p>
@@ -221,7 +221,7 @@ export default function Paywall() {
             </ul>
 
             <button 
-              onClick={() => handleCryptoPayment('yearly', 117)}
+              onClick={() => handleCryptoPayment('yearly', 114)}
               className="w-full mt-auto py-3 rounded-full font-medium bg-emerald-600 hover:bg-blue-700 text-white transition-colors shadow-lg shadow-emerald-500/25"
             >
               Renew Subscription

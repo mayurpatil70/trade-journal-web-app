@@ -47,7 +47,7 @@ export default function AffiliateDashboard() {
         {/* Referral Link Card */}
         <div className="bg-gray-900 p-6 rounded-xl border border-gray-800">
           <h2 className="text-xl mb-4">Your Referral Link</h2>
-          <p className="text-sm text-gray-400 mb-2">Earn 10% on every Monthly ($1.40) and Yearly ($11.70) sale.</p>
+          <p className="text-sm text-gray-400 mb-2">Earn 10% on every Monthly ($1.40) and Yearly ($11.40) sale.</p>
           <div className="bg-black p-3 rounded text-emerald-400 font-mono overflow-x-auto">
             https://forexnotes.in/?ref={profile.referral_code}
           </div>

@@ -39,7 +39,7 @@ export const verifyCryptoPayment = async (req, res) => {
           parsedLog.args.to.toLowerCase() === yourMerchantWallet
         ) {
            const amountTransferred = ethers.formatUnits(parsedLog.args.value, 18);
-           const expectedAmount = plan === 'yearly' ? '117.0' : '14.0';
+           const expectedAmount = plan === 'yearly' ? '114.0' : '14.0';
            
            if (parseFloat(amountTransferred) >= parseFloat(expectedAmount) * 0.99) { // 1% tolerance for float issues
              validTransferFound = true;
@@ -54,7 +54,7 @@ export const verifyCryptoPayment = async (req, res) => {
     }
 
     const daysToAdd = plan === 'yearly' ? 365 : 30;
-    const pricePaid = plan === 'yearly' ? 117 : 14;
+    const pricePaid = plan === 'yearly' ? 114 : 14;
     const affiliateCommission = pricePaid * 0.10;
 
     const newSubEndDate = new Date();

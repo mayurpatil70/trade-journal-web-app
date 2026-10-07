@@ -710,7 +710,7 @@ export default function LandingPage() {
                   letterSpacing: "0.1em", textTransform: "uppercase",
                   padding: "8px 20px", borderBottomLeftRadius: "12px",
                 }}>
-                  Best Value
+                  50% OFF YEARLY - HURRY UP GRAB IT ASAP!
                 </div>
 
                 <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "32px", paddingBottom: "32px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
@@ -719,12 +719,12 @@ export default function LandingPage() {
                       Yearly Plan
                     </h3>
                     <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)" }}>
-                      Save 30% annually
+                      Massive 50% discount! Hurry up, grab it ASAP!
                     </p>
                   </div>
                   <div style={{ textAlign: "right", flexShrink: 0 }}>
-                    <div style={{ fontSize: "20px", fontWeight: 700, color: "rgba(255,255,255,0.5)", textDecoration: "line-through", marginBottom: "-4px" }}>$168</div>
-                    <div style={{ fontSize: "42px", fontWeight: 900, color: "white", letterSpacing: "-0.04em", lineHeight: 1 }}>$117</div>
+                    <div style={{ fontSize: "20px", fontWeight: 700, color: "rgba(255,255,255,0.5)", textDecoration: "line-through", marginBottom: "-4px" }}>$228</div>
+                    <div style={{ fontSize: "42px", fontWeight: 900, color: "white", letterSpacing: "-0.04em", lineHeight: 1 }}>$114</div>
                     <div style={{ fontSize: "12px", fontWeight: 700, color: "rgba(255,255,255,0.4)" }}>/year</div>
                     <div style={{ fontSize: "10px", fontWeight: 700, color: "#10b981", marginTop: "6px", letterSpacing: "0.02em" }}>+ 10% affiliate rewards</div>
                   </div>
