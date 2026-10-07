@@ -162,7 +162,7 @@ export default function FeaturesBento() {
                   background: 'linear-gradient(145deg, rgba(16,20,28,0.9) 0%, rgba(10,12,16,0.9) 100%)',
                   borderRadius: '24px',
                   padding: '32px',
-                  border: \`1px solid \${item.border}\`,
+                  border: `1px solid ${item.border}`,
                   position: 'relative',
                   overflow: 'hidden',
                   display: 'flex',
@@ -171,9 +171,9 @@ export default function FeaturesBento() {
                   alignItems: item.wide ? 'center' : 'flex-start',
                 }}
               >
-                <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: \`radial-gradient(circle at top left, \${item.glow}, transparent 60%)\`, pointerEvents: 'none' }} />
+                <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: `radial-gradient(circle at top left, ${item.glow}, transparent 60%)`, pointerEvents: 'none' }} />
                 
-                <div style={{ width: '64px', height: '64px', borderRadius: '16px', background: item.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', border: \`1px solid \${item.border}\`, flexShrink: 0 }}>
+                <div style={{ width: '64px', height: '64px', borderRadius: '16px', background: item.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', border: `1px solid ${item.border}`, flexShrink: 0 }}>
                   <Icon size={28} color={item.color} />
                 </div>
 
