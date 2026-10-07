@@ -111,7 +111,7 @@ export default function LandingHero() {
               marginBottom: '32px',
               maxWidth: '520px',
             }}>
-              The only trading journal for Forex, Crypto, and Gold that pairs your chart setups with an <strong style={{ color: 'rgba(255,255,255,0.8)' }}>AI psychology guard</strong>, <strong style={{ color: 'rgba(255,255,255,0.8)' }}>prop firm rule tracking</strong>, and <strong style={{ color: 'rgba(255,255,255,0.8)' }}>automated R-multiple analytics</strong> — all for a one-time $11 USDT.
+              The only trading journal for Forex, Crypto, and Gold that pairs your chart setups with an <strong style={{ color: 'rgba(255,255,255,0.8)' }}>AI psychology guard</strong>, <strong style={{ color: 'rgba(255,255,255,0.8)' }}>prop firm rule tracking</strong>, and <strong style={{ color: 'rgba(255,255,255,0.8)' }}>automated R-multiple analytics</strong> — all for a one-time $11Access Now.
             </p>
 
             {/* Trader Hint Chips */}
@@ -165,7 +165,7 @@ export default function LandingHero() {
                 }}
               >
                 <Zap size={16} />
-                Unlock Lifetime Access — $11 USDT
+                Unlock Lifetime Access — $11Access Now
                 <ArrowRight size={16} />
               </Link>
               <a

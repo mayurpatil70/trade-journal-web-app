@@ -647,8 +647,10 @@ export default function LandingPage() {
                     </p>
                   </div>
                   <div style={{ textAlign: "right", flexShrink: 0 }}>
-                    <div style={{ fontSize: "42px", fontWeight: 900, color: "white", letterSpacing: "-0.04em", lineHeight: 1 }}>$19</div>
+                    <div style={{ fontSize: "20px", fontWeight: 700, color: "rgba(255,255,255,0.5)", textDecoration: "line-through", marginBottom: "-4px" }}>$19</div>
+                    <div style={{ fontSize: "42px", fontWeight: 900, color: "white", letterSpacing: "-0.04em", lineHeight: 1 }}>$14</div>
                     <div style={{ fontSize: "12px", fontWeight: 700, color: "rgba(255,255,255,0.4)" }}>/month</div>
+                    <div style={{ fontSize: "10px", fontWeight: 700, color: "#10b981", marginTop: "6px", letterSpacing: "0.02em" }}>+ 10% affiliate rewards</div>
                   </div>
                 </div>
 
@@ -721,8 +723,10 @@ export default function LandingPage() {
                     </p>
                   </div>
                   <div style={{ textAlign: "right", flexShrink: 0 }}>
-                    <div style={{ fontSize: "42px", fontWeight: 900, color: "white", letterSpacing: "-0.04em", lineHeight: 1 }}>$149</div>
+                    <div style={{ fontSize: "20px", fontWeight: 700, color: "rgba(255,255,255,0.5)", textDecoration: "line-through", marginBottom: "-4px" }}>$168</div>
+                    <div style={{ fontSize: "42px", fontWeight: 900, color: "white", letterSpacing: "-0.04em", lineHeight: 1 }}>$117</div>
                     <div style={{ fontSize: "12px", fontWeight: 700, color: "rgba(255,255,255,0.4)" }}>/year</div>
+                    <div style={{ fontSize: "10px", fontWeight: 700, color: "#10b981", marginTop: "6px", letterSpacing: "0.02em" }}>+ 10% affiliate rewards</div>
                   </div>
                 </div>
 
