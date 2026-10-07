@@ -3,29 +3,21 @@ import { useNavigate } from 'react-router-dom';
 import { Play, Plus, Clock, TrendingUp, FolderClock, Edit, Trash2 } from 'lucide-react';
 import api from '../api/axios';
 import { Button } from '@/components/ui/button';
+import SymbolPicker from '../components/SymbolPicker';
 
 export default function Sessions() {
   const navigate = useNavigate();
   const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Mock sessions if database isn't hooked up perfectly yet by the user
-  const mockSessions = [
-    { id: '1', name: '12:30 candle 15tf', pair: 'XAU/USD', balance: 15436.70, date: '02/06/2026, 19:29' },
-    { id: '2', name: 'xyz', pair: 'XAU/USD', balance: 1000.00, date: '01/01/2026, 02:29' },
-    { id: '3', name: 'ema 21 souce low', pair: 'XAU/USD', balance: 32487.31, date: '01/06/2026, 04:29' },
-    { id: '4', name: 'Btc', pair: 'BTC/USD', balance: 14928.98, date: '16/02/2026, 15:30' },
-  ];
+  const [creating, setCreating] = useState(false);
+  const [draft, setDraft] = useState({ name: '', pair: 'BTCUSDT', balance: 10000, tf: '1h' });
 
   useEffect(() => {
-    // In a real app we fetch from /api/sessions
-    // For now we will use local storage or mock to guarantee it works immediately
-    const saved = localStorage.getItem('backtest_sessions');
-    if (saved) {
-      setSessions(JSON.parse(saved));
-    } else {
-      setSessions(mockSessions);
-      localStorage.setItem('backtest_sessions', JSON.stringify(mockSessions));
+    try {
+      setSessions(JSON.parse(localStorage.getItem('backtest_sessions') || '[]'));
+    } catch {
+      setSessions([]);
     }
     setLoading(false);
   }, []);
@@ -50,16 +42,20 @@ export default function Sessions() {
   };
 
   const createNewSession = () => {
+    const balance = Number(draft.balance);
+    if (!(balance > 0)) return;
     const newSession = {
       id: Date.now().toString(),
-      name: `New Session ${new Date().toLocaleDateString()}`,
-      pair: 'BTCUSDT',
-      balance: 10000.00,
+      name: draft.name.trim() || `${draft.pair} ${new Date().toLocaleDateString()}`,
+      pair: draft.pair,
+      tf: draft.tf,
+      balance,
+      initialBalance: balance,
       date: new Date().toLocaleString()
     };
     const updated = [newSession, ...sessions];
+    localStorage.setItem('backtest_sessions', JSON.stringify(updated));
     setSessions(updated);
-    // Removed auto-save to localStorage here as requested
     navigate(`/backtest/${newSession.id}`);
   };
 
@@ -74,10 +70,30 @@ export default function Sessions() {
             Manage and resume your backtesting environments.
           </p>
         </div>
-        <Button onClick={createNewSession} className="bg-cyan-500 hover:bg-cyan-400 text-black font-bold flex items-center gap-2">
+        <Button onClick={() => setCreating((c) => !c)} className="bg-cyan-500 hover:bg-cyan-400 text-black font-bold flex items-center gap-2">
           <Plus className="w-4 h-4" /> New Session
         </Button>
       </div>
+
+      {creating && (
+        <div className="bg-[#101216] border border-white/10 rounded-xl p-5 mb-6 grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+          <label className="block text-xs text-gray-400">Name
+            <input value={draft.name} onChange={(e) => setDraft((d) => ({ ...d, name: e.target.value }))} placeholder="Optional" className="mt-1 w-full rounded-lg border border-white/10 bg-[#0a0a0a] px-3 py-2 text-sm text-white outline-none" />
+          </label>
+          <SymbolPicker label="Symbol" value={draft.pair} onChange={(pair) => setDraft((d) => ({ ...d, pair }))} />
+          <label className="block text-xs text-gray-400">Timeframe
+            <select value={draft.tf} onChange={(e) => setDraft((d) => ({ ...d, tf: e.target.value }))} className="mt-1 w-full rounded-lg border border-white/10 bg-[#0a0a0a] px-3 py-2 text-sm text-white outline-none">
+              {['1m', '5m', '15m', '30m', '1h', '4h', '1d'].map((t) => <option key={t}>{t}</option>)}
+            </select>
+          </label>
+          <label className="block text-xs text-gray-400">Starting balance
+            <input type="number" min="1" value={draft.balance} onChange={(e) => setDraft((d) => ({ ...d, balance: e.target.value }))} className="mt-1 w-full rounded-lg border border-white/10 bg-[#0a0a0a] px-3 py-2 text-sm text-white outline-none" />
+          </label>
+          <Button onClick={createNewSession} className="bg-cyan-500 hover:bg-cyan-400 text-black font-bold">Start</Button>
+        </div>
+      )}
+
+      {!loading && sessions.length === 0 && <p className="text-gray-500 text-sm">No sessions yet. Create one to start replaying a market.</p>}
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
         {sessions.map(s => (
@@ -101,7 +117,7 @@ export default function Sessions() {
                 <span className="text-white text-right font-medium">{s.pair}</span>
                 
                 <span className="text-gray-500 font-bold">Balance:</span>
-                <span className="text-emerald-400 text-right font-mono font-bold">${s.balance.toFixed(2)}</span>
+                <span className="text-emerald-400 text-right font-mono font-bold">${Number(s.balance).toFixed(2)}</span>
                 
                 <span className="text-gray-500 font-bold">Date:</span>
                 <span className="text-gray-400 text-right">{s.date}</span>

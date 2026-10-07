@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { hubApi, errorMessage } from "../services/hubApi";
 import { usePaged } from "../hooks/usePaged";
+import SymbolPicker from "../../../components/SymbolPicker";
 
 const TIMEFRAMES = ["M1", "M5", "M15", "M30", "H1", "H4", "D1"];
 const TONE = { pending: "text-amber-400", approved: "text-sky-400", executed: "text-emerald-400", failed: "text-rose-400", rejected: "text-gray-500", none: "text-gray-500" };
@@ -167,6 +168,7 @@ export default function Mt5BotPage() {
             <label className="block text-xs text-gray-400">Symbols (comma separated)
               <input value={form.symbols} onChange={(e) => setForm((f) => ({ ...f, symbols: e.target.value }))} placeholder="EURUSD, XAUUSD" className={input} />
             </label>
+            <SymbolPicker label="Add from list" target="mt5" value="" onChange={(symbol) => setForm((f) => ({ ...f, symbols: [...new Set([...f.symbols.split(",").map((x) => x.trim()).filter(Boolean), symbol])].join(", ") }))} />
             <label className="block text-xs text-gray-400">Risk per trade %
               <input type="number" step="0.1" min="0.1" max="5" value={form.maxRiskPct} onChange={(e) => setForm((f) => ({ ...f, maxRiskPct: e.target.value }))} className={input} />
             </label>

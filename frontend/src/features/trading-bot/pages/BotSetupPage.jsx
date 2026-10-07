@@ -1,6 +1,7 @@
 import { lazy, Suspense, useState } from "react";
 import { getSymbolInfo } from "../services/symbolInfoCache";
 import { useBotConfig } from "../hooks/useBotConfig";
+import SymbolPicker from "../../../components/SymbolPicker";
 
 const BulkOrderDrawer = lazy(() => import("../components/BulkOrderDrawer"));
 
@@ -33,9 +34,9 @@ export default function BotSetupPage() {
 
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
 
-  const checkSymbol = async () => {
+  const checkSymbol = async (symbol) => {
     try {
-      setInfo(await getSymbolInfo(form.symbol.toUpperCase().trim()));
+      setInfo(await getSymbolInfo(symbol.toUpperCase().trim()));
     } catch {
       setInfo(null);
       setMessage({ text: "Symbol not found on Binance.", ok: false });
@@ -67,7 +68,7 @@ export default function BotSetupPage() {
         <h2 className="text-sm font-semibold text-gray-300">Pair and risk parameters</h2>
         <div className="grid gap-3 sm:grid-cols-2">
           <Field label="Name (optional)" value={form.name} onChange={set("name")} />
-          <Field label="Symbol" value={form.symbol} onChange={set("symbol")} onBlur={checkSymbol} />
+          <SymbolPicker label="Symbol" target="binance" value={form.symbol} onChange={(symbol) => { setForm((f) => ({ ...f, symbol })); setMessage({ text: "", ok: false }); checkSymbol(symbol); }} />
           <label className="block text-xs text-gray-400">
             Strategy
             <select value={form.strategyType} onChange={set("strategyType")} className="mt-1 w-full rounded-lg border border-white/10 bg-[#0a0a0a] px-3 py-2 text-sm text-white">
