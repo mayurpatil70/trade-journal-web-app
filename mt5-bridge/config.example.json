@@ -1,0 +1,8 @@
+{
+  "api_base": "https://your-backend.example.com/api/bot-hub",
+  "token": "tjb_paste_token_from_bot_hub_mt5_page",
+  "candles": 200,
+  "poll_seconds": 60,
+  "deviation": 20,
+  "magic": 7001
+}
