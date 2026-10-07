@@ -17,6 +17,7 @@ import adminRoutes from "./routes/adminRoutes.js";
 import journalRoutes from "./routes/journalRoutes.js";
 import affiliateRoutes from "./routes/affiliateRoutes.js";
 import botRoutes from "./trading-bot/routes.js";
+import botHubRoutes from "./bot-hub/routes.js";
 
 const app = express();
 
@@ -52,6 +53,7 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/journals", journalRoutes);
 app.use("/api/affiliate", affiliateRoutes);
 app.use("/api/bot", botRoutes);
+app.use("/api/bot-hub", botHubRoutes);
 
 // Health Check Endpoint
 app.get("/", (req, res) => {

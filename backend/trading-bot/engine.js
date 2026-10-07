@@ -1,5 +1,5 @@
-import * as binance from "./binanceClient.js";
-import * as store from "./store.js";
+import * as defaultBinance from "./binanceClient.js";
+import * as defaultStore from "./store.js";
 import { normalizeOrder } from "./symbolFilters.js";
 import { planBuyOrders, sellPriceFor, stopLossTriggered, updateTrailingStop, averageEntry } from "./strategy.js";
 
@@ -8,9 +8,10 @@ let timer = null;
 let running = false;
 let lastTickAt = null;
 
+const defaultCtx = { binance: defaultBinance, store: defaultStore };
 const configOf = (row) => ({ ...row.params, symbol: row.symbol });
 
-async function syncOrders(row, info) {
+async function syncOrders({ binance, store }, row, info) {
   for (const o of await store.openOrders(row.id)) {
     if (!o.binance_order_id) continue;
     const remote = await binance.getOrder(row.symbol, o.binance_order_id);
@@ -20,12 +21,12 @@ async function syncOrders(row, info) {
     await store.log(row.user_id, row.id, `${o.side} ${o.quantity} ${row.symbol} filled at ${o.price}`);
     if (o.side === "BUY") {
       const sell = normalizeOrder(info, sellPriceFor(Number(o.price), row.params.takeProfitPercentage), Number(remote.executedQty));
-      if (sell.ok) await placeOrder(row, "SELL", sell.price, sell.quantity, o.id);
+      if (sell.ok) await placeOrder({ binance, store }, row, "SELL", sell.price, sell.quantity, o.id);
     }
   }
 }
 
-async function placeOrder(row, side, price, quantity, parentId = null) {
+async function placeOrder({ binance, store }, row, side, price, quantity, parentId = null) {
   const clientOrderId = `tj_${row.id.slice(0, 8)}_${Date.now().toString(36)}`;
   try {
     const remote = await binance.placeLimit(row.symbol, side, price, quantity, clientOrderId);
@@ -38,7 +39,7 @@ async function placeOrder(row, side, price, quantity, parentId = null) {
   }
 }
 
-async function exitPosition(row, info, reason, qty, avg, price) {
+async function exitPosition({ binance, store }, row, info, reason, qty, avg, price) {
   for (const o of await store.openOrders(row.id)) {
     await binance.cancelOrder(row.symbol, o.binance_order_id).catch(() => {});
     await store.updateOrder(o.id, { status: "CANCELED" });
@@ -55,28 +56,29 @@ async function exitPosition(row, info, reason, qty, avg, price) {
   await store.log(row.user_id, row.id, `${reason}: position closed at ~${price}, bot stopped`, "warn");
 }
 
-async function tickConfig(row) {
+export async function tickConfig(row, ctx = defaultCtx) {
+  const { binance, store } = ctx;
   const info = await binance.getSymbolInfo(row.symbol);
   const price = await binance.getPrice(row.symbol);
-  await syncOrders(row, info);
+  await syncOrders(ctx, row, info);
 
   const fills = (await store.filledBuys(row.id)).map((o) => ({ price: Number(o.price), quantity: Number(o.executed_qty) }));
   const { qty, avg } = averageEntry(fills);
 
   if (qty > 0) {
     if (stopLossTriggered({ avgEntry: avg, price, stopLossPct: row.params.stopLossPercentage })) {
-      return exitPosition(row, info, "Stop-loss hit", qty, avg, price);
+      return exitPosition(ctx, row, info, "Stop-loss hit", qty, avg, price);
     }
     const trail = updateTrailingStop({ highest: Number(row.highest_price), price, trailingPct: row.params.trailingPercentage });
     if (trail.highest !== Number(row.highest_price)) await store.updateConfig(row.id, { highest_price: trail.highest });
-    if (trail.hit && price > avg) return exitPosition(row, info, "Trailing stop hit", qty, avg, price);
+    if (trail.hit && price > avg) return exitPosition(ctx, row, info, "Trailing stop hit", qty, avg, price);
   }
 
   const open = await store.openOrders(row.id);
   const openBuys = open.filter((o) => o.side === "BUY").map((o) => Number(o.price));
   const balance = await binance.getFreeBalance(info.quoteAsset);
   for (const plan of planBuyOrders({ config: configOf(row), info, price, openBuyPrices: openBuys, balanceQuote: balance })) {
-    await placeOrder(row, "BUY", plan.price, plan.quantity);
+    await placeOrder(ctx, row, "BUY", plan.price, plan.quantity);
   }
 }
 
@@ -84,11 +86,11 @@ export async function tick() {
   if (running) return;
   running = true;
   try {
-    for (const row of await store.listActiveConfigs()) {
+    for (const row of await defaultStore.listActiveConfigs()) {
       try {
         await tickConfig(row);
       } catch (err) {
-        await store.log(row.user_id, row.id, `Tick failed: ${err.message}`, "error").catch(() => {});
+        await defaultStore.log(row.user_id, row.id, `Tick failed: ${err.message}`, "error").catch(() => {});
       }
     }
     lastTickAt = new Date().toISOString();
