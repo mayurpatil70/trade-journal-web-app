@@ -3,7 +3,7 @@ import PnlValueBadge from "./PnlValueBadge";
 
 const STATUS_TONE = {
   FILLED: "text-emerald-400",
-  NEW: "text-sky-400",
+  NEW: "text-emerald-400",
   PARTIALLY_FILLED: "text-amber-400",
   CANCELED: "text-gray-500",
   REJECTED: "text-rose-400",

@@ -106,8 +106,8 @@ export default function Support() {
         {/* Ticket Form */}
         <div className="lg:col-span-2 bg-white/60 dark:bg-white/[0.03] border border-gray-200/80 dark:border-white/10 rounded-2xl p-6 md:p-8 shadow-xl backdrop-blur-xl">
           <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-200/80 dark:border-white/10">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500/20 to-cyan-500/20 border border-blue-500/20 flex items-center justify-center">
-              <MessageSquare className="w-4 h-4 text-blue-400" />
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-500/20 to-emerald-500/20 border border-emerald-500/20 flex items-center justify-center">
+              <MessageSquare className="w-4 h-4 text-emerald-400" />
             </div>
             <h2 className="text-base font-bold text-gray-900 dark:text-white">
               Open a Support Ticket
@@ -123,7 +123,7 @@ export default function Support() {
                 placeholder="Describe your issue or question in detail..."
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                className="appearance-none w-full min-h-[160px] bg-white/40 dark:bg-white/[0.04] border border-gray-300/80 dark:border-white/10 rounded-xl px-4 py-3 text-gray-900 dark:text-white font-medium focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 outline-none text-sm text-left resize-y backdrop-blur-sm transition-all"
+                className="appearance-none w-full min-h-[160px] bg-white/40 dark:bg-white/[0.04] border border-gray-300/80 dark:border-white/10 rounded-xl px-4 py-3 text-gray-900 dark:text-white font-medium focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/20 outline-none text-sm text-left resize-y backdrop-blur-sm transition-all"
                 required
               />
             </div>
@@ -132,7 +132,7 @@ export default function Support() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="px-8 py-3.5 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white font-bold rounded-2xl shadow-lg shadow-blue-500/25 transition-all flex items-center gap-2 text-sm disabled:opacity-50"
+                className="px-8 py-3.5 bg-gradient-to-r from-emerald-600 to-emerald-600 hover:from-emerald-500 hover:to-emerald-500 text-white font-bold rounded-2xl shadow-lg shadow-emerald-500/25 transition-all flex items-center gap-2 text-sm disabled:opacity-50"
               >
                 {isSubmitting ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -171,16 +171,16 @@ export default function Support() {
             </div>
           </div>
 
-          <div className="mt-6 p-4 bg-gradient-to-br from-blue-500/10 to-violet-500/10 border border-blue-500/20 rounded-2xl text-center">
-            <Zap className="w-5 h-5 text-blue-400 mx-auto mb-2" />
-            <p className="text-[10px] font-bold text-blue-400 uppercase tracking-widest mb-1">
+          <div className="mt-6 p-4 bg-gradient-to-br from-emerald-500/10 to-violet-500/10 border border-emerald-500/20 rounded-2xl text-center">
+            <Zap className="w-5 h-5 text-emerald-400 mx-auto mb-2" />
+            <p className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest mb-1">
               Community Discord
             </p>
             <a
               href="https://discord.gg/Ajaw3AjfWE"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-xs text-gray-500 dark:text-gray-400 hover:text-blue-400 transition-colors underline block"
+              className="text-xs text-gray-500 dark:text-gray-400 hover:text-emerald-400 transition-colors underline block"
             >
               Join our official trader community chat.
             </a>

@@ -27,7 +27,7 @@ export default function Profile() {
   };
 
   const inputClass =
-    "w-full bg-white/40 dark:bg-white/[0.04] border border-gray-300/80 dark:border-white/10 rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-white font-medium focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all placeholder-gray-400 dark:placeholder-gray-500 backdrop-blur-sm";
+    "w-full bg-white/40 dark:bg-white/[0.04] border border-gray-300/80 dark:border-white/10 rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-white font-medium focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all placeholder-gray-400 dark:placeholder-gray-500 backdrop-blur-sm";
   const labelClass =
     "text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest block mb-2";
 
@@ -42,8 +42,8 @@ export default function Profile() {
     >
       {/* Header */}
       <div className="mb-8 md:mb-10 flex items-center gap-4">
-        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500/20 to-cyan-500/20 border border-blue-500/20 flex items-center justify-center shrink-0 shadow-lg shadow-blue-500/10">
-          <User className="w-6 h-6 text-blue-400" />
+        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-emerald-500/20 border border-emerald-500/20 flex items-center justify-center shrink-0 shadow-lg shadow-emerald-500/10">
+          <User className="w-6 h-6 text-emerald-400" />
         </div>
         <div>
           <div className="flex items-center gap-2 mb-1">
@@ -61,7 +61,7 @@ export default function Profile() {
       <div className="bg-white/60 dark:bg-white/[0.03] border border-gray-200/80 dark:border-white/10 rounded-2xl p-6 md:p-8 shadow-xl backdrop-blur-xl mb-6">
         <div className="flex items-center gap-6">
           <div className="relative">
-            <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 text-white flex items-center justify-center font-black text-3xl shadow-xl shadow-blue-500/30">
+            <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-500 text-white flex items-center justify-center font-black text-3xl shadow-xl shadow-emerald-500/30">
               {emailInitial}
             </div>
             <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-lg bg-emerald-500 border-2 border-white dark:border-[#0a0a0a] flex items-center justify-center">
@@ -85,8 +85,8 @@ export default function Profile() {
       {/* Form Card */}
       <div className="bg-white/60 dark:bg-white/[0.03] border border-gray-200/80 dark:border-white/10 rounded-2xl p-6 md:p-8 shadow-xl backdrop-blur-xl">
         <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-200/80 dark:border-white/10">
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500/20 to-cyan-500/20 border border-blue-500/20 flex items-center justify-center">
-            <User className="w-4 h-4 text-blue-400" />
+          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-500/20 to-emerald-500/20 border border-emerald-500/20 flex items-center justify-center">
+            <User className="w-4 h-4 text-emerald-400" />
           </div>
           <h2 className="text-base font-bold text-gray-900 dark:text-white">
             Basic Information
@@ -161,7 +161,7 @@ export default function Profile() {
             <button
               type="submit"
               disabled={saving}
-              className="px-8 py-3.5 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white font-bold text-sm rounded-2xl transition-all shadow-lg shadow-blue-500/25 flex items-center justify-center gap-2"
+              className="px-8 py-3.5 bg-gradient-to-r from-emerald-600 to-emerald-600 hover:from-emerald-500 hover:to-emerald-500 text-white font-bold text-sm rounded-2xl transition-all shadow-lg shadow-emerald-500/25 flex items-center justify-center gap-2"
             >
               {saving ? (
                 <><Loader2 className="w-4 h-4 animate-spin" /> Saving...</>

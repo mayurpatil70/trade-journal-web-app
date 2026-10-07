@@ -154,7 +154,7 @@ export default function Paywall() {
                <span className="text-gray-400 text-sm mb-1">/monthly</span>
             </div>
             <p className="text-gray-500 text-xs line-through mb-4">$19/monthly</p>
-            <div className="bg-blue-600/20 text-blue-400 border border-blue-500/30 text-center py-2 rounded-md mb-6 font-medium text-sm">Save 25% a month!</div>
+            <div className="bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 text-center py-2 rounded-md mb-6 font-medium text-sm">Save 25% a month!</div>
             <p className="text-xs text-gray-400 mb-6">Everything you need to achieve profitability</p>
 
             <ul className="text-sm space-y-4 mb-8 text-gray-300 flex-1">
@@ -166,7 +166,7 @@ export default function Paywall() {
 
             <button 
               onClick={() => handleCryptoPayment('monthly', 14)}
-              className="w-full mt-auto py-3 rounded-full font-medium bg-blue-600 hover:bg-blue-700 text-white transition-colors"
+              className="w-full mt-auto py-3 rounded-full font-medium bg-emerald-600 hover:bg-blue-700 text-white transition-colors"
             >
               Upgrade Monthly
             </button>
@@ -175,15 +175,15 @@ export default function Paywall() {
 
         {/* Yearly Card - Show for FREE and MONTHLY users */}
         {(subType !== 'yearly') && (
-          <div className="bg-[#0A0A0A] border border-blue-500/30 p-8 rounded-2xl w-full md:w-80 flex flex-col relative overflow-hidden shadow-[0_0_30px_rgba(37,99,235,0.15)]">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/20 blur-3xl rounded-full pointer-events-none"></div>
+          <div className="bg-[#0A0A0A] border border-emerald-500/30 p-8 rounded-2xl w-full md:w-80 flex flex-col relative overflow-hidden shadow-[0_0_30px_rgba(37,99,235,0.15)]">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/20 blur-3xl rounded-full pointer-events-none"></div>
             <h2 className="text-lg font-medium text-white mb-4">Pro Yearly</h2>
             <div className="flex items-end gap-1 mb-2">
                <h3 className="text-4xl font-bold text-white">$117</h3>
                <span className="text-gray-400 text-sm mb-1">/yearly</span>
             </div>
             <p className="text-gray-500 text-xs line-through mb-4">$168/yearly</p>
-            <div className="bg-blue-600 text-white text-center py-2 rounded-md mb-6 font-medium text-sm">Save 30% a year!</div>
+            <div className="bg-emerald-600 text-white text-center py-2 rounded-md mb-6 font-medium text-sm">Save 30% a year!</div>
             <p className="text-xs text-gray-400 mb-6">Everything you need to achieve profitability</p>
 
             <ul className="text-sm space-y-4 mb-8 text-gray-300 flex-1">
@@ -191,12 +191,12 @@ export default function Paywall() {
               <li className="flex items-center">✓ <span className="ml-3">Premium Indicators</span></li>
               <li className="flex items-center">✓ <span className="ml-3">Unlimited Data Retention</span></li>
               <li className="flex items-center">✓ <span className="ml-3">Advanced Charts</span></li>
-              <li className="flex items-center font-semibold text-blue-400">✓ <span className="ml-3">Priority Support</span></li>
+              <li className="flex items-center font-semibold text-emerald-400">✓ <span className="ml-3">Priority Support</span></li>
             </ul>
 
             <button 
               onClick={() => handleCryptoPayment('yearly', 117)}
-              className="w-full mt-auto py-3 rounded-full font-medium bg-blue-600 hover:bg-blue-700 text-white transition-colors shadow-lg shadow-blue-500/25"
+              className="w-full mt-auto py-3 rounded-full font-medium bg-emerald-600 hover:bg-blue-700 text-white transition-colors shadow-lg shadow-emerald-500/25"
             >
               Upgrade Yearly
             </button>
@@ -205,8 +205,8 @@ export default function Paywall() {
 
         {/* Renew Yearly Card - ONLY FOR YEARLY USERS */}
         {(subType === 'yearly') && (
-          <div className="bg-[#0A0A0A] border border-blue-500/30 p-8 rounded-2xl w-full md:w-80 flex flex-col relative overflow-hidden shadow-[0_0_30px_rgba(37,99,235,0.15)] mx-auto">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/20 blur-3xl rounded-full pointer-events-none"></div>
+          <div className="bg-[#0A0A0A] border border-emerald-500/30 p-8 rounded-2xl w-full md:w-80 flex flex-col relative overflow-hidden shadow-[0_0_30px_rgba(37,99,235,0.15)] mx-auto">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/20 blur-3xl rounded-full pointer-events-none"></div>
             <h2 className="text-lg font-medium text-white mb-4">Extend Pro Yearly</h2>
             <div className="flex items-end gap-1 mb-2">
                <h3 className="text-4xl font-bold text-white">$117</h3>
@@ -222,7 +222,7 @@ export default function Paywall() {
 
             <button 
               onClick={() => handleCryptoPayment('yearly', 117)}
-              className="w-full mt-auto py-3 rounded-full font-medium bg-blue-600 hover:bg-blue-700 text-white transition-colors shadow-lg shadow-blue-500/25"
+              className="w-full mt-auto py-3 rounded-full font-medium bg-emerald-600 hover:bg-blue-700 text-white transition-colors shadow-lg shadow-emerald-500/25"
             >
               Renew Subscription
             </button>

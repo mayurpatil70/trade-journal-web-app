@@ -163,7 +163,7 @@ export default function PreTradeGate() {
         <div className="mb-4 w-[350px] md:w-[400px] h-[580px] bg-white/80 dark:bg-[#121418]/80 backdrop-blur-xl border border-gray-200 dark:border-white/20 rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom-5">
 
           {/* Header */}
-          <div className="bg-[#2f8df4] p-4 flex items-center justify-between shrink-0">
+          <div className="bg-[#10b981] p-4 flex items-center justify-between shrink-0">
             <div className="flex items-center gap-3">
               <img
                 src={ROBOT_AVATAR}
@@ -193,7 +193,7 @@ export default function PreTradeGate() {
                 <div
                   className={`max-w-[88%] p-3 rounded-2xl text-sm leading-relaxed shadow-sm ${
                     msg.sender === "user"
-                      ? "bg-[#2f8df4] text-white rounded-br-sm"
+                      ? "bg-[#10b981] text-white rounded-br-sm"
                       : "bg-white dark:bg-[#1a1d24] text-gray-800 dark:text-gray-200 border border-gray-100 dark:border-white/5 rounded-bl-sm"
                   }`}
                 >
@@ -213,7 +213,7 @@ export default function PreTradeGate() {
             {isLoading && (
               <div className="flex justify-start">
                 <div className="bg-white dark:bg-[#1a1d24] p-3 rounded-2xl border border-gray-100 dark:border-white/5 shadow-sm flex items-center gap-2">
-                  <Loader2 className="w-4 h-4 text-[#2f8df4] animate-spin" />
+                  <Loader2 className="w-4 h-4 text-[#10b981] animate-spin" />
                   <span className="text-xs text-gray-400 dark:text-gray-500">Coach is thinking...</span>
                 </div>
               </div>
@@ -256,7 +256,7 @@ export default function PreTradeGate() {
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 title="Attach chart"
-                className="text-gray-400 hover:text-[#2f8df4] transition-colors shrink-0 p-2"
+                className="text-gray-400 hover:text-[#10b981] transition-colors shrink-0 p-2"
               >
                 <ImagePlus className="w-5 h-5" />
               </button>
@@ -268,14 +268,14 @@ export default function PreTradeGate() {
                 onChange={(e) => setMessage(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder={imageFile ? "Add a note about the chart..." : "Type your message..."}
-                className="flex-1 bg-gray-100 dark:bg-[#1a1d24] text-sm text-gray-900 dark:text-white border-none rounded-full px-3 py-2.5 focus:outline-none focus:ring-1 focus:ring-[#2f8df4]"
+                className="flex-1 bg-gray-100 dark:bg-[#1a1d24] text-sm text-gray-900 dark:text-white border-none rounded-full px-3 py-2.5 focus:outline-none focus:ring-1 focus:ring-[#10b981]"
               />
 
               {/* Send button */}
               <button
                 type="submit"
                 disabled={isLoading || (!message.trim() && !imageFile)}
-                className="bg-[#2f8df4] hover:bg-[#2376e8] disabled:bg-[#2f8df4]/40 text-white p-2.5 rounded-full transition-colors flex items-center justify-center shrink-0"
+                className="bg-[#10b981] hover:bg-[#2376e8] disabled:bg-[#10b981]/40 text-white p-2.5 rounded-full transition-colors flex items-center justify-center shrink-0"
               >
                 <Send className="w-4 h-4" />
               </button>
@@ -302,7 +302,7 @@ export default function PreTradeGate() {
             <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[8px] border-t-white dark:border-t-[#1a1d24]"></div>
           </div>
 
-          <div className="w-16 h-16 rounded-full overflow-hidden shadow-2xl border-[3px] border-[#2f8df4] bg-[#121418] transform transition-transform group-hover:scale-105">
+          <div className="w-16 h-16 rounded-full overflow-hidden shadow-2xl border-[3px] border-[#10b981] bg-[#121418] transform transition-transform group-hover:scale-105">
             <img
               src={ROBOT_AVATAR}
               alt="AI Trading Coach"

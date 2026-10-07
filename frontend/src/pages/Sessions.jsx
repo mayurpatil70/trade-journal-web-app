@@ -64,13 +64,13 @@ export default function Sessions() {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
         <div>
           <h1 className="text-2xl font-semibold text-white flex items-center gap-3">
-            <FolderClock className="w-6 h-6 text-cyan-400" /> Your Sessions
+            <FolderClock className="w-6 h-6 text-emerald-400" /> Your Sessions
           </h1>
           <p className="text-gray-500 mt-1 text-[13px]">
             Manage and resume your backtesting environments.
           </p>
         </div>
-        <Button onClick={() => setCreating((c) => !c)} className="bg-cyan-500 hover:bg-cyan-400 text-black font-bold flex items-center gap-2">
+        <Button onClick={() => setCreating((c) => !c)} className="bg-emerald-500 hover:bg-emerald-400 text-black font-bold flex items-center gap-2">
           <Plus className="w-4 h-4" /> New Session
         </Button>
       </div>
@@ -89,7 +89,7 @@ export default function Sessions() {
           <label className="block text-xs text-gray-400">Starting balance
             <input type="number" min="1" value={draft.balance} onChange={(e) => setDraft((d) => ({ ...d, balance: e.target.value }))} className="mt-1 w-full rounded-lg border border-white/10 bg-[#0a0a0a] px-3 py-2 text-sm text-white outline-none" />
           </label>
-          <Button onClick={createNewSession} className="bg-cyan-500 hover:bg-cyan-400 text-black font-bold">Start</Button>
+          <Button onClick={createNewSession} className="bg-emerald-500 hover:bg-emerald-400 text-black font-bold">Start</Button>
         </div>
       )}
 
@@ -125,7 +125,7 @@ export default function Sessions() {
             </div>
 
             <div className="flex justify-end mt-auto pt-2">
-              <button onClick={() => navigate(`/backtest/${s.id}`)} className="w-8 h-8 rounded-full bg-cyan-500/10 flex items-center justify-center text-cyan-400 hover:bg-cyan-500 hover:text-black transition-colors">
+              <button onClick={() => navigate(`/backtest/${s.id}`)} className="w-8 h-8 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-400 hover:bg-emerald-500 hover:text-black transition-colors">
                 <Play className="w-4 h-4 ml-0.5" fill="currentColor" />
               </button>
             </div>

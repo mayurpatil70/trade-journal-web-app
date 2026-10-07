@@ -27,7 +27,7 @@ export default function TradingBotDashboard() {
     <div className="mx-auto max-w-6xl space-y-6 p-4 md:p-8">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-xl font-semibold text-white">Trading Bot</h1>
-        <span className={`rounded-md px-2 py-1 text-[10px] font-bold uppercase tracking-wider ${live ? "bg-rose-500/10 text-rose-400" : "bg-sky-500/10 text-sky-400"}`}>{status?.mode}</span>
+        <span className={`rounded-md px-2 py-1 text-[10px] font-bold uppercase tracking-wider ${live ? "bg-rose-500/10 text-rose-400" : "bg-emerald-500/10 text-emerald-400"}`}>{status?.mode}</span>
       </div>
 
       {!status?.keysConfigured && (
@@ -70,7 +70,7 @@ export default function TradingBotDashboard() {
       <section className="space-y-2">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-semibold text-gray-300">Order history</h2>
-          <select value={symbolFilter} onChange={(e) => setSymbolFilter(e.target.value)} className="rounded-lg border border-white/10 bg-[#0a0a0a] px-2 py-1 text-xs text-gray-300 focus:outline-none focus:ring-1 focus:ring-cyan-500/50">
+          <select value={symbolFilter} onChange={(e) => setSymbolFilter(e.target.value)} className="rounded-lg border border-white/10 bg-[#0a0a0a] px-2 py-1 text-xs text-gray-300 focus:outline-none focus:ring-1 focus:ring-emerald-500/50">
             <option className="bg-[#0a0a0a] text-gray-300" value="">All symbols</option>
             {symbols.map((s) => <option className="bg-[#0a0a0a] text-gray-300" key={s} value={s}>{s}</option>)}
           </select>

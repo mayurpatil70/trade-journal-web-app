@@ -6,7 +6,7 @@ const EMPTY = { symbols: "", allocatedCapital: 100, takeProfitPercentage: 2, sto
 const Field = ({ label, ...props }) => (
   <label className="block text-xs text-gray-400">
     {label}
-    <input {...props} className="mt-1 w-full rounded-lg border border-white/10 bg-[#0a0a0a] px-3 py-2 text-sm text-white outline-none focus:border-cyan-500/50" />
+    <input {...props} className="mt-1 w-full rounded-lg border border-white/10 bg-[#0a0a0a] px-3 py-2 text-sm text-white outline-none focus:border-emerald-500/50" />
   </label>
 );
 
@@ -56,7 +56,7 @@ export default function BulkOrderDrawer({ open, onClose, onCreate }) {
         </div>
         {message && <p className="text-xs text-rose-400">{message}</p>}
         <div className="flex gap-2">
-          <button type="submit" disabled={busy} className="flex-1 rounded-lg bg-cyan-500 py-2 text-sm font-semibold text-black disabled:opacity-50">{busy ? "Creating..." : "Create bots"}</button>
+          <button type="submit" disabled={busy} className="flex-1 rounded-lg bg-emerald-500 py-2 text-sm font-semibold text-black disabled:opacity-50">{busy ? "Creating..." : "Create bots"}</button>
           <button type="button" onClick={onClose} className="rounded-lg bg-white/5 px-4 py-2 text-sm text-gray-300">Cancel</button>
         </div>
       </form>

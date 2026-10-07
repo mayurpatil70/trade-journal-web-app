@@ -35,7 +35,6 @@ function AutoPlayVideo({ src, overlayIcon: Icon, overlayTitle, overlayText, grad
 
   return (
     <div style={{ position: 'relative', width: '100%', height: '100%', display: 'flex' }}>
-      {/* Native HTML5 Video for granular scroll-control */}
       <video
         ref={videoRef}
         src={src}
@@ -44,38 +43,6 @@ function AutoPlayVideo({ src, overlayIcon: Icon, overlayTitle, overlayText, grad
         playsInline
         style={{ width: '100%', height: 'auto', display: 'block', objectFit: 'cover' }}
       />
-      
-      {/* Marketing Strategy: Premium Feature Overlay Badge */}
-      <div style={{
-        position: 'absolute',
-        bottom: '20px',
-        left: '20px',
-        right: '20px',
-        background: 'rgba(12, 16, 24, 0.85)',
-        backdropFilter: 'blur(16px)',
-        border: '1px solid rgba(255,255,255,0.1)',
-        borderRadius: '16px',
-        padding: '16px',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '16px',
-        boxShadow: '0 10px 30px rgba(0,0,0,0.5)'
-      }}>
-        <div style={{
-          width: 44, height: 44, borderRadius: '12px',
-          background: gradient, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0
-        }}>
-          <Icon size={20} color="white" />
-        </div>
-        <div>
-          <h4 style={{ color: 'white', fontSize: '15px', fontWeight: 800, marginBottom: '2px', letterSpacing: '-0.01em' }}>
-            {overlayTitle}
-          </h4>
-          <p style={{ color: 'rgba(255,255,255,0.65)', fontSize: '12px', lineHeight: 1.4 }}>
-            {overlayText}
-          </p>
-        </div>
-      </div>
     </div>
   );
 }
@@ -147,10 +114,10 @@ export default function MarketingVideos() {
             gap: '6px',
             padding: '5px 14px',
             borderRadius: '999px',
-            background: 'rgba(47,141,244,0.1)',
-            border: '1px solid rgba(47,141,244,0.25)',
+            background: 'rgba(16,185,129,0.1)',
+            border: '1px solid rgba(16,185,129,0.25)',
             fontSize: '10px',
-            color: '#2f8df4',
+            color: '#10b981',
             fontWeight: 700,
             letterSpacing: '0.1em',
             textTransform: 'uppercase',
@@ -166,7 +133,7 @@ export default function MarketingVideos() {
             lineHeight: 1.1,
             marginBottom: '16px',
           }}>
-            See Forex Notes <span style={{ color: '#2f8df4' }}>in Action</span>
+            See Forex Notes <span style={{ color: '#10b981' }}>in Action</span>
           </h2>
           <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.45)', lineHeight: 1.7 }}>
             An AI-powered trading journal for traders who are serious about improving. Watch how our automated dashboard prevents emotional mistakes and tracks your prop firm limits in real-time.

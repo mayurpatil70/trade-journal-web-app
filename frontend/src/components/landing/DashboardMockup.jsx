@@ -134,14 +134,14 @@ export default function DashboardMockup({ style = {}, className = '' }) {
         }}>
           <div style={{
             width: 32, height: 32, borderRadius: '10px',
-            background: 'linear-gradient(135deg, #2f8df4, #22d3ee)',
+            background: 'linear-gradient(135deg, #10b981, #059669)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             marginBottom: '12px',
           }}>
             <Activity size={14} color="white" />
           </div>
           {[
-            { icon: BarChart2, active: true, color: '#2f8df4' },
+            { icon: BarChart2, active: true, color: '#10b981' },
             { icon: TrendingUp, active: false },
             { icon: Calendar, active: false },
             { icon: Calculator, active: false },
@@ -150,11 +150,11 @@ export default function DashboardMockup({ style = {}, className = '' }) {
           ].map(({ icon: Icon, active, color }, i) => (
             <div key={i} style={{
               width: 32, height: 32, borderRadius: '8px',
-              background: active ? 'rgba(47,141,244,0.15)' : 'transparent',
+              background: active ? 'rgba(16,185,129,0.15)' : 'transparent',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               cursor: 'pointer',
             }}>
-              <Icon size={13} color={active ? (color || '#2f8df4') : 'rgba(255,255,255,0.25)'} />
+              <Icon size={13} color={active ? (color || '#10b981') : 'rgba(255,255,255,0.25)'} />
             </div>
           ))}
         </div>
@@ -185,8 +185,8 @@ export default function DashboardMockup({ style = {}, className = '' }) {
             {[
               { label: 'Win Rate', value: '68.4%', change: '+4.2%', color: '#10b981', spark: [40,55,48,65,60,72,68,75] },
               { label: 'Net R-Multiple', value: '+34.8R', change: 'Avg: 2.4R', color: '#10b981', spark: [20,35,30,50,45,60,55,70] },
-              { label: 'Profit Factor', value: '2.18', change: 'Inst. edge', color: '#2f8df4', spark: [50,58,52,65,62,70,68,75] },
-              { label: 'Rule Discipline', value: '94%', change: '0 revenge', color: '#22d3ee', spark: [80,82,78,85,83,88,86,90] },
+              { label: 'Profit Factor', value: '2.18', change: 'Inst. edge', color: '#10b981', spark: [50,58,52,65,62,70,68,75] },
+              { label: 'Rule Discipline', value: '94%', change: '0 revenge', color: '#059669', spark: [80,82,78,85,83,88,86,90] },
             ].map((s, i) => (
               <div key={i} style={{
                 background: 'rgba(255,255,255,0.03)',

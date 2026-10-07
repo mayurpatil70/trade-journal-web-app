@@ -93,7 +93,7 @@ export default function Login() {
                 href="/privacy"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-400 hover:text-blue-300 underline"
+                className="text-emerald-400 hover:text-blue-300 underline"
               >
                 Privacy Policy
               </a>

@@ -20,7 +20,7 @@ const INITIAL = {
 const Field = ({ label, ...props }) => (
   <label className="block text-xs text-gray-400">
     {label}
-    <input {...props} className="mt-1 w-full rounded-lg border border-white/10 bg-[#0a0a0a] px-3 py-2 text-sm text-white outline-none focus:border-cyan-500/50" />
+    <input {...props} className="mt-1 w-full rounded-lg border border-white/10 bg-[#0a0a0a] px-3 py-2 text-sm text-white outline-none focus:border-emerald-500/50" />
   </label>
 );
 
@@ -59,7 +59,7 @@ export default function BotSetupPage() {
 
       <section className="rounded-2xl border border-white/5 bg-[#111418] p-4 text-sm">
         <h2 className="mb-2 font-semibold text-gray-300">Exchange connection</h2>
-        <p className="text-gray-400">Mode: <b className={status?.mode === "LIVE" ? "text-rose-400" : "text-sky-400"}>{status?.mode}</b></p>
+        <p className="text-gray-400">Mode: <b className={status?.mode === "LIVE" ? "text-rose-400" : "text-emerald-400"}>{status?.mode}</b></p>
         <p className="text-gray-400">API keys: <b className={status?.keysConfigured ? "text-emerald-400" : "text-amber-400"}>{status?.keysConfigured ? "configured on server" : "not configured"}</b></p>
         <p className="mt-2 text-xs text-gray-500">Keys are never entered or stored in the browser. Set BINANCE_API_KEY and BINANCE_API_SECRET in the server environment. Orders go to the Binance testnet unless BOT_ENABLE_LIVE=true.</p>
       </section>
@@ -89,7 +89,7 @@ export default function BotSetupPage() {
         )}
         {message.text && <p className={`text-sm ${message.ok ? "text-emerald-400" : "text-rose-400"}`}>{message.text}</p>}
         <div className="flex gap-2">
-          <button type="submit" disabled={busy} className="rounded-lg bg-cyan-500 px-4 py-2 text-sm font-semibold text-black disabled:opacity-50">{busy ? "Saving..." : "Save bot"}</button>
+          <button type="submit" disabled={busy} className="rounded-lg bg-emerald-500 px-4 py-2 text-sm font-semibold text-black disabled:opacity-50">{busy ? "Saving..." : "Save bot"}</button>
           <button type="button" onClick={() => setDrawer(true)} className="rounded-lg bg-white/5 px-4 py-2 text-sm text-gray-300">Bulk create</button>
         </div>
       </form>

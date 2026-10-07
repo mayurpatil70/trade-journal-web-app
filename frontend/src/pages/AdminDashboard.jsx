@@ -69,7 +69,7 @@ export default function AdminDashboard() {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center h-screen bg-[#0a0a0a]">
-        <Loader2 className="w-8 h-8 text-[#2f8df4] animate-spin mb-3" />
+        <Loader2 className="w-8 h-8 text-[#10b981] animate-spin mb-3" />
         <p className="text-sm text-gray-500 font-medium">Loading Admin Center...</p>
       </div>
     );
@@ -90,8 +90,8 @@ export default function AdminDashboard() {
     <div className="w-full max-w-7xl mx-auto pb-16 px-4 md:px-8 mt-6 md:mt-8" style={{ fontFamily: "'Inter', sans-serif" }}>
       {/* Header */}
       <div className="mb-8 flex items-center gap-4">
-        <div className="w-12 h-12 rounded-2xl bg-[#2f8df4]/10 border border-[#2f8df4]/20 flex items-center justify-center backdrop-blur-sm">
-          <ShieldCheck className="w-6 h-6 text-[#2f8df4]" />
+        <div className="w-12 h-12 rounded-2xl bg-[#10b981]/10 border border-[#10b981]/20 flex items-center justify-center backdrop-blur-sm">
+          <ShieldCheck className="w-6 h-6 text-[#10b981]" />
         </div>
         <div>
           <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight">Admin Command Center</h1>
@@ -101,7 +101,7 @@ export default function AdminDashboard() {
 
       <div className="flex gap-4 border-b border-white/10 pb-4 mb-6">
         <button onClick={() => setActiveTab("overview")} className={`text-sm font-bold uppercase tracking-wider ${activeTab === "overview" ? "text-emerald-400" : "text-gray-500 hover:text-white"}`}>Overview</button>
-        <button onClick={() => setActiveTab("affiliates")} className={`text-sm font-bold uppercase tracking-wider ${activeTab === "affiliates" ? "text-[#2f8df4]" : "text-gray-500 hover:text-white"}`}>Affiliates & Payouts</button>
+        <button onClick={() => setActiveTab("affiliates")} className={`text-sm font-bold uppercase tracking-wider ${activeTab === "affiliates" ? "text-[#10b981]" : "text-gray-500 hover:text-white"}`}>Affiliates & Payouts</button>
       </div>
 
       {activeTab === "overview" && (
@@ -124,12 +124,12 @@ export default function AdminDashboard() {
         <div className="bg-[#0a0a0a]/60 backdrop-blur-xl border border-white/10 rounded-2xl p-6 shadow-xl">
           <div className="flex items-center justify-between mb-4">
             <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Active SAAS Users</span>
-            <div className="w-8 h-8 rounded-xl bg-[#2f8df4]/10 border border-[#2f8df4]/20 flex items-center justify-center">
-              <Users className="w-4 h-4 text-[#2f8df4]" />
+            <div className="w-8 h-8 rounded-xl bg-[#10b981]/10 border border-[#10b981]/20 flex items-center justify-center">
+              <Users className="w-4 h-4 text-[#10b981]" />
             </div>
           </div>
           <p className="text-4xl font-black text-white">{accounts?.length || 0}</p>
-          <p className="text-xs text-[#2f8df4] font-medium mt-2">Registered users total</p>
+          <p className="text-xs text-[#10b981] font-medium mt-2">Registered users total</p>
         </div>
 
         {/* Pending Payments */}
@@ -181,7 +181,7 @@ export default function AdminDashboard() {
                   <td className="py-3 pr-4">
                     {ord.payment_screenshot ? (
                       <a href={ord.payment_screenshot} target="_blank" rel="noreferrer"
-                        className="flex items-center gap-1 text-[#2f8df4] hover:underline text-[10px] font-bold">
+                        className="flex items-center gap-1 text-[#10b981] hover:underline text-[10px] font-bold">
                         View <ExternalLink className="w-3 h-3" />
                       </a>
                     ) : <span className="text-gray-600 text-[10px]">No screenshot</span>}
@@ -292,7 +292,7 @@ export default function AdminDashboard() {
                               alert("Email copied to clipboard!");
                           }
                         }}
-                        className="text-[#2f8df4] hover:underline text-[10px] font-bold uppercase tracking-wider ml-auto">
+                        className="text-[#10b981] hover:underline text-[10px] font-bold uppercase tracking-wider ml-auto">
                         Copy Email
                       </button>
                     </td>
@@ -338,7 +338,7 @@ export default function AdminDashboard() {
                       <td className="py-3 text-right">
                         <div className="flex items-center justify-end gap-2">
                           <button onClick={() => window.open(`mailto:${w.users?.email}?subject=ForexNotes Affiliate Payout&body=Your withdrawal of $${w.amount} has been processed!`, "_blank")}
-                            className="bg-[#2f8df4]/10 text-[#2f8df4] hover:bg-[#2f8df4] hover:text-white border border-[#2f8df4]/20 px-3 py-1.5 rounded-xl text-[10px] uppercase font-bold transition-all">
+                            className="bg-[#10b981]/10 text-[#10b981] hover:bg-[#10b981] hover:text-white border border-[#10b981]/20 px-3 py-1.5 rounded-xl text-[10px] uppercase font-bold transition-all">
                             Email
                           </button>
                           {w.status === "pending" && (

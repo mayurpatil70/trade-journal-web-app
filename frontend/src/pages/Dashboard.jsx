@@ -189,7 +189,7 @@ export default function Dashboard() {
         </div>
         <button
           onClick={() => navigate("/add-trade")}
-          className="flex items-center gap-2 px-6 py-2.5 bg-cyan-600 hover:bg-cyan-500 text-white font-medium rounded-lg transition-colors text-[13px] shadow-lg shadow-cyan-500/20"
+          className="flex items-center gap-2 px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-medium rounded-lg transition-colors text-[13px] shadow-lg shadow-emerald-500/20"
         >
           <PlusCircle className="w-4 h-4" /> Log Trade
         </button>
@@ -232,9 +232,9 @@ export default function Dashboard() {
         {/* AI Insight & Trading Health */}
         <div className="flex flex-col gap-6">
           {/* Economic Calendar & Promotion Card */}
-          <div className="bg-gradient-to-br from-[#102a3a] to-[#0A0B0D] border border-cyan-500/20 rounded-2xl p-6 relative overflow-hidden group flex flex-col justify-between h-full">
+          <div className="bg-gradient-to-br from-[#102a3a] to-[#0A0B0D] border border-emerald-500/20 rounded-2xl p-6 relative overflow-hidden group flex flex-col justify-between h-full">
             <div>
-              <h3 className="text-[11px] font-semibold text-cyan-500 uppercase tracking-widest mb-3 flex items-center gap-2">
+              <h3 className="text-[11px] font-semibold text-emerald-500 uppercase tracking-widest mb-3 flex items-center gap-2">
                 Economic Calendar
               </h3>
               <p className="text-gray-200 text-[13px] leading-relaxed mb-4 relative z-10">
@@ -247,7 +247,7 @@ export default function Dashboard() {
               </span>
               <button 
                 onClick={() => navigate("/news")}
-                className="text-[12px] font-semibold text-cyan-400 hover:text-cyan-300 flex items-center gap-1 transition-colors"
+                className="text-[12px] font-semibold text-emerald-400 hover:text-cyan-300 flex items-center gap-1 transition-colors"
               >
                 View Calendar <ArrowRight className="w-3 h-3" />
               </button>
@@ -272,10 +272,10 @@ export default function Dashboard() {
               <div>
                 <div className="flex justify-between text-xs mb-2">
                   <span className="text-gray-400">Rule Following</span>
-                  <span className="text-cyan-400 font-semibold">85%</span>
+                  <span className="text-emerald-400 font-semibold">85%</span>
                 </div>
                 <div className="w-full bg-white/5 rounded-full h-1.5">
-                  <div className="bg-cyan-400 h-1.5 rounded-full" style={{ width: '85%' }}></div>
+                  <div className="bg-emerald-400 h-1.5 rounded-full" style={{ width: '85%' }}></div>
                 </div>
               </div>
               <div className="pt-4 mt-2 border-t border-white/5">
@@ -329,7 +329,7 @@ export default function Dashboard() {
                   <div className="flex items-start justify-between mb-4">
                     <div>
                       <div className="flex items-center gap-2 mb-1">
-                        <span className={`w-2 h-2 rounded-full ${t.direction === "LONG" ? "bg-cyan-400" : "bg-purple-400"}`} />
+                        <span className={`w-2 h-2 rounded-full ${t.direction === "LONG" ? "bg-emerald-400" : "bg-purple-400"}`} />
                         <h4 className="font-semibold text-[14px] text-gray-100">{t.asset}</h4>
                         <span className="text-[9px] uppercase font-bold text-gray-400 px-1.5 py-0.5 bg-white/5 rounded">{t.direction}</span>
                       </div>

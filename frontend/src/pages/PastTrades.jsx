@@ -158,7 +158,7 @@ export default function PastTrades() {
                 >
                   {/* Left: Asset & Time */}
                   <div className="flex items-center gap-4 md:w-[25%]">
-                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center font-bold text-xs border ${t.direction === "LONG" ? "bg-cyan-500/10 text-cyan-400 border-cyan-500/20" : "bg-purple-500/10 text-purple-400 border-purple-500/20"}`}>
+                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center font-bold text-xs border ${t.direction === "LONG" ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : "bg-purple-500/10 text-purple-400 border-purple-500/20"}`}>
                       {t.direction === "LONG" ? "▲" : "▼"}
                     </div>
                     <div>
@@ -231,7 +231,7 @@ export default function PastTrades() {
              {/* Header */}
              <div className="px-6 py-5 border-b border-white/5 flex items-center justify-between bg-[#0A0B0D]">
                 <div className="flex items-center gap-3">
-                   <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-widest ${selectedTrade.direction === "LONG" ? "bg-cyan-500/10 text-cyan-400" : "bg-purple-500/10 text-purple-400"}`}>{selectedTrade.direction}</span>
+                   <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-widest ${selectedTrade.direction === "LONG" ? "bg-emerald-500/10 text-emerald-400" : "bg-purple-500/10 text-purple-400"}`}>{selectedTrade.direction}</span>
                    <h2 className="text-xl font-bold text-white">{selectedTrade.asset}</h2>
                    <span className="text-gray-500 text-sm">• {selectedTrade.date}</span>
                 </div>
@@ -264,7 +264,7 @@ export default function PastTrades() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                    <div className="space-y-4">
                       <div>
-                        <h3 className="text-xs font-semibold text-cyan-400 uppercase tracking-widest mb-2 flex items-center gap-2"><Target className="w-3 h-3" /> Analysis</h3>
+                        <h3 className="text-xs font-semibold text-emerald-400 uppercase tracking-widest mb-2 flex items-center gap-2"><Target className="w-3 h-3" /> Analysis</h3>
                         <p className="text-sm text-gray-300 leading-relaxed bg-[#15181D] border border-white/5 p-4 rounded-xl min-h-[100px] whitespace-pre-wrap">{selectedTrade.reason || "No analysis recorded."}</p>
                       </div>
                       <div>

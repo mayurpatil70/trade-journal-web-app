@@ -51,7 +51,7 @@ const NavItem = ({
         isDisabled
           ? "opacity-50 cursor-not-allowed text-gray-500"
           : isActive
-            ? "bg-[#1B2027] text-white border border-white/5 shadow-sm"
+            ? "bg-[#1B2027] text-white border border-white/5 shadow-[0_0_15px_rgba(16,185,129,0.15)]"
             : "text-gray-400 hover:bg-[#15181D] hover:text-gray-200 border border-transparent"
       }`}
     >
@@ -59,7 +59,7 @@ const NavItem = ({
         <Icon
           className={`w-[18px] h-[18px] transition-colors ${
             isActive
-              ? "text-cyan-400"
+              ? "text-emerald-400"
               : "text-gray-500 group-hover:text-gray-300"
           }`}
           strokeWidth={isActive ? 2.5 : 2}
@@ -67,7 +67,7 @@ const NavItem = ({
         <span className="tracking-tight">{label}</span>
       </div>
       {isBeta && (
-        <span className="text-[9px] uppercase tracking-wider font-bold bg-blue-500/10 text-blue-400 px-1.5 py-0.5 rounded-md">
+        <span className="text-[9px] uppercase tracking-wider font-bold bg-emerald-500/10 text-emerald-400 px-1.5 py-0.5 rounded-md">
           Beta
         </span>
       )}
@@ -168,12 +168,7 @@ export default function MainLayout() {
     >
       {/* Mobile Header */}
       <div className="md:hidden fixed top-0 left-0 right-0 h-14 bg-[#101216]/95 border-b border-white/5 flex items-center justify-between px-4 z-40 backdrop-blur-xl">
-        <div className="flex items-center gap-2">
-          <Activity className="w-5 h-5 text-cyan-400" />
-          <span className="font-semibold text-white text-base tracking-tight">
-            Forex Notes
-          </span>
-        </div>
+        <div className="flex items-center gap-2"><img src="/logo3d.png" alt="ForexNotes" className="h-8 object-contain drop-shadow-[0_0_12px_rgba(16,185,129,0.5)]" /></div>
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-colors"
@@ -194,12 +189,7 @@ export default function MainLayout() {
       >
         {/* Logo */}
         <div className="h-16 flex items-center justify-between px-5 shrink-0 hidden md:flex border-b border-white/5">
-          <div className="flex items-center gap-2.5">
-            <Activity className="w-5 h-5 text-cyan-400" />
-            <span className="font-semibold text-gray-100 text-[15px] tracking-tight">
-              Forex Notes
-            </span>
-          </div>
+          <div className="flex items-center gap-2"><img src="/logo3d.png" alt="ForexNotes" className="h-10 object-contain drop-shadow-[0_0_12px_rgba(16,185,129,0.5)]" /></div>
           <button
             onClick={() => setIsSearchOpen(true)}
             className="p-1.5 text-gray-500 hover:text-gray-300 rounded-md hover:bg-white/5 transition-colors"
@@ -263,7 +253,7 @@ export default function MainLayout() {
                 onClick={closeMenu}
                 className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-300 hover:bg-[#232931] hover:text-white transition-colors"
               >
-                <User className="w-4 h-4 text-cyan-400" />
+                <User className="w-4 h-4 text-emerald-400" />
                 Profile
               </Link>
               <button
@@ -291,7 +281,7 @@ export default function MainLayout() {
             className="flex items-center justify-between p-3 rounded-xl bg-[#101216] border border-white/5 hover:border-white/10 transition-colors cursor-pointer group"
           >
             <div className="flex items-center gap-3 overflow-hidden">
-              <div className="w-8 h-8 rounded-lg bg-cyan-500/10 text-cyan-400 flex items-center justify-center font-bold text-sm shrink-0 border border-cyan-500/20">
+              <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center font-bold text-sm shrink-0 border border-emerald-500/20">
                 {localStorage.getItem("userEmail")
                   ? localStorage.getItem("userEmail").charAt(0).toUpperCase()
                   : "U"}
@@ -353,7 +343,7 @@ export default function MainLayout() {
                 }}
                 className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-gray-300 hover:bg-white/5 rounded-lg transition-colors text-left"
               >
-                <PlusCircle className="w-4 h-4 text-cyan-400" /> Log a new trade
+                <PlusCircle className="w-4 h-4 text-emerald-400" /> Log a new trade
               </button>
               <button
                 onClick={() => {

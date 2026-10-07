@@ -20,13 +20,13 @@ export default function PromoPopup() {
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
-      <div className="relative w-full max-w-md bg-gradient-to-br from-[#121418] to-[#0a0a0a] border border-white/10 rounded-3xl shadow-[0_0_80px_rgba(47,141,244,0.15)] overflow-hidden">
+      <div className="relative w-full max-w-md bg-gradient-to-br from-[#121418] to-[#0a0a0a] border border-white/10 rounded-3xl shadow-[0_0_80px_rgba(16,185,129,0.15)] overflow-hidden">
         {/* Glossy Overlay */}
         <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-white/10 pointer-events-none" />
         
         {/* Glow Effects */}
-        <div className="absolute -top-24 -right-24 w-48 h-48 bg-blue-500/30 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-cyan-500/30 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -top-24 -right-24 w-48 h-48 bg-emerald-500/30 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-emerald-500/30 rounded-full blur-3xl pointer-events-none" />
 
         <button
           type="button"
@@ -41,7 +41,7 @@ export default function PromoPopup() {
         </button>
 
         <div className="p-8 relative z-10 flex flex-col items-center text-center">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-blue-500/30 mb-6">
+          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-500 flex items-center justify-center shadow-lg shadow-emerald-500/30 mb-6">
             <Activity className="w-8 h-8 text-white" />
           </div>
 

@@ -56,11 +56,11 @@ export default function PropAccounts() {
   };
 
   const inputClass =
-    "appearance-none w-full bg-white/40 dark:bg-white/[0.04] border border-gray-300/80 dark:border-white/10 rounded-xl px-4 py-3 text-blue-600 dark:text-blue-400 font-bold focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 outline-none text-sm text-center [text-align-last:center] backdrop-blur-sm transition-all";
+    "appearance-none w-full bg-white/40 dark:bg-white/[0.04] border border-gray-300/80 dark:border-white/10 rounded-xl px-4 py-3 text-emerald-600 dark:text-emerald-400 font-bold focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/20 outline-none text-sm text-center [text-align-last:center] backdrop-blur-sm transition-all";
   const labelClass = "text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest block mb-2";
 
   const firmColors = {
-    FTMO: { gradient: "from-blue-500/20 to-cyan-500/20", border: "border-blue-500/20", text: "text-blue-400" },
+    FTMO: { gradient: "from-emerald-500/20 to-emerald-500/20", border: "border-emerald-500/20", text: "text-emerald-400" },
     "Funding Pips": { gradient: "from-emerald-500/20 to-green-500/20", border: "border-emerald-500/20", text: "text-emerald-400" },
     "The Funded Trader": { gradient: "from-violet-500/20 to-purple-500/20", border: "border-violet-500/20", text: "text-violet-400" },
     Apex: { gradient: "from-orange-500/20 to-amber-500/20", border: "border-orange-500/20", text: "text-orange-400" },

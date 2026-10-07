@@ -111,9 +111,9 @@ function CandlestickGroup({ scrollProgress }) {
         />
       ))}
       {/* Ambient glow spheres */}
-      <GlowSphere position={[-1.5, 0.8, -0.5]} color="#22d3ee" />
+      <GlowSphere position={[-1.5, 0.8, -0.5]} color="#059669" />
       <GlowSphere position={[1.8, -0.5, -0.3]} color="#7c3aed" />
-      <GlowSphere position={[0, 1.2, -0.8]} color="#2f8df4" />
+      <GlowSphere position={[0, 1.2, -0.8]} color="#10b981" />
     </group>
   );
 }
@@ -128,9 +128,9 @@ export default function CandlestickScene({ scrollProgress }) {
     >
       <Suspense fallback={null}>
         <ambientLight intensity={0.4} />
-        <pointLight position={[5, 5, 5]} intensity={1.2} color="#22d3ee" />
+        <pointLight position={[5, 5, 5]} intensity={1.2} color="#059669" />
         <pointLight position={[-5, -3, 3]} intensity={0.8} color="#7c3aed" />
-        <pointLight position={[0, 8, 2]} intensity={0.6} color="#2f8df4" />
+        <pointLight position={[0, 8, 2]} intensity={0.6} color="#10b981" />
         <CandlestickGroup scrollProgress={scrollProgress} />
       </Suspense>
     </Canvas>

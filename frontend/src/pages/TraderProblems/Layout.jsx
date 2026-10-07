@@ -26,8 +26,8 @@ export default function CalculatorLayout() {
       style={{ fontFamily: "'Inter', sans-serif" }}
     >
       <div className="mb-8 md:mb-10 flex items-center gap-4">
-        <div className="w-10 h-10 md:w-12 md:h-12 rounded-[2px] bg-[#2f8df4]/10 flex items-center justify-center border border-[#2f8df4]/20 shrink-0">
-          <Calculator className="w-5 h-5 md:w-6 md:h-6 text-[#2f8df4]" />
+        <div className="w-10 h-10 md:w-12 md:h-12 rounded-[2px] bg-[#10b981]/10 flex items-center justify-center border border-[#10b981]/20 shrink-0">
+          <Calculator className="w-5 h-5 md:w-6 md:h-6 text-[#10b981]" />
         </div>
         <div>
           <h1 className="text-xl md:text-3xl font-bold text-gray-900 dark:text-white tracking-tight mb-1">
@@ -47,7 +47,7 @@ export default function CalculatorLayout() {
             className={({ isActive }) =>
               `flex items-center gap-2 px-4 py-3 text-sm font-bold whitespace-nowrap border-b-2 transition-colors ${
                 isActive || location.pathname.includes(tab.path)
-                  ? "border-[#2f8df4] text-[#2f8df4]"
+                  ? "border-[#10b981] text-[#10b981]"
                   : "border-transparent text-gray-500 hover:text-gray-300"
               }`
             }

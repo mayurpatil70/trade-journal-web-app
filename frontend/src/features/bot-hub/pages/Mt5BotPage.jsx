@@ -5,8 +5,8 @@ import { usePaged } from "../hooks/usePaged";
 import SymbolPicker from "../../../components/SymbolPicker";
 
 const TIMEFRAMES = ["M1", "M5", "M15", "M30", "H1", "H4", "D1"];
-const TONE = { pending: "text-amber-400", approved: "text-sky-400", executed: "text-emerald-400", failed: "text-rose-400", rejected: "text-gray-500", none: "text-gray-500" };
-const input = "mt-1 w-full rounded-lg border border-white/10 bg-[#0a0a0a] px-3 py-2 text-sm text-white outline-none focus:border-cyan-500/50";
+const TONE = { pending: "text-amber-400", approved: "text-emerald-400", executed: "text-emerald-400", failed: "text-rose-400", rejected: "text-gray-500", none: "text-gray-500" };
+const input = "mt-1 w-full rounded-lg border border-white/10 bg-[#0a0a0a] px-3 py-2 text-sm text-white outline-none focus:border-emerald-500/50";
 
 function SignalsTable({ onDecide }) {
   const s = usePaged(hubApi.mt5Signals);
@@ -137,7 +137,7 @@ export default function Mt5BotPage() {
             </p>
           </div>
           <div className="flex gap-2">
-            <button onClick={generate} className="rounded-lg bg-cyan-500 px-3 py-1.5 text-xs font-semibold text-black">{bridge ? "Regenerate token" : "Generate token"}</button>
+            <button onClick={generate} className="rounded-lg bg-emerald-500 px-3 py-1.5 text-xs font-semibold text-black">{bridge ? "Regenerate token" : "Generate token"}</button>
             {bridge && <button onClick={() => run(async () => { await hubApi.mt5Revoke(); setToken(""); setForm(null); }, "Bridge disconnected.")} className="rounded-lg bg-rose-500/10 px-3 py-1.5 text-xs text-rose-400">Revoke</button>}
           </div>
         </div>
@@ -182,7 +182,7 @@ export default function Mt5BotPage() {
           </div>
           {form.autoExecute && <p className="text-xs text-rose-400">Auto-execute places real orders without asking you. Test in paper mode first.</p>}
           {message.text && <p className={`text-sm ${message.ok ? "text-emerald-400" : "text-rose-400"}`}>{message.text}</p>}
-          <button type="submit" className="rounded-lg bg-cyan-500 px-4 py-2 text-sm font-semibold text-black">Save settings</button>
+          <button type="submit" className="rounded-lg bg-emerald-500 px-4 py-2 text-sm font-semibold text-black">Save settings</button>
         </form>
       )}
       {(!bridge || !form) && message.text && <p className={`text-sm ${message.ok ? "text-emerald-400" : "text-rose-400"}`}>{message.text}</p>}

@@ -47,7 +47,7 @@ export default function ConnectionsPage() {
   };
 
   const conn = state.data[0];
-  const input = "mt-1 w-full rounded-lg border border-white/10 bg-[#0a0a0a] px-3 py-2 text-sm text-white outline-none focus:border-cyan-500/50";
+  const input = "mt-1 w-full rounded-lg border border-white/10 bg-[#0a0a0a] px-3 py-2 text-sm text-white outline-none focus:border-emerald-500/50";
 
   if (state.loading) return <div className="p-8 text-center text-gray-500">Loading connections...</div>;
 
@@ -67,7 +67,7 @@ export default function ConnectionsPage() {
               <p className="font-semibold text-white">Binance{conn.label ? ` · ${conn.label}` : ""}</p>
               <p className="font-mono text-xs text-gray-400">{conn.apiKeyMasked}</p>
             </div>
-            <span className={`rounded-md px-2 py-1 text-[10px] font-bold uppercase tracking-wider ${conn.live ? "bg-rose-500/10 text-rose-400" : "bg-sky-500/10 text-sky-400"}`}>{conn.live ? "Live" : "Testnet"}</span>
+            <span className={`rounded-md px-2 py-1 text-[10px] font-bold uppercase tracking-wider ${conn.live ? "bg-rose-500/10 text-rose-400" : "bg-emerald-500/10 text-emerald-400"}`}>{conn.live ? "Live" : "Testnet"}</span>
           </div>
           <div className="flex flex-wrap gap-2">
             <button disabled={busy} onClick={() => run(() => hubApi.testConnection("binance"), (r) => `Keys accepted on ${r.mode}${r.canTrade ? "" : " (trading disabled on this key)"}.`)} className="rounded-lg bg-white/5 px-3 py-1.5 text-xs text-gray-300">Test</button>
@@ -75,7 +75,7 @@ export default function ConnectionsPage() {
           </div>
           <div className="border-t border-white/5 pt-3">
             {conn.live ? (
-              <button disabled={busy} onClick={() => run(() => hubApi.setLive("binance", false), () => "Switched back to testnet. Bots were stopped.")} className="rounded-lg bg-sky-500/10 px-3 py-1.5 text-xs text-sky-400">Switch to testnet</button>
+              <button disabled={busy} onClick={() => run(() => hubApi.setLive("binance", false), () => "Switched back to testnet. Bots were stopped.")} className="rounded-lg bg-emerald-500/10 px-3 py-1.5 text-xs text-emerald-400">Switch to testnet</button>
             ) : (
               <div className="space-y-2">
                 <p className="text-xs text-gray-500">Live trading uses real funds. Use live keys only, then type ENABLE LIVE to opt in. Active bots stop when the mode changes.</p>
@@ -105,7 +105,7 @@ export default function ConnectionsPage() {
         </label>
         <p className="text-xs text-gray-500">Create the key with trading enabled and withdrawals disabled. The secret is encrypted on the server and never shown again.</p>
         {message.text && <p className={`text-sm ${message.ok ? "text-emerald-400" : "text-rose-400"}`}>{message.text}</p>}
-        <button type="submit" disabled={busy || !state.ready || !form.apiKey || !form.apiSecret} className="rounded-lg bg-cyan-500 px-4 py-2 text-sm font-semibold text-black disabled:opacity-50">{busy ? "Saving..." : "Save keys"}</button>
+        <button type="submit" disabled={busy || !state.ready || !form.apiKey || !form.apiSecret} className="rounded-lg bg-emerald-500 px-4 py-2 text-sm font-semibold text-black disabled:opacity-50">{busy ? "Saving..." : "Save keys"}</button>
       </form>
     </div>
   );

@@ -12,20 +12,20 @@ const CandlestickScene = lazy(() => import('./CandlestickScene'));
 const TRADER_HINTS = [
   { icon: Brain, label: 'AI Stops Revenge Trades', color: '#ec4899', bg: 'rgba(236,72,153,0.1)', border: 'rgba(236,72,153,0.25)' },
   { icon: ShieldCheck, label: 'Prop Firm Drawdown Auto-Tracked', color: '#10b981', bg: 'rgba(16,185,129,0.1)', border: 'rgba(16,185,129,0.25)' },
-  { icon: Calculator, label: 'Instant Lot Size Sizing', color: '#2f8df4', bg: 'rgba(47,141,244,0.1)', border: 'rgba(47,141,244,0.25)' },
-  { icon: TrendingUp, label: 'R-Multiple Analytics Engine', color: '#22d3ee', bg: 'rgba(34,211,238,0.1)', border: 'rgba(34,211,238,0.25)' },
+  { icon: Calculator, label: 'Instant Lot Size Sizing', color: '#10b981', bg: 'rgba(16,185,129,0.1)', border: 'rgba(16,185,129,0.25)' },
+  { icon: TrendingUp, label: 'R-Multiple Analytics Engine', color: '#059669', bg: 'rgba(16,185,129,0.1)', border: 'rgba(16,185,129,0.25)' },
 ];
 
 const LIVE_FEEDS = [
   { id: 1, title: 'AI Blocked Trade', detail: 'Revenge trade detected', time: 'Just now', color: '#ec4899' },
   { id: 2, title: 'Prop Limit Alert', detail: '75% daily drawdown', time: '2m ago', color: '#10b981' },
-  { id: 3, title: 'Trade Logged', detail: '+4.2R Win (EURUSD)', time: '5m ago', color: '#2f8df4' },
-  { id: 4, title: 'AI Insight', detail: 'You perform best in London session', time: '12m ago', color: '#22d3ee' },
+  { id: 3, title: 'Trade Logged', detail: '+4.2R Win (EURUSD)', time: '5m ago', color: '#10b981' },
+  { id: 4, title: 'AI Insight', detail: 'You perform best in London session', time: '12m ago', color: '#059669' },
   // Duplicates for seamless infinite marquee scroll
   { id: 5, title: 'AI Blocked Trade', detail: 'Revenge trade detected', time: 'Just now', color: '#ec4899' },
   { id: 6, title: 'Prop Limit Alert', detail: '75% daily drawdown', time: '2m ago', color: '#10b981' },
-  { id: 7, title: 'Trade Logged', detail: '+4.2R Win (EURUSD)', time: '5m ago', color: '#2f8df4' },
-  { id: 8, title: 'AI Insight', detail: 'You perform best in London session', time: '12m ago', color: '#22d3ee' },
+  { id: 7, title: 'Trade Logged', detail: '+4.2R Win (EURUSD)', time: '5m ago', color: '#10b981' },
+  { id: 8, title: 'AI Insight', detail: 'You perform best in London session', time: '12m ago', color: '#059669' },
 ];
 
 export default function LandingHero() {
@@ -95,7 +95,7 @@ export default function LandingHero() {
             }}>
               Stop Bleeding Capital<br />
               <span style={{
-                background: 'linear-gradient(135deg, #2f8df4 0%, #22d3ee 50%, #10b981 100%)',
+                background: 'linear-gradient(135deg, #10b981 0%, #059669 50%, #10b981 100%)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
                 backgroundClip: 'text',
@@ -146,22 +146,22 @@ export default function LandingHero() {
                   gap: '10px',
                   padding: '14px 32px',
                   borderRadius: '14px',
-                  background: 'linear-gradient(135deg, #2f8df4, #1d6fd8)',
+                  background: 'linear-gradient(135deg, #10b981, #047857)',
                   color: 'white',
                   fontSize: '14px',
                   fontWeight: 800,
                   textDecoration: 'none',
-                  boxShadow: '0 8px 32px rgba(47,141,244,0.4), 0 0 0 1px rgba(47,141,244,0.3)',
+                  boxShadow: '0 8px 32px rgba(16,185,129,0.4), 0 0 0 1px rgba(16,185,129,0.3)',
                   transition: 'transform 0.2s, box-shadow 0.2s',
                   letterSpacing: '0.01em',
                 }}
                 onMouseEnter={e => {
                   e.currentTarget.style.transform = 'translateY(-2px)';
-                  e.currentTarget.style.boxShadow = '0 16px 40px rgba(47,141,244,0.5), 0 0 0 1px rgba(47,141,244,0.4)';
+                  e.currentTarget.style.boxShadow = '0 16px 40px rgba(16,185,129,0.5), 0 0 0 1px rgba(16,185,129,0.4)';
                 }}
                 onMouseLeave={e => {
                   e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = '0 8px 32px rgba(47,141,244,0.4), 0 0 0 1px rgba(47,141,244,0.3)';
+                  e.currentTarget.style.boxShadow = '0 8px 32px rgba(16,185,129,0.4), 0 0 0 1px rgba(16,185,129,0.3)';
                 }}
               >
                 <Zap size={16} />

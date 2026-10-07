@@ -380,7 +380,7 @@ export default function PropFirm() {
                   className={`h-full rounded-full transition-all duration-500 ${
                     dailyDrawdownUsedPercent >= 80
                       ? "bg-gradient-to-r from-amber-500 to-red-500"
-                      : "bg-gradient-to-r from-emerald-500 to-cyan-500"
+                      : "bg-gradient-to-r from-emerald-500 to-emerald-500"
                   }`}
                   style={{ width: `${dailyDrawdownUsedPercent}%` }}
                 ></div>
@@ -401,7 +401,7 @@ export default function PropFirm() {
 
             {/* Advisory note */}
             <div className="p-3.5 rounded-xl bg-white/5 border border-white/5 text-xs text-gray-300 leading-relaxed flex items-start gap-2">
-              <HelpCircle className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
+              <HelpCircle className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
               <span>
                 Tip: If your drawdown used passes <strong>50%</strong>, reduce your lot size by half immediately to prevent emotional spiral.
               </span>

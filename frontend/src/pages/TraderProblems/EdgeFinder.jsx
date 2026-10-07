@@ -68,7 +68,7 @@ export default function EdgeFinder() {
     <div className="space-y-6">
       <div className="bg-white dark:bg-[#121418] border border-gray-200 dark:border-white/5 rounded-[4px] p-6 shadow-sm">
         <h2 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2 mb-2">
-          <BrainCircuit className="w-5 h-5 text-[#2f8df4]" /> The Edge Finder
+          <BrainCircuit className="w-5 h-5 text-[#10b981]" /> The Edge Finder
         </h2>
         <p className="text-sm text-gray-500 mb-6">
           Our AI analyzes your entire journal history to find hidden
@@ -77,14 +77,14 @@ export default function EdgeFinder() {
 
         {loading ? (
           <div className="flex flex-col items-center justify-center py-12">
-            <Loader2 className="w-8 h-8 text-[#2f8df4] animate-spin mb-3" />
+            <Loader2 className="w-8 h-8 text-[#10b981] animate-spin mb-3" />
             <p className="text-sm text-gray-500 font-medium">
               Crunching your trade data with Gemini AI...
             </p>
           </div>
         ) : leaks.length === 0 && edges.length === 0 ? (
           <div className="py-12 text-center text-gray-500 text-sm">
-            <Sparkles className="w-8 h-8 text-[#2f8df4] mx-auto mb-2 opacity-60" />
+            <Sparkles className="w-8 h-8 text-[#10b981] mx-auto mb-2 opacity-60" />
             <p className="font-bold text-gray-800 dark:text-gray-200 mb-1">
               No Edge Insights Available Yet
             </p>

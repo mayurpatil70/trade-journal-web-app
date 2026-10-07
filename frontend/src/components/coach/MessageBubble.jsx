@@ -20,7 +20,7 @@ function ContextChips({ context }) {
   const tones = {
     green: "text-emerald-600 dark:text-emerald-400 bg-emerald-500/10",
     amber: "text-amber-600 dark:text-amber-400 bg-amber-500/10",
-    blue: "text-[#2f8df4] bg-[#2f8df4]/10",
+    blue: "text-[#10b981] bg-[#10b981]/10",
   };
   return (
     <div className="flex flex-wrap gap-1.5 mt-1.5">
@@ -56,7 +56,7 @@ export default function MessageBubble({ message, isLast, canRegenerate, onRegene
         <div
           className={`px-4 py-3 rounded-3xl text-sm leading-relaxed shadow-sm ${
             isUser
-              ? "bg-[#2f8df4] text-white whitespace-pre-wrap break-words"
+              ? "bg-[#10b981] text-white whitespace-pre-wrap break-words"
               : "bg-white dark:bg-[#1a1d24] text-gray-800 dark:text-gray-200 border border-gray-100 dark:border-white/5"
           }`}
         >
@@ -66,7 +66,7 @@ export default function MessageBubble({ message, isLast, canRegenerate, onRegene
             <>
               <Markdown text={message.text} />
               {message.pending && (
-                <span className="inline-block w-1.5 h-4 ml-0.5 align-middle bg-[#2f8df4] animate-pulse rounded-sm" />
+                <span className="inline-block w-1.5 h-4 ml-0.5 align-middle bg-[#10b981] animate-pulse rounded-sm" />
               )}
             </>
           )}
@@ -107,7 +107,7 @@ export default function MessageBubble({ message, isLast, canRegenerate, onRegene
           <button
             onClick={onRegenerate}
             disabled={isBusy}
-            className="mt-1.5 text-xs font-semibold text-[#2f8df4] hover:underline disabled:opacity-50"
+            className="mt-1.5 text-xs font-semibold text-[#10b981] hover:underline disabled:opacity-50"
           >
             Try again
           </button>

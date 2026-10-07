@@ -177,7 +177,7 @@ export default function PerformanceCalendar() {
                  return (
                    <div key={idx} onClick={() => navigate("/trades", { state: { openTradeId: t.id } })} className="bg-[#15181D] border border-white/5 rounded-xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 cursor-pointer hover:bg-white/5 transition-colors">
                       <div className="flex items-center gap-4">
-                         <div className={`w-10 h-10 rounded-lg flex items-center justify-center font-bold text-xs border ${t.direction === "LONG" ? "bg-cyan-500/10 text-cyan-400 border-cyan-500/20" : "bg-purple-500/10 text-purple-400 border-purple-500/20"}`}>
+                         <div className={`w-10 h-10 rounded-lg flex items-center justify-center font-bold text-xs border ${t.direction === "LONG" ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : "bg-purple-500/10 text-purple-400 border-purple-500/20"}`}>
                            {t.direction === "LONG" ? "▲" : "▼"}
                          </div>
                          <div>

@@ -64,11 +64,11 @@ export default function Hindsight() {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
           <div>
             <h2 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2 mb-2">
-              <SlidersHorizontal className="w-5 h-5 text-[#2f8df4]" /> Hindsight
+              <SlidersHorizontal className="w-5 h-5 text-[#10b981]" /> Hindsight
               Bias Eliminator
             </h2>
             <p className="text-sm text-gray-500 flex items-start gap-2">
-              <Info className="w-4 h-4 shrink-0 mt-0.5 text-[#2f8df4]" />
+              <Info className="w-4 h-4 shrink-0 mt-0.5 text-[#10b981]" />
               Compare what the chart looked like at the exact moment you
               entered, versus how it played out.
             </p>
@@ -88,7 +88,7 @@ export default function Hindsight() {
                   setSelectedTrade(trade);
                   setSliderPosition(50); // Reset slider on trade change
                 }}
-                className="bg-gray-50 dark:bg-[#1a1d24] border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white text-sm rounded-[2px] focus:ring-[#2f8df4] focus:border-[#2f8df4] block w-full p-2.5 outline-none font-medium"
+                className="bg-gray-50 dark:bg-[#1a1d24] border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white text-sm rounded-[2px] focus:ring-[#10b981] focus:border-[#10b981] block w-full p-2.5 outline-none font-medium"
               >
                 {trades.map((trade) => (
                   <option key={trade.id} value={trade.id}>
@@ -103,7 +103,7 @@ export default function Hindsight() {
         {/* Loading State */}
         {loading && (
           <div className="flex flex-col items-center justify-center py-16">
-            <Loader2 className="w-8 h-8 text-[#2f8df4] animate-spin mb-3" />
+            <Loader2 className="w-8 h-8 text-[#10b981] animate-spin mb-3" />
             <p className="text-sm text-gray-500 font-medium">
               Loading your chart history...
             </p>
@@ -182,7 +182,7 @@ export default function Hindsight() {
 
               {/* Overlay Image (Before) */}
               <div
-                className="absolute inset-0 h-full border-r-2 border-[#2f8df4] shadow-[5px_0_20px_rgba(0,0,0,0.8)] z-10 overflow-hidden bg-gray-900"
+                className="absolute inset-0 h-full border-r-2 border-[#10b981] shadow-[5px_0_20px_rgba(0,0,0,0.8)] z-10 overflow-hidden bg-gray-900"
                 style={{ width: `${sliderPosition}%` }}
               >
                 <div className="absolute inset-0 w-[100vw] max-w-[1024px] h-full flex items-center justify-start">
@@ -194,7 +194,7 @@ export default function Hindsight() {
                     crossOrigin="anonymous"
                   />
                 </div>
-                <div className="absolute bottom-4 left-4 bg-[#2f8df4] text-white px-3 py-1.5 rounded-[2px] text-xs font-bold tracking-widest uppercase shadow-lg">
+                <div className="absolute bottom-4 left-4 bg-[#10b981] text-white px-3 py-1.5 rounded-[2px] text-xs font-bold tracking-widest uppercase shadow-lg">
                   Before (Entry)
                 </div>
               </div>
@@ -211,7 +211,7 @@ export default function Hindsight() {
 
               {/* Center Drag Handle Indicator */}
               <div
-                className="absolute top-1/2 -translate-y-1/2 w-8 h-8 bg-white border-2 border-[#2f8df4] rounded-full flex items-center justify-center shadow-[0_0_15px_rgba(0,0,0,0.5)] z-10 pointer-events-none transition-transform"
+                className="absolute top-1/2 -translate-y-1/2 w-8 h-8 bg-white border-2 border-[#10b981] rounded-full flex items-center justify-center shadow-[0_0_15px_rgba(0,0,0,0.5)] z-10 pointer-events-none transition-transform"
                 style={{ left: `calc(${sliderPosition}% - 16px)` }}
               >
                 <div className="flex gap-0.5">

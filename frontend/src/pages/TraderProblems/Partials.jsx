@@ -57,7 +57,7 @@ export default function Partials() {
           </div>
           <button
             onClick={addExecution}
-            className="px-4 py-2 bg-[#2f8df4]/10 text-[#2f8df4] hover:bg-[#2f8df4]/20 border border-[#2f8df4]/20 font-bold text-xs rounded-[2px] transition-colors flex items-center gap-2 shrink-0"
+            className="px-4 py-2 bg-[#10b981]/10 text-[#10b981] hover:bg-[#10b981]/20 border border-[#10b981]/20 font-bold text-xs rounded-[2px] transition-colors flex items-center gap-2 shrink-0"
           >
             <Plus className="w-4 h-4" /> Add Execution
           </button>
@@ -90,7 +90,7 @@ export default function Partials() {
                         e.target.value,
                       )
                     }
-                    className="w-full bg-white dark:bg-[#0d0e12] border border-gray-200 dark:border-white/10 rounded-[2px] pl-3 pr-8 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-[#2f8df4]"
+                    className="w-full bg-white dark:bg-[#0d0e12] border border-gray-200 dark:border-white/10 rounded-[2px] pl-3 pr-8 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-[#10b981]"
                   />
                   <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-bold">
                     %
@@ -104,7 +104,7 @@ export default function Partials() {
                     onChange={(e) =>
                       updateExecution(exe.id, "rMultiple", e.target.value)
                     }
-                    className="w-full bg-white dark:bg-[#0d0e12] border border-gray-200 dark:border-white/10 rounded-[2px] pl-3 pr-8 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-[#2f8df4]"
+                    className="w-full bg-white dark:bg-[#0d0e12] border border-gray-200 dark:border-white/10 rounded-[2px] pl-3 pr-8 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-[#10b981]"
                   />
                   <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-bold">
                     R
@@ -145,7 +145,7 @@ export default function Partials() {
               </div>
 
               <div className="pt-6 border-t border-gray-200 dark:border-white/10">
-                <p className="text-[10px] font-bold text-[#2f8df4] uppercase tracking-widest mb-1">
+                <p className="text-[10px] font-bold text-[#10b981] uppercase tracking-widest mb-1">
                   Blended Net R-Multiple
                 </p>
                 <p className="text-4xl font-black text-gray-900 dark:text-white">

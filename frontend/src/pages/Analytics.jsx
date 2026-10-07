@@ -27,7 +27,7 @@ export default function Analytics() {
   if (loading) {
     return (
       <div className="flex h-full items-center justify-center p-12">
-        <Loader2 className="w-8 h-8 text-cyan-400 animate-spin" />
+        <Loader2 className="w-8 h-8 text-emerald-400 animate-spin" />
       </div>
     );
   }
@@ -70,7 +70,7 @@ export default function Analytics() {
     <div className="w-full max-w-7xl mx-auto font-sans pb-24 px-4 md:px-8 mt-6">
       <div className="mb-10">
         <h1 className="text-2xl font-semibold text-white flex items-center gap-3">
-          <Activity className="w-6 h-6 text-cyan-400" /> Strategy Analytics
+          <Activity className="w-6 h-6 text-emerald-400" /> Strategy Analytics
         </h1>
         <p className="text-gray-500 mt-1 text-[13px]">
           Discover your statistical edge based on actual execution data.
@@ -88,10 +88,10 @@ export default function Analytics() {
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
              <div className="bg-[#101216] border border-white/5 rounded-2xl p-6 relative overflow-hidden">
-                <div className="absolute top-0 right-0 p-6 opacity-10"><Target className="w-16 h-16 text-cyan-400" /></div>
+                <div className="absolute top-0 right-0 p-6 opacity-10"><Target className="w-16 h-16 text-emerald-400" /></div>
                 <h3 className="text-[11px] font-bold text-gray-500 uppercase tracking-widest mb-1">Global Win Rate</h3>
                 <p className="text-3xl font-bold text-white">{winRate.toFixed(1)}%</p>
-                <p className="text-xs text-cyan-400 mt-2 font-semibold">Over {totalTrades} executions</p>
+                <p className="text-xs text-emerald-400 mt-2 font-semibold">Over {totalTrades} executions</p>
              </div>
              <div className="bg-[#101216] border border-white/5 rounded-2xl p-6 relative overflow-hidden">
                 <div className="absolute top-0 right-0 p-6 opacity-10"><Zap className="w-16 h-16 text-emerald-400" /></div>
@@ -111,7 +111,7 @@ export default function Analytics() {
              {/* Setups Table */}
              <div className="bg-[#101216] border border-white/5 rounded-2xl shadow-xl overflow-hidden">
                 <div className="p-5 border-b border-white/5 bg-[#0A0B0D]">
-                   <h2 className="text-sm font-semibold text-white flex items-center gap-2"><Zap className="w-4 h-4 text-cyan-400" /> Edge by Setup</h2>
+                   <h2 className="text-sm font-semibold text-white flex items-center gap-2"><Zap className="w-4 h-4 text-emerald-400" /> Edge by Setup</h2>
                 </div>
                 <div className="p-5">
                    {setupArray.length === 0 ? <p className="text-sm text-gray-500">No setups logged.</p> : (

@@ -48,7 +48,7 @@ export default function AffiliateDashboard() {
         <div className="bg-gray-900 p-6 rounded-xl border border-gray-800">
           <h2 className="text-xl mb-4">Your Referral Link</h2>
           <p className="text-sm text-gray-400 mb-2">Earn 10% on every Monthly ($1.40) and Yearly ($11.70) sale.</p>
-          <div className="bg-black p-3 rounded text-blue-400 font-mono overflow-x-auto">
+          <div className="bg-black p-3 rounded text-emerald-400 font-mono overflow-x-auto">
             https://forexnotes.in/?ref={profile.referral_code}
           </div>
           <button 
@@ -70,7 +70,7 @@ export default function AffiliateDashboard() {
           <input 
             type="text" 
             placeholder="Your BEP20 USDT Address" 
-            className="w-full bg-black border border-gray-700 rounded p-3 mb-4 text-white focus:outline-none focus:border-blue-500"
+            className="w-full bg-black border border-gray-700 rounded p-3 mb-4 text-white focus:outline-none focus:border-emerald-500"
             value={withdrawAddress}
             onChange={(e) => setWithdrawAddress(e.target.value)}
           />
@@ -78,7 +78,7 @@ export default function AffiliateDashboard() {
           <button 
             onClick={handleWithdraw}
             disabled={(profile.wallet_balance || 0) < 25}
-            className={`w-full py-3 rounded-lg font-bold transition-colors ${(profile.wallet_balance || 0) >= 25 ? 'bg-blue-600 hover:bg-blue-500' : 'bg-gray-600 cursor-not-allowed text-gray-400'}`}
+            className={`w-full py-3 rounded-lg font-bold transition-colors ${(profile.wallet_balance || 0) >= 25 ? 'bg-emerald-600 hover:bg-emerald-500' : 'bg-gray-600 cursor-not-allowed text-gray-400'}`}
           >
             Withdraw to Wallet (Min $25)
           </button>

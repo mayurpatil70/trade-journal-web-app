@@ -108,7 +108,7 @@ export default function Verify() {
             </p>
             <button
               onClick={() => navigate("/login")}
-              className="w-full py-4 px-6 bg-[#2f8df4] hover:bg-[#2376e8] text-white font-bold rounded-[2px] shadow-lg transition-all flex justify-center items-center gap-2 text-sm"
+              className="w-full py-4 px-6 bg-[#10b981] hover:bg-[#2376e8] text-white font-bold rounded-[2px] shadow-lg transition-all flex justify-center items-center gap-2 text-sm"
             >
               Back to Login <ArrowRight className="w-4 h-4" />
             </button>

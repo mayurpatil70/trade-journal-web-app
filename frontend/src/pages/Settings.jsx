@@ -93,7 +93,7 @@ export default function Settings() {
 
   const exportFormats = [
     { fmt: "csv", label: "CSV", icon: <Table className="w-5 h-5" />, color: "from-emerald-500/20 to-green-500/20", border: "border-emerald-500/20", text: "text-emerald-400" },
-    { fmt: "excel", label: "Excel", icon: <Table className="w-5 h-5" />, color: "from-blue-500/20 to-cyan-500/20", border: "border-blue-500/20", text: "text-blue-400" },
+    { fmt: "excel", label: "Excel", icon: <Table className="w-5 h-5" />, color: "from-emerald-500/20 to-emerald-500/20", border: "border-emerald-500/20", text: "text-emerald-400" },
     { fmt: "doc", label: "Word", icon: <FileText className="w-5 h-5" />, color: "from-violet-500/20 to-purple-500/20", border: "border-violet-500/20", text: "text-violet-400" },
     { fmt: "pdf", label: "PDF", icon: <FileType className="w-5 h-5" />, color: "from-red-500/20 to-rose-500/20", border: "border-red-500/20", text: "text-red-400" },
   ];
@@ -124,13 +124,13 @@ export default function Settings() {
         {/* Export Data */}
         <div className="bg-white/60 dark:bg-white/[0.03] border border-gray-200/80 dark:border-white/10 rounded-2xl p-6 md:p-8 shadow-xl backdrop-blur-xl">
           <div className="flex items-center gap-3 mb-2 pb-4 border-b border-gray-200/80 dark:border-white/10">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500/20 to-cyan-500/20 border border-blue-500/20 flex items-center justify-center">
-              <Download className="w-4 h-4 text-blue-400" />
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-500/20 to-emerald-500/20 border border-emerald-500/20 flex items-center justify-center">
+              <Download className="w-4 h-4 text-emerald-400" />
             </div>
             <h2 className="text-base font-bold text-gray-900 dark:text-white">
               Export Journal Data
             </h2>
-            <span className="text-[10px] bg-blue-500/10 text-blue-400 border border-blue-500/20 px-2 py-0.5 rounded uppercase tracking-wider font-bold">Trades + Daily Notes</span>
+            <span className="text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded uppercase tracking-wider font-bold">Trades + Daily Notes</span>
           </div>
           <p className="text-xs text-gray-500 dark:text-gray-400 mb-6">
             Download a complete combined copy of your trading journal logs and your daily Pre/Post market notes.
@@ -161,8 +161,8 @@ export default function Settings() {
         {/* Journal History Logs */}
         <div className="bg-white/60 dark:bg-white/[0.03] border border-gray-200/80 dark:border-white/10 rounded-2xl p-6 md:p-8 shadow-xl backdrop-blur-xl">
           <div className="flex items-center gap-3 mb-2 pb-4 border-b border-gray-200/80 dark:border-white/10">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500/20 to-cyan-500/20 border border-blue-500/20 flex items-center justify-center">
-              <BookOpen className="w-4 h-4 text-blue-400" />
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-500/20 to-emerald-500/20 border border-emerald-500/20 flex items-center justify-center">
+              <BookOpen className="w-4 h-4 text-emerald-400" />
             </div>
             <h2 className="text-base font-bold text-gray-900 dark:text-white">
               Journal History Logs
@@ -175,7 +175,7 @@ export default function Settings() {
           <div className="w-full overflow-x-auto">
             {loadingHistory ? (
               <div className="flex justify-center py-10">
-                <Loader2 className="w-6 h-6 text-blue-400 animate-spin" />
+                <Loader2 className="w-6 h-6 text-emerald-400 animate-spin" />
               </div>
             ) : historyTrades.length === 0 ? (
               <p className="text-sm text-gray-500 text-center py-10 border border-dashed border-gray-200/80 dark:border-white/10 rounded-2xl">

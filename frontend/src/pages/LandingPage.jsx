@@ -26,6 +26,7 @@ import LandingHero from "../components/landing/LandingHero";
 import MarketingVideos from "../components/landing/MarketingVideos";
 import LandingDashboard from "../components/landing/LandingDashboard";
 import FeaturesBento from "../components/landing/FeaturesBento";
+import ExtraVideos from "../components/landing/ExtraVideos";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -56,7 +57,7 @@ const REVIEWS = [
     flag: "🇺🇸",
     text: "The lot size calculator is wicked fast for Bitcoin and NAS100. Having it integrated right next to my journal — no more switching between spreadsheets mid-session.",
     highlight: "Saves 45 min per trading day",
-    highlightColor: "#2f8df4",
+    highlightColor: "#10b981",
   },
   {
     photo: "/trader_ravi.png",
@@ -74,7 +75,7 @@ const REVIEWS = [
     flag: "🇦🇺",
     text: "R-multiple tracking showed I was leaving a ton of money on the table exiting XAUUSD early. Fixed my exits in 2 weeks after seeing my data. My PF jumped from 1.4 to 2.1.",
     highlight: "PF jumped from 1.4 → 2.1 in 2 weeks",
-    highlightColor: "#22d3ee",
+    highlightColor: "#059669",
   },
   {
     photo: "/trader_nina.png",
@@ -111,7 +112,7 @@ const REVIEWS = [
     flag: "🇺🇸",
     text: "The lot size calculator is wicked fast for Bitcoin and NAS100. Having it integrated right next to my journal — no more switching between spreadsheets mid-session.",
     highlight: "Saves 45 min per trading day",
-    highlightColor: "#2f8df4",
+    highlightColor: "#10b981",
   },
   {
     photo: "/trader_ravi.png",
@@ -129,7 +130,7 @@ const REVIEWS = [
     flag: "🇦🇺",
     text: "R-multiple tracking showed I was leaving a ton of money on the table exiting XAUUSD early. Fixed my exits in 2 weeks after seeing my data. My PF jumped from 1.4 to 2.1.",
     highlight: "PF jumped from 1.4 → 2.1 in 2 weeks",
-    highlightColor: "#22d3ee",
+    highlightColor: "#059669",
   },
   {
     photo: "/trader_nina.png",
@@ -148,7 +149,7 @@ const COMPARISON = [
   { metric: "Psychology & Emotion", manual: "Ignored or forgotten", journal: "Built-in AI Pre-Trade Guard" },
   { metric: "Prop Firm Drawdown", manual: "Manual calculation errors", journal: "Automated breach threshold alerts" },
   { metric: "Lot Size Sizing", manual: "Error-prone mental math", journal: "Precision calculator built-in" },
-  { metric: "Pricing Model", manual: "Monthly $30–50/mo forever", journal: "Single $11 USDT Lifetime Payment" },
+  { metric: "Pricing Model", manual: "Monthly $30–50/mo forever", journal: "Flexible Monthly & Yearly Memberships" },
 ];
 
 const PRICING_FEATURES = [
@@ -290,7 +291,7 @@ export default function LandingPage() {
           letterSpacing: "0.03em",
           textShadow: "0 0 8px rgba(245,158,11,0.6)",
         }}>
-          <span>Forex Notes — Lifetime Access via On-Chain USDT · No Subscriptions, Ever.</span>
+          <span>Forex Notes — Track, analyze, and optimize your trading strategy automatically.</span>
           <Link to="/login" style={{ color: "#fbbf24", display: "inline-flex", alignItems: "center", gap: "2px", fontWeight: 900, textDecoration: "underline" }}>
             Claim Access <ChevronRight size={12} />
           </Link>
@@ -316,19 +317,7 @@ export default function LandingPage() {
             justifyContent: "space-between",
           }}>
             {/* Logo */}
-            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-              <div style={{
-                width: 36, height: 36, borderRadius: "10px",
-                background: "linear-gradient(135deg, #2f8df4, #22d3ee)",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                boxShadow: "0 0 20px rgba(47,141,244,0.4)",
-              }}>
-                <Activity size={18} color="white" />
-              </div>
-              <span style={{ fontSize: "17px", fontWeight: 900, letterSpacing: "-0.03em", color: "white" }}>
-                Forex Notes
-              </span>
-            </div>
+            <Link to="/" style={{ display: "flex", alignItems: "center" }}><img src="/logo3d.png" alt="ForexNotes" style={{ height: "48px", objectFit: "contain", filter: "drop-shadow(0 0 16px rgba(16,185,129,0.6))" }} /></Link>
 
             {/* Nav Links */}
             <nav style={{ display: "flex", gap: "32px", alignItems: "center" }}>
@@ -378,16 +367,16 @@ export default function LandingPage() {
               <Link to="/login" style={{
                 fontSize: "11px", fontWeight: 800, letterSpacing: "0.05em",
                 padding: "9px 18px", borderRadius: "8px",
-                background: "linear-gradient(135deg, #2f8df4, #1d6fd8)",
+                background: "linear-gradient(135deg, #10b981, #047857)",
                 color: "white", textDecoration: "none",
-                boxShadow: "0 4px 16px rgba(47,141,244,0.35)",
+                boxShadow: "0 4px 16px rgba(16,185,129,0.35)",
                 display: "flex", alignItems: "center", gap: "6px",
                 transition: "box-shadow 0.2s, transform 0.2s",
               }}
-                onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 6px 24px rgba(47,141,244,0.5)"; e.currentTarget.style.transform = "translateY(-1px)"; }}
-                onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 4px 16px rgba(47,141,244,0.35)"; e.currentTarget.style.transform = "translateY(0)"; }}
+                onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 6px 24px rgba(16,185,129,0.5)"; e.currentTarget.style.transform = "translateY(-1px)"; }}
+                onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 4px 16px rgba(16,185,129,0.35)"; e.currentTarget.style.transform = "translateY(0)"; }}
               >
-                Get Access ($11) <ArrowRight size={12} />
+                Get Access <ArrowRight size={12} />
               </Link>
             </div>
           </div>
@@ -409,8 +398,8 @@ export default function LandingPage() {
         <section style={{ padding: "80px 20px", borderTop: "1px solid rgba(255,255,255,0.05)" }}>
           <div style={{ maxWidth: "900px", margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px" }}>
             <AnimatedStat value="3,200+" label="Funded traders using Forex Notes daily" color="#10b981" />
-            <AnimatedStat value="$11" label="One-time lifetime payment — zero subscriptions" color="#f59e0b" />
-            <AnimatedStat value="94%" label="Users report fewer rule violations within 30 days" color="#2f8df4" />
+            <AnimatedStat value="$11" label="Affordable monthly & yearly plans available" color="#f59e0b" />
+            <AnimatedStat value="94%" label="Users report fewer rule violations within 30 days" color="#10b981" />
           </div>
         </section>
 
@@ -455,7 +444,7 @@ export default function LandingPage() {
               }}>
                 <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(255,255,255,0.35)" }}>Metric</span>
                 <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(255,255,255,0.35)" }}>Spreadsheets / Notion</span>
-                <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "#2f8df4" }}>Forex Notes ✓</span>
+                <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "#10b981" }}>Forex Notes ✓</span>
               </div>
               {COMPARISON.map((row, i) => (
                 <div
@@ -484,9 +473,9 @@ export default function LandingPage() {
           <div style={{ maxWidth: "960px", margin: "0 auto 56px", textAlign: "center", padding: "0 20px" }}>
             <div style={{
               display: "inline-block", fontSize: "10px", fontWeight: 700, letterSpacing: "0.12em",
-              textTransform: "uppercase", color: "#2f8df4",
+              textTransform: "uppercase", color: "#10b981",
               padding: "5px 14px", borderRadius: "999px",
-              background: "rgba(47,141,244,0.08)", border: "1px solid rgba(47,141,244,0.2)",
+              background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.2)",
               marginBottom: "16px",
             }}>Trader Testimonials</div>
             <h2 style={{
@@ -495,7 +484,7 @@ export default function LandingPage() {
             }}>
               Trusted by Funded Traders<br />
               <span style={{
-                background: "linear-gradient(135deg, #2f8df4, #22d3ee)",
+                background: "linear-gradient(135deg, #10b981, #059669)",
                 WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
               }}>
                 Across 40+ Countries
@@ -587,7 +576,7 @@ export default function LandingPage() {
                     />
                     <div style={{
                       width: 44, height: 44, borderRadius: "50%",
-                      background: "linear-gradient(135deg, #2f8df4, #22d3ee)",
+                      background: "linear-gradient(135deg, #10b981, #059669)",
                       display: "none", alignItems: "center", justifyContent: "center",
                       fontSize: "14px", fontWeight: 800, color: "white", flexShrink: 0,
                     }}>
@@ -616,114 +605,158 @@ export default function LandingPage() {
           <div style={{ maxWidth: "640px", margin: "0 auto", textAlign: "center" }}>
             <div style={{
               display: "inline-block", fontSize: "10px", fontWeight: 700, letterSpacing: "0.12em",
-              textTransform: "uppercase", color: "#2f8df4",
+              textTransform: "uppercase", color: "#10b981",
               padding: "5px 14px", borderRadius: "999px",
-              background: "rgba(47,141,244,0.08)", border: "1px solid rgba(47,141,244,0.2)",
+              background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.2)",
               marginBottom: "16px",
             }}>Transparent Pricing</div>
             <h2 style={{
               fontSize: "clamp(1.8rem,4vw,2.8rem)", fontWeight: 900,
               color: "white", letterSpacing: "-0.03em", lineHeight: 1.1, marginBottom: "12px",
             }}>
-              One Single Payment.<br />Zero Monthly Fees.
+              Choose Your Plan.<br />Cancel Anytime.
             </h2>
             <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.45)", marginBottom: "48px", lineHeight: 1.7 }}>
-              No recurring charges. Pay once via on-chain USDT and receive instant lifetime access.
+              Select the best plan that fits your trading journey. Gain instant access today.
             </p>
 
-            <div
-              className="pricing-card"
-              style={{
-                background: "rgba(12,16,24,0.85)",
-                backdropFilter: "blur(24px)",
-                WebkitBackdropFilter: "blur(24px)",
-                border: "1px solid rgba(47,141,244,0.35)",
-                borderRadius: "24px",
-                padding: "40px",
-                position: "relative",
-                overflow: "hidden",
-                textAlign: "left",
-                boxShadow: "0 0 80px rgba(47,141,244,0.1), 0 40px 80px rgba(0,0,0,0.6)",
-                opacity: 0,
-              }}
-            >
-              {/* Glow */}
-              <div style={{
-                position: "absolute", top: "-60px", right: "-60px",
-                width: "300px", height: "300px",
-                background: "radial-gradient(ellipse, rgba(47,141,244,0.15) 0%, transparent 70%)",
-                pointerEvents: "none",
-              }} />
-
-              {/* Badge */}
-              <div style={{
-                position: "absolute", top: 0, right: 0,
-                background: "linear-gradient(135deg, #2f8df4, #22d3ee)",
-                color: "white", fontSize: "9px", fontWeight: 900,
-                letterSpacing: "0.1em", textTransform: "uppercase",
-                padding: "8px 20px", borderBottomLeftRadius: "12px",
-              }}>
-                Lifetime Pass
-              </div>
-
-              <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "32px", paddingBottom: "32px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-                <div>
-                  <h3 style={{ fontSize: "22px", fontWeight: 900, color: "white", letterSpacing: "-0.02em", marginBottom: "6px" }}>
-                    Full Trader Pro Suite
-                  </h3>
-                  <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)" }}>
-                    Access to all current features + every future update
-                  </p>
-                </div>
-                <div style={{ textAlign: "right", flexShrink: 0 }}>
-                  <div style={{ fontSize: "42px", fontWeight: 900, color: "white", letterSpacing: "-0.04em", lineHeight: 1 }}>$11</div>
-                  <div style={{ fontSize: "12px", fontWeight: 700, color: "rgba(255,255,255,0.4)" }}>USDT</div>
-                  <div style={{ fontSize: "10px", fontWeight: 800, color: "#10b981", letterSpacing: "0.05em", textTransform: "uppercase", marginTop: "4px" }}>
-                    One-time · Forever
-                  </div>
-                </div>
-              </div>
-
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "32px" }}>
-                {PRICING_FEATURES.map((item, i) => (
-                  <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: "8px", fontSize: "12px", color: "rgba(255,255,255,0.65)" }}>
-                    <CheckCircle2 size={14} color="#10b981" style={{ flexShrink: 0, marginTop: "1px" }} />
-                    <span>{item}</span>
-                  </div>
-                ))}
-              </div>
-
-              <Link
-                to="/login"
+            
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px', textAlign: 'left' }}>
+              {/* Monthly Plan */}
+              <div
+                className="pricing-card"
                 style={{
-                  display: "flex", alignItems: "center", justifyContent: "center", gap: "8px",
-                  width: "100%", padding: "16px", borderRadius: "14px",
-                  background: "linear-gradient(135deg, #2f8df4, #1d6fd8)",
-                  color: "white", fontSize: "14px", fontWeight: 800,
-                  textDecoration: "none", letterSpacing: "0.01em",
-                  boxShadow: "0 8px 32px rgba(47,141,244,0.4)",
-                  transition: "all 0.2s",
+                  background: "rgba(12,16,24,0.85)",
+                  backdropFilter: "blur(24px)",
+                  WebkitBackdropFilter: "blur(24px)",
+                  border: "1px solid rgba(16,185,129,0.35)",
+                  borderRadius: "24px",
+                  padding: "40px",
+                  position: "relative",
+                  overflow: "hidden",
+                  boxShadow: "0 0 40px rgba(16,185,129,0.05), 0 40px 80px rgba(0,0,0,0.6)",
                 }}
-                onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 12px 40px rgba(47,141,244,0.6)"; e.currentTarget.style.transform = "translateY(-1px)"; }}
-                onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 8px 32px rgba(47,141,244,0.4)"; e.currentTarget.style.transform = "translateY(0)"; }}
               >
-                <Zap size={16} />
-                Join Now for $11 USDT — Lifetime Access
-                <ArrowRight size={14} />
-              </Link>
+                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "32px", paddingBottom: "32px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+                  <div>
+                    <h3 style={{ fontSize: "22px", fontWeight: 900, color: "white", letterSpacing: "-0.02em", marginBottom: "6px" }}>
+                      Monthly Plan
+                    </h3>
+                    <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)" }}>
+                      Pay as you go access
+                    </p>
+                  </div>
+                  <div style={{ textAlign: "right", flexShrink: 0 }}>
+                    <div style={{ fontSize: "42px", fontWeight: 900, color: "white", letterSpacing: "-0.04em", lineHeight: 1 }}>$19</div>
+                    <div style={{ fontSize: "12px", fontWeight: 700, color: "rgba(255,255,255,0.4)" }}>/month</div>
+                  </div>
+                </div>
 
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "16px", marginTop: "16px", fontSize: "10px", color: "rgba(255,255,255,0.3)", letterSpacing: "0.05em", textTransform: "uppercase" }}>
-                <span style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                  <Lock size={10} /> TRC20 & BEP20
-                </span>
-                <span>·</span>
-                <span>Instant On-Chain Verification</span>
-                <span>·</span>
-                <span>3,200+ Traders</span>
+                <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginBottom: "32px" }}>
+                  {PRICING_FEATURES.slice(0, 5).map((item, i) => (
+                    <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: "8px", fontSize: "12px", color: "rgba(255,255,255,0.65)" }}>
+                      <CheckCircle2 size={14} color="#10b981" style={{ flexShrink: 0, marginTop: "1px" }} />
+                      <span>{item}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <Link
+                  to="/login"
+                  style={{
+                    display: "flex", alignItems: "center", justifyContent: "center", gap: "8px",
+                    width: "100%", padding: "16px", borderRadius: "14px",
+                    background: "transparent",
+                    border: "1px solid rgba(16,185,129,0.4)",
+                    color: "white", fontSize: "14px", fontWeight: 800,
+                    textDecoration: "none", letterSpacing: "0.01em",
+                    transition: "all 0.2s",
+                  }}
+                >
+                  Join Monthly
+                </Link>
+              </div>
+
+              {/* Yearly Plan */}
+              <div
+                className="pricing-card"
+                style={{
+                  background: "rgba(12,16,24,0.85)",
+                  backdropFilter: "blur(24px)",
+                  WebkitBackdropFilter: "blur(24px)",
+                  border: "2px solid #10b981",
+                  borderRadius: "24px",
+                  padding: "40px",
+                  position: "relative",
+                  overflow: "hidden",
+                  boxShadow: "0 0 80px rgba(16,185,129,0.15), 0 40px 80px rgba(0,0,0,0.6)",
+                }}
+              >
+                {/* Glow */}
+                <div style={{
+                  position: "absolute", top: "-60px", right: "-60px",
+                  width: "300px", height: "300px",
+                  background: "radial-gradient(ellipse, rgba(16,185,129,0.2) 0%, transparent 70%)",
+                  pointerEvents: "none",
+                }} />
+                
+                {/* Badge */}
+                <div style={{
+                  position: "absolute", top: 0, right: 0,
+                  background: "linear-gradient(135deg, #10b981, #059669)",
+                  color: "white", fontSize: "9px", fontWeight: 900,
+                  letterSpacing: "0.1em", textTransform: "uppercase",
+                  padding: "8px 20px", borderBottomLeftRadius: "12px",
+                }}>
+                  Best Value
+                </div>
+
+                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "32px", paddingBottom: "32px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+                  <div>
+                    <h3 style={{ fontSize: "22px", fontWeight: 900, color: "white", letterSpacing: "-0.02em", marginBottom: "6px" }}>
+                      Yearly Plan
+                    </h3>
+                    <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)" }}>
+                      Save 30% annually
+                    </p>
+                  </div>
+                  <div style={{ textAlign: "right", flexShrink: 0 }}>
+                    <div style={{ fontSize: "42px", fontWeight: 900, color: "white", letterSpacing: "-0.04em", lineHeight: 1 }}>$149</div>
+                    <div style={{ fontSize: "12px", fontWeight: 700, color: "rgba(255,255,255,0.4)" }}>/year</div>
+                  </div>
+                </div>
+
+                <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginBottom: "32px" }}>
+                  {PRICING_FEATURES.map((item, i) => (
+                    <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: "8px", fontSize: "12px", color: "rgba(255,255,255,0.65)" }}>
+                      <CheckCircle2 size={14} color="#10b981" style={{ flexShrink: 0, marginTop: "1px" }} />
+                      <span>{item}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <Link
+                  to="/login"
+                  style={{
+                    display: "flex", alignItems: "center", justifyContent: "center", gap: "8px",
+                    width: "100%", padding: "16px", borderRadius: "14px",
+                    background: "linear-gradient(135deg, #10b981, #047857)",
+                    color: "white", fontSize: "14px", fontWeight: 800,
+                    textDecoration: "none", letterSpacing: "0.01em",
+                    boxShadow: "0 8px 32px rgba(16,185,129,0.4)",
+                    transition: "all 0.2s",
+                  }}
+                >
+                  <Zap size={16} />
+                  Join Yearly
+                  <ArrowRight size={14} />
+                </Link>
               </div>
             </div>
           </div>
         </section>
+
+        <ExtraVideos />
 
         {/* ── Discord Community CTA ── */}
         <section style={{ padding: "80px 20px", borderTop: "1px solid rgba(255,255,255,0.05)" }}>
@@ -792,7 +825,7 @@ export default function LandingPage() {
             alignItems: "center", justifyContent: "space-between", gap: "16px",
           }}>
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-              <Activity size={16} color="#2f8df4" />
+              <Activity size={16} color="#10b981" />
               <span style={{ fontSize: "14px", fontWeight: 800, color: "white" }}>Forex Notes</span>
               <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)" }}>
                 © {new Date().getFullYear()} All Rights Reserved.

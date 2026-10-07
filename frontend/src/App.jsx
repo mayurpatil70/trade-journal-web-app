@@ -122,7 +122,7 @@ const PaywallGuard = () => {
   if (access === null) {
     return (
       <div className="flex h-screen bg-[#0a0a0a] items-center justify-center">
-        <Loader2 className="w-8 h-8 text-[#2f8df4] animate-spin" />
+        <Loader2 className="w-8 h-8 text-[#10b981] animate-spin" />
       </div>
     );
   }
@@ -142,7 +142,7 @@ function App() {
   return (
     <BrowserRouter>
       <RouteSeo />
-      <Suspense fallback={<div className="flex h-screen bg-[#0a0a0a] items-center justify-center"><Loader2 className="w-8 h-8 text-[#2f8df4] animate-spin" /></div>}>
+      <Suspense fallback={<div className="flex h-screen bg-[#0a0a0a] items-center justify-center"><Loader2 className="w-8 h-8 text-[#10b981] animate-spin" /></div>}>
         <ErrorBoundary>
           <Routes>
             {/* Public Landing Pages */}

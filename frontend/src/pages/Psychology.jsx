@@ -83,7 +83,7 @@ export default function Psychology() {
              {/* Discipline Impact */}
              <div className="bg-[#101216] border border-white/5 rounded-2xl p-6 flex flex-col justify-between">
                 <div>
-                   <h2 className="text-sm font-semibold text-white flex items-center gap-2 mb-4"><Target className="w-4 h-4 text-cyan-400" /> Discipline Impact</h2>
+                   <h2 className="text-sm font-semibold text-white flex items-center gap-2 mb-4"><Target className="w-4 h-4 text-emerald-400" /> Discipline Impact</h2>
                    <p className="text-xs text-gray-400 mb-6">How breaking your rules affects your P&L.</p>
                 </div>
                 <div className="grid grid-cols-2 gap-4">

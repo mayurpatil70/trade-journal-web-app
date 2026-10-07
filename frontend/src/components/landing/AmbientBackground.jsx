@@ -44,7 +44,7 @@ export default function AmbientBackground() {
           width: '800px',
           height: '600px',
           background:
-            'radial-gradient(ellipse at center, rgba(34,211,238,0.18) 0%, transparent 70%)',
+            'radial-gradient(ellipse at center, rgba(16,185,129,0.18) 0%, transparent 70%)',
           filter: 'blur(60px)',
           borderRadius: '50%',
           transform: 'translate(-50%, -50%)',
@@ -78,7 +78,7 @@ export default function AmbientBackground() {
           width: '600px',
           height: '400px',
           background:
-            'radial-gradient(ellipse at center, rgba(47,141,244,0.12) 0%, transparent 70%)',
+            'radial-gradient(ellipse at center, rgba(16,185,129,0.12) 0%, transparent 70%)',
           filter: 'blur(70px)',
           borderRadius: '50%',
           transform: 'translate(-70%, -60%)',

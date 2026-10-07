@@ -143,9 +143,9 @@ export default function AddTrade() {
     { num: 6, title: "Evidence" },
   ];
 
-  const inputClass = "w-full bg-[#15181D] border border-white/10 rounded-xl px-4 py-3.5 text-white placeholder-gray-600 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 outline-none text-[15px] transition-all";
-  const selectClass = "appearance-none w-full bg-[#15181D] border border-white/10 rounded-xl px-4 py-3.5 text-white focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 outline-none text-[15px] transition-all pr-10 cursor-pointer";
-  const textareaClass = "w-full min-h-[120px] bg-[#15181D] border border-white/10 rounded-xl px-4 py-3.5 text-white placeholder-gray-600 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 outline-none text-[15px] resize-y transition-all";
+  const inputClass = "w-full bg-[#15181D] border border-white/10 rounded-xl px-4 py-3.5 text-white placeholder-gray-600 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none text-[15px] transition-all";
+  const selectClass = "appearance-none w-full bg-[#15181D] border border-white/10 rounded-xl px-4 py-3.5 text-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none text-[15px] transition-all pr-10 cursor-pointer";
+  const textareaClass = "w-full min-h-[120px] bg-[#15181D] border border-white/10 rounded-xl px-4 py-3.5 text-white placeholder-gray-600 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none text-[15px] resize-y transition-all";
   const labelClass = "text-[12px] font-semibold text-gray-400 mb-2 block uppercase tracking-wider";
 
   return (
@@ -154,7 +154,7 @@ export default function AddTrade() {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-2xl font-semibold text-white flex items-center gap-2">
-            <Target className="w-6 h-6 text-cyan-400" /> Log Trade
+            <Target className="w-6 h-6 text-emerald-400" /> Log Trade
           </h1>
           <p className="text-sm text-gray-500 mt-1">Capture your edge efficiently.</p>
         </div>
@@ -166,14 +166,14 @@ export default function AddTrade() {
       {/* PROGRESS BAR */}
       <div className="flex items-center justify-between mb-10 relative">
         <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-[2px] bg-white/5 z-0"></div>
-        <div className="absolute left-0 top-1/2 -translate-y-1/2 h-[2px] bg-cyan-500 z-0 transition-all duration-300" style={{ width: `${((step - 1) / 5) * 100}%` }}></div>
+        <div className="absolute left-0 top-1/2 -translate-y-1/2 h-[2px] bg-emerald-500 z-0 transition-all duration-300" style={{ width: `${((step - 1) / 5) * 100}%` }}></div>
         
         {steps.map(s => (
           <div key={s.num} className="relative z-10 flex flex-col items-center gap-2">
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-colors duration-300 ${step >= s.num ? 'bg-cyan-500 text-white' : 'bg-[#15181D] border border-white/10 text-gray-500'}`}>
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-colors duration-300 ${step >= s.num ? 'bg-emerald-500 text-white' : 'bg-[#15181D] border border-white/10 text-gray-500'}`}>
               {step > s.num ? <Check className="w-4 h-4" /> : s.num}
             </div>
-            <span className={`text-[10px] uppercase tracking-widest absolute -bottom-6 whitespace-nowrap font-semibold ${step >= s.num ? 'text-cyan-400' : 'text-gray-600'}`}>{s.title}</span>
+            <span className={`text-[10px] uppercase tracking-widest absolute -bottom-6 whitespace-nowrap font-semibold ${step >= s.num ? 'text-emerald-400' : 'text-gray-600'}`}>{s.title}</span>
           </div>
         ))}
       </div>
@@ -238,7 +238,7 @@ export default function AddTrade() {
               <div className="bg-[#15181D] border border-white/5 rounded-2xl p-6 mb-6">
                  <div className="flex justify-between items-end mb-4">
                     <span className="text-xs text-gray-500 font-semibold uppercase tracking-widest">Trade Architecture</span>
-                    {calcRR > 0 && <span className="text-sm font-bold text-cyan-400">1 : {calcRR} R:R</span>}
+                    {calcRR > 0 && <span className="text-sm font-bold text-emerald-400">1 : {calcRR} R:R</span>}
                  </div>
                  
                  <div className="relative h-20 flex flex-col justify-center">
@@ -338,7 +338,7 @@ export default function AddTrade() {
                 <div>
                   <label className={labelClass}>Rule Broken?</label>
                   <div className="flex gap-2">
-                     <button type="button" onClick={() => setFormData({...formData, ruleBreak: "no"})} className={`flex-1 py-3.5 rounded-xl font-bold text-sm transition-colors border ${formData.ruleBreak === "no" ? "bg-cyan-500/10 border-cyan-500/30 text-cyan-400" : "bg-[#15181D] border-white/10 text-gray-500 hover:text-white"}`}>Followed Plan</button>
+                     <button type="button" onClick={() => setFormData({...formData, ruleBreak: "no"})} className={`flex-1 py-3.5 rounded-xl font-bold text-sm transition-colors border ${formData.ruleBreak === "no" ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400" : "bg-[#15181D] border-white/10 text-gray-500 hover:text-white"}`}>Followed Plan</button>
                      <button type="button" onClick={() => setFormData({...formData, ruleBreak: "yes"})} className={`flex-1 py-3.5 rounded-xl font-bold text-sm transition-colors border ${formData.ruleBreak === "yes" ? "bg-amber-500/10 border-amber-500/30 text-amber-400" : "bg-[#15181D] border-white/10 text-gray-500 hover:text-white"}`}>Broke Rule</button>
                   </div>
                 </div>
@@ -398,7 +398,7 @@ export default function AddTrade() {
                <h2 className="text-xl font-semibold text-white mb-6">Visual Evidence</h2>
                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {["Before (Entry Chart)", "After (Exit Chart)"].map((label, idx) => (
-                    <label key={idx} className="border-2 border-dashed border-white/10 rounded-2xl p-8 flex flex-col items-center justify-center text-center hover:bg-white/5 hover:border-cyan-500/50 transition-all cursor-pointer group min-h-[200px] bg-[#15181D]">
+                    <label key={idx} className="border-2 border-dashed border-white/10 rounded-2xl p-8 flex flex-col items-center justify-center text-center hover:bg-white/5 hover:border-emerald-500/50 transition-all cursor-pointer group min-h-[200px] bg-[#15181D]">
                       {images[idx] ? (
                         <>
                           <div className="w-14 h-14 rounded-full bg-emerald-500/10 flex items-center justify-center mb-4 border border-emerald-500/20">
@@ -409,8 +409,8 @@ export default function AddTrade() {
                         </>
                       ) : (
                         <>
-                          <div className="w-14 h-14 rounded-full bg-cyan-500/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                            <UploadCloud className="w-6 h-6 text-cyan-400" />
+                          <div className="w-14 h-14 rounded-full bg-emerald-500/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                            <UploadCloud className="w-6 h-6 text-emerald-400" />
                           </div>
                           <p className="text-sm font-semibold text-gray-300 mb-1">{label}</p>
                           <p className="text-[11px] text-gray-500 uppercase tracking-widest">Click to upload</p>
@@ -434,7 +434,7 @@ export default function AddTrade() {
                   Continue <ArrowRight className="w-4 h-4" />
                </button>
              ) : (
-               <button type="submit" disabled={isSubmitting || !images[0] || !images[1]} className="px-8 py-3 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-white font-bold text-sm transition-all shadow-lg shadow-cyan-500/30 flex items-center gap-2 disabled:opacity-50 disabled:hover:bg-cyan-500 disabled:cursor-not-allowed">
+               <button type="submit" disabled={isSubmitting || !images[0] || !images[1]} className="px-8 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white font-bold text-sm transition-all shadow-lg shadow-emerald-500/30 flex items-center gap-2 disabled:opacity-50 disabled:hover:bg-emerald-500 disabled:cursor-not-allowed">
                   {isSubmitting ? <><Loader2 className="w-4 h-4 animate-spin" /> Saving...</> : <><Save className="w-4 h-4" /> Save Trade</>}
                </button>
              )}

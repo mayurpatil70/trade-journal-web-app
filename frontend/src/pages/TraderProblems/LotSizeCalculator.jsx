@@ -142,10 +142,10 @@ export default function LotSizeCalculator() {
   return (
     <div className="space-y-8 animate-in fade-in duration-300">
       {/* Hero Title with Glow */}
-      <div className="relative overflow-hidden rounded-3xl p-6 sm:p-8 bg-gradient-to-r from-emerald-500/10 via-cyan-500/10 to-blue-500/10 border border-emerald-500/20 backdrop-blur-xl shadow-[0_8px_32px_0_rgba(16,185,129,0.1)]">
+      <div className="relative overflow-hidden rounded-3xl p-6 sm:p-8 bg-gradient-to-r from-emerald-500/10 via-emerald-500/10 to-emerald-500/10 border border-emerald-500/20 backdrop-blur-xl shadow-[0_8px_32px_0_rgba(16,185,129,0.1)]">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-emerald-500 to-cyan-500 flex items-center justify-center text-white shadow-[0_0_20px_rgba(16,185,129,0.4)] shrink-0">
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-emerald-500 to-emerald-500 flex items-center justify-center text-white shadow-[0_0_20px_rgba(16,185,129,0.4)] shrink-0">
               <Calculator className="w-7 h-7" />
             </div>
             <div>
@@ -221,7 +221,7 @@ export default function LotSizeCalculator() {
           <div className="p-6 rounded-2xl bg-white/80 dark:bg-[#121418]/90 border border-gray-200/80 dark:border-white/10 backdrop-blur-xl shadow-lg space-y-4">
             <div className="flex justify-between items-center">
               <label className="text-xs font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1.5">
-                <Percent className="w-4 h-4 text-cyan-500" />
+                <Percent className="w-4 h-4 text-emerald-500" />
                 Risk Allocation
               </label>
 
@@ -232,7 +232,7 @@ export default function LotSizeCalculator() {
                   onClick={() => setRiskMode("percent")}
                   className={`px-3 py-1 rounded-md transition-all ${
                     riskMode === "percent"
-                      ? "bg-cyan-500 text-white shadow-sm"
+                      ? "bg-emerald-500 text-white shadow-sm"
                       : "text-gray-500 hover:text-white"
                   }`}
                 >
@@ -243,7 +243,7 @@ export default function LotSizeCalculator() {
                   onClick={() => setRiskMode("cash")}
                   className={`px-3 py-1 rounded-md transition-all ${
                     riskMode === "cash"
-                      ? "bg-cyan-500 text-white shadow-sm"
+                      ? "bg-emerald-500 text-white shadow-sm"
                       : "text-gray-500 hover:text-white"
                   }`}
                 >
@@ -262,7 +262,7 @@ export default function LotSizeCalculator() {
                     max="10"
                     value={riskPercent}
                     onChange={(e) => setRiskPercent(Number(e.target.value))}
-                    className="w-full bg-gray-50 dark:bg-[#0b131d] border border-gray-200 dark:border-white/10 rounded-xl px-4 py-3.5 text-lg font-black text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/50 transition-all shadow-inner"
+                    className="w-full bg-gray-50 dark:bg-[#0b131d] border border-gray-200 dark:border-white/10 rounded-xl px-4 py-3.5 text-lg font-black text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all shadow-inner"
                   />
                   <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold">
                     %
@@ -276,8 +276,8 @@ export default function LotSizeCalculator() {
                       onClick={() => setRiskPercent(p)}
                       className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${
                         riskPercent === p
-                          ? "bg-cyan-500 text-white border-cyan-500 shadow-[0_0_12px_rgba(6,182,212,0.35)]"
-                          : "bg-gray-100 dark:bg-white/5 border-gray-200 dark:border-white/10 text-gray-600 dark:text-gray-400 hover:border-cyan-500/50"
+                          ? "bg-emerald-500 text-white border-emerald-500 shadow-[0_0_12px_rgba(6,182,212,0.35)]"
+                          : "bg-gray-100 dark:bg-white/5 border-gray-200 dark:border-white/10 text-gray-600 dark:text-gray-400 hover:border-emerald-500/50"
                       }`}
                     >
                       {p}%
@@ -294,7 +294,7 @@ export default function LotSizeCalculator() {
                   type="number"
                   value={riskCash}
                   onChange={(e) => setRiskCash(Number(e.target.value))}
-                  className="w-full bg-gray-50 dark:bg-[#0b131d] border border-gray-200 dark:border-white/10 rounded-xl pl-9 pr-4 py-3.5 text-lg font-black text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/50 transition-all shadow-inner"
+                  className="w-full bg-gray-50 dark:bg-[#0b131d] border border-gray-200 dark:border-white/10 rounded-xl pl-9 pr-4 py-3.5 text-lg font-black text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all shadow-inner"
                 />
               </div>
             )}
@@ -312,7 +312,7 @@ export default function LotSizeCalculator() {
                 className="w-full bg-gray-50 dark:bg-[#0b131d] border border-gray-200 dark:border-white/10 rounded-xl px-4 py-3.5 text-base font-bold text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all"
               >
                 {INSTRUMENTS.map((inst) => (
-                  <option key={inst.symbol} value={inst.symbol} className="bg-white dark:bg-[#0b131d] text-blue-600 dark:text-blue-400 font-bold">
+                  <option key={inst.symbol} value={inst.symbol} className="bg-white dark:bg-[#0b131d] text-emerald-600 dark:text-emerald-400 font-bold">
                     {inst.name}
                   </option>
                 ))}
@@ -338,7 +338,7 @@ export default function LotSizeCalculator() {
                   onClick={() => setInputMode("prices")}
                   className={`px-3 py-1 rounded-md transition-all ${
                     inputMode === "prices"
-                      ? "bg-blue-500 text-white shadow-sm"
+                      ? "bg-emerald-500 text-white shadow-sm"
                       : "text-gray-500 hover:text-white"
                   }`}
                 >
@@ -349,7 +349,7 @@ export default function LotSizeCalculator() {
                   onClick={() => setInputMode("pips")}
                   className={`px-3 py-1 rounded-md transition-all ${
                     inputMode === "pips"
-                      ? "bg-blue-500 text-white shadow-sm"
+                      ? "bg-emerald-500 text-white shadow-sm"
                       : "text-gray-500 hover:text-white"
                   }`}
                 >
@@ -369,7 +369,7 @@ export default function LotSizeCalculator() {
                     step="any"
                     value={entryPrice}
                     onChange={(e) => setEntryPrice(Number(e.target.value))}
-                    className="w-full bg-gray-50 dark:bg-[#0b131d] border border-gray-200 dark:border-white/10 rounded-xl px-4 py-3 text-sm font-bold text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                    className="w-full bg-gray-50 dark:bg-[#0b131d] border border-gray-200 dark:border-white/10 rounded-xl px-4 py-3 text-sm font-bold text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
                   />
                 </div>
                 <div>
@@ -395,7 +395,7 @@ export default function LotSizeCalculator() {
                   step="any"
                   value={manualPips}
                   onChange={(e) => setManualPips(Number(e.target.value))}
-                  className="w-full bg-gray-50 dark:bg-[#0b131d] border border-gray-200 dark:border-white/10 rounded-xl px-4 py-3 text-base font-bold text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                  className="w-full bg-gray-50 dark:bg-[#0b131d] border border-gray-200 dark:border-white/10 rounded-xl px-4 py-3 text-base font-bold text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
                 />
               </div>
             )}
@@ -404,9 +404,9 @@ export default function LotSizeCalculator() {
 
         {/* Right Output Card (5 Cols) - Glowing Hero Card */}
         <div className="lg:col-span-5 space-y-6">
-          <div className="relative overflow-hidden rounded-3xl p-6 sm:p-8 bg-gradient-to-b from-[#121418] via-[#101b2b] to-[#0c1219] border border-[#2f8df4]/40 shadow-[0_0_50px_rgba(47,141,244,0.18)] text-white space-y-6">
+          <div className="relative overflow-hidden rounded-3xl p-6 sm:p-8 bg-gradient-to-b from-[#121418] via-[#101b2b] to-[#0c1219] border border-[#10b981]/40 shadow-[0_0_50px_rgba(16,185,129,0.18)] text-white space-y-6">
             <div className="flex justify-between items-center">
-              <span className="text-xs font-bold text-cyan-400 uppercase tracking-widest flex items-center gap-1.5">
+              <span className="text-xs font-bold text-emerald-400 uppercase tracking-widest flex items-center gap-1.5">
                 <Zap className="w-4 h-4" /> Recommended Execution
               </span>
               <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
@@ -418,7 +418,7 @@ export default function LotSizeCalculator() {
             <div className="text-center py-4 space-y-2">
               <p className="text-xs text-gray-400 font-medium">Standard Lots</p>
               <div className="flex items-center justify-center gap-3">
-                <span className="text-6xl sm:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 drop-shadow-[0_0_25px_rgba(52,211,153,0.4)]">
+                <span className="text-6xl sm:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-emerald-400 to-emerald-400 drop-shadow-[0_0_25px_rgba(52,211,153,0.4)]">
                   {lotSize.toFixed(2)}
                 </span>
               </div>
@@ -434,7 +434,7 @@ export default function LotSizeCalculator() {
               className={`w-full py-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-lg ${
                 copied
                   ? "bg-emerald-500 text-white shadow-emerald-500/30"
-                  : "bg-gradient-to-r from-[#2f8df4] to-cyan-500 hover:from-[#2376e8] hover:to-cyan-600 text-white shadow-[0_0_20px_rgba(47,141,244,0.4)] hover:scale-[1.02] active:scale-[0.98]"
+                  : "bg-gradient-to-r from-[#10b981] to-emerald-500 hover:from-[#2376e8] hover:to-emerald-600 text-white shadow-[0_0_20px_rgba(16,185,129,0.4)] hover:scale-[1.02] active:scale-[0.98]"
               }`}
             >
               {copied ? (
