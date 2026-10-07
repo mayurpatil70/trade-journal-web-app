@@ -6,6 +6,7 @@ import PnlValueBadge from "../../trading-bot/components/PnlValueBadge";
 import { useHubBots } from "../hooks/useHubBots";
 import { usePaged } from "../hooks/usePaged";
 import { hubApi } from "../services/hubApi";
+import SymbolPicker from "../../../components/SymbolPicker";
 
 const INITIAL = {
   name: "",
@@ -84,7 +85,7 @@ export default function BotHubPage() {
         <h2 className="text-sm font-semibold text-gray-300">New bot</h2>
         <div className="grid gap-3 sm:grid-cols-3">
           <Field label="Name (optional)" value={form.name} onChange={set("name")} />
-          <Field label="Symbol" value={form.symbol} onChange={set("symbol")} />
+          <SymbolPicker label="Symbol" target="binance" value={form.symbol} onChange={(symbol) => setForm((f) => ({ ...f, symbol }))} />
           <Field label="Allocated capital (quote)" type="number" min="1" value={form.allocatedCapital} onChange={set("allocatedCapital")} />
           <Field label="Max open orders" type="number" min="1" max="20" value={form.maxActiveOrders} onChange={set("maxActiveOrders")} />
           <Field label="Grid spacing %" type="number" step="0.1" value={form.gridSpacingPercentage} onChange={set("gridSpacingPercentage")} />
