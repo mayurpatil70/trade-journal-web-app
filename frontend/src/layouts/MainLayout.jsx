@@ -168,7 +168,7 @@ export default function MainLayout() {
     >
       {/* Mobile Header */}
       <div className="md:hidden fixed top-0 left-0 right-0 h-14 bg-[#101216]/95 border-b border-white/5 flex items-center justify-between px-4 z-40 backdrop-blur-xl">
-        <div className="flex items-center gap-2"><img src="/logo3d.png" alt="ForexNotes" className="h-8 object-contain drop-shadow-[0_0_12px_rgba(16,185,129,0.5)]" /></div>
+        <div className="flex items-center gap-2"><img src="/logo3d.png" alt="ForexNotes" className="h-16 w-auto object-contain drop-shadow-[0_0_12px_rgba(16,185,129,0.5)]" /></div>
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-colors"
@@ -189,7 +189,7 @@ export default function MainLayout() {
       >
         {/* Logo */}
         <div className="h-16 flex items-center justify-between px-5 shrink-0 hidden md:flex border-b border-white/5">
-          <div className="flex items-center gap-2"><img src="/logo3d.png" alt="ForexNotes" className="h-10 object-contain drop-shadow-[0_0_12px_rgba(16,185,129,0.5)]" /></div>
+          <div className="flex items-center gap-2"><img src="/logo3d.png" alt="ForexNotes" className="h-16 w-auto object-contain drop-shadow-[0_0_12px_rgba(16,185,129,0.5)]" /></div>
           <button
             onClick={() => setIsSearchOpen(true)}
             className="p-1.5 text-gray-500 hover:text-gray-300 rounded-md hover:bg-white/5 transition-colors"

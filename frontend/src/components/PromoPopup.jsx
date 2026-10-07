@@ -42,7 +42,7 @@ export default function PromoPopup() {
 
         <div className="p-8 relative z-10 flex flex-col items-center text-center">
           <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-500 flex items-center justify-center shadow-lg shadow-emerald-500/30 mb-6">
-            <img src="/logo3d.png" alt="Logo" style={{ width: "40px", height: "40px", objectFit: "contain", filter: "drop-shadow(0 0 10px rgba(255,255,255,0.4))" }} />
+            <img src="/logo3d.png" alt="Logo" style={{ height: "60px", width: "auto", objectFit: "contain", filter: "drop-shadow(0 0 10px rgba(255,255,255,0.4))" }} />
           </div>
 
           <h2 className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400 mb-3 leading-tight">

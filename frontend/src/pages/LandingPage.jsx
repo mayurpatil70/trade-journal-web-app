@@ -317,7 +317,7 @@ export default function LandingPage() {
             justifyContent: "space-between",
           }}>
             {/* Logo */}
-            <Link to="/" style={{ display: "flex", alignItems: "center" }}><img src="/logo3d.png" alt="Logo" style={{ width: "44px", height: "44px", objectFit: "contain", filter: "drop-shadow(0 0 12px rgba(16,185,129,0.8))" }} /></Link>
+            <Link to="/" style={{ display: "flex", alignItems: "center" }}><img src="/logo3d.png" alt="Logo" style={{ height: "60px", width: "auto", objectFit: "contain", filter: "drop-shadow(0 0 12px rgba(16,185,129,0.8))" }} /></Link>
 
             {/* Nav Links */}
             <nav style={{ display: "flex", gap: "32px", alignItems: "center" }}>
@@ -829,8 +829,7 @@ export default function LandingPage() {
             alignItems: "center", justifyContent: "space-between", gap: "16px",
           }}>
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-              <Activity size={16} color="#10b981" />
-              <span style={{ fontSize: "14px", fontWeight: 800, color: "white" }}>Forex Notes</span>
+              <img src="/logo3d.png" alt="Forex Notes" style={{ height: "48px", width: "auto", objectFit: "contain", filter: "drop-shadow(0 0 12px rgba(16,185,129,0.4))" }} />
               <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)" }}>
                 © {new Date().getFullYear()} All Rights Reserved.
               </span>
