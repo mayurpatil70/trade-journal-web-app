@@ -70,9 +70,9 @@ export default function TradingBotDashboard() {
       <section className="space-y-2">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-semibold text-gray-300">Order history</h2>
-          <select value={symbolFilter} onChange={(e) => setSymbolFilter(e.target.value)} className="rounded-lg border border-white/10 bg-[#0a0a0a] px-2 py-1 text-xs text-gray-300">
-            <option value="">All symbols</option>
-            {symbols.map((s) => <option key={s} value={s}>{s}</option>)}
+          <select value={symbolFilter} onChange={(e) => setSymbolFilter(e.target.value)} className="rounded-lg border border-white/10 bg-[#0a0a0a] px-2 py-1 text-xs text-gray-300 focus:outline-none focus:ring-1 focus:ring-cyan-500/50">
+            <option className="bg-[#0a0a0a] text-gray-300" value="">All symbols</option>
+            {symbols.map((s) => <option className="bg-[#0a0a0a] text-gray-300" key={s} value={s}>{s}</option>)}
           </select>
         </div>
         <OrderHistoryTable {...orders} onPageChange={orders.setPage} />
