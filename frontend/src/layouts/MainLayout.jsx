@@ -139,6 +139,9 @@ export default function MainLayout() {
         { to: "/news", icon: Globe, label: "Economic Calendar" },
         { to: "/trading-bot", icon: Activity, label: "Trading Bot", isBeta: true },
         { to: "/setup", icon: Settings, label: "Bot Setup" },
+        { to: "/bot-hub", icon: Activity, label: "Bot Hub", isBeta: true },
+        { to: "/bot-hub/connections", icon: ShieldCheck, label: "Exchange Keys" },
+        { to: "/bot-hub/mt5", icon: Zap, label: "MT5 AI Bot", isBeta: true },
         {
           to: "/calculator/lot-size",
           icon: CalculatorIcon,

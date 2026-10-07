@@ -46,6 +46,9 @@ const Sessions = lazy(() => import("./pages/Sessions.jsx"));
 
 const TradingBotDashboard = lazy(() => import("./features/trading-bot/pages/TradingBotDashboard.jsx"));
 const BotSetupPage = lazy(() => import("./features/trading-bot/pages/BotSetupPage.jsx"));
+const BotHubPage = lazy(() => import("./features/bot-hub/pages/BotHubPage.jsx"));
+const ConnectionsPage = lazy(() => import("./features/bot-hub/pages/ConnectionsPage.jsx"));
+const Mt5BotPage = lazy(() => import("./features/bot-hub/pages/Mt5BotPage.jsx"));
 
 const MainLayout = lazy(() => import("./layouts/MainLayout.jsx"));
 const PreTradeGate = lazy(() => import("./components/PreTradeGate.jsx"));
@@ -177,6 +180,9 @@ function App() {
                   <Route path="sessions" element={<Sessions />} />
                   <Route path="trading-bot" element={<TradingBotDashboard />} />
                   <Route path="setup" element={<BotSetupPage />} />
+                  <Route path="bot-hub" element={<BotHubPage />} />
+                  <Route path="bot-hub/connections" element={<ConnectionsPage />} />
+                  <Route path="bot-hub/mt5" element={<Mt5BotPage />} />
                   
                   <Route path="calculator" element={<CalculatorLayout />}>
                     <Route index element={<Navigate to="lot-size" replace />} />
