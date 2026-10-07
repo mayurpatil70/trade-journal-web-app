@@ -36,7 +36,7 @@ export default function LandingHero() {
   const dummyProgress = { current: 0 };
 
   return (
-    <div style={{ position: 'relative', overflow: 'hidden', paddingTop: '80px', paddingBottom: '60px' }}>
+    <div style={{ position: 'relative', overflow: 'hidden', paddingTop: '80px', paddingBottom: '100px' }}>
       <div
         className="flex flex-col items-center justify-center px-5"
         style={{ minHeight: '50vh' }}
@@ -228,7 +228,8 @@ export default function LandingHero() {
             ))}
           </div>
           {/* Gradient masks for smooth fade at top/bottom */}
-          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '80px', background: 'linear-gradient(to bottom, #000, transparent)' }} />
+          <div style={{ position: 'absolute', bottom: 0,
+    top: "auto", left: 0, right: 0, height: '80px', background: 'linear-gradient(to bottom, #000, transparent)' }} />
           <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '80px', background: 'linear-gradient(to top, #000, transparent)' }} />
         </div>
       </div>

@@ -398,7 +398,7 @@ export default function LandingPage() {
         <section style={{ padding: "80px 20px", borderTop: "1px solid rgba(255,255,255,0.05)" }}>
           <div style={{ maxWidth: "900px", margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px" }}>
             <AnimatedStat value="3,200+" label="Funded traders using Forex Notes daily" color="#10b981" />
-            <AnimatedStat value="$11" label="Affordable monthly & yearly plans available" color="#f59e0b" />
+            <AnimatedStat value="50% OFF" label="Massive discounts on Yearly plan available ($114)" color="#f59e0b" />
             <AnimatedStat value="94%" label="Users report fewer rule violations within 30 days" color="#10b981" />
           </div>
         </section>

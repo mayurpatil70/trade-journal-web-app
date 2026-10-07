@@ -1,291 +1,196 @@
-// src/components/landing/FeaturesBento.jsx
-// Scroll-revealed glassmorphism bento grid with GSAP ScrollTrigger.batch
-
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import ScrollTrigger from 'gsap/ScrollTrigger';
-import { Brain, ShieldCheck, Calculator, TrendingUp, Layers, Calendar } from 'lucide-react';
+import { Database, Activity, Newspaper, Printer, Bot, Users, Headphones, ShieldCheck, Star, GraduationCap } from 'lucide-react';
 
 gsap.registerPlugin(ScrollTrigger);
 
 const features = [
   {
-    icon: Brain,
-    title: 'AI Pre-Trade Psychology Guard',
-    description: 'Before every trade, the AI scans your emotional state — detecting FOMO and revenge trading urges. If you\'re tilted trading XAUUSD or Bitcoin, it blocks you from a costly mistake.',
-    tag: 'Protect Your Edge',
-    color: '#ec4899',
-    bg: 'rgba(236,72,153,0.08)',
-    border: 'rgba(236,72,153,0.2)',
-    glow: 'rgba(236,72,153,0.15)',
-    detail: '23 traders avoided blown accounts this month',
+    icon: Database,
+    title: '10-Year Live Market Data for Backtesting',
+    description: 'Access ultra-precise tick data spanning the last decade. Backtest your strategies on Forex, Gold, and Crypto with deep historical context before risking live capital.',
+    tag: 'Backtesting Mastery',
+    color: '#3b82f6',
+    bg: 'rgba(59,130,246,0.08)',
+    border: 'rgba(59,130,246,0.2)',
+    glow: 'rgba(59,130,246,0.15)',
+    detail: 'Decade-long precision data',
     wide: true,
   },
   {
-    icon: ShieldCheck,
-    title: 'Prop Firm Challenge Guardian',
-    description: 'Track daily drawdown, trailing max loss, and profit targets across every evaluation phase. Get breach alerts before you fail your prop firm challenge.',
-    tag: 'Rule Compliance',
+    icon: Activity,
+    title: 'Live Market Charts',
+    description: 'Execute trades and analyze setups with real-time, zero-latency market charting built directly into the platform.',
+    tag: 'Live Data',
     color: '#10b981',
     bg: 'rgba(16,185,129,0.08)',
     border: 'rgba(16,185,129,0.2)',
     glow: 'rgba(16,185,129,0.12)',
-    detail: 'Supports FTMO, Apex, MyFundedFX, The5ers',
+    detail: 'Zero latency charts',
   },
   {
-    icon: Calculator,
-    title: 'Precision Lot Size & Pip Calculator',
-    description: 'Calculate exact position sizes instantly based on your account balance, risk percentage, and instrument tick value. Perfect for Forex, Gold (XAUUSD), and Crypto markets.',
-    tag: 'Precision Sizing',
-    color: '#10b981',
-    bg: 'rgba(16,185,129,0.08)',
-    border: 'rgba(16,185,129,0.2)',
-    glow: 'rgba(16,185,129,0.12)',
-    detail: '0.01 lot precision for Forex & Crypto',
+    icon: Newspaper,
+    title: 'AI News Impact Analysis',
+    description: 'Our proprietary AI scans high and low impact market news 24/7, predicting volatility before it happens so you never get caught off guard.',
+    tag: 'AI Intelligence',
+    color: '#8b5cf6',
+    bg: 'rgba(139,92,246,0.08)',
+    border: 'rgba(139,92,246,0.2)',
+    glow: 'rgba(139,92,246,0.12)',
+    detail: 'Predicts news volatility',
   },
   {
-    icon: TrendingUp,
-    title: 'Net R & Distribution Analytics',
-    description: 'Deep-dive win rate by setup type, session (London/NY/Asia), and R-multiple distribution. See exactly what\'s working and what\'s killing your edge.',
-    tag: 'Data Driven',
-    color: '#059669',
-    bg: 'rgba(16,185,129,0.08)',
-    border: 'rgba(16,185,129,0.2)',
-    glow: 'rgba(16,185,129,0.12)',
-    detail: 'Avg users identify their #1 losing setup in 7 days',
-    wide: true,
-  },
-  {
-    icon: Layers,
-    title: 'Before/After Chart Archive',
-    description: 'Upload pre-entry and post-exit screenshots to build a visual evidence archive of your playbook setups. Build an undeniable track record.',
-    tag: 'Visual Journal',
-    color: '#a78bfa',
-    bg: 'rgba(167,139,250,0.08)',
-    border: 'rgba(167,139,250,0.2)',
-    glow: 'rgba(167,139,250,0.12)',
-    detail: 'Unlimited cloud storage included',
-  },
-  {
-    icon: Calendar,
-    title: 'Daily P&L Performance Calendar',
-    description: 'Color-coded heatmap of every trading day. Instantly spot your winning streaks, danger sessions, and consistency patterns at a glance.',
-    tag: 'P&L Heatmap',
+    icon: Printer,
+    title: 'Printable Digital Trading Journal',
+    description: 'Log everything. Export your entire trading journal in any format (PDF, CSV, Excel) and print it out to study your performance off-screen.',
+    tag: 'Export Anywhere',
     color: '#f59e0b',
     bg: 'rgba(245,158,11,0.08)',
     border: 'rgba(245,158,11,0.2)',
     glow: 'rgba(245,158,11,0.12)',
-    detail: 'Identifies your most dangerous trading days',
+    detail: 'Export & Print seamlessly',
   },
+  {
+    icon: Bot,
+    title: 'Trading Bot Integration (No Extra Cost)',
+    description: 'The only journal on the market offering direct trading bot integrations at the exact same price point. Fully automate your executions based on your logged setups.',
+    tag: 'Unique Selling Point',
+    color: '#ef4444',
+    bg: 'rgba(239,68,68,0.08)',
+    border: 'rgba(239,68,68,0.2)',
+    glow: 'rgba(239,68,68,0.15)',
+    detail: 'Included with your membership',
+    wide: true,
+  },
+  {
+    icon: Users,
+    title: '10% Lifetime Affiliate Commissions',
+    description: 'Share Forex Notes with other traders or your followers and earn a 10% recurring commission on every monthly and yearly package you sell.',
+    tag: 'Earn with us',
+    color: '#10b981',
+    bg: 'rgba(16,185,129,0.08)',
+    border: 'rgba(16,185,129,0.2)',
+    glow: 'rgba(16,185,129,0.12)',
+    detail: 'For users & influencers',
+  },
+  {
+    icon: Headphones,
+    title: '24/7 Instant Support',
+    description: 'Our backend team is working around the clock. Get fast, instant, and reliable support anytime you need it.',
+    tag: 'We got you',
+    color: '#06b6d4',
+    bg: 'rgba(6,182,212,0.08)',
+    border: 'rgba(6,182,212,0.2)',
+    glow: 'rgba(6,182,212,0.12)',
+    detail: 'Instant response times',
+  },
+  {
+    icon: ShieldCheck,
+    title: 'Prop Firm Pass Guidance',
+    description: 'End-to-end guidance to pass your prop firm challenges. We stay with you every step of the way until your first payout arrives.',
+    tag: 'Get Funded',
+    color: '#10b981',
+    bg: 'rgba(16,185,129,0.08)',
+    border: 'rgba(16,185,129,0.2)',
+    glow: 'rgba(16,185,129,0.12)',
+    detail: 'Until your first payout',
+    wide: true,
+  },
+  {
+    icon: Star,
+    title: 'Annual Real-Life Trader Events',
+    description: 'We host an exclusive real-life event once a year for our members to celebrate glory, network, and grow together.',
+    tag: 'Community',
+    color: '#f43f5e',
+    bg: 'rgba(244,63,94,0.08)',
+    border: 'rgba(244,63,94,0.2)',
+    glow: 'rgba(244,63,94,0.12)',
+    detail: 'Celebrate in person',
+  },
+  {
+    icon: GraduationCap,
+    title: 'Dedicated Beginner Guidance',
+    description: 'New to trading? We provide specialized guidance and playbooks designed specifically to get beginners up to speed and profitable.',
+    tag: 'Learn & Grow',
+    color: '#a3e635',
+    bg: 'rgba(163,230,53,0.08)',
+    border: 'rgba(163,230,53,0.2)',
+    glow: 'rgba(163,230,53,0.12)',
+    detail: 'From zero to funded',
+  }
 ];
 
 export default function FeaturesBento() {
-  const sectionRef = useRef(null);
-  const cardsRef = useRef([]);
+  const containerRef = useRef(null);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Header reveal
-      gsap.fromTo(
-        '.features-header',
-        { opacity: 0, y: 40 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.8,
-          ease: 'power3.out',
-          scrollTrigger: {
-            trigger: '.features-header',
-            start: 'top 85%',
-          },
-        }
-      );
-
-      // Cards staggered reveal
+      gsap.set('.feature-card', { y: 60, opacity: 0 });
       ScrollTrigger.batch('.feature-card', {
-        start: 'top 88%',
-        onEnter: (batch) => {
-          gsap.fromTo(
-            batch,
-            { opacity: 0, y: 60, scale: 0.96 },
-            {
-              opacity: 1,
-              y: 0,
-              scale: 1,
-              duration: 0.7,
-              stagger: 0.12,
-              ease: 'power3.out',
-            }
-          );
-        },
+        interval: 0.1,
+        batchMax: 2,
+        onEnter: (batch) => gsap.to(batch, { opacity: 1, y: 0, stagger: 0.1, duration: 0.8, ease: 'power3.out' }),
+        start: 'top 85%',
       });
-    }, sectionRef);
-
+    }, containerRef);
     return () => ctx.revert();
   }, []);
 
   return (
-    <section
-      ref={sectionRef}
-      id="features"
-      style={{
-        padding: '100px 20px',
-        borderTop: '1px solid rgba(255,255,255,0.05)',
-        background: 'rgba(0,0,0,0.4)',
-        position: 'relative',
-        zIndex: 1,
-      }}
-    >
-      <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-        {/* Header */}
-        <div className="features-header" style={{ textAlign: 'center', maxWidth: '640px', margin: '0 auto 64px' }}>
-          <div style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '6px',
-            padding: '5px 14px',
-            borderRadius: '999px',
-            background: 'rgba(16,185,129,0.1)',
-            border: '1px solid rgba(16,185,129,0.25)',
-            fontSize: '10px',
-            color: '#10b981',
-            fontWeight: 700,
-            letterSpacing: '0.1em',
-            textTransform: 'uppercase',
-            marginBottom: '16px',
-          }}>
-            ⚡ Core Features
+    <section style={{ padding: '100px 20px', position: 'relative' }}>
+      <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
+        
+        <div style={{ textAlign: 'center', marginBottom: '60px' }}>
+          <div style={{ display: 'inline-block', padding: '6px 14px', borderRadius: '100px', background: 'rgba(16,185,129,0.1)', color: '#10b981', fontSize: '11px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '16px' }}>
+            Unmatched Value
           </div>
-          <h2 style={{
-            fontSize: 'clamp(1.8rem, 4vw, 3rem)',
-            fontWeight: 900,
-            color: 'white',
-            letterSpacing: '-0.03em',
-            lineHeight: 1.1,
-            marginBottom: '16px',
-          }}>
-            Everything Funded Traders<br />
-            <span style={{
-              background: 'linear-gradient(135deg, #10b981, #059669)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
-            }}>
-              Need to Stay Funded
-            </span>
+          <h2 style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', fontWeight: 900, color: 'white', letterSpacing: '-0.03em', lineHeight: 1.1 }}>
+            Everything You Need to <span style={{ color: '#10b981' }}>Dominate</span>
           </h2>
-          <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.45)', lineHeight: 1.7 }}>
-            Traditional spreadsheets leave you blind to emotional patterns and prop firm limits.
-            Forex Notes automates all of it so you can focus on execution.
-          </p>
         </div>
 
-        {/* Bento Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {features.map((f, i) => {
-            const Icon = f.icon;
-            const isWide = f.wide;
+        <div ref={containerRef} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' }}>
+          {features.map((item, i) => {
+            const Icon = item.icon;
             return (
               <div
                 key={i}
-                className={`feature-card h-full flex flex-col ${isWide ? 'md:col-span-2' : 'col-span-1'}`}
+                className="feature-card"
                 style={{
-                  background: 'rgba(12,16,24,0.7)',
-                  backdropFilter: 'blur(20px)',
-                  WebkitBackdropFilter: 'blur(20px)',
-                  border: `1px solid ${f.border}`,
-                  borderRadius: '20px',
-                  padding: '28px',
+                  gridColumn: item.wide ? '1 / -1' : 'auto',
+                  background: 'linear-gradient(145deg, rgba(16,20,28,0.9) 0%, rgba(10,12,16,0.9) 100%)',
+                  borderRadius: '24px',
+                  padding: '32px',
+                  border: \`1px solid \${item.border}\`,
                   position: 'relative',
                   overflow: 'hidden',
-                  cursor: 'default',
-                  transition: 'transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease',
-                }}
-                onMouseEnter={e => {
-                  e.currentTarget.style.transform = 'translateY(-4px)';
-                  e.currentTarget.style.boxShadow = `0 20px 60px ${f.glow}, 0 0 0 1px ${f.border}`;
-                  e.currentTarget.style.borderColor = f.color + '50';
-                }}
-                onMouseLeave={e => {
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = 'none';
-                  e.currentTarget.style.borderColor = f.border;
+                  display: 'flex',
+                  flexDirection: item.wide ? 'row' : 'column',
+                  gap: '24px',
+                  alignItems: item.wide ? 'center' : 'flex-start',
                 }}
               >
-                {/* Background glow on hover area */}
-                <div style={{
-                  position: 'absolute',
-                  top: '-40px',
-                  right: '-40px',
-                  width: '200px',
-                  height: '200px',
-                  background: `radial-gradient(ellipse, ${f.glow} 0%, transparent 70%)`,
-                  pointerEvents: 'none',
-                }} />
+                <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: \`radial-gradient(circle at top left, \${item.glow}, transparent 60%)\`, pointerEvents: 'none' }} />
+                
+                <div style={{ width: '64px', height: '64px', borderRadius: '16px', background: item.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', border: \`1px solid \${item.border}\`, flexShrink: 0 }}>
+                  <Icon size={28} color={item.color} />
+                </div>
 
-                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '16px' }}>
-                  <div style={{
-                    width: 44,
-                    height: 44,
-                    borderRadius: '12px',
-                    background: f.bg,
-                    border: `1px solid ${f.border}`,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexShrink: 0,
-                  }}>
-                    <Icon size={20} color={f.color} />
+                <div style={{ flex: 1 }}>
+                  <div style={{ color: item.color, fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '8px' }}>
+                    {item.tag}
                   </div>
-                  <span style={{
-                    fontSize: '9px',
-                    fontWeight: 700,
-                    letterSpacing: '0.08em',
-                    textTransform: 'uppercase',
-                    color: f.color,
-                    background: f.bg,
-                    border: `1px solid ${f.border}`,
-                    padding: '4px 10px',
-                    borderRadius: '20px',
-                  }}>
-                    {f.tag}
-                  </span>
-                </div>
-
-                <h3 style={{
-                  fontSize: '16px',
-                  fontWeight: 800,
-                  color: 'white',
-                  marginBottom: '10px',
-                  letterSpacing: '-0.02em',
-                  lineHeight: 1.3,
-                }}>
-                  {f.title}
-                </h3>
-
-                <div className="flex-1">
-                  <p style={{
-                    fontSize: '13px',
-                    color: 'rgba(255,255,255,0.45)',
-                    lineHeight: 1.65,
-                    marginBottom: '16px',
-                  }}>
-                    {f.description}
+                  <h3 style={{ fontSize: '20px', fontWeight: 800, color: 'white', marginBottom: '12px', letterSpacing: '-0.01em' }}>
+                    {item.title}
+                  </h3>
+                  <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.5)', lineHeight: 1.6, marginBottom: '20px' }}>
+                    {item.description}
                   </p>
-                </div>
-
-                {/* Trader hint detail */}
-                <div style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  fontSize: '10px',
-                  color: f.color,
-                  fontWeight: 600,
-                  opacity: 0.8,
-                }}>
-                  <span style={{ width: 5, height: 5, borderRadius: '50%', background: f.color, display: 'inline-block' }} />
-                  {f.detail}
+                  
+                  <div style={{ display: 'inline-block', padding: '6px 12px', borderRadius: '8px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)', fontSize: '12px', color: 'rgba(255,255,255,0.7)', fontWeight: 600 }}>
+                    {item.detail}
+                  </div>
                 </div>
               </div>
             );
