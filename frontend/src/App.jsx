@@ -44,6 +44,9 @@ const Mistakes = lazy(() => import("./pages/Mistakes.jsx"));
 const Backtest = lazy(() => import("./pages/Backtest.jsx"));
 const Sessions = lazy(() => import("./pages/Sessions.jsx"));
 
+const TradingBotDashboard = lazy(() => import("./features/trading-bot/pages/TradingBotDashboard.jsx"));
+const BotSetupPage = lazy(() => import("./features/trading-bot/pages/BotSetupPage.jsx"));
+
 const MainLayout = lazy(() => import("./layouts/MainLayout.jsx"));
 const PreTradeGate = lazy(() => import("./components/PreTradeGate.jsx"));
 
@@ -172,6 +175,8 @@ function App() {
                   <Route path="admin" element={<AdminDashboard />} />
                   <Route path="charts" element={<Charts />} />
                   <Route path="sessions" element={<Sessions />} />
+                  <Route path="trading-bot" element={<TradingBotDashboard />} />
+                  <Route path="setup" element={<BotSetupPage />} />
                   
                   <Route path="calculator" element={<CalculatorLayout />}>
                     <Route index element={<Navigate to="lot-size" replace />} />
