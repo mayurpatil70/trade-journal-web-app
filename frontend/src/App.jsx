@@ -135,12 +135,18 @@ const PaywallGuard = () => {
 
 // GUARD 3: Admin Only
 const AdminGuard = () => {
-  const userId = localStorage.getItem("userId") || localStorage.getItem("userEmail");
-  if (userId === "noballondesk@gmail.com" || userId === "akpatil51340@gmail.com") {
-    return <Outlet />;
-  }
-  return <Navigate to="/dashboard" replace />;
-};
+    const id = localStorage.getItem("userId") || "";
+    const email = (localStorage.getItem("userEmail") || "").toLowerCase().trim();
+    if (
+      id === "noballondesk@gmail.com" || 
+      id === "akpatil51340@gmail.com" || 
+      email === "noballondesk@gmail.com" || 
+      email === "akpatil51340@gmail.com"
+    ) {
+      return <Outlet />;
+    }
+    return <Navigate to="/dashboard" replace />;
+  };
 
 function App() {
   useEffect(() => {
