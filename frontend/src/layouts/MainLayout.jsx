@@ -271,6 +271,20 @@ export default function MainLayout() {
                   currentPath={location.pathname}
                   onClick={closeMenu}
                 />
+                  <NavItem
+                    to="/admin/setup"
+                    icon={Settings}
+                    label="Bot Setup"
+                    currentPath={location.pathname}
+                    onClick={closeMenu}
+                  />
+                  <NavItem
+                    to="/admin/trading-bot"
+                    icon={Activity}
+                    label="Trading Bot"
+                    currentPath={location.pathname}
+                    onClick={closeMenu}
+                  />
               </div>
             </div>
           )}
