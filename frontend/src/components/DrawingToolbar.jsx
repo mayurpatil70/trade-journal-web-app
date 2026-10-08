@@ -17,13 +17,13 @@ export default function DrawingToolbar() {
   ];
 
   return (
-    <div className="absolute left-4 top-1/2 -translate-y-1/2 z-50 bg-[#131418] border border-[#222429] rounded-lg p-1.5 flex flex-col gap-1 shadow-lg">
+    <div className="w-[52px] h-full bg-[#101216] border-r border-[#222429] z-50 flex flex-col items-center py-2 gap-1 shrink-0">
       {tools.map((t) => (
         <button
           key={t.id}
           title={t.label}
           onClick={() => setActiveTool(t.id)}
-          className={`p-2 rounded hover:bg-[#1B1C20] transition-colors ${activeTool === t.id ? "text-[#2962FF] bg-[#2962FF]/10" : "text-[#787B86] hover:text-[#D1D4DC]"}`}
+          className={`p-2.5 rounded-xl hover:bg-[#1B1C20] transition-colors ${activeTool === t.id ? "text-[#2962FF] bg-[#2962FF]/10" : "text-[#787B86] hover:text-[#D1D4DC]"}`}
         >
           <t.icon className="w-4 h-4" />
         </button>

@@ -468,7 +468,11 @@ export default function Backtest() {
           </div>
         </div>
 
-        <div className="w-[300px] border-l border-[#1B1C20] bg-[#101114] flex flex-col shrink-0 z-20 text-[11px]">
+        {showRightPane && (
+          <div className="w-[300px] border-l border-[#1B1C20] bg-[#101114] flex flex-col shrink-0 z-[100] text-[11px] absolute right-0 top-0 bottom-0 md:relative md:w-[300px]">
+            <button onClick={() => setShowRightPane(false)} className="md:hidden absolute -left-8 top-1/2 -translate-y-1/2 bg-[#1B1C20] p-1.5 rounded-l-md border border-[#222429] border-r-0 text-[#787B86] hover:text-white">
+              <ChevronRight className="w-5 h-5" />
+            </button>
           <div className="flex h-12 border-b border-[#1B1C20] text-[#787B86]">
             {tabBtn('order', 'Order', Activity)}
             {tabBtn('journal', 'Journal', ChevronRight)}
@@ -629,6 +633,7 @@ export default function Backtest() {
             </div>
           )}
         </div>
+        )}
       </div>
 
       <div className="h-8 border-t border-[#1B1C20] flex items-center justify-between px-3 shrink-0">

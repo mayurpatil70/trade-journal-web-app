@@ -150,8 +150,8 @@ export default function MainLayout() {
         { to: "/charts", icon: Activity, label: "Live Charts" },
         { to: "/sessions", icon: Zap, label: "Setup Backtesting" },
         { to: "/news", icon: Globe, label: "Economic Calendar" },
-        { to: "/admin/trading-bot", icon: Activity, label: "Trading Bot", isBeta: true, requiresAdmin: true },
-        { to: "/admin/setup", icon: Settings, label: "Bot Setup", requiresAdmin: true },
+        
+        
         { to: "/bot-hub", icon: Activity, label: "Bot Hub", isBeta: true, requiresAdmin: true },
         { to: "/bot-hub/connections", icon: ShieldCheck, label: "Exchange Keys", requiresAdmin: true },
         { to: "/bot-hub/mt5", icon: Zap, label: "MT5 AI Bot", isBeta: true, requiresAdmin: true },
