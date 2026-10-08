@@ -25,6 +25,7 @@ import {
   Sparkles,
   ShieldCheck,
   Zap,
+  Lock,
   Calculator as CalculatorIcon,
 } from "lucide-react";
 
@@ -37,15 +38,20 @@ const NavItem = ({
   onClick,
   isBeta = false,
   isDisabled = false,
+  isLocked = false,
+  onLockedClick,
 }) => {
   const isActive = currentPath === to || currentPath.startsWith(to + "/");
 
   return (
     <Link
-      to={isDisabled ? "#" : to}
+      to={(isDisabled || isLocked) ? "#" : to}
       onClick={(e) => {
         if (isDisabled) e.preventDefault();
-        else if (onClick) onClick();
+        else if (isLocked) {
+          e.preventDefault();
+          if (onLockedClick) onLockedClick();
+        } else if (onClick) onClick();
       }}
       className={`group flex items-center justify-between px-3 py-2.5 rounded-xl transition-all font-medium text-[13px] ${
         isDisabled
@@ -66,11 +72,14 @@ const NavItem = ({
         />
         <span className="tracking-tight">{label}</span>
       </div>
-      {isBeta && (
-        <span className="text-[9px] uppercase tracking-wider font-bold bg-emerald-500/10 text-emerald-400 px-1.5 py-0.5 rounded-md">
-          Beta
-        </span>
-      )}
+      <div className="flex items-center gap-2">
+        {isBeta && (
+          <span className="text-[9px] uppercase tracking-wider font-bold bg-emerald-500/10 text-emerald-400 px-1.5 py-0.5 rounded-md">
+            Beta
+          </span>
+        )}
+        {isLocked && <Lock className="w-3.5 h-3.5 text-gray-500" />}
+      </div>
     </Link>
   );
 };
@@ -80,8 +89,12 @@ export default function MainLayout() {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isSubscriptionOpen, setIsSubscriptionOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [showLockPopup, setShowLockPopup] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+
+  const userId = localStorage.getItem("userId") || localStorage.getItem("userEmail");
+  const isAdmin = userId === "noballondesk@gmail.com" || userId === "akpatil51340@gmail.com";
 
   // FIX: Enforce Theme Globally on Mount & Route Change
   useEffect(() => {
@@ -137,11 +150,11 @@ export default function MainLayout() {
         { to: "/charts", icon: Activity, label: "Live Charts" },
         { to: "/sessions", icon: Zap, label: "Setup Backtesting" },
         { to: "/news", icon: Globe, label: "Economic Calendar" },
-        { to: "/trading-bot", icon: Activity, label: "Trading Bot", isBeta: true },
-        { to: "/setup", icon: Settings, label: "Bot Setup" },
-        { to: "/bot-hub", icon: Activity, label: "Bot Hub", isBeta: true },
-        { to: "/bot-hub/connections", icon: ShieldCheck, label: "Exchange Keys" },
-        { to: "/bot-hub/mt5", icon: Zap, label: "MT5 AI Bot", isBeta: true },
+        { to: "/admin/trading-bot", icon: Activity, label: "Trading Bot", isBeta: true, requiresAdmin: true },
+        { to: "/admin/setup", icon: Settings, label: "Bot Setup", requiresAdmin: true },
+        { to: "/bot-hub", icon: Activity, label: "Bot Hub", isBeta: true, requiresAdmin: true },
+        { to: "/bot-hub/connections", icon: ShieldCheck, label: "Exchange Keys", requiresAdmin: true },
+        { to: "/bot-hub/mt5", icon: Zap, label: "MT5 AI Bot", isBeta: true, requiresAdmin: true },
         {
           to: "/calculator/lot-size",
           icon: CalculatorIcon,
@@ -166,6 +179,25 @@ export default function MainLayout() {
       className="flex h-screen bg-[#0A0B0D] text-white transition-colors duration-200 overflow-hidden"
       style={{ fontFamily: "'Inter', sans-serif" }}
     >
+      {showLockPopup && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
+          <div className="bg-[#101216] border border-white/10 p-6 rounded-2xl shadow-2xl max-w-sm w-full relative text-center">
+            <button onClick={() => setShowLockPopup(false)} className="absolute top-4 right-4 text-gray-500 hover:text-white transition-colors">
+              <X className="w-5 h-5" />
+            </button>
+            <div className="w-12 h-12 bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Lock className="w-6 h-6 text-emerald-400" />
+            </div>
+            <h3 className="text-lg font-bold text-white mb-2">Coming Soon</h3>
+            <p className="text-gray-400 text-sm mb-6">
+              This feature is currently in development and will be available in the upcoming Pro Plan. Stay tuned!
+            </p>
+            <button onClick={() => setShowLockPopup(false)} className="w-full py-2.5 bg-emerald-500 hover:bg-emerald-400 text-black font-semibold rounded-xl transition-colors">
+              Got it
+            </button>
+          </div>
+        </div>
+      )}
       {/* Mobile Header */}
       <div className="md:hidden fixed top-0 left-0 right-0 h-14 bg-[#101216]/95 border-b border-white/5 flex items-center justify-between px-4 z-40 backdrop-blur-xl">
         <div className="flex items-center gap-2"><img src="/logo3d.png" alt="ForexNotes" className="h-16 w-auto object-contain drop-shadow-[0_0_12px_rgba(16,185,129,0.5)]" /></div>
@@ -214,7 +246,7 @@ export default function MainLayout() {
                     icon={item.icon}
                     label={item.label}
                     isBeta={item.isBeta}
-                    isDisabled={item.isDisabled}
+                    isDisabled={item.isDisabled} isLocked={!isAdmin && item.requiresAdmin} onLockedClick={() => setShowLockPopup(true)}
                     currentPath={location.pathname}
                     onClick={closeMenu}
                   />

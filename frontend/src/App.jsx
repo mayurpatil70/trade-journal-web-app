@@ -133,6 +133,15 @@ const PaywallGuard = () => {
   return <Outlet />;
 };
 
+// GUARD 3: Admin Only
+const AdminGuard = () => {
+  const userId = localStorage.getItem("userId") || localStorage.getItem("userEmail");
+  if (userId === "noballondesk@gmail.com" || userId === "akpatil51340@gmail.com") {
+    return <Outlet />;
+  }
+  return <Navigate to="/dashboard" replace />;
+};
+
 function App() {
   useEffect(() => {
     document.documentElement.classList.add("dark");
@@ -178,8 +187,13 @@ function App() {
                   <Route path="admin" element={<AdminDashboard />} />
                   <Route path="charts" element={<Charts />} />
                   <Route path="sessions" element={<Sessions />} />
-                  <Route path="trading-bot" element={<TradingBotDashboard />} />
-                  <Route path="setup" element={<BotSetupPage />} />
+
+                  {/* Admin Only Routes */}
+                  <Route element={<AdminGuard />}>
+                    <Route path="admin/trading-bot" element={<TradingBotDashboard />} />
+                    <Route path="admin/setup" element={<BotSetupPage />} />
+                  </Route>
+
                   <Route path="bot-hub" element={<BotHubPage />} />
                   <Route path="bot-hub/connections" element={<ConnectionsPage />} />
                   <Route path="bot-hub/mt5" element={<Mt5BotPage />} />

@@ -53,10 +53,7 @@ export default function Sessions() {
       initialBalance: balance,
       date: new Date().toLocaleString()
     };
-    const updated = [newSession, ...sessions];
-    localStorage.setItem('backtest_sessions', JSON.stringify(updated));
-    setSessions(updated);
-    navigate(`/backtest/${newSession.id}`);
+    navigate(`/backtest/${newSession.id}`, { state: { draftSession: newSession } });
   };
 
   return (
@@ -83,7 +80,7 @@ export default function Sessions() {
           <SymbolPicker label="Symbol" value={draft.pair} onChange={(pair) => setDraft((d) => ({ ...d, pair }))} />
           <label className="block text-xs text-gray-400">Timeframe
             <select value={draft.tf} onChange={(e) => setDraft((d) => ({ ...d, tf: e.target.value }))} className="mt-1 w-full rounded-lg border border-white/10 bg-[#0a0a0a] px-3 py-2 text-sm text-white outline-none">
-              {['1m', '5m', '15m', '30m', '1h', '4h', '1d'].map((t) => <option key={t}>{t}</option>)}
+              {['1m', '5m', '15m', '30m', '1h', '4h', '1d'].map((t) => <option key={t} value={t} className="bg-[#0a0a0a] text-white">{t}</option>)}
             </select>
           </label>
           <label className="block text-xs text-gray-400">Starting balance
@@ -99,7 +96,7 @@ export default function Sessions() {
         {sessions.map(s => (
           <div key={s.id} className="bg-[#101216] border border-white/5 rounded-xl p-5 hover:bg-[#15181D] hover:border-white/10 transition-all group flex flex-col justify-between min-h-[160px] relative">
             
-            <div className="absolute top-3 right-3 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+            <div className="absolute top-3 right-3 flex gap-1.5 z-10">
               <button onClick={(e) => handleEdit(e, s.id, s.name)} className="p-1.5 rounded-md bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-colors" title="Edit">
                 <Edit className="w-3.5 h-3.5" />
               </button>

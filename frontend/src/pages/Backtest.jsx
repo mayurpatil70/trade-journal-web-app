@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { createChart } from 'lightweight-charts';
 import {
   Play, Pause, StepForward, ChevronLeft, Loader2, SkipBack, Rewind, FastForward,
@@ -77,6 +77,7 @@ const Stat = ({ label, value, tone }) => (
 export default function Backtest() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const chartContainerRef = useRef(null);
   const chartRef = useRef(null);
   const seriesRef = useRef(null);
@@ -112,6 +113,8 @@ export default function Backtest() {
   const [formError, setFormError] = useState('');
   const [editSl, setEditSl] = useState('');
   const [editTp, setEditTp] = useState('');
+  const [showRightPane, setShowRightPane] = useState(window.innerWidth > 768);
+  const [isReadonlyReplay, setIsReadonlyReplay] = useState(false);
 
   const { replay, index } = run;
   const candle = candles[index - 1];
@@ -119,7 +122,7 @@ export default function Backtest() {
   const finished = candles.length > 0 && index >= candles.length;
 
   useEffect(() => {
-    const found = loadSessions().find((s) => s.id === id);
+    const found = loadSessions().find((s) => s.id === id) || location.state?.draftSession;
     const base = found ?? { id, name: `New Session ${new Date().toLocaleDateString()}`, pair: 'BTCUSDT', balance: 10000 };
     const initialBalance = base.initialBalance ?? base.balance;
     const sess = { ...base, initialBalance };
