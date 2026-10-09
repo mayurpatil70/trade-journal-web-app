@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
-import { useWriteContract, useWaitForTransactionReceipt, useAccount, useConnect } from 'wagmi';
+import { WagmiProvider, useWriteContract, useWaitForTransactionReceipt, useAccount, useConnect } from 'wagmi';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { wagmiConfig } from '../lib/wagmi';
 import { injected } from 'wagmi/connectors';
 import { parseUnits } from 'viem';
 import { Loader2, ArrowLeft } from 'lucide-react';
@@ -26,7 +28,19 @@ const ERC20_ABI = [
   }
 ];
 
-export default function Paywall() {
+const queryClient = new QueryClient();
+
+export default function PaywallPage() {
+  return (
+    <WagmiProvider config={wagmiConfig}>
+      <QueryClientProvider client={queryClient}>
+        <Paywall />
+      </QueryClientProvider>
+    </WagmiProvider>
+  );
+}
+
+function Paywall() {
   const [isStartingTrial, setIsStartingTrial] = useState(false);
   const [selectedPlanType, setSelectedPlanType] = useState('monthly'); // track which plan is being purchased
   const { isConnected } = useAccount();

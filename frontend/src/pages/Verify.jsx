@@ -73,7 +73,7 @@ export default function Verify() {
       <div className="w-full max-w-md bg-[#121418] border border-white/5 rounded-2xl p-8 sm:p-10 shadow-2xl flex flex-col items-center text-center">
         {status === "authenticating" && (
           <div className="flex flex-col items-center animate-in fade-in duration-300">
-            <Loader2 className="w-12 h-12 text-[#6366f1] animate-spin mb-6" />
+            <Loader2 className="w-12 h-12 text-[#10b981] animate-spin mb-6" />
             <h2 className="text-xl font-bold text-white mb-2">
               Authenticating...
             </h2>

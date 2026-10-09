@@ -1,10 +1,11 @@
 // backend/controllers/tradeController.js
 import { Parser } from "json2csv";
 import ExcelJS from "exceljs";
-import { Document, Packer, Paragraph, TextRun } from "docx";
+import { Document, Packer, Paragraph, TextRun, ImageRun } from "docx";
 import PDFDocument from "pdfkit";
 import { supabase } from "../config/supabase.js";
 import { uploadToCloudinary } from "../utils/cloudinary.js";
+import { loadTradeImages, tradeImageUrls } from "../utils/exportImages.js";
 
 export const createTrade = async (req, res) => {
   try {
@@ -143,7 +144,7 @@ export const exportTrades = async (req, res) => {
     const { data: trades, error } = await supabase
       .from("trades")
       .select(
-        "date, time, asset, direction, session, setup, result, r_multiple, entry, sl, tp",
+        "date, time, asset, direction, session, setup, result, r_multiple, entry, sl, tp, images, before_image, after_image",
       )
       .eq("user_id", userId)
       .order("date", { ascending: false })
@@ -158,8 +159,11 @@ export const exportTrades = async (req, res) => {
     }
 
     if (format === "csv") {
-      const parser = new Parser();
-      const csv = parser.parse(trades);
+      const rows = trades.map(({ images, before_image, after_image, ...t }) => ({
+        ...t,
+        image_urls: tradeImageUrls({ images, before_image, after_image }).join(" | "),
+      }));
+      const csv = new Parser().parse(rows);
       res.header("Content-Type", "text/csv");
       res.attachment("Trade_Journey_Export.csv");
       return res.send(csv);
@@ -181,9 +185,24 @@ export const exportTrades = async (req, res) => {
         { header: "Entry", key: "entry", width: 12 },
         { header: "SL", key: "sl", width: 12 },
         { header: "TP", key: "tp", width: 12 },
+        { header: "Screenshots", key: "shots", width: 40 },
       ];
 
-      trades.forEach((trade) => worksheet.addRow(trade));
+      const imagesOf = await loadTradeImages(trades);
+      trades.forEach((trade) => {
+        const imgs = imagesOf(trade);
+        const row = worksheet.addRow({ ...trade, shots: imgs.length ? "" : "-" });
+        if (!imgs.length) return;
+        row.height = 150;
+        imgs.slice(0, 3).forEach((img, i) => {
+          const imageId = workbook.addImage({ buffer: img.buffer, extension: img.type });
+          worksheet.addImage(imageId, {
+            tl: { col: 11 + i, row: row.number - 1 },
+            ext: { width: 200, height: 190 },
+          });
+        });
+      });
+      [12, 13].forEach((c) => (worksheet.getColumn(c + 1).width = 30));
       res.header(
         "Content-Type",
         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -194,17 +213,30 @@ export const exportTrades = async (req, res) => {
     }
 
     if (format === "doc") {
-      const rows = trades.map(
-        (t) =>
-          new Paragraph({
-            children: [
-              new TextRun({
-                text: `${t.date} ${t.time || ""} | ${t.asset} | ${t.direction || ""} | Setup: ${t.setup || "N/A"} | Result: ${t.result || "N/A"} | R: ${t.r_multiple ?? "N/A"}`,
-                font: "Arial",
-              }),
-            ],
-          }),
-      );
+      const imagesOf = await loadTradeImages(trades);
+      const rows = trades.flatMap((t) => [
+        new Paragraph({
+          spacing: { before: 200 },
+          children: [
+            new TextRun({
+              text: `${t.date} ${t.time || ""} | ${t.asset} | ${t.direction || ""} | Setup: ${t.setup || "N/A"} | Result: ${t.result || "N/A"} | R: ${t.r_multiple ?? "N/A"}`,
+              font: "Arial",
+            }),
+          ],
+        }),
+        ...imagesOf(t).map(
+          (img) =>
+            new Paragraph({
+              children: [
+                new ImageRun({
+                  type: img.type === "jpeg" ? "jpg" : img.type,
+                  data: img.buffer,
+                  transformation: { width: 450, height: 260 },
+                }),
+              ],
+            }),
+        ),
+      ]);
 
       const doc = new Document({
         sections: [
@@ -235,6 +267,7 @@ export const exportTrades = async (req, res) => {
     }
 
     if (format === "pdf") {
+      const imagesOf = await loadTradeImages(trades);
       const doc = new PDFDocument({ margin: 40, size: "A4" });
       res.header("Content-Type", "application/pdf");
       res.attachment("Trade_Journey_Export.pdf");
@@ -252,6 +285,16 @@ export const exportTrades = async (req, res) => {
             `${t.date} ${t.time || ""} | ${t.asset} | ${t.direction || ""} | Setup: ${t.setup || "N/A"} | Result: ${t.result || "N/A"} | R: ${t.r_multiple ?? "N/A"}`,
           );
         doc.moveDown(0.4);
+        imagesOf(t).forEach((img) => {
+          if (doc.y > 560) doc.addPage();
+          try {
+            doc.image(img.buffer, { fit: [480, 250] });
+          } catch {
+            return;
+          }
+          doc.moveDown(0.4);
+        });
+        doc.moveDown(0.6);
       });
 
       doc.end();

@@ -27,6 +27,8 @@ import MarketingVideos from "../components/landing/MarketingVideos";
 import LandingDashboard from "../components/landing/LandingDashboard";
 import FeaturesBento from "../components/landing/FeaturesBento";
 import ExtraVideos from "../components/landing/ExtraVideos";
+import SiteFooter from "../components/seo/SiteFooter";
+import { LANDING_FAQS } from "../data/seoPages";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -317,7 +319,7 @@ export default function LandingPage() {
             justifyContent: "space-between",
           }}>
             {/* Logo */}
-            <Link to="/" style={{ display: "flex", alignItems: "center" }}><img src="/logo3d.png" alt="Logo" style={{ height: "60px", width: "auto", objectFit: "contain", filter: "drop-shadow(0 0 12px rgba(16,185,129,0.8))" }} /></Link>
+            <Link to="/" style={{ display: "flex", alignItems: "center" }}><img src="/logo-256.webp" alt="Logo" style={{ height: "60px", width: "auto", objectFit: "contain", filter: "drop-shadow(0 0 12px rgba(16,185,129,0.8))" }} /></Link>
 
             {/* Nav Links */}
             <nav style={{ display: "flex", gap: "32px", alignItems: "center" }}>
@@ -325,6 +327,7 @@ export default function LandingPage() {
                 { href: "#features", label: "Features" },
                 { href: "#comparison", label: "vs. Spreadsheets" },
                 { href: "#pricing", label: "Pricing" },
+                { href: "#faq", label: "FAQ" },
                 { href: "https://discord.gg/Ajaw3AjfWE", label: "Community", external: true },
               ].map(({ href, label, external }) => (
                 <a
@@ -762,6 +765,23 @@ export default function LandingPage() {
 
         <ExtraVideos />
 
+        <section id="faq" className="px-5 py-20 border-t border-white/5">
+          <div className="max-w-3xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-black text-white tracking-tight text-center mb-10">Frequently Asked Questions</h2>
+            <div className="glossy rounded-2xl divide-y divide-white/5">
+              {LANDING_FAQS.map((f) => (
+                <details key={f.q} className="group px-6 py-5">
+                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-semibold text-white">
+                    {f.q}
+                    <ChevronRight size={16} className="shrink-0 text-gray-500 transition-transform group-open:rotate-90" />
+                  </summary>
+                  <p className="mt-2 text-sm text-gray-400 leading-relaxed">{f.a}</p>
+                </details>
+              ))}
+            </div>
+          </div>
+        </section>
+
         {/* ── Discord Community CTA ── */}
         <section style={{ padding: "80px 20px", borderTop: "1px solid rgba(255,255,255,0.05)" }}>
           <div style={{
@@ -829,15 +849,17 @@ export default function LandingPage() {
             alignItems: "center", justifyContent: "space-between", gap: "16px",
           }}>
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-              <img src="/logo3d.png" alt="Forex Notes" style={{ height: "48px", width: "auto", objectFit: "contain", filter: "drop-shadow(0 0 12px rgba(16,185,129,0.4))" }} />
+              <img src="/logo-256.webp" alt="Forex Notes" style={{ height: "48px", width: "auto", objectFit: "contain", filter: "drop-shadow(0 0 12px rgba(16,185,129,0.4))" }} />
               <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)" }}>
                 © {new Date().getFullYear()} All Rights Reserved.
               </span>
             </div>
-            <div style={{ display: "flex", gap: "24px" }}>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "24px" }}>
               {[
                 { href: "https://discord.gg/Ajaw3AjfWE", label: "Discord", external: true },
                 { href: "https://instagram.com/forexnotes.in", label: "Instagram", external: true },
+                { href: "/vs/tradezella", label: "vs TradeZella", external: false },
+                { href: "/vs/fx-replay", label: "vs FX Replay", external: false },
                 { href: "/login", label: "Sign In", external: false },
               ].map(({ href, label, external }) =>
                 external ? (
@@ -857,6 +879,7 @@ export default function LandingPage() {
             </div>
           </div>
         </footer>
+        <SiteFooter copyright={false} />
       </div>
     </div>
   );

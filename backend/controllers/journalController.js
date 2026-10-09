@@ -3,7 +3,8 @@ import { uploadToCloudinary } from "../utils/cloudinary.js"; // Assume this is a
 
 export const saveJournal = async (req, res) => {
   try {
-    const { userId, date, pre_market_note, post_market_note } = req.body;
+    const { userId } = req;
+    const { date, pre_market_note, post_market_note } = req.body;
 
     if (!userId || !date) {
       return res.status(400).json({ success: false, error: "Missing required fields" });
@@ -43,7 +44,8 @@ export const saveJournal = async (req, res) => {
 
 export const getJournal = async (req, res) => {
   try {
-    const { userId, date } = req.query;
+    const { userId } = req;
+    const { date } = req.query;
 
     if (!userId) {
       return res.status(400).json({ success: false, error: "Missing userId" });

@@ -3,7 +3,6 @@ import { useState } from "react";
 import api from "../api/axios";
 import {
   ArrowRight,
-  Activity,
   Loader2,
   CheckCircle,
   AlertTriangle,
@@ -49,15 +48,13 @@ export default function Login() {
 
   return (
     <div
-      className="min-h-screen bg-[#020202] text-white flex items-center justify-center p-6"
+      className="min-h-screen trading-bg text-white flex items-center justify-center p-6"
       style={{ fontFamily: "'Inter', sans-serif" }}
     >
-      <div className="w-full max-w-md bg-[#121418] border border-white/5 rounded-2xl p-8 sm:p-10 shadow-2xl flex flex-col items-center text-center">
+      <div className="w-full max-w-md glossy rounded-3xl p-8 sm:p-10 flex flex-col items-center text-center">
         {/* Logo & Branding */}
         <div className="flex flex-col items-center mb-8">
-          <div className="w-14 h-14 bg-[#6366f1] rounded-full flex items-center justify-center mb-5 shadow-[0_0_30px_rgba(99,102,241,0.3)]">
-            <Activity className="w-7 h-7 text-white" />
-          </div>
+          <img src="/logo-256.webp" alt="Forex Notes" width="96" height="85" className="h-20 w-auto mb-4 drop-shadow-[0_0_18px_rgba(16,185,129,0.45)]" />
           <h1 className="text-3xl font-bold tracking-tight text-white mb-2">
             Forex Notes
           </h1>
@@ -111,7 +108,7 @@ export default function Login() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-5 py-4 bg-[#1a1b20] border border-white/10 rounded-2xl text-white placeholder-gray-600 focus:outline-none focus:border-[#6366f1] focus:ring-1 focus:ring-[#6366f1] transition-all"
+                  className="w-full px-5 py-4 bg-[#1a1b20] border border-white/10 rounded-2xl text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all"
                   placeholder="you@example.com"
                   required
                   disabled={status === "loading"}
@@ -128,7 +125,7 @@ export default function Login() {
               <button
                 type="submit"
                 disabled={status === "loading"}
-                className="w-full py-4 px-6 bg-[#6366f1] hover:bg-[#4f46e5] active:bg-[#4338ca] text-white font-bold rounded-2xl shadow-[0_0_20px_rgba(99,102,241,0.2)] transition-all flex justify-center items-center gap-2 disabled:opacity-50 text-sm mt-2"
+                className="w-full py-4 px-6 btn-glossy-green font-bold rounded-2xl flex justify-center items-center gap-2 disabled:opacity-50 text-sm mt-2"
               >
                 {status === "loading" ? (
                   <>

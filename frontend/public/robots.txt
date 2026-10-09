@@ -5,3 +5,5 @@ Disallow: /verify
 Disallow: /dashboard/
 
 Sitemap: https://forexnotes.in/sitemap.xml
+Sitemap: https://forexnotes.in/sitemap-india.xml
+Sitemap: https://forexnotes.in/sitemap-uae.xml

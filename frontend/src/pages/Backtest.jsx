@@ -6,6 +6,7 @@ import {
   SkipForward, BarChart2, Activity, ChevronRight, X,
 } from 'lucide-react';
 import SymbolPicker from '../components/SymbolPicker';
+import DrawingLayer from '../components/drawing/DrawingLayer';
 import { marketApi } from '../api/market';
 import {
   createReplay, positionSize, validateOrder, stepReplay, placeOrder, closePosition,
@@ -30,6 +31,15 @@ const loadSessions = () => {
   }
 };
 
+const drawingsKey = (id, symbol) => `bt_drawings:${id}:${symbol}`;
+const readDrawings = (key) => {
+  try {
+    return JSON.parse(localStorage.getItem(key) || 'null');
+  } catch {
+    return null;
+  }
+};
+
 const normalizePair = (pair) => {
   const key = String(pair || 'BTCUSDT').toUpperCase().replace(/[^A-Z0-9]/g, '');
   return ALIASES[key] || key;
@@ -46,6 +56,7 @@ const countAtOrBefore = (candles, t) => {
   return lo;
 };
 
+const WATCH_LEAD = 25;
 const defaultStart = (len) => Math.max(Math.min(Math.floor(len * 0.6), len - 1), Math.min(len, 50));
 const fmt = (n, d = 2) => (Number.isFinite(n) ? n.toLocaleString(undefined, { minimumFractionDigits: d, maximumFractionDigits: d }) : '-');
 const priceDp = (p) => (p >= 1000 ? 2 : p >= 100 ? 3 : p >= 1 ? 4 : 6);
@@ -113,10 +124,27 @@ export default function Backtest() {
   const [formError, setFormError] = useState('');
   const [editSl, setEditSl] = useState('');
   const [editTp, setEditTp] = useState('');
+  const [drawings, setDrawings] = useState([]);
   const [showRightPane, setShowRightPane] = useState(window.innerWidth > 768);
-  const [isReadonlyReplay, setIsReadonlyReplay] = useState(false);
+  const watch = new URLSearchParams(location.search).has('watch');
 
-  const { replay, index } = run;
+  const { index } = run;
+  const recorded = useMemo(() => session?.replay?.trades ?? [], [session]);
+  const stopIndex = useMemo(() => {
+    if (!watch || !recorded.length || !candles.length) return 0;
+    return countAtOrBefore(candles, Math.max(...recorded.map((t) => t.exitTime))) + 10;
+  }, [watch, recorded, candles]);
+  const clockTime = candles[index - 1]?.time ?? 0;
+  const replay = useMemo(() => {
+    if (!watch) return run.replay;
+    const active = recorded.find((t) => t.entryTime <= clockTime && clockTime < t.exitTime);
+    return {
+      ...run.replay,
+      trades: recorded.filter((t) => t.exitTime <= clockTime),
+      position: active ? { id: active.id, side: active.side, entry: active.entry, sl: active.sl, tp: active.tp, units: active.units, entryTime: active.entryTime } : null,
+      pending: null,
+    };
+  }, [watch, run.replay, recorded, clockTime]);
   const candle = candles[index - 1];
   const price = candle?.close;
   const finished = candles.length > 0 && index >= candles.length;
@@ -126,13 +154,27 @@ export default function Backtest() {
     const base = found ?? { id, name: `New Session ${new Date().toLocaleDateString()}`, pair: 'BTCUSDT', balance: 10000 };
     const initialBalance = base.initialBalance ?? base.balance;
     const sess = { ...base, initialBalance };
-    anchorTimeRef.current = base.replayTime ?? null;
+    const trades = base.replay?.trades ?? [];
+    anchorTimeRef.current = watch && trades.length ? Math.min(...trades.map((t) => t.entryTime)) : base.replayTime ?? null;
     setSession(sess);
     setRiskPct(base.riskPct ?? 1);
     setTf(base.tf || '1h');
-    setRun({ index: 0, replay: base.replay ?? createReplay(initialBalance) });
+    setRun({ index: 0, replay: watch ? createReplay(initialBalance) : base.replay ?? createReplay(initialBalance) });
     setSymbol(normalizePair(base.pair));
-  }, [id]);
+  }, [id, watch]);
+
+  useEffect(() => {
+    if (!symbol || !session) return;
+    const stored = session.drawings?.[symbol];
+    setDrawings((watch ? stored : readDrawings(drawingsKey(id, symbol)) ?? stored) || []);
+  }, [id, symbol, session, watch]);
+
+  const changeDrawings = useCallback((next) => {
+    setDrawings(next);
+    try {
+      localStorage.setItem(drawingsKey(id, symbol), JSON.stringify(next));
+    } catch { /* storage full or blocked */ }
+  }, [id, symbol]);
 
   useEffect(() => {
     if (!symbol) return undefined;
@@ -149,6 +191,7 @@ export default function Backtest() {
         setRun((r) => {
           const t = anchorTimeRef.current;
           let idx = t ? countAtOrBefore(res.candles, t) : 0;
+          if (watch && idx) idx = Math.max(idx - WATCH_LEAD, 1);
           if (!idx) {
             idx = defaultStart(res.candles.length);
             if (t) setNotice(`Saved position is outside the ${tf} data range, restarted at a default point.`);
@@ -162,11 +205,15 @@ export default function Backtest() {
         setCandles([]);
         setLoadError(e.response?.data?.error || 'Could not load market data.');
       })
-      .finally(() => !cancelled && setLoading(false));
+      .finally(() => {
+        if (cancelled) return;
+        setLoading(false);
+        if (watch) setPlaying(true);
+      });
     return () => {
       cancelled = true;
     };
-  }, [symbol, tf, reloadKey]);
+  }, [symbol, tf, reloadKey, watch]);
 
   useEffect(() => {
     const el = chartContainerRef.current;
@@ -229,12 +276,12 @@ export default function Backtest() {
       add(o.entry, '#2962FF', replay.position ? 'Entry' : `${replay.pending.type} entry`, 0);
       add(o.sl, '#F23645', 'SL');
       add(o.tp, '#089981', 'TP');
-    } else if (tab === 'order') {
+    } else if (tab === 'order' && !watch) {
       add(entryNum, '#2962FF', 'Entry', 0);
       add(slNum, '#F23645', 'SL');
       add(tpNum, '#089981', 'TP');
     }
-  }, [replay.position, replay.pending, tab, entryNum, slNum, tpNum]);
+  }, [replay.position, replay.pending, tab, entryNum, slNum, tpNum, watch]);
 
   useEffect(() => {
     const series = seriesRef.current;
@@ -272,13 +319,13 @@ export default function Backtest() {
 
   useEffect(() => {
     if (!playing) return undefined;
-    if (finished || loading) {
+    if (finished || loading || (stopIndex && index >= stopIndex)) {
       setPlaying(false);
       return undefined;
     }
     const timer = setTimeout(() => advance(1), SPEEDS[speedIdx].ms);
     return () => clearTimeout(timer);
-  }, [playing, index, finished, loading, speedIdx, advance]);
+  }, [playing, index, finished, loading, speedIdx, advance, stopIndex]);
 
   const hasActivity = replay.trades.length > 0 || replay.position || replay.pending;
 
@@ -291,7 +338,13 @@ export default function Backtest() {
     }
   };
 
-  const restart = () => seek(defaultStart(candles.length));
+  const restart = () => {
+    if (!watch) return seek(defaultStart(candles.length));
+    const t = anchorTimeRef.current;
+    const idx = t ? Math.max(countAtOrBefore(candles, t) - WATCH_LEAD, 1) : 1;
+    setRun((r) => ({ ...r, index: idx }));
+    setPlaying(true);
+  };
 
   const jumpToDate = (value) => {
     if (!value || !candles.length) return;
@@ -383,6 +436,7 @@ export default function Backtest() {
       riskPct,
       replayTime: candle?.time ?? null,
       replay,
+      drawings: { ...session?.drawings, [symbol]: drawings },
       date: new Date().toLocaleString(),
     };
     const saved = loadSessions();
@@ -409,15 +463,21 @@ export default function Backtest() {
           <button onClick={() => navigate('/sessions')} className="p-1.5 hover:bg-[#1B1C20] rounded text-[#787B86] hover:text-white">
             <ChevronLeft className="w-5 h-5" />
           </button>
-          <SymbolPicker variant="compact" value={symbol} onChange={changeSymbol} />
-          <div className="h-4 w-px bg-[#1B1C20] mx-2" />
-          <select value={tf} onChange={(e) => changeTf(e.target.value)} className="bg-transparent text-[#D1D4DC] font-semibold px-2 py-1.5 rounded hover:bg-[#1B1C20] outline-none">
-            {TFS.map((t) => <option key={t} value={t} className="bg-[#0A0B0D]">{t}</option>)}
-          </select>
-          <div className="h-4 w-px bg-[#1B1C20] mx-2" />
-          <button onClick={() => setTab('analytics')} className="flex items-center gap-1 px-2 py-1.5 hover:bg-[#1B1C20] rounded text-[#787B86] hover:text-[#D1D4DC]">
-            <BarChart2 className="w-4 h-4" /> Analytics
-          </button>
+          {watch ? (
+            <span className="px-2 font-semibold text-[#D1D4DC]">{symbol} · {tf} <span className="ml-2 text-[#2962FF]">Replay recording (view only)</span></span>
+          ) : (
+            <>
+              <SymbolPicker variant="compact" value={symbol} onChange={changeSymbol} />
+              <div className="h-4 w-px bg-[#1B1C20] mx-2" />
+              <select value={tf} onChange={(e) => changeTf(e.target.value)} className="bg-transparent text-[#D1D4DC] font-semibold px-2 py-1.5 rounded hover:bg-[#1B1C20] outline-none">
+                {TFS.map((t) => <option key={t} value={t} className="bg-[#0A0B0D]">{t}</option>)}
+              </select>
+              <div className="h-4 w-px bg-[#1B1C20] mx-2" />
+              <button onClick={() => setTab('analytics')} className="flex items-center gap-1 px-2 py-1.5 hover:bg-[#1B1C20] rounded text-[#787B86] hover:text-[#D1D4DC]">
+                <BarChart2 className="w-4 h-4" /> Analytics
+              </button>
+            </>
+          )}
         </div>
         <div className="flex items-center gap-3">
           {notice && (
@@ -426,8 +486,8 @@ export default function Backtest() {
               <button onClick={() => setNotice('')}><X className="w-3 h-3" /></button>
             </span>
           )}
-          {dirty && <span className="text-amber-400">Unsaved changes</span>}
-          <button onClick={saveSession} className="px-3 py-1 bg-[#2962FF] hover:bg-[#1E4CDB] text-white font-bold rounded text-xs">Save Session</button>
+          {!watch && dirty && <span className="text-amber-400">Unsaved changes</span>}
+          {!watch && <button onClick={saveSession} className="px-3 py-1 bg-[#2962FF] hover:bg-[#1E4CDB] text-white font-bold rounded text-xs">Save Session</button>}
         </div>
       </div>
 
@@ -439,14 +499,24 @@ export default function Backtest() {
             <button title={playing ? 'Pause' : 'Play'} disabled={finished || loading} className="text-[#2962FF] hover:text-white border border-[#2962FF]/30 p-1 rounded hover:bg-[#2962FF]/10 disabled:opacity-30" onClick={() => setPlaying((p) => !p)}>
               {playing ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4 ml-0.5" />}
             </button>
-            <button title="Step one bar" disabled={finished || loading} className="text-[#787B86] hover:text-white disabled:opacity-30" onClick={() => advance(1)}><StepForward className="w-4 h-4" /></button>
+            {!watch && <button title="Step one bar" disabled={finished || loading} className="text-[#787B86] hover:text-white disabled:opacity-30" onClick={() => advance(1)}><StepForward className="w-4 h-4" /></button>}
             <button title="Faster" className="text-[#787B86] hover:text-white disabled:opacity-30" disabled={speedIdx === SPEEDS.length - 1} onClick={() => setSpeedIdx((i) => i + 1)}><FastForward className="w-4 h-4" /></button>
-            <button title="Forward 10 bars" disabled={finished || loading} className="text-[#787B86] hover:text-white disabled:opacity-30" onClick={() => advance(10)}><SkipForward className="w-4 h-4" /></button>
+            {!watch && <button title="Forward 10 bars" disabled={finished || loading} className="text-[#787B86] hover:text-white disabled:opacity-30" onClick={() => advance(10)}><SkipForward className="w-4 h-4" /></button>}
             <span className="text-[#D1D4DC] font-semibold font-mono w-8 text-center">{SPEEDS[speedIdx].label}</span>
-            <input type="date" title="Jump to date" onChange={(e) => jumpToDate(e.target.value)} className="bg-[#0A0B0D] border border-[#222429] rounded px-1 py-0.5 text-[#D1D4DC]" />
+            {!watch && <input type="date" title="Jump to date" onChange={(e) => jumpToDate(e.target.value)} className="bg-[#0A0B0D] border border-[#222429] rounded px-1 py-0.5 text-[#D1D4DC]" />}
           </div>
 
-          <div ref={chartContainerRef} className="absolute inset-0 w-full h-full" />
+          <div ref={chartContainerRef} className={`absolute inset-0 ${watch ? '' : 'md:left-11'}`} />
+          <DrawingLayer
+            chartRef={chartRef}
+            seriesRef={seriesRef}
+            containerRef={chartContainerRef}
+            candles={candles}
+            drawings={drawings}
+            onChange={changeDrawings}
+            readOnly={watch}
+            resetKey={`${id}|${symbol}`}
+          />
 
           {(loading || loadError) && (
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[#0A0B0D]/90 z-40">
@@ -468,7 +538,7 @@ export default function Backtest() {
           </div>
         </div>
 
-        {showRightPane && (
+        {showRightPane && !watch && (
           <div className="w-[300px] border-l border-[#1B1C20] bg-[#101114] flex flex-col shrink-0 z-[100] text-[11px] absolute right-0 top-0 bottom-0 md:relative md:w-[300px]">
             <button onClick={() => setShowRightPane(false)} className="md:hidden absolute -left-8 top-1/2 -translate-y-1/2 bg-[#1B1C20] p-1.5 rounded-l-md border border-[#222429] border-r-0 text-[#787B86] hover:text-white">
               <ChevronRight className="w-5 h-5" />

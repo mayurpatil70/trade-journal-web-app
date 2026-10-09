@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
+import { EdgeBreakdown, TradingHealth, BacktestSummary } from "../components/dashboard/PerformanceHub";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
 import {
@@ -11,7 +12,6 @@ import {
   PlusCircle,
   Clock,
   ArrowRight,
-  ShieldAlert,
   List,
 } from "lucide-react";
 
@@ -23,7 +23,8 @@ const getGreeting = () => {
 };
 
 // Mini SVG Equity Curve
-const EquityCurve = ({ data }) => {
+const EquityCurve = ({ data, trades = [] }) => {
+  const [hover, setHover] = useState(null);
   if (!data || data.length < 2) {
     return (
       <div className="w-full h-full flex flex-col items-center justify-center text-gray-600">
@@ -50,7 +51,19 @@ const EquityCurve = ({ data }) => {
   const strokeColor = isProfitable ? "#34d399" : "#f87171"; // emerald-400 or red-400
   const fillColor = isProfitable ? "url(#emeraldGradient)" : "url(#redGradient)";
 
+  const onMove = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const ratio = Math.min(Math.max((e.clientX - rect.left) / rect.width, 0), 1);
+    setHover({ i: Math.round(ratio * (data.length - 1)), ratio });
+  };
+
+  const hi = hover?.i;
+  const ht = hi > 0 ? trades[hi - 1] : null;
+  const hx = hi != null ? (hi / (data.length - 1)) * width : 0;
+  const hy = hi != null ? height - ((data[hi] - min) / range) * height : 0;
+
   return (
+    <div className="relative w-full h-full" onMouseMove={onMove} onMouseLeave={() => setHover(null)}>
     <svg viewBox={`0 -10 ${width} ${height + 20}`} className="w-full h-full overflow-visible preserve-3d">
       <defs>
         <linearGradient id="emeraldGradient" x1="0" y1="0" x2="0" y2="1">
@@ -75,7 +88,42 @@ const EquityCurve = ({ data }) => {
         fill={fillColor}
         points={`${0},${height} ${points.join(" ")} ${width},${height}`}
       />
+      {hi != null && (
+        <>
+          <line x1={hx} x2={hx} y1={-10} y2={height + 10} stroke="#ffffff" strokeOpacity="0.15" strokeDasharray="4 4" />
+          <circle cx={hx} cy={hy} r="6" fill={strokeColor} stroke="#101216" strokeWidth="2" />
+        </>
+      )}
     </svg>
+    {hi != null && (
+      <div
+        className="absolute top-0 z-10 w-52 pointer-events-none rounded-xl border border-white/10 bg-[#0b0d10]/95 p-3 text-[11px] shadow-2xl backdrop-blur"
+        style={{ left: `${hover.ratio * 100}%`, transform: `translateX(${hover.ratio > 0.6 ? "-105%" : "5%"})` }}
+      >
+        {ht ? (
+          <>
+            <div className="flex justify-between text-gray-400"><span>{ht.date}</span><span>#{hi}</span></div>
+            <div className="mt-1 font-semibold text-white">{ht.asset} {ht.direction}</div>
+            <div className={`font-mono font-bold ${(parseFloat(ht.r_multiple) || 0) >= 0 ? "text-emerald-400" : "text-red-400"}`}>
+              {(parseFloat(ht.r_multiple) || 0) >= 0 ? "+" : ""}{(parseFloat(ht.r_multiple) || 0).toFixed(2)}R
+            </div>
+            <div className="mt-1.5 space-y-0.5 text-gray-400">
+              {ht.setup && <div>Setup: <span className="text-gray-200">{ht.setup}</span></div>}
+              {ht.session && <div>Session: <span className="text-gray-200">{ht.session}</span></div>}
+              {(ht.emotion_before || ht.emotion_after) && (
+                <div>Mindset: <span className="text-gray-200">{[ht.emotion_before, ht.emotion_after].filter(Boolean).join(" → ")}</span></div>
+              )}
+            </div>
+          </>
+        ) : (
+          <div className="text-gray-400">Start</div>
+        )}
+        <div className="mt-2 border-t border-white/10 pt-1.5 text-gray-400">
+          Equity: <span className="font-mono text-white">{data[hi].toFixed(2)}R</span>
+        </div>
+      </div>
+    )}
+    </div>
   );
 };
 
@@ -204,7 +252,7 @@ export default function Dashboard() {
           { label: "Average R", value: `${stats.avgR >= 0 ? "+" : ""}${stats.avgR}R`, color: "text-gray-300" },
           { label: "Max Drawdown", value: `-${stats.maxDrawdown}R`, color: "text-red-400" },
         ].map((kpi, i) => (
-          <div key={i} className="bg-[#101216] border border-white/5 rounded-2xl p-5 hover:bg-[#15181D] transition-colors">
+          <div key={i} className="glossy rounded-2xl p-5">
             <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-widest mb-2">{kpi.label}</p>
             <p className={`text-2xl font-bold tracking-tight ${kpi.color}`}>{kpi.value}</p>
           </div>
@@ -214,7 +262,7 @@ export default function Dashboard() {
       {/* 3. MAIN PERFORMANCE AREA */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Equity Curve */}
-        <div className="lg:col-span-2 bg-[#101216] border border-white/5 rounded-2xl p-6 flex flex-col shadow-xl">
+        <div className="lg:col-span-2 glossy rounded-2xl p-6 flex flex-col">
           <div className="flex items-center justify-between mb-6">
             <div>
               <h2 className="text-[15px] font-semibold text-white">Equity Progression (R)</h2>
@@ -225,7 +273,7 @@ export default function Dashboard() {
             </div>
           </div>
           <div className="flex-1 min-h-[250px] relative">
-            <EquityCurve data={stats.equityData} />
+            <EquityCurve data={stats.equityData} trades={trades} />
           </div>
         </div>
 
@@ -254,44 +302,13 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Quick Stats / Trading Health */}
-          <div className="bg-[#101216] border border-white/5 rounded-2xl p-6 flex-1">
-            <h3 className="text-[11px] font-semibold text-gray-500 uppercase tracking-widest mb-5">
-              Trading Health
-            </h3>
-            <div className="space-y-5">
-              <div>
-                <div className="flex justify-between text-xs mb-2">
-                  <span className="text-gray-400">Execution Discipline</span>
-                  <span className="text-emerald-400 font-semibold">92%</span>
-                </div>
-                <div className="w-full bg-white/5 rounded-full h-1.5">
-                  <div className="bg-emerald-400 h-1.5 rounded-full" style={{ width: '92%' }}></div>
-                </div>
-              </div>
-              <div>
-                <div className="flex justify-between text-xs mb-2">
-                  <span className="text-gray-400">Rule Following</span>
-                  <span className="text-emerald-400 font-semibold">85%</span>
-                </div>
-                <div className="w-full bg-white/5 rounded-full h-1.5">
-                  <div className="bg-emerald-400 h-1.5 rounded-full" style={{ width: '85%' }}></div>
-                </div>
-              </div>
-              <div className="pt-4 mt-2 border-t border-white/5">
-                 <div className="flex items-center gap-3 text-sm">
-                   <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center border border-amber-500/20 text-amber-400">
-                     <ShieldAlert className="w-4 h-4" />
-                   </div>
-                   <div>
-                     <p className="text-gray-300 font-medium text-[13px]">1 Trade needs review</p>
-                     <p className="text-[11px] text-gray-500">Missing psychology tags</p>
-                   </div>
-                 </div>
-              </div>
-            </div>
-          </div>
+          <TradingHealth trades={trades} />
         </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2"><EdgeBreakdown trades={trades} /></div>
+        <BacktestSummary live={stats.totalTrades ? stats : null} />
       </div>
 
       {/* 4. RECENT TRADES (Visual Preview Format) */}
