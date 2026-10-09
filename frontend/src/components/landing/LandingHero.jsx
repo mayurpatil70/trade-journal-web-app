@@ -9,9 +9,9 @@ import { ArrowRight, MessageSquare, Zap, ShieldCheck, Brain, TrendingUp, Calcula
 const CandlestickScene = lazy(() => import('./CandlestickScene'));
 
 // "What you get" hint chips shown in hero
-const GREEN = { color: '#10b981', bg: 'rgba(16,185,129,0.1)', border: 'rgba(16,185,129,0.25)' };
-const RED = { color: '#f87171', bg: 'rgba(239,68,68,0.1)', border: 'rgba(239,68,68,0.25)' };
-const GRAY = { color: '#d4d4d8', bg: 'rgba(255,255,255,0.05)', border: 'rgba(255,255,255,0.14)' };
+const GREEN = { color: 'var(--l-gain)', bg: 'rgba(16,185,129,0.1)', border: 'rgba(16,185,129,0.25)' };
+const RED = { color: 'var(--l-loss)', bg: 'rgba(239,68,68,0.1)', border: 'rgba(239,68,68,0.25)' };
+const GRAY = { color: 'rgb(var(--l-fg) / calc(0.75 + var(--l-ta)))', bg: 'rgb(var(--l-fg) / 0.05)', border: 'rgb(var(--l-fg) / 0.14)' };
 const TRADER_HINTS = [
   { icon: TrendingUp, label: '10 Years of Backtest Data', ...GREEN },
   { icon: Brain, label: 'AI Psychology Coach', ...RED },
@@ -20,15 +20,15 @@ const TRADER_HINTS = [
 ];
 
 const LIVE_FEEDS = [
-  { id: 1, title: 'AI Blocked Trade', detail: 'Revenge trade detected', time: 'Just now', color: '#ec4899' },
-  { id: 2, title: 'Prop Limit Alert', detail: '75% daily drawdown', time: '2m ago', color: '#10b981' },
-  { id: 3, title: 'Trade Logged', detail: '+4.2R Win (EURUSD)', time: '5m ago', color: '#10b981' },
-  { id: 4, title: 'AI Insight', detail: 'You perform best in London session', time: '12m ago', color: '#059669' },
+  { id: 1, title: 'AI Blocked Trade', detail: 'Revenge trade detected', time: 'Just now', color: 'var(--l-pink)' },
+  { id: 2, title: 'Prop Limit Alert', detail: '75% daily drawdown', time: '2m ago', color: 'var(--l-gain)' },
+  { id: 3, title: 'Trade Logged', detail: '+4.2R Win (EURUSD)', time: '5m ago', color: 'var(--l-gain)' },
+  { id: 4, title: 'AI Insight', detail: 'You perform best in London session', time: '12m ago', color: 'var(--l-gain)' },
   // Duplicates for seamless infinite marquee scroll
-  { id: 5, title: 'AI Blocked Trade', detail: 'Revenge trade detected', time: 'Just now', color: '#ec4899' },
-  { id: 6, title: 'Prop Limit Alert', detail: '75% daily drawdown', time: '2m ago', color: '#10b981' },
-  { id: 7, title: 'Trade Logged', detail: '+4.2R Win (EURUSD)', time: '5m ago', color: '#10b981' },
-  { id: 8, title: 'AI Insight', detail: 'You perform best in London session', time: '12m ago', color: '#059669' },
+  { id: 5, title: 'AI Blocked Trade', detail: 'Revenge trade detected', time: 'Just now', color: 'var(--l-pink)' },
+  { id: 6, title: 'Prop Limit Alert', detail: '75% daily drawdown', time: '2m ago', color: 'var(--l-gain)' },
+  { id: 7, title: 'Trade Logged', detail: '+4.2R Win (EURUSD)', time: '5m ago', color: 'var(--l-gain)' },
+  { id: 8, title: 'AI Insight', detail: 'You perform best in London session', time: '12m ago', color: 'var(--l-gain)' },
 ];
 
 export default function LandingHero() {
@@ -64,10 +64,10 @@ export default function LandingHero() {
               gap: '8px',
               padding: '6px 14px',
               borderRadius: '999px',
-              background: 'rgba(255,255,255,0.04)',
-              border: '1px solid rgba(255,255,255,0.1)',
+              background: 'rgb(var(--l-fg) / 0.04)',
+              border: '1px solid rgb(var(--l-fg) / 0.1)',
               fontSize: '11px',
-              color: 'rgba(255,255,255,0.7)',
+              color: 'rgb(var(--l-fg) / calc(0.7 + var(--l-ta)))',
               fontWeight: 600,
               marginBottom: '20px',
               letterSpacing: '0.02em',
@@ -81,7 +81,7 @@ export default function LandingHero() {
               fontWeight: 900,
               lineHeight: 1.05,
               letterSpacing: '-0.03em',
-              color: 'white',
+              color: "var(--l-ink)",
               marginBottom: '20px',
             }}>
               Backtest 10 Years of Markets.<br />
@@ -97,12 +97,12 @@ export default function LandingHero() {
 
             <p style={{
               fontSize: 'clamp(14px, 1.5vw, 16px)',
-              color: 'rgba(255,255,255,0.6)',
+              color: 'rgb(var(--l-fg) / calc(0.6 + var(--l-ta)))',
               lineHeight: 1.6,
               marginBottom: '32px',
               maxWidth: '520px',
             }}>
-              Forex Notes is a <strong style={{ color: 'rgba(255,255,255,0.85)' }}>bar replay backtesting platform</strong> with 10 years of historical data, a <strong style={{ color: 'rgba(255,255,255,0.85)' }}>digital trading journal</strong> with an <strong style={{ color: 'rgba(255,255,255,0.85)' }}>AI psychology coach</strong>, and <strong style={{ color: 'rgba(255,255,255,0.85)' }}>prop firm challenge tools</strong> in one app. Plans from $14/month, pay by card or USDT.
+              Forex Notes is a <strong style={{ color: 'rgb(var(--l-fg) / calc(0.85 + var(--l-ta)))' }}>bar replay backtesting platform</strong> with 10 years of historical data, a <strong style={{ color: 'rgb(var(--l-fg) / calc(0.85 + var(--l-ta)))' }}>digital trading journal</strong> with an <strong style={{ color: 'rgb(var(--l-fg) / calc(0.85 + var(--l-ta)))' }}>AI psychology coach</strong>, and <strong style={{ color: 'rgb(var(--l-fg) / calc(0.85 + var(--l-ta)))' }}>prop firm challenge tools</strong> in one app. Plans from $14/month, pay by card or USDT.
             </p>
 
             {/* Trader Hint Chips */}
@@ -169,21 +169,21 @@ export default function LandingHero() {
                   gap: '8px',
                   padding: '14px 26px',
                   borderRadius: '14px',
-                  background: 'rgba(255,255,255,0.04)',
-                  border: '1px solid rgba(255,255,255,0.1)',
-                  color: 'rgba(255,255,255,0.7)',
+                  background: 'rgb(var(--l-fg) / 0.04)',
+                  border: '1px solid rgb(var(--l-fg) / 0.1)',
+                  color: 'rgb(var(--l-fg) / calc(0.7 + var(--l-ta)))',
                   fontSize: '14px',
                   fontWeight: 600,
                   textDecoration: 'none',
                   transition: 'background 0.2s, color 0.2s',
                 }}
                 onMouseEnter={e => {
-                  e.currentTarget.style.background = 'rgba(255,255,255,0.08)';
-                  e.currentTarget.style.color = 'white';
+                  e.currentTarget.style.background = 'rgb(var(--l-fg) / 0.08)';
+                  e.currentTarget.style.color = 'var(--l-ink)';
                 }}
                 onMouseLeave={e => {
-                  e.currentTarget.style.background = 'rgba(255,255,255,0.04)';
-                  e.currentTarget.style.color = 'rgba(255,255,255,0.7)';
+                  e.currentTarget.style.background = 'rgb(var(--l-fg) / 0.04)';
+                  e.currentTarget.style.color = 'rgb(var(--l-fg) / calc(0.7 + var(--l-ta)))';
                 }}
               >
                 <MessageSquare size={16} color="#5865F2" />
@@ -204,24 +204,24 @@ export default function LandingHero() {
             {LIVE_FEEDS.map((feed) => (
               <div key={feed.id} style={{
                 padding: '16px',
-                background: 'rgba(255,255,255,0.03)',
+                background: 'rgb(var(--l-fg) / 0.03)',
                 backdropFilter: 'blur(10px)',
                 WebkitBackdropFilter: 'blur(10px)',
-                border: '1px solid rgba(255,255,255,0.06)',
+                border: '1px solid rgb(var(--l-fg) / 0.06)',
                 borderRadius: '16px',
                 borderLeft: `4px solid ${feed.color}`,
-                boxShadow: '0 8px 24px rgba(0,0,0,0.3)',
+                boxShadow: '0 8px 24px rgb(var(--l-shadow) / calc(0.3 * var(--l-sh-k)))',
               }}>
-                <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)', marginBottom: '4px', letterSpacing: '0.05em', textTransform: 'uppercase', fontWeight: 600 }}>{feed.time}</div>
-                <div style={{ fontSize: '13px', fontWeight: 700, color: 'white', marginBottom: '4px', letterSpacing: '-0.02em' }}>{feed.title}</div>
+                <div style={{ fontSize: '10px', color: 'rgb(var(--l-fg) / calc(0.4 + var(--l-ta)))', marginBottom: '4px', letterSpacing: '0.05em', textTransform: 'uppercase', fontWeight: 600 }}>{feed.time}</div>
+                <div style={{ fontSize: '13px', fontWeight: 700, color: "var(--l-ink)", marginBottom: '4px', letterSpacing: '-0.02em' }}>{feed.title}</div>
                 <div style={{ fontSize: '12px', color: feed.color, fontWeight: 500 }}>{feed.detail}</div>
               </div>
             ))}
           </div>
           {/* Gradient masks for smooth fade at top/bottom */}
           <div style={{ position: 'absolute', bottom: 0,
-    top: "auto", left: 0, right: 0, height: '80px', background: 'linear-gradient(to bottom, #000, transparent)' }} />
-          <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '80px', background: 'linear-gradient(to top, #000, transparent)' }} />
+    top: "auto", left: 0, right: 0, height: '80px', background: 'linear-gradient(to bottom, var(--l-bg), transparent)' }} />
+          <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '80px', background: 'linear-gradient(to top, var(--l-bg), transparent)' }} />
         </div>
       </div>
     </div>

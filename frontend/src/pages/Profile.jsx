@@ -59,8 +59,8 @@ export default function Profile() {
 
       {/* Avatar Card */}
       <div className="bg-white/60 dark:bg-white/[0.03] border border-gray-200/80 dark:border-white/10 rounded-2xl p-6 md:p-8 shadow-xl backdrop-blur-xl mb-6">
-        <div className="flex items-center gap-6">
-          <div className="relative">
+        <div className="flex items-center gap-4 sm:gap-6">
+          <div className="relative shrink-0">
             <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-500 text-white flex items-center justify-center font-black text-3xl shadow-xl shadow-emerald-500/30">
               {emailInitial}
             </div>
@@ -68,11 +68,11 @@ export default function Profile() {
               <Shield className="w-3 h-3 text-white" />
             </div>
           </div>
-          <div>
-            <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-1">
+          <div className="min-w-0">
+            <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-1 truncate">
               {profileData.fullName || profileData.email || "Trader"}
             </h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
               {profileData.email}
             </p>
             <span className="inline-block mt-2 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-gradient-to-r from-emerald-500/20 to-green-500/20 text-emerald-400 border border-emerald-500/30">

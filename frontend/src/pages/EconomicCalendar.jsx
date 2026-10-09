@@ -36,7 +36,7 @@ export default function EconomicCalendar() {
         <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shrink-0">
           <div className="flex items-center gap-4">
             <div className="w-10 h-10 md:w-12 md:h-12 rounded-[2px] bg-[#ffb84d]/10 flex items-center justify-center border border-[#ffb84d]/20 shrink-0">
-              <Globe className="w-5 h-5 md:w-6 md:h-6 text-[#ffb84d]" />
+              <Globe className="w-5 h-5 md:w-6 md:h-6 text-amber-700 dark:text-[#ffb84d]" />
             </div>
             <div>
               <h1 className="text-xl md:text-3xl font-bold text-white tracking-tight mb-1">
@@ -67,7 +67,7 @@ export default function EconomicCalendar() {
 
         {/* Pro Tip Footer */}
         <div className="mt-6 p-4 bg-[#121418] border border-white/5 rounded-2xl shrink-0">
-          <p className="text-[10px] font-bold text-[#ffb84d] uppercase tracking-widest mb-1 flex items-center gap-1.5">
+          <p className="text-[10px] font-bold text-amber-700 dark:text-[#ffb84d] uppercase tracking-widest mb-1 flex items-center gap-1.5">
             <CalendarDays className="w-3.5 h-3.5" /> News Trading Rule
           </p>
           <p className="text-xs text-gray-400 leading-relaxed">

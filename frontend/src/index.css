@@ -413,7 +413,7 @@ LANDING PAGE ANIMATIONS
 
 /* Glassmorphism card for landing */
 .glass-card-landing {
-  background: rgba(12, 16, 24, 0.7);
+  background: rgb(var(--l-surf) / 0.7);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.07);
@@ -573,18 +573,6 @@ html.light body:not(.terminal) input[type="time"] {
   color-scheme: light;
 }
 
-html.light .landing-root {
-  background: #fff;
-  filter: invert(0.97) hue-rotate(180deg);
-}
-
-html.light .landing-root img,
-html.light .landing-root video,
-html.light .landing-root canvas,
-html.light .landing-root iframe {
-  filter: invert(1) hue-rotate(180deg);
-}
-
 /* =========================================================
 LEDGER UTILITIES
 ========================================================= */
@@ -645,3 +633,62 @@ html.light body:not(.terminal) [class~="text-emerald-300"] { color: var(--gain) 
 .page-shell h2 { color: var(--ink); }
 .page-shell .page-muted { color: var(--ink-mute); }
 .page-shell .page-body { color: var(--ink-soft); }
+
+/* =========================================================
+LANDING: theme tokens (light default, dark under .dark)
+========================================================= */
+
+.landing-root {
+  --l-bg: #fafaf8;
+  --l-bg-rgb: 250 250 248;
+  --l-ink: #14161a;
+  --l-fg: 20 22 26;
+  --l-surf: 255 255 255;
+  --l-gain: #15803d;
+  --l-loss: #b91c1c;
+  --l-amber: #a16207;
+  --l-pink: #be185d;
+  --l-violet: #6d28d9;
+  --l-tint: 62%;
+  --l-ta: 0.32;
+  --l-shadow: 30 41 59;
+  --l-sh-k: 0.22;
+  --l-mock-1: #ffffff;
+  --l-mock-2: #f1f2f4;
+  --l-mock-3: #f7f7f8;
+  --l-glow-a: 0.1;
+  min-height: 100vh;
+  background: var(--l-bg);
+  color: var(--l-ink);
+}
+
+.dark .landing-root {
+  --l-bg: #050608;
+  --l-bg-rgb: 5 6 8;
+  --l-ink: #ffffff;
+  --l-fg: 255 255 255;
+  --l-surf: 12 16 24;
+  --l-gain: #10b981;
+  --l-loss: #f87171;
+  --l-amber: #fcd34d;
+  --l-pink: #ec4899;
+  --l-violet: #a78bfa;
+  --l-tint: 100%;
+  --l-ta: 0;
+  --l-shadow: 0 0 0;
+  --l-sh-k: 1;
+  --l-mock-1: #090e18;
+  --l-mock-2: #0d1520;
+  --l-mock-3: #0a0f1a;
+  --l-glow-a: 0.18;
+}
+
+.landing-root .landing-faq {
+  background: rgb(var(--l-surf) / 0.8);
+  border: 1px solid rgb(var(--l-fg) / 0.1);
+  box-shadow: 0 20px 50px rgb(var(--l-shadow) / calc(0.3 * var(--l-sh-k)));
+  backdrop-filter: blur(16px);
+}
+.landing-root .landing-faq > details + details {
+  border-top: 1px solid rgb(var(--l-fg) / 0.07);
+}
