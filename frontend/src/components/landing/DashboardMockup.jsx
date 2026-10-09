@@ -4,7 +4,7 @@
 
 import { TrendingUp, ShieldCheck, Calculator, Activity, BarChart2, Calendar, BookOpen, Settings } from 'lucide-react';
 
-const MiniSparkline = ({ color = '#10b981', data = [30, 55, 40, 70, 60, 85, 75, 90] }) => {
+const MiniSparkline = ({ color = 'var(--l-gain)', data = [30, 55, 40, 70, 60, 85, 75, 90] }) => {
   const max = Math.max(...data);
   const min = Math.min(...data);
   const w = 80;
@@ -74,11 +74,11 @@ export default function DashboardMockup({ style = {}, className = '' }) {
     <div
       className={className}
       style={{
-        background: '#090e18',
+        background: 'var(--l-mock-1)',
         borderRadius: '16px',
-        border: '1px solid rgba(255,255,255,0.08)',
+        border: '1px solid rgb(var(--l-fg) / 0.08)',
         overflow: 'hidden',
-        boxShadow: '0 40px 120px rgba(0,0,0,0.9), 0 0 0 1px rgba(255,255,255,0.04), inset 0 1px 0 rgba(255,255,255,0.05)',
+        boxShadow: '0 40px 120px rgb(var(--l-shadow) / calc(0.9 * var(--l-sh-k))), 0 0 0 1px rgb(var(--l-fg) / 0.04), inset 0 1px 0 rgb(var(--l-fg) / 0.05)',
         fontFamily: "'Inter', sans-serif",
         width: '100%',
         ...style,
@@ -86,8 +86,8 @@ export default function DashboardMockup({ style = {}, className = '' }) {
     >
       {/* Browser Chrome Bar */}
       <div style={{
-        background: '#0d1520',
-        borderBottom: '1px solid rgba(255,255,255,0.06)',
+        background: 'var(--l-mock-2)',
+        borderBottom: '1px solid rgb(var(--l-fg) / 0.06)',
         padding: '10px 16px',
         display: 'flex',
         alignItems: 'center',
@@ -100,12 +100,12 @@ export default function DashboardMockup({ style = {}, className = '' }) {
         </div>
         <div style={{
           flex: 1,
-          background: 'rgba(255,255,255,0.04)',
-          border: '1px solid rgba(255,255,255,0.06)',
+          background: 'rgb(var(--l-fg) / 0.04)',
+          border: '1px solid rgb(var(--l-fg) / 0.06)',
           borderRadius: '6px',
           padding: '4px 12px',
           fontSize: '10px',
-          color: 'rgba(255,255,255,0.35)',
+          color: 'rgb(var(--l-fg) / calc(0.5 + var(--l-ta)))',
           fontFamily: 'monospace',
           maxWidth: '300px',
           margin: '0 auto',
@@ -114,8 +114,8 @@ export default function DashboardMockup({ style = {}, className = '' }) {
           🔒 app.forexnotes.in/dashboard
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <ShieldCheck size={11} style={{ color: '#10b981' }} />
-          <span style={{ fontSize: '9px', color: '#10b981', fontWeight: 700, letterSpacing: '0.05em' }}>GUARDIAN ACTIVE</span>
+          <ShieldCheck size={11} style={{ color: 'var(--l-gain)' }} />
+          <span style={{ fontSize: '9px', color: 'var(--l-gain)', fontWeight: 700, letterSpacing: '0.05em' }}>GUARDIAN ACTIVE</span>
         </div>
       </div>
 
@@ -124,8 +124,8 @@ export default function DashboardMockup({ style = {}, className = '' }) {
         {/* Sidebar */}
         <div style={{
           width: '48px',
-          background: '#0a0f1a',
-          borderRight: '1px solid rgba(255,255,255,0.05)',
+          background: 'var(--l-mock-3)',
+          borderRight: '1px solid rgb(var(--l-fg) / 0.05)',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
@@ -141,7 +141,7 @@ export default function DashboardMockup({ style = {}, className = '' }) {
             <Activity size={14} color="white" />
           </div>
           {[
-            { icon: BarChart2, active: true, color: '#10b981' },
+            { icon: BarChart2, active: true, color: 'var(--l-gain)' },
             { icon: TrendingUp, active: false },
             { icon: Calendar, active: false },
             { icon: Calculator, active: false },
@@ -154,18 +154,18 @@ export default function DashboardMockup({ style = {}, className = '' }) {
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               cursor: 'pointer',
             }}>
-              <Icon size={13} color={active ? (color || '#10b981') : 'rgba(255,255,255,0.25)'} />
+              <Icon size={13} color={active ? (color || '#10b981') : 'rgb(var(--l-fg) / 0.25)'} />
             </div>
           ))}
         </div>
 
         {/* Main Content */}
-        <div style={{ flex: 1, padding: '14px', overflow: 'hidden', background: '#090e18' }}>
+        <div style={{ flex: 1, padding: '14px', overflow: 'hidden', background: 'var(--l-mock-1)' }}>
           {/* Header */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
             <div>
-              <div style={{ fontSize: '12px', fontWeight: 800, color: 'white', letterSpacing: '-0.02em' }}>Trading Dashboard</div>
-              <div style={{ fontSize: '9px', color: 'rgba(255,255,255,0.35)', marginTop: '1px' }}>October 2024 · London Session</div>
+              <div style={{ fontSize: '12px', fontWeight: 800, color: "var(--l-ink)", letterSpacing: '-0.02em' }}>Trading Dashboard</div>
+              <div style={{ fontSize: '9px', color: 'rgb(var(--l-fg) / calc(0.5 + var(--l-ta)))', marginTop: '1px' }}>October 2024 · London Session</div>
             </div>
             <div style={{
               background: 'rgba(16,185,129,0.12)',
@@ -173,7 +173,7 @@ export default function DashboardMockup({ style = {}, className = '' }) {
               borderRadius: '20px',
               padding: '3px 10px',
               fontSize: '9px',
-              color: '#10b981',
+              color: 'var(--l-gain)',
               fontWeight: 700,
             }}>
               ● Live Tracking
@@ -183,21 +183,21 @@ export default function DashboardMockup({ style = {}, className = '' }) {
           {/* Stat Cards */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px', marginBottom: '12px' }}>
             {[
-              { label: 'Win Rate', value: '68.4%', change: '+4.2%', color: '#10b981', spark: [40,55,48,65,60,72,68,75] },
-              { label: 'Net R-Multiple', value: '+34.8R', change: 'Avg: 2.4R', color: '#10b981', spark: [20,35,30,50,45,60,55,70] },
-              { label: 'Profit Factor', value: '2.18', change: 'Inst. edge', color: '#10b981', spark: [50,58,52,65,62,70,68,75] },
-              { label: 'Rule Discipline', value: '94%', change: '0 revenge', color: '#059669', spark: [80,82,78,85,83,88,86,90] },
+              { label: 'Win Rate', value: '68.4%', change: '+4.2%', color: 'var(--l-gain)', spark: [40,55,48,65,60,72,68,75] },
+              { label: 'Net R-Multiple', value: '+34.8R', change: 'Avg: 2.4R', color: 'var(--l-gain)', spark: [20,35,30,50,45,60,55,70] },
+              { label: 'Profit Factor', value: '2.18', change: 'Inst. edge', color: 'var(--l-gain)', spark: [50,58,52,65,62,70,68,75] },
+              { label: 'Rule Discipline', value: '94%', change: '0 revenge', color: 'var(--l-gain)', spark: [80,82,78,85,83,88,86,90] },
             ].map((s, i) => (
               <div key={i} style={{
-                background: 'rgba(255,255,255,0.03)',
-                border: '1px solid rgba(255,255,255,0.06)',
+                background: 'rgb(var(--l-fg) / 0.03)',
+                border: '1px solid rgb(var(--l-fg) / 0.06)',
                 borderRadius: '10px',
                 padding: '10px',
               }}>
-                <div style={{ fontSize: '8px', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 700 }}>{s.label}</div>
+                <div style={{ fontSize: '8px', color: 'rgb(var(--l-fg) / calc(0.5 + var(--l-ta)))', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 700 }}>{s.label}</div>
                 <div style={{ fontSize: '16px', fontWeight: 800, color: s.color, marginTop: '4px', letterSpacing: '-0.02em' }}>{s.value}</div>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '4px' }}>
-                  <span style={{ fontSize: '8px', color: 'rgba(255,255,255,0.3)' }}>{s.change}</span>
+                  <span style={{ fontSize: '8px', color: 'rgb(var(--l-fg) / calc(0.5 + var(--l-ta)))' }}>{s.change}</span>
                   <MiniSparkline color={s.color} data={s.spark} />
                 </div>
               </div>
@@ -208,18 +208,18 @@ export default function DashboardMockup({ style = {}, className = '' }) {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '10px' }}>
             {/* Chart */}
             <div style={{
-              background: 'rgba(255,255,255,0.02)',
-              border: '1px solid rgba(255,255,255,0.06)',
+              background: 'rgb(var(--l-fg) / 0.02)',
+              border: '1px solid rgb(var(--l-fg) / 0.06)',
               borderRadius: '10px',
               padding: '10px',
             }}>
-              <div style={{ fontSize: '8px', color: 'rgba(255,255,255,0.35)', fontWeight: 700, marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+              <div style={{ fontSize: '8px', color: 'rgb(var(--l-fg) / calc(0.5 + var(--l-ta)))', fontWeight: 700, marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                 XAUUSD · Candlestick View
               </div>
               <CandlestickMini />
               <div style={{ display: 'flex', gap: '8px', marginTop: '6px' }}>
-                <span style={{ fontSize: '8px', color: '#10b981', fontWeight: 700 }}>▲ 9 wins</span>
-                <span style={{ fontSize: '8px', color: '#ef4444', fontWeight: 700 }}>▼ 3 losses</span>
+                <span style={{ fontSize: '8px', color: 'var(--l-gain)', fontWeight: 700 }}>▲ 9 wins</span>
+                <span style={{ fontSize: '8px', color: 'var(--l-loss)', fontWeight: 700 }}>▼ 3 losses</span>
               </div>
             </div>
 
@@ -230,17 +230,17 @@ export default function DashboardMockup({ style = {}, className = '' }) {
               borderRadius: '10px',
               padding: '10px',
             }}>
-              <div style={{ fontSize: '8px', color: 'rgba(167,139,250,0.8)', fontWeight: 700, marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+              <div style={{ fontSize: '8px', color: 'var(--l-violet)', fontWeight: 700, marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                 🧠 AI Pre-Trade Guard
               </div>
-              <div style={{ fontSize: '9px', color: 'rgba(255,255,255,0.6)', lineHeight: 1.5 }}>
-                Emotional state: <span style={{ color: '#10b981', fontWeight: 700 }}>Calm ✓</span>
+              <div style={{ fontSize: '9px', color: 'rgb(var(--l-fg) / calc(0.6 + var(--l-ta)))', lineHeight: 1.5 }}>
+                Emotional state: <span style={{ color: 'var(--l-gain)', fontWeight: 700 }}>Calm ✓</span>
               </div>
-              <div style={{ fontSize: '9px', color: 'rgba(255,255,255,0.6)', lineHeight: 1.5 }}>
-                FOMO detected: <span style={{ color: '#10b981', fontWeight: 700 }}>None ✓</span>
+              <div style={{ fontSize: '9px', color: 'rgb(var(--l-fg) / calc(0.6 + var(--l-ta)))', lineHeight: 1.5 }}>
+                FOMO detected: <span style={{ color: 'var(--l-gain)', fontWeight: 700 }}>None ✓</span>
               </div>
-              <div style={{ fontSize: '9px', color: 'rgba(255,255,255,0.6)', lineHeight: 1.5 }}>
-                Revenge risk: <span style={{ color: '#10b981', fontWeight: 700 }}>Low ✓</span>
+              <div style={{ fontSize: '9px', color: 'rgb(var(--l-fg) / calc(0.6 + var(--l-ta)))', lineHeight: 1.5 }}>
+                Revenge risk: <span style={{ color: 'var(--l-gain)', fontWeight: 700 }}>Low ✓</span>
               </div>
               <div style={{
                 marginTop: '8px',
@@ -249,7 +249,7 @@ export default function DashboardMockup({ style = {}, className = '' }) {
                 borderRadius: '6px',
                 padding: '5px 8px',
                 fontSize: '8px',
-                color: '#10b981',
+                color: 'var(--l-gain)',
                 fontWeight: 700,
               }}>
                 ✓ CLEARED TO TRADE
@@ -259,25 +259,25 @@ export default function DashboardMockup({ style = {}, className = '' }) {
 
           {/* Recent Trades */}
           <div style={{
-            background: 'rgba(255,255,255,0.02)',
-            border: '1px solid rgba(255,255,255,0.06)',
+            background: 'rgb(var(--l-fg) / 0.02)',
+            border: '1px solid rgb(var(--l-fg) / 0.06)',
             borderRadius: '10px',
             overflow: 'hidden',
           }}>
-            <div style={{ padding: '8px 12px', borderBottom: '1px solid rgba(255,255,255,0.04)', fontSize: '8px', color: 'rgba(255,255,255,0.35)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+            <div style={{ padding: '8px 12px', borderBottom: '1px solid rgb(var(--l-fg) / 0.04)', fontSize: '8px', color: 'rgb(var(--l-fg) / calc(0.5 + var(--l-ta)))', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
               Recent Trades
             </div>
             {[
-              { dir: 'LONG', pair: 'XAUUSD', setup: 'London Open Liq. Sweep', risk: '0.5%', rr: '+3.20R', color: '#10b981' },
-              { dir: 'SHORT', pair: 'GBPUSD', setup: 'NY Session FVG Fill', risk: '1.0%', rr: '+1.80R', color: '#10b981' },
-              { dir: 'LONG', pair: 'EURUSD', setup: 'Asia Range Breakout', risk: '0.5%', rr: '-0.50R', color: '#ef4444' },
+              { dir: 'LONG', pair: 'XAUUSD', setup: 'London Open Liq. Sweep', risk: '0.5%', rr: '+3.20R', color: 'var(--l-gain)' },
+              { dir: 'SHORT', pair: 'GBPUSD', setup: 'NY Session FVG Fill', risk: '1.0%', rr: '+1.80R', color: 'var(--l-gain)' },
+              { dir: 'LONG', pair: 'EURUSD', setup: 'Asia Range Breakout', risk: '0.5%', rr: '-0.50R', color: 'var(--l-loss)' },
             ].map((t, i) => (
               <div key={i} style={{
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 padding: '7px 12px',
-                borderBottom: i < 2 ? '1px solid rgba(255,255,255,0.03)' : 'none',
+                borderBottom: i < 2 ? '1px solid rgb(var(--l-fg) / 0.03)' : 'none',
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <span style={{
@@ -287,14 +287,14 @@ export default function DashboardMockup({ style = {}, className = '' }) {
                     fontWeight: 800,
                     letterSpacing: '0.05em',
                     background: t.dir === 'LONG' ? 'rgba(16,185,129,0.12)' : 'rgba(239,68,68,0.12)',
-                    color: t.dir === 'LONG' ? '#10b981' : '#ef4444',
+                    color: t.dir === 'LONG' ? 'var(--l-gain)' : 'var(--l-loss)',
                     border: `1px solid ${t.dir === 'LONG' ? 'rgba(16,185,129,0.25)' : 'rgba(239,68,68,0.25)'}`,
                   }}>{t.dir}</span>
-                  <span style={{ fontSize: '9px', fontWeight: 700, color: 'white' }}>{t.pair}</span>
-                  <span style={{ fontSize: '8px', color: 'rgba(255,255,255,0.3)' }}>{t.setup}</span>
+                  <span style={{ fontSize: '9px', fontWeight: 700, color: "var(--l-ink)" }}>{t.pair}</span>
+                  <span style={{ fontSize: '8px', color: 'rgb(var(--l-fg) / calc(0.5 + var(--l-ta)))' }}>{t.setup}</span>
                 </div>
                 <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                  <span style={{ fontSize: '8px', color: 'rgba(255,255,255,0.3)', fontFamily: 'monospace' }}>Risk: {t.risk}</span>
+                  <span style={{ fontSize: '8px', color: 'rgb(var(--l-fg) / calc(0.5 + var(--l-ta)))', fontFamily: 'monospace' }}>Risk: {t.risk}</span>
                   <span style={{ fontSize: '10px', fontWeight: 800, color: t.color, fontFamily: 'monospace' }}>{t.rr}</span>
                 </div>
               </div>

@@ -52,7 +52,7 @@ export default function LandingDashboard() {
           background: 'rgba(16,185,129,0.1)',
           border: '1px solid rgba(16,185,129,0.25)',
           fontSize: '10px',
-          color: '#10b981',
+          color: 'var(--l-gain)',
           fontWeight: 700,
           letterSpacing: '0.1em',
           textTransform: 'uppercase',
@@ -63,12 +63,12 @@ export default function LandingDashboard() {
         <h2 style={{
           fontSize: 'clamp(1.8rem, 4vw, 2.5rem)',
           fontWeight: 900,
-          color: 'white',
+          color: "var(--l-ink)",
           letterSpacing: '-0.03em',
           lineHeight: 1.1,
           marginBottom: '64px',
         }}>
-          Everything You Need. <span style={{ color: '#10b981' }}>Nothing You Don't.</span>
+          Everything You Need. <span style={{ color: 'var(--l-gain)' }}>Nothing You Don't.</span>
         </h2>
         
         {/* Perspective Dashboard Mockup */}

@@ -443,7 +443,8 @@ export default function Backtest() {
     const p = replay.position;
     const newSl = num(editSl);
     const newTp = num(editTp);
-    const err = validateOrder({ side: p.side, type: 'Market', entry: p.entry, sl: newSl, tp: newTp, price: p.entry });
+    const slProbe = Number.isFinite(newSl) ? newSl : p.entry + (p.side === 'Buy' ? -1 : 1);
+    const err = validateOrder({ side: p.side, type: 'Market', entry: p.entry, sl: slProbe, tp: newTp, price: p.entry });
     if (err) return setFormError(err);
     setFormError('');
     setRun((r) => ({ ...r, replay: modifyPosition(r.replay, { sl: newSl, tp: newTp }) }));
@@ -451,10 +452,10 @@ export default function Backtest() {
 
   useEffect(() => {
     if (replay.position) {
-      setEditSl(String(replay.position.sl));
+      setEditSl(replay.position.sl == null ? '' : String(replay.position.sl));
       setEditTp(replay.position.tp == null ? '' : String(replay.position.tp));
     }
-  }, [replay.position?.id]);
+  }, [replay.position?.id, replay.position?.sl, replay.position?.tp]);
 
   const analytics = useMemo(() => computeAnalytics(replay.trades, replay.initialBalance), [replay.trades, replay.initialBalance]);
   const journal = useMemo(() => paginate([...replay.trades].reverse(), journalPage, PAGE_SIZE), [replay.trades, journalPage]);
@@ -551,7 +552,7 @@ export default function Backtest() {
 
       <div className="flex flex-1 overflow-hidden relative">
         <div className="flex-1 relative overflow-hidden">
-          <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50 bg-[#131418] border border-[#222429] rounded-full px-4 py-2 flex items-center gap-3 shadow-lg">
+          <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50 bg-[#131418] border border-[#222429] rounded-full px-4 py-2 flex items-center gap-3 shadow-lg max-w-[calc(100%-1rem)] overflow-x-auto [&>*]:shrink-0">
             <button title="Restart from default start" className="text-[#787B86] hover:text-white" onClick={restart}><SkipBack className="w-4 h-4" /></button>
             <button title="Slower" className="text-[#787B86] hover:text-white disabled:opacity-30" disabled={speedIdx === 0} onClick={() => setSpeedIdx((i) => i - 1)}><Rewind className="w-4 h-4" /></button>
             <button title={playing ? 'Pause' : 'Play'} disabled={finished || loading} className="text-[#2962FF] hover:text-white border border-[#2962FF]/30 p-1 rounded hover:bg-[#2962FF]/10 disabled:opacity-30" onClick={() => setPlaying((p) => !p)}>

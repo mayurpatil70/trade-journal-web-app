@@ -23,7 +23,7 @@ const features = [
     title: 'Live Market Charts',
     description: 'Execute trades and analyze setups with real-time, zero-latency market charting built directly into the platform.',
     tag: 'Live Data',
-    color: '#10b981',
+    color: 'var(--l-gain)',
     bg: 'rgba(16,185,129,0.08)',
     border: 'rgba(16,185,129,0.2)',
     glow: 'rgba(16,185,129,0.12)',
@@ -34,7 +34,7 @@ const features = [
     title: 'AI News Impact Analysis',
     description: 'Our proprietary AI scans high and low impact market news 24/7, predicting volatility before it happens so you never get caught off guard.',
     tag: 'AI Intelligence',
-    color: '#8b5cf6',
+    color: 'var(--l-violet)',
     bg: 'rgba(139,92,246,0.08)',
     border: 'rgba(139,92,246,0.2)',
     glow: 'rgba(139,92,246,0.12)',
@@ -45,7 +45,7 @@ const features = [
     title: 'Printable Digital Trading Journal',
     description: 'Log everything. Export your entire trading journal in any format (PDF, CSV, Excel) and print it out to study your performance off-screen.',
     tag: 'Export Anywhere',
-    color: '#f59e0b',
+    color: 'var(--l-amber)',
     bg: 'rgba(245,158,11,0.08)',
     border: 'rgba(245,158,11,0.2)',
     glow: 'rgba(245,158,11,0.12)',
@@ -56,7 +56,7 @@ const features = [
     title: 'Trading Bot Integration (No Extra Cost)',
     description: 'The only journal on the market offering direct trading bot integrations at the exact same price point. Fully automate your executions based on your logged setups.',
     tag: 'Unique Selling Point',
-    color: '#ef4444',
+    color: 'var(--l-loss)',
     bg: 'rgba(239,68,68,0.08)',
     border: 'rgba(239,68,68,0.2)',
     glow: 'rgba(239,68,68,0.15)',
@@ -68,7 +68,7 @@ const features = [
     title: '10% Lifetime Affiliate Commissions',
     description: 'Share Forex Notes with other traders or your followers and earn a 10% recurring commission on every monthly and yearly package you sell.',
     tag: 'Earn with us',
-    color: '#10b981',
+    color: 'var(--l-gain)',
     bg: 'rgba(16,185,129,0.08)',
     border: 'rgba(16,185,129,0.2)',
     glow: 'rgba(16,185,129,0.12)',
@@ -90,7 +90,7 @@ const features = [
     title: 'Prop Firm Pass Guidance',
     description: 'End-to-end guidance to pass your prop firm challenges. We stay with you every step of the way until your first payout arrives.',
     tag: 'Get Funded',
-    color: '#10b981',
+    color: 'var(--l-gain)',
     bg: 'rgba(16,185,129,0.08)',
     border: 'rgba(16,185,129,0.2)',
     glow: 'rgba(16,185,129,0.12)',
@@ -142,11 +142,11 @@ export default function FeaturesBento() {
       <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
         
         <div style={{ textAlign: 'center', marginBottom: '60px' }}>
-          <div style={{ display: 'inline-block', padding: '6px 14px', borderRadius: '100px', background: 'rgba(16,185,129,0.1)', color: '#10b981', fontSize: '11px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '16px' }}>
+          <div style={{ display: 'inline-block', padding: '6px 14px', borderRadius: '100px', background: 'rgba(16,185,129,0.1)', color: 'var(--l-gain)', fontSize: '11px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '16px' }}>
             Unmatched Value
           </div>
-          <h2 style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', fontWeight: 900, color: 'white', letterSpacing: '-0.03em', lineHeight: 1.1 }}>
-            Everything You Need to <span style={{ color: '#10b981' }}>Dominate</span>
+          <h2 style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', fontWeight: 900, color: "var(--l-ink)", letterSpacing: '-0.03em', lineHeight: 1.1 }}>
+            Everything You Need to <span style={{ color: 'var(--l-gain)' }}>Dominate</span>
           </h2>
         </div>
 
@@ -159,7 +159,7 @@ export default function FeaturesBento() {
                 className="feature-card"
                 style={{
                   gridColumn: item.wide ? '1 / -1' : 'auto',
-                  background: 'linear-gradient(145deg, rgba(16,20,28,0.9) 0%, rgba(10,12,16,0.9) 100%)',
+                  background: 'linear-gradient(145deg, rgb(var(--l-surf) / 0.9) 0%, rgb(var(--l-surf) / 0.9) 100%)',
                   borderRadius: '24px',
                   padding: '32px',
                   border: `1px solid ${item.border}`,
@@ -181,14 +181,14 @@ export default function FeaturesBento() {
                   <div style={{ color: item.color, fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '8px' }}>
                     {item.tag}
                   </div>
-                  <h3 style={{ fontSize: '20px', fontWeight: 800, color: 'white', marginBottom: '12px', letterSpacing: '-0.01em' }}>
+                  <h3 style={{ fontSize: '20px', fontWeight: 800, color: "var(--l-ink)", marginBottom: '12px', letterSpacing: '-0.01em' }}>
                     {item.title}
                   </h3>
-                  <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.5)', lineHeight: 1.6, marginBottom: '20px' }}>
+                  <p style={{ fontSize: '14px', color: 'rgb(var(--l-fg) / calc(0.5 + var(--l-ta)))', lineHeight: 1.6, marginBottom: '20px' }}>
                     {item.description}
                   </p>
                   
-                  <div style={{ display: 'inline-block', padding: '6px 12px', borderRadius: '8px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)', fontSize: '12px', color: 'rgba(255,255,255,0.7)', fontWeight: 600 }}>
+                  <div style={{ display: 'inline-block', padding: '6px 12px', borderRadius: '8px', background: 'rgb(var(--l-fg) / 0.03)', border: '1px solid rgb(var(--l-fg) / 0.05)', fontSize: '12px', color: 'rgb(var(--l-fg) / calc(0.7 + var(--l-ta)))', fontWeight: 600 }}>
                     {item.detail}
                   </div>
                 </div>

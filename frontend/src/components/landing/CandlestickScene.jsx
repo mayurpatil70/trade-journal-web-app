@@ -1,7 +1,10 @@
 import { useEffect, useRef } from 'react';
+import { useTheme } from '../theme-provider';
 
-const BULL = [16, 185, 129];
-const BEAR = [239, 68, 68];
+const PALETTE = {
+  dark: { bull: [16, 185, 129], bear: [239, 68, 68] },
+  light: { bull: [21, 128, 61], bear: [185, 28, 28] },
+};
 const COUNT = 13;
 const SPACING = 0.36;
 const LIGHT = (() => {
@@ -38,8 +41,10 @@ const seed = () => {
 // Pseudo-3D candles on a 2D canvas: no WebGL, adaptive frame rate, pauses off-screen.
 export default function CandlestickScene() {
   const ref = useRef(null);
+  const { theme } = useTheme();
 
   useEffect(() => {
+    const { bull: BULL, bear: BEAR } = PALETTE[theme];
     const canvas = ref.current;
     const ctx = canvas.getContext('2d');
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -185,7 +190,7 @@ export default function CandlestickScene() {
       ro.disconnect();
       document.removeEventListener('visibilitychange', onVis);
     };
-  }, []);
+  }, [theme]);
 
   return <canvas ref={ref} aria-hidden="true" style={{ width: '100%', height: '100%', display: 'block' }} />;
 }

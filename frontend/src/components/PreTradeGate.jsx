@@ -164,7 +164,7 @@ export default function PreTradeGate() {
         <div className={`${expanded ? "w-full h-full md:w-[min(900px,calc(100vw-3rem))] md:rounded-3xl rounded-none" : "mb-4 w-[calc(100vw-3rem)] max-w-[350px] md:max-w-none md:w-[400px] h-[min(580px,calc(100vh-7rem))] rounded-3xl"} transition-all duration-300 bg-white/80 dark:bg-[#121418]/80 backdrop-blur-xl border border-gray-200 dark:border-white/20 shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom-5`}>
 
           {/* Header */}
-          <div className="bg-[#10b981] p-4 flex items-center justify-between shrink-0">
+          <div className="bg-emerald-600 p-4 flex items-center justify-between shrink-0">
             <div className="flex items-center gap-3">
               <img
                 src={ROBOT_AVATAR}
@@ -206,7 +206,7 @@ export default function PreTradeGate() {
                 <div
                   className={`max-w-[88%] p-3 rounded-2xl text-sm leading-relaxed shadow-sm ${
                     msg.sender === "user"
-                      ? "bg-[#10b981] text-white rounded-br-sm"
+                      ? "bg-emerald-600 text-white rounded-br-sm"
                       : "bg-white dark:bg-[#1a1d24] text-gray-800 dark:text-gray-200 border border-gray-100 dark:border-white/5 rounded-bl-sm"
                   }`}
                 >
@@ -288,7 +288,7 @@ export default function PreTradeGate() {
               <button
                 type="submit"
                 disabled={isLoading || (!message.trim() && !imageFile)}
-                className="bg-[#10b981] hover:bg-[#2376e8] disabled:bg-[#10b981]/40 text-white p-2.5 rounded-full transition-colors flex items-center justify-center shrink-0"
+                className="bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-600/40 text-white p-2.5 rounded-full transition-colors flex items-center justify-center shrink-0"
               >
                 <Send className="w-4 h-4" />
               </button>

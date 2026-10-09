@@ -31,6 +31,9 @@ export default function PastTrades() {
   const location = useLocation();
   const [trades, setTrades] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showFilters, setShowFilters] = useState(false);
+  const [directionFilter, setDirectionFilter] = useState("");
+  const [sessionFilter, setSessionFilter] = useState("");
   const [search, setSearch] = useState("");
   const [resultFilter, setResultFilter] = useState("");
   const [selectedTrade, setSelectedTrade] = useState(null);
@@ -65,7 +68,9 @@ export default function PastTrades() {
         .toLowerCase()
         .includes(search.toLowerCase());
     const matchesResult = !resultFilter || t.result === resultFilter;
-    return matchesSearch && matchesResult;
+    const matchesDirection = !directionFilter || t.direction === directionFilter;
+    const matchesSession = !sessionFilter || t.session === sessionFilter;
+    return matchesSearch && matchesResult && matchesDirection && matchesSession;
   });
 
   // Pagination logic
@@ -75,7 +80,7 @@ export default function PastTrades() {
   // Reset to first page when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [search, resultFilter]);
+  }, [search, resultFilter, directionFilter, sessionFilter]);
 
   const indexOfLastTrade = currentPage * itemsPerPage;
   const indexOfFirstTrade = indexOfLastTrade - itemsPerPage;
@@ -131,11 +136,33 @@ export default function PastTrades() {
              <option value="loss" className="bg-[#101216] text-white">Loss ✗</option>
              <option value="be" className="bg-[#101216] text-white">Break-Even</option>
            </select>
-           <button className="px-4 py-3 bg-[#101216] border border-white/5 rounded-xl text-gray-400 hover:text-white transition-colors flex items-center gap-2 text-[13px]">
+           <button
+             type="button"
+             onClick={() => setShowFilters((v) => !v)}
+             aria-expanded={showFilters}
+             className={`px-4 py-3 bg-[#101216] border rounded-xl hover:text-white transition-colors flex items-center gap-2 text-[13px] ${showFilters || directionFilter || sessionFilter ? "border-emerald-500/40 text-emerald-400" : "border-white/5 text-gray-400"}`}
+           >
              <Filter className="w-4 h-4" /> More Filters
            </button>
         </div>
       </div>
+
+      {showFilters && (
+        <div className="flex flex-wrap items-center gap-3 mb-6">
+          <select value={directionFilter} onChange={(e) => setDirectionFilter(e.target.value)} className="appearance-none bg-[#101216] border border-white/5 rounded-xl py-2.5 px-4 text-white text-[13px] outline-none min-w-[140px]">
+            <option value="">All Directions</option>
+            <option value="LONG">Long</option>
+            <option value="SHORT">Short</option>
+          </select>
+          <select value={sessionFilter} onChange={(e) => setSessionFilter(e.target.value)} className="appearance-none bg-[#101216] border border-white/5 rounded-xl py-2.5 px-4 text-white text-[13px] outline-none min-w-[140px]">
+            <option value="">All Sessions</option>
+            {[...new Set(trades.map((t) => t.session).filter(Boolean))].map((x) => <option key={x} value={x}>{x}</option>)}
+          </select>
+          {(directionFilter || sessionFilter) && (
+            <button type="button" onClick={() => { setDirectionFilter(""); setSessionFilter(""); }} className="text-[13px] text-gray-400 hover:text-white">Clear</button>
+          )}
+        </div>
+      )}
 
       {/* TRADE LIST */}
       <div className="space-y-3">
