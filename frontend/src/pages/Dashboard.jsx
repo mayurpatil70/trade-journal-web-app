@@ -23,7 +23,8 @@ const getGreeting = () => {
 };
 
 // Mini SVG Equity Curve
-const EquityCurve = ({ data }) => {
+const EquityCurve = ({ data, trades = [] }) => {
+  const [hover, setHover] = useState(null);
   if (!data || data.length < 2) {
     return (
       <div className="w-full h-full flex flex-col items-center justify-center text-gray-600">
@@ -50,7 +51,19 @@ const EquityCurve = ({ data }) => {
   const strokeColor = isProfitable ? "#34d399" : "#f87171"; // emerald-400 or red-400
   const fillColor = isProfitable ? "url(#emeraldGradient)" : "url(#redGradient)";
 
+  const onMove = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const ratio = Math.min(Math.max((e.clientX - rect.left) / rect.width, 0), 1);
+    setHover({ i: Math.round(ratio * (data.length - 1)), ratio });
+  };
+
+  const hi = hover?.i;
+  const ht = hi > 0 ? trades[hi - 1] : null;
+  const hx = hi != null ? (hi / (data.length - 1)) * width : 0;
+  const hy = hi != null ? height - ((data[hi] - min) / range) * height : 0;
+
   return (
+    <div className="relative w-full h-full" onMouseMove={onMove} onMouseLeave={() => setHover(null)}>
     <svg viewBox={`0 -10 ${width} ${height + 20}`} className="w-full h-full overflow-visible preserve-3d">
       <defs>
         <linearGradient id="emeraldGradient" x1="0" y1="0" x2="0" y2="1">
@@ -75,7 +88,42 @@ const EquityCurve = ({ data }) => {
         fill={fillColor}
         points={`${0},${height} ${points.join(" ")} ${width},${height}`}
       />
+      {hi != null && (
+        <>
+          <line x1={hx} x2={hx} y1={-10} y2={height + 10} stroke="#ffffff" strokeOpacity="0.15" strokeDasharray="4 4" />
+          <circle cx={hx} cy={hy} r="6" fill={strokeColor} stroke="#101216" strokeWidth="2" />
+        </>
+      )}
     </svg>
+    {hi != null && (
+      <div
+        className="absolute top-0 z-10 w-52 pointer-events-none rounded-xl border border-white/10 bg-[#0b0d10]/95 p-3 text-[11px] shadow-2xl backdrop-blur"
+        style={{ left: `${hover.ratio * 100}%`, transform: `translateX(${hover.ratio > 0.6 ? "-105%" : "5%"})` }}
+      >
+        {ht ? (
+          <>
+            <div className="flex justify-between text-gray-400"><span>{ht.date}</span><span>#{hi}</span></div>
+            <div className="mt-1 font-semibold text-white">{ht.asset} {ht.direction}</div>
+            <div className={`font-mono font-bold ${(parseFloat(ht.r_multiple) || 0) >= 0 ? "text-emerald-400" : "text-red-400"}`}>
+              {(parseFloat(ht.r_multiple) || 0) >= 0 ? "+" : ""}{(parseFloat(ht.r_multiple) || 0).toFixed(2)}R
+            </div>
+            <div className="mt-1.5 space-y-0.5 text-gray-400">
+              {ht.setup && <div>Setup: <span className="text-gray-200">{ht.setup}</span></div>}
+              {ht.session && <div>Session: <span className="text-gray-200">{ht.session}</span></div>}
+              {(ht.emotion_before || ht.emotion_after) && (
+                <div>Mindset: <span className="text-gray-200">{[ht.emotion_before, ht.emotion_after].filter(Boolean).join(" → ")}</span></div>
+              )}
+            </div>
+          </>
+        ) : (
+          <div className="text-gray-400">Start</div>
+        )}
+        <div className="mt-2 border-t border-white/10 pt-1.5 text-gray-400">
+          Equity: <span className="font-mono text-white">{data[hi].toFixed(2)}R</span>
+        </div>
+      </div>
+    )}
+    </div>
   );
 };
 
@@ -225,7 +273,7 @@ export default function Dashboard() {
             </div>
           </div>
           <div className="flex-1 min-h-[250px] relative">
-            <EquityCurve data={stats.equityData} />
+            <EquityCurve data={stats.equityData} trades={trades} />
           </div>
         </div>
 

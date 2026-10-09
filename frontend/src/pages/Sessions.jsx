@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Play, Plus, Clock, TrendingUp, FolderClock, Edit, Trash2 } from 'lucide-react';
+import { Play, Plus, Clock, TrendingUp, FolderClock, Edit, Trash2, Eye } from 'lucide-react';
 import api from '../api/axios';
 import { Button } from '@/components/ui/button';
 import SymbolPicker from '../components/SymbolPicker';
@@ -121,7 +121,12 @@ export default function Sessions() {
               </div>
             </div>
 
-            <div className="flex justify-end mt-auto pt-2">
+            <div className="flex justify-end gap-2 mt-auto pt-2">
+              {s.replay?.trades?.length > 0 && (
+                <button onClick={() => navigate(`/backtest/${s.id}?watch=1`)} title="Watch replay" className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-gray-300 hover:bg-white/10 hover:text-white transition-colors">
+                  <Eye className="w-4 h-4" />
+                </button>
+              )}
               <button onClick={() => navigate(`/backtest/${s.id}`)} className="w-8 h-8 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-400 hover:bg-emerald-500 hover:text-black transition-colors">
                 <Play className="w-4 h-4 ml-0.5" fill="currentColor" />
               </button>

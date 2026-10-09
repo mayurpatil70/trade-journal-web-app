@@ -50,13 +50,14 @@ export default function Settings() {
     try {
       const response = await api.get(
         `/api/trades/export?userId=${userId}&format=${format}`,
-        { responseType: "blob" }
+        { responseType: "blob", timeout: 120000 }
       );
 
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement("a");
       link.href = url;
-      link.setAttribute("download", `trade_journal.${format}`);
+      const ext = { excel: "xlsx", doc: "docx" }[format] || format;
+      link.setAttribute("download", `trade_journal.${ext}`);
       document.body.appendChild(link);
       link.click();
       link.remove();
