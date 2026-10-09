@@ -405,3 +405,6 @@ LANDING PAGE ANIMATIONS
     grid-template-columns: repeat(2, 1fr) !important;
   }
 }
+
+.dl-drawing canvas { cursor: crosshair !important; }
+.dl-hover canvas { cursor: pointer !important; }

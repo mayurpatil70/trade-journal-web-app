@@ -6,6 +6,7 @@ import {
   SkipForward, BarChart2, Activity, ChevronRight, X,
 } from 'lucide-react';
 import SymbolPicker from '../components/SymbolPicker';
+import DrawingLayer from '../components/drawing/DrawingLayer';
 import { marketApi } from '../api/market';
 import {
   createReplay, positionSize, validateOrder, stepReplay, placeOrder, closePosition,
@@ -27,6 +28,15 @@ const loadSessions = () => {
     return JSON.parse(localStorage.getItem('backtest_sessions') || '[]');
   } catch {
     return [];
+  }
+};
+
+const drawingsKey = (id, symbol) => `bt_drawings:${id}:${symbol}`;
+const readDrawings = (key) => {
+  try {
+    return JSON.parse(localStorage.getItem(key) || 'null');
+  } catch {
+    return null;
   }
 };
 
@@ -114,6 +124,7 @@ export default function Backtest() {
   const [formError, setFormError] = useState('');
   const [editSl, setEditSl] = useState('');
   const [editTp, setEditTp] = useState('');
+  const [drawings, setDrawings] = useState([]);
   const [showRightPane, setShowRightPane] = useState(window.innerWidth > 768);
   const watch = new URLSearchParams(location.search).has('watch');
 
@@ -151,6 +162,19 @@ export default function Backtest() {
     setRun({ index: 0, replay: watch ? createReplay(initialBalance) : base.replay ?? createReplay(initialBalance) });
     setSymbol(normalizePair(base.pair));
   }, [id, watch]);
+
+  useEffect(() => {
+    if (!symbol || !session) return;
+    const stored = session.drawings?.[symbol];
+    setDrawings((watch ? stored : readDrawings(drawingsKey(id, symbol)) ?? stored) || []);
+  }, [id, symbol, session, watch]);
+
+  const changeDrawings = useCallback((next) => {
+    setDrawings(next);
+    try {
+      localStorage.setItem(drawingsKey(id, symbol), JSON.stringify(next));
+    } catch { /* storage full or blocked */ }
+  }, [id, symbol]);
 
   useEffect(() => {
     if (!symbol) return undefined;
@@ -412,6 +436,7 @@ export default function Backtest() {
       riskPct,
       replayTime: candle?.time ?? null,
       replay,
+      drawings: { ...session?.drawings, [symbol]: drawings },
       date: new Date().toLocaleString(),
     };
     const saved = loadSessions();
@@ -481,7 +506,17 @@ export default function Backtest() {
             {!watch && <input type="date" title="Jump to date" onChange={(e) => jumpToDate(e.target.value)} className="bg-[#0A0B0D] border border-[#222429] rounded px-1 py-0.5 text-[#D1D4DC]" />}
           </div>
 
-          <div ref={chartContainerRef} className="absolute inset-0 w-full h-full" />
+          <div ref={chartContainerRef} className={`absolute inset-0 ${watch ? '' : 'md:left-11'}`} />
+          <DrawingLayer
+            chartRef={chartRef}
+            seriesRef={seriesRef}
+            containerRef={chartContainerRef}
+            candles={candles}
+            drawings={drawings}
+            onChange={changeDrawings}
+            readOnly={watch}
+            resetKey={`${id}|${symbol}`}
+          />
 
           {(loading || loadError) && (
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[#0A0B0D]/90 z-40">
