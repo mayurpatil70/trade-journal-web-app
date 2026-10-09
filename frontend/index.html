@@ -1,8 +1,16 @@
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="en" class="light">
 
 <head>
   <meta charset="UTF-8" />
+  <script>
+    try {
+      var t = localStorage.getItem('vite-ui-theme') === 'dark' ? 'dark' : 'light';
+      var r = document.documentElement;
+      r.className = t;
+      r.style.colorScheme = t;
+    } catch (e) {}
+  </script>
   <!-- Google Analytics: production domain only (skips localhost and the Capacitor app) -->
   <script>
     if (/(^|\.)forexnotes\.in$/.test(location.hostname)) {
@@ -16,6 +24,9 @@
       document.head.appendChild(ga);
     }
   </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Instrument+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
   <link rel="icon" type="image/png" sizes="192x192" href="/logo-192.png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
@@ -24,7 +35,7 @@
   <title>Forex Notes | Backtesting, Trading Journal & AI Coach</title>
   <meta name="description" content="Backtest forex, gold and crypto with bar replay on 10 years of data, journal every trade and fix your psychology with an AI coach. From $14/mo." />
   <meta name="robots" content="index, follow" />
-  <meta name="theme-color" content="#000000" />
+  <meta name="theme-color" content="#FBFBFB" />
   <link rel="canonical" href="https://forexnotes.in/" />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Forex Notes" />

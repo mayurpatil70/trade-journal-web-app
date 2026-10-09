@@ -27,6 +27,7 @@ import MarketingVideos from "../components/landing/MarketingVideos";
 import LandingDashboard from "../components/landing/LandingDashboard";
 import FeaturesBento from "../components/landing/FeaturesBento";
 import ExtraVideos from "../components/landing/ExtraVideos";
+import ThemeToggle from "../components/ThemeToggle";
 import SiteFooter from "../components/seo/SiteFooter";
 import { LANDING_FAQS } from "../data/seoPages";
 
@@ -261,6 +262,7 @@ export default function LandingPage() {
 
   return (
     <div
+      className="landing-root"
       style={{
         minHeight: "100vh",
         background: "#000000",
@@ -355,6 +357,7 @@ export default function LandingPage() {
 
             {/* Header CTAs */}
             <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+              <ThemeToggle onDark />
               <Link to="/login" style={{
                 fontSize: "11px", fontWeight: 700, letterSpacing: "0.05em",
                 padding: "8px 16px", borderRadius: "8px",

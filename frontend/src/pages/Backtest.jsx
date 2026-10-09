@@ -151,6 +151,11 @@ export default function Backtest() {
   const finished = candles.length > 0 && index >= candles.length;
 
   useEffect(() => {
+    document.body.classList.add('terminal');
+    return () => document.body.classList.remove('terminal');
+  }, []);
+
+  useEffect(() => {
     const found = loadSessions().find((s) => s.id === id) || location.state?.draftSession;
     const base = found ?? { id, name: `New Session ${new Date().toLocaleDateString()}`, pair: 'BTCUSDT', balance: 10000 };
     const initialBalance = base.initialBalance ?? base.balance;

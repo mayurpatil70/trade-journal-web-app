@@ -230,8 +230,8 @@ export default function Dashboard() {
       {/* 1. HERO HEADER */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-200">
-            {getGreeting()}, <span className="text-white font-bold">{localStorage.getItem("userEmail")?.split('@')[0] || "Trader"}</span>
+          <h1 className="font-serif text-3xl font-medium text-gray-200">
+            {getGreeting()}, <span className="text-white font-semibold">{localStorage.getItem("userEmail")?.split('@')[0] || "Trader"}</span>
           </h1>
           <p className="text-gray-500 mt-1 text-[13px]">Your trading performance at a glance.</p>
         </div>
@@ -254,7 +254,7 @@ export default function Dashboard() {
         ].map((kpi, i) => (
           <div key={i} className="glossy rounded-2xl p-5">
             <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-widest mb-2">{kpi.label}</p>
-            <p className={`text-2xl font-bold tracking-tight ${kpi.color}`}>{kpi.value}</p>
+            <p className={`ledger-figure text-3xl ${kpi.color}`}>{kpi.value}</p>
           </div>
         ))}
       </div>
@@ -280,7 +280,7 @@ export default function Dashboard() {
         {/* AI Insight & Trading Health */}
         <div className="flex flex-col gap-6">
           {/* Economic Calendar & Promotion Card */}
-          <div className="bg-gradient-to-br from-[#102a3a] to-[#0A0B0D] border border-emerald-500/20 rounded-2xl p-6 relative overflow-hidden group flex flex-col justify-between h-full">
+          <div className="bg-gradient-to-br from-emerald-50 to-white dark:from-[#102a3a] dark:to-[#0A0B0D] border border-emerald-500/20 rounded-2xl p-6 relative overflow-hidden group flex flex-col justify-between h-full">
             <div>
               <h3 className="text-[11px] font-semibold text-emerald-500 uppercase tracking-widest mb-3 flex items-center gap-2">
                 Economic Calendar
