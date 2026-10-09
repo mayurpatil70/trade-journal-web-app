@@ -45,11 +45,12 @@ export function pendingFillPrice(order, candle) {
 export function exitCheck(position, candle, gapAllowed = true) {
   const buy = isBuy(position.side);
   const hasTp = Number.isFinite(position.tp);
+  const hasSl = Number.isFinite(position.sl);
   if (gapAllowed) {
-    if (buy ? candle.open <= position.sl : candle.open >= position.sl) return { price: candle.open, reason: 'SL' };
+    if (hasSl && (buy ? candle.open <= position.sl : candle.open >= position.sl)) return { price: candle.open, reason: 'SL' };
     if (hasTp && (buy ? candle.open >= position.tp : candle.open <= position.tp)) return { price: candle.open, reason: 'TP' };
   }
-  if (buy ? candle.low <= position.sl : candle.high >= position.sl) return { price: position.sl, reason: 'SL' };
+  if (hasSl && (buy ? candle.low <= position.sl : candle.high >= position.sl)) return { price: position.sl, reason: 'SL' };
   if (hasTp && (buy ? candle.high >= position.tp : candle.low <= position.tp)) return { price: position.tp, reason: 'TP' };
   return null;
 }
@@ -58,18 +59,18 @@ export function openPnl(position, price) {
   return (price - position.entry) * dir(position.side) * position.units;
 }
 
-function closeTrade(state, exit, time) {
+function closeTrade(state, exit, time, units = state.position.units, tradeId) {
   const { position } = state;
-  const pnl = openPnl(position, exit.price);
-  const risk = Math.abs(position.entry - position.initialSl) * position.units;
+  const pnl = openPnl({ ...position, units }, exit.price);
+  const risk = Math.abs(position.entry - position.initialSl) * units;
   const balance = state.balance + pnl;
   const trade = {
-    id: position.id,
+    id: tradeId ?? position.id,
     side: position.side,
     entry: position.entry,
     sl: position.initialSl,
     tp: position.tp,
-    units: position.units,
+    units,
     entryTime: position.entryTime,
     exitTime: time,
     exitPrice: exit.price,
@@ -78,7 +79,16 @@ function closeTrade(state, exit, time) {
     r: risk > 0 ? pnl / risk : 0,
     balanceAfter: balance,
   };
-  return { ...state, balance, position: null, trades: [...state.trades, trade] };
+  const remaining = position.units - units;
+  const next = remaining > 1e-12 ? { ...position, units: remaining, partials: (position.partials || 0) + 1 } : null;
+  return { ...state, balance, position: next, trades: [...state.trades, trade] };
+}
+
+export function partialClose(state, price, time, fraction = 0.5) {
+  const { position } = state;
+  if (!position) return state;
+  const units = position.units * fraction;
+  return closeTrade(state, { price, reason: 'Partial' }, time, units, `${position.id}.${(position.partials || 0) + 1}`);
 }
 
 export function fillPending(state, price, time) {
@@ -135,7 +145,7 @@ export function cancelPending(state) {
 export function modifyPosition(state, { sl, tp }) {
   if (!state.position) return state;
   const p = state.position;
-  return { ...state, position: { ...p, sl: Number.isFinite(sl) ? sl : p.sl, tp: Number.isFinite(tp) ? tp : undefined } };
+  return { ...state, position: { ...p, sl: Number.isFinite(sl) ? sl : undefined, tp: Number.isFinite(tp) ? tp : undefined } };
 }
 
 export function computeAnalytics(trades, initialBalance) {

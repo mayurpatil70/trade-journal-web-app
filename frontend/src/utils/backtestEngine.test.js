@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   createReplay, positionSize, validateOrder, pendingFillPrice, exitCheck, stepReplay,
-  placeOrder, closePosition, computeAnalytics, paginate,
+  placeOrder, closePosition, computeAnalytics, paginate, partialClose, modifyPosition,
 } from './backtestEngine';
 
 const c = (time, open, high, low, close) => ({ time, open, high, low, close });
@@ -129,5 +129,22 @@ describe('paginate', () => {
     expect(paginate(items, 2, 10).items).toEqual([10, 11, 12, 13, 14, 15, 16, 17, 18, 19]);
     expect(paginate(items, 99, 10)).toMatchObject({ page: 3, pages: 3 });
     expect(paginate([], 1, 10)).toMatchObject({ page: 1, pages: 1, total: 0 });
+  });
+});
+
+describe('partialClose and cancelled stop', () => {
+  const open = () => placeOrder(createReplay(10000), { side: 'Buy', type: 'Market', entry: 100, sl: 90, tp: 120, units: 10 }, { close: 100, time: 1 });
+
+  it('books half the units and keeps the rest open', () => {
+    const next = partialClose(open(), 110, 2, 0.5);
+    expect(next.position.units).toBe(5);
+    expect(next.trades).toHaveLength(1);
+    expect(next.trades[0]).toMatchObject({ units: 5, pnl: 50, r: 1 });
+  });
+
+  it('does not trigger a stop once it is cancelled', () => {
+    const state = modifyPosition(open(), { sl: undefined, tp: 120 });
+    const stepped = stepReplay(state, { open: 100, high: 101, low: 50, close: 60, time: 2 });
+    expect(stepped.position).not.toBeNull();
   });
 });

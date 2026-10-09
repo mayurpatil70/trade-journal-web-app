@@ -93,7 +93,8 @@ export const getTrades = async (req, res) => {
       .select("*")
       .eq("user_id", userId)
       .order("date", { ascending: false })
-      .order("time", { ascending: false });
+      .order("time", { ascending: false, nullsFirst: false })
+      .order("created_at", { ascending: false });
 
     if (error) throw error;
 
@@ -148,7 +149,8 @@ export const exportTrades = async (req, res) => {
       )
       .eq("user_id", userId)
       .order("date", { ascending: false })
-      .order("time", { ascending: false });
+      .order("time", { ascending: false, nullsFirst: false })
+      .order("created_at", { ascending: false });
 
     if (error) throw error;
 
