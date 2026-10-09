@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
+import { EdgeBreakdown, TradingHealth, BacktestSummary } from "../components/dashboard/PerformanceHub";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
 import {
@@ -11,7 +12,6 @@ import {
   PlusCircle,
   Clock,
   ArrowRight,
-  ShieldAlert,
   List,
 } from "lucide-react";
 
@@ -252,7 +252,7 @@ export default function Dashboard() {
           { label: "Average R", value: `${stats.avgR >= 0 ? "+" : ""}${stats.avgR}R`, color: "text-gray-300" },
           { label: "Max Drawdown", value: `-${stats.maxDrawdown}R`, color: "text-red-400" },
         ].map((kpi, i) => (
-          <div key={i} className="bg-[#101216] border border-white/5 rounded-2xl p-5 hover:bg-[#15181D] transition-colors">
+          <div key={i} className="glossy rounded-2xl p-5">
             <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-widest mb-2">{kpi.label}</p>
             <p className={`text-2xl font-bold tracking-tight ${kpi.color}`}>{kpi.value}</p>
           </div>
@@ -262,7 +262,7 @@ export default function Dashboard() {
       {/* 3. MAIN PERFORMANCE AREA */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Equity Curve */}
-        <div className="lg:col-span-2 bg-[#101216] border border-white/5 rounded-2xl p-6 flex flex-col shadow-xl">
+        <div className="lg:col-span-2 glossy rounded-2xl p-6 flex flex-col">
           <div className="flex items-center justify-between mb-6">
             <div>
               <h2 className="text-[15px] font-semibold text-white">Equity Progression (R)</h2>
@@ -302,44 +302,13 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Quick Stats / Trading Health */}
-          <div className="bg-[#101216] border border-white/5 rounded-2xl p-6 flex-1">
-            <h3 className="text-[11px] font-semibold text-gray-500 uppercase tracking-widest mb-5">
-              Trading Health
-            </h3>
-            <div className="space-y-5">
-              <div>
-                <div className="flex justify-between text-xs mb-2">
-                  <span className="text-gray-400">Execution Discipline</span>
-                  <span className="text-emerald-400 font-semibold">92%</span>
-                </div>
-                <div className="w-full bg-white/5 rounded-full h-1.5">
-                  <div className="bg-emerald-400 h-1.5 rounded-full" style={{ width: '92%' }}></div>
-                </div>
-              </div>
-              <div>
-                <div className="flex justify-between text-xs mb-2">
-                  <span className="text-gray-400">Rule Following</span>
-                  <span className="text-emerald-400 font-semibold">85%</span>
-                </div>
-                <div className="w-full bg-white/5 rounded-full h-1.5">
-                  <div className="bg-emerald-400 h-1.5 rounded-full" style={{ width: '85%' }}></div>
-                </div>
-              </div>
-              <div className="pt-4 mt-2 border-t border-white/5">
-                 <div className="flex items-center gap-3 text-sm">
-                   <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center border border-amber-500/20 text-amber-400">
-                     <ShieldAlert className="w-4 h-4" />
-                   </div>
-                   <div>
-                     <p className="text-gray-300 font-medium text-[13px]">1 Trade needs review</p>
-                     <p className="text-[11px] text-gray-500">Missing psychology tags</p>
-                   </div>
-                 </div>
-              </div>
-            </div>
-          </div>
+          <TradingHealth trades={trades} />
         </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2"><EdgeBreakdown trades={trades} /></div>
+        <BacktestSummary live={stats.totalTrades ? stats : null} />
       </div>
 
       {/* 4. RECENT TRADES (Visual Preview Format) */}
