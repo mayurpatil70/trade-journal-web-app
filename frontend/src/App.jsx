@@ -15,6 +15,7 @@ import api from "./api/axios";
 import LandingPage from "./pages/LandingPage.jsx";
 import PrivacyPolicy from "./pages/PrivacyPolicy.jsx";
 import NotFound from "./pages/NotFound.jsx";
+const CompetitorVsPage = lazy(() => import("./pages/CompetitorVsPage.jsx"));
 
 // Lazy Loaded Protected App Pages
 const Login = lazy(() => import("./pages/Login.jsx"));
@@ -58,12 +59,13 @@ const PropFirm = lazy(() => import("./pages/TraderProblems/PropFirm.jsx"));
 const LotSizeCalculator = lazy(() => import("./pages/TraderProblems/LotSizeCalculator.jsx"));
 
 const INDEXABLE_PATHS = ["/", "/privacy"];
+const isIndexable = (path) => INDEXABLE_PATHS.includes(path) || path.startsWith("/vs/");
 
 const RouteSeo = () => {
   const { pathname, search } = useLocation();
 
   useEffect(() => {
-    const searchParams = new URLSearchParams(search); const refCode = searchParams.get("ref"); if (refCode) { localStorage.setItem("referred_by", refCode); } const indexable = INDEXABLE_PATHS.includes(pathname);
+    const searchParams = new URLSearchParams(search); const refCode = searchParams.get("ref"); if (refCode) { localStorage.setItem("referred_by", refCode); } const indexable = isIndexable(pathname);
     let robots = document.querySelector('meta[name="robots"]');
     if (!robots) {
       robots = document.createElement("meta");
@@ -163,6 +165,7 @@ function App() {
             {/* Public Landing Pages */}
             <Route path="/" element={<LandingPage />} />
             <Route path="/privacy" element={<PrivacyPolicy />} />
+            <Route path="/vs/:competitorSlug" element={<CompetitorVsPage />} />
             <Route path="/login" element={<Login />} />
             <Route path="/verify" element={<Verify />} />
 

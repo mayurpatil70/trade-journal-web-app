@@ -834,10 +834,12 @@ export default function LandingPage() {
                 © {new Date().getFullYear()} All Rights Reserved.
               </span>
             </div>
-            <div style={{ display: "flex", gap: "24px" }}>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "24px" }}>
               {[
                 { href: "https://discord.gg/Ajaw3AjfWE", label: "Discord", external: true },
                 { href: "https://instagram.com/forexnotes.in", label: "Instagram", external: true },
+                { href: "/vs/tradezella", label: "vs TradeZella", external: false },
+                { href: "/vs/fx-replay", label: "vs FX Replay", external: false },
                 { href: "/login", label: "Sign In", external: false },
               ].map(({ href, label, external }) =>
                 external ? (
