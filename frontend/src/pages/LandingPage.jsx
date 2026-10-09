@@ -3,6 +3,7 @@
 // Stack: GSAP + ScrollTrigger, Lenis smooth scroll, React Three Fiber, Glassmorphism
 
 import { useEffect, useRef } from "react";
+import BrandLogo from "../components/BrandLogo";
 import { Link } from "react-router-dom";
 import gsap from "gsap";
 import ScrollTrigger from "gsap/ScrollTrigger";
@@ -321,7 +322,7 @@ export default function LandingPage() {
             justifyContent: "space-between",
           }}>
             {/* Logo */}
-            <Link to="/" style={{ display: "flex", alignItems: "center" }}><img src="/logo-256.webp" alt="Logo" style={{ height: "60px", width: "auto", objectFit: "contain", filter: "drop-shadow(0 0 12px rgba(16,185,129,0.8))" }} /></Link>
+            <Link to="/" style={{ display: "flex", alignItems: "center" }}><BrandLogo style={{ height: "60px", width: "auto", objectFit: "contain", filter: "drop-shadow(0 0 12px rgba(16,185,129,0.8))" }} /></Link>
 
             {/* Nav Links */}
             <nav style={{ display: "flex", gap: "32px", alignItems: "center" }}>
@@ -852,7 +853,7 @@ export default function LandingPage() {
             alignItems: "center", justifyContent: "space-between", gap: "16px",
           }}>
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-              <img src="/logo-256.webp" alt="Forex Notes" style={{ height: "48px", width: "auto", objectFit: "contain", filter: "drop-shadow(0 0 12px rgba(16,185,129,0.4))" }} />
+              <BrandLogo style={{ height: "48px", width: "auto", objectFit: "contain", filter: "drop-shadow(0 0 12px rgba(16,185,129,0.4))" }} />
               <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)" }}>
                 © {new Date().getFullYear()} All Rights Reserved.
               </span>

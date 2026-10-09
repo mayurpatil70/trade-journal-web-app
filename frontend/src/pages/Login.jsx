@@ -1,5 +1,6 @@
 // frontend/src/pages/Login.jsx
 import { useState } from "react";
+import BrandLogo from "../components/BrandLogo";
 import api from "../api/axios";
 import {
   ArrowRight,
@@ -54,7 +55,7 @@ export default function Login() {
       <div className="w-full max-w-md glossy rounded-3xl p-8 sm:p-10 flex flex-col items-center text-center">
         {/* Logo & Branding */}
         <div className="flex flex-col items-center mb-8">
-          <img src="/logo-256.webp" alt="Forex Notes" width="96" height="85" className="h-20 w-auto mb-4 drop-shadow-[0_0_18px_rgba(16,185,129,0.45)]" />
+          <BrandLogo width="96" height="85" className="h-20 w-auto mb-4 drop-shadow-[0_0_18px_rgba(16,185,129,0.45)]" />
           <h1 className="text-3xl font-bold tracking-tight text-white mb-2">
             Forex Notes
           </h1>

@@ -104,6 +104,7 @@ export default function ChartTrading({ chartRef, seriesRef, containerRef, positi
 
     const onDown = (e) => {
       if (e.pointerType === 'mouse' && e.button !== 0) return;
+      if (e.target.closest?.('[data-trade-badge]')) return;
       const kind = pick(e.clientY, e.clientX);
       if (!kind) return;
       e.stopImmediatePropagation();
@@ -135,6 +136,7 @@ export default function ChartTrading({ chartRef, seriesRef, containerRef, positi
     };
 
     const onTouchStart = (e) => {
+      if (e.target.closest?.('[data-trade-badge]')) return;
       const t = e.touches[0];
       if (t && pick(t.clientY, t.clientX)) {
         e.stopImmediatePropagation();
@@ -165,10 +167,11 @@ export default function ChartTrading({ chartRef, seriesRef, containerRef, positi
   const badge = (key, y, label, color, onClick, title) => (Number.isFinite(y) ? (
     <button
       key={key}
+      data-trade-badge
       title={title}
       onClick={onClick}
       style={{ top: y - 10, right: axisW + 6, borderColor: color, color }}
-      className="pointer-events-auto absolute h-5 px-1.5 rounded bg-[#131418]/90 border text-[10px] font-bold leading-none hover:bg-[#1B1C20]"
+      className="pointer-events-auto absolute h-5 px-1.5 rounded bg-popover/90 border text-[10px] font-bold leading-none hover:bg-accent"
     >
       {label}
     </button>

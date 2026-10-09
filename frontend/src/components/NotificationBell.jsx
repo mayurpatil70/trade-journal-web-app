@@ -87,9 +87,9 @@ export default function NotificationBell({ className }) {
       <button
         onClick={toggle}
         title="High impact news today"
-        className="relative p-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-colors"
+        className="relative p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
       >
-        <Bell className={`w-5 h-5 ${unread ? "text-red-400" : ""}`} />
+        <Bell className={`w-5 h-5 ${unread ? "text-destructive" : ""}`} />
         {unread > 0 && (
           <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center">
             {unread}
@@ -98,33 +98,33 @@ export default function NotificationBell({ className }) {
       </button>
 
       {open && (
-        <div className="absolute right-0 mt-2 w-[min(340px,calc(100vw-2rem))] max-h-[70vh] overflow-y-auto rounded-xl border border-white/10 bg-[#101216]/95 backdrop-blur-xl shadow-2xl z-50">
-          <div className="flex items-center justify-between px-4 py-3 border-b border-white/5">
+        <div className="absolute right-0 mt-2 w-[min(340px,calc(100vw-2rem))] max-h-[70vh] overflow-y-auto rounded-xl border border-border bg-popover/95 backdrop-blur-xl shadow-2xl z-50">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-border">
             <div>
-              <p className="text-sm font-semibold text-white">Red folder news</p>
-              <p className="text-[11px] text-gray-500">Today, 3:30 AM to 2:30 AM IST</p>
+              <p className="text-sm font-semibold text-foreground">Red folder news</p>
+              <p className="text-[11px] text-muted-foreground">Today, 3:30 AM to 2:30 AM IST</p>
             </div>
-            <button onClick={() => setOpen(false)} className="text-gray-500 hover:text-white">
+            <button onClick={() => setOpen(false)} className="text-muted-foreground hover:text-foreground">
               <X className="w-4 h-4" />
             </button>
           </div>
           {red.length === 0 ? (
-            <p className="px-4 py-6 text-center text-xs text-gray-500">No high impact news today.</p>
+            <p className="px-4 py-6 text-center text-xs text-muted-foreground">No high impact news today.</p>
           ) : (
-            <ul className="divide-y divide-white/5">
+            <ul className="divide-y divide-border">
               {red.map((e, i) => (
                 <li key={`${e.title}-${e.ts}-${i}`} className="px-4 py-3 text-xs">
                   <div className="flex items-center justify-between gap-2">
-                    <span className="font-semibold text-white">{e.country} · {e.title}</span>
-                    <span className={`shrink-0 font-mono ${e.ts < day.now ? "text-gray-500" : "text-red-400"}`}>
+                    <span className="font-semibold text-foreground">{e.country} · {e.title}</span>
+                    <span className={`shrink-0 font-mono ${e.ts < day.now ? "text-muted-foreground" : "text-destructive"}`}>
                       {new Date(e.ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                     </span>
                   </div>
-                  <div className="mt-1 flex gap-3 text-gray-500">
+                  <div className="mt-1 flex gap-3 text-muted-foreground">
                     <span>{sessionOf(e.ts)} session</span>
                     {e.forecast && <span>F: {e.forecast}</span>}
                     {e.previous && <span>P: {e.previous}</span>}
-                    {e.actual && <span className="text-gray-300">A: {e.actual}</span>}
+                    {e.actual && <span className="text-foreground/80">A: {e.actual}</span>}
                   </div>
                 </li>
               ))}

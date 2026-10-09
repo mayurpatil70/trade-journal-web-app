@@ -613,3 +613,35 @@ LEDGER UTILITIES
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
 }
+
+/* =========================================================
+LIGHT-MODE: standalone pages, footer, calculators, generic dark fills
+========================================================= */
+
+html.light .trading-bg {
+  background:
+    radial-gradient(900px 500px at 10% -10%, rgba(21, 128, 61, 0.09), transparent 60%),
+    radial-gradient(700px 400px at 100% 10%, rgba(220, 38, 38, 0.05), transparent 60%),
+    var(--paper);
+}
+
+html.light body:not(.terminal) [class~="bg-black"] { background-color: var(--paper) !important; }
+html.light body:not(.terminal) [class*="bg-black/"]:not([class*="fixed"]):not([class*="absolute"]) { background-color: rgb(0 0 0 / 0.04) !important; }
+html.light body:not(.terminal) [class*="bg-[#"][class*="/"] { background-color: var(--surface-raised) !important; }
+html.light body:not(.terminal) [class*="border-gray-"] { border-color: var(--hairline) !important; }
+html.light body:not(.terminal) [class~="text-gray-600"],
+html.light body:not(.terminal) [class~="text-gray-700"] { color: var(--ink-mute) !important; }
+html.light body:not(.terminal) [class~="hover:text-white"]:hover { color: var(--ink) !important; }
+html.light body:not(.terminal) [class~="hover:bg-white/5"]:hover { background-color: rgb(0 0 0 / 0.05) !important; }
+html.light body:not(.terminal) [class~="placeholder-gray-600"]::placeholder { color: var(--ink-mute); }
+html.light body:not(.terminal) [class~="text-emerald-300"] { color: var(--gain) !important; }
+
+.page-shell {
+  min-height: 100vh;
+  background: var(--paper);
+  color: var(--ink);
+}
+.page-shell h1,
+.page-shell h2 { color: var(--ink); }
+.page-shell .page-muted { color: var(--ink-mute); }
+.page-shell .page-body { color: var(--ink-soft); }

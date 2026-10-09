@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import BrandLogo from "../components/BrandLogo";
 import { Link, Navigate, useParams } from "react-router-dom";
 import { Check, X } from "lucide-react";
 import { COMPETITORS, FOREX_NOTES, SECTIONS, comparisonRows, faqs } from "../data/competitorComparisons";
@@ -90,7 +91,7 @@ export default function CompetitorVsPage() {
   return (
     <div className="min-h-screen bg-[#0A0B0D] text-gray-300">
       <header className="max-w-5xl mx-auto px-4 py-5 flex items-center justify-between">
-        <Link to="/"><img src="/logo-256.webp" alt="Forex Notes" className="h-12 w-auto" /></Link>
+        <Link to="/"><BrandLogo className="h-12 w-auto" /></Link>
         <Link to="/login" className="px-4 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-black text-sm font-bold">Start free trial</Link>
       </header>
 

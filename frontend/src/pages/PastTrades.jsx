@@ -20,8 +20,10 @@ import {
 } from "lucide-react";
 
 const tradeStamp = (t) => {
+  const c = new Date(t.created_at || 0).getTime();
+  if (!Number.isNaN(c) && c > 0) return c;
   const d = new Date(`${t.date}T${t.time || "00:00"}`).getTime();
-  return Number.isNaN(d) ? new Date(t.created_at || 0).getTime() : d;
+  return Number.isNaN(d) ? 0 : d;
 };
 
 export default function PastTrades() {

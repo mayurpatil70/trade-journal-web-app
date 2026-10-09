@@ -338,7 +338,7 @@ export default function Dashboard() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {/* Show last 3 trades by sorting descending */}
-            {[...trades].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 3).map((t, i) => {
+            {[...trades].sort((a, b) => (new Date(b.created_at || b.date) - new Date(a.created_at || a.date))).slice(0, 3).map((t, i) => {
               const r = parseFloat(t.r_multiple || 0);
               const isWin = r >= 0;
               return (
