@@ -3,6 +3,19 @@
 
 <head>
   <meta charset="UTF-8" />
+  <!-- Google Analytics: production domain only (skips localhost and the Capacitor app) -->
+  <script>
+    if (/(^|\.)forexnotes\.in$/.test(location.hostname)) {
+      window.dataLayer = window.dataLayer || [];
+      window.gtag = function () { dataLayer.push(arguments); };
+      gtag('js', new Date());
+      gtag('config', 'G-GSW577JG22');
+      var ga = document.createElement('script');
+      ga.async = true;
+      ga.src = 'https://www.googletagmanager.com/gtag/js?id=G-GSW577JG22';
+      document.head.appendChild(ga);
+    }
+  </script>
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
   <link rel="icon" type="image/png" sizes="192x192" href="/logo-192.png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
