@@ -9,9 +9,13 @@ const supabase = createClient(
   process.env.SUPABASE_KEY,
 );
 const resend = new Resend(process.env.RESEND_API_KEY);
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export const requestLogin = async (req, res) => {
-  const { email } = req.body;
+  const email = String(req.body?.email || "").trim();
+  if (!EMAIL_RE.test(email)) {
+    return res.status(400).json({ error: "Please enter a valid email address." });
+  }
   const token = crypto.randomBytes(32).toString("hex");
   const expires = new Date(Date.now() + 15 * 60000).toISOString();
 
@@ -32,7 +36,13 @@ export const requestLogin = async (req, res) => {
       from: "ForexNotes <auth@forexnotes.in>",
       to: email,
       subject: "ForexNotes - Secure Login",
-      html: `<p>Click <a href="${magicLink}">here</a> to access your trading journal.</p>`,
+      text: `Sign in to ForexNotes: ${magicLink}\n\nThis link expires in 15 minutes. If you didn't request it, ignore this email.`,
+      html: `<div style="font-family:Arial,sans-serif;max-width:480px;margin:auto;padding:24px">
+        <h2 style="margin:0 0 12px">Sign in to ForexNotes</h2>
+        <p>Click the button below to access your trading journal. This link expires in 15 minutes.</p>
+        <p><a href="${magicLink}" style="display:inline-block;background:#10b981;color:#000;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:bold">Sign in</a></p>
+        <p style="color:#666;font-size:12px">If you didn't request this email, you can safely ignore it.</p>
+      </div>`,
     });
 
     if (emailError) throw new Error(emailError.message);
@@ -40,7 +50,7 @@ export const requestLogin = async (req, res) => {
     res.json({ message: "Login link sent successfully." });
   } catch (error) {
     console.error("Auth Error:", error.message);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: "Could not send the login link. Please try again." });
   }
 };
 

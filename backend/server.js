@@ -7,7 +7,6 @@ import cors from "cors";
 import aiRoutes from "./routes/aiRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import discordRoutes from "./routes/discordRoutes.js";
-import exportRoutes from "./routes/exportRoutes.js";
 import kycRoutes from "./routes/kycRoutes.js";
 import newsRoutes from "./routes/newsRoutes.js";
 import tradeRoutes from "./routes/tradeRoutes.js";
@@ -47,7 +46,6 @@ app.use("/api/auth", kycRoutes); // <-- This handles your /api/auth/kyc
 app.use("/api/discord", discordRoutes);
 app.use("/api/news", newsRoutes);
 app.use("/api/trades", tradeRoutes);
-app.use("/api/trades", exportRoutes); // <-- This handles your exports
 app.use("/api/support", supportRoutes);
 app.use("/api/subscriptions", subscriptionRoutes);
 app.use("/api/admin", adminRoutes);

@@ -1,4 +1,5 @@
 // frontend/src/layouts/MainLayout.jsx
+import NotificationBell from "../components/NotificationBell.jsx";
 import { useState, useEffect } from "react";
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import PreTradeGate from "../components/PreTradeGate.jsx";
@@ -201,6 +202,8 @@ export default function MainLayout() {
       {/* Mobile Header */}
       <div className="md:hidden fixed top-0 left-0 right-0 h-14 bg-[#101216]/95 border-b border-white/5 flex items-center justify-between px-4 z-40 backdrop-blur-xl">
         <div className="flex items-center gap-2"><img src="/logo3d.png" alt="ForexNotes" className="h-16 w-auto object-contain drop-shadow-[0_0_12px_rgba(16,185,129,0.5)]" /></div>
+        <div className="flex items-center gap-1">
+        <NotificationBell />
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-colors"
@@ -211,6 +214,7 @@ export default function MainLayout() {
             <Menu className="w-5 h-5" />
           )}
         </button>
+        </div>
       </div>
 
       {/* Sidebar - Premium Trading Cockpit Style */}
@@ -350,6 +354,7 @@ export default function MainLayout() {
 
       {/* Main Content Area */}
       <main className="flex-1 overflow-y-auto relative pt-14 md:pt-0 bg-[#0A0B0D]">
+        <NotificationBell className="hidden md:block fixed top-3 right-5 z-40" />
         <Outlet />
       </main>
 
