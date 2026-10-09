@@ -15,7 +15,9 @@ import api from "./api/axios";
 import LandingPage from "./pages/LandingPage.jsx";
 import PrivacyPolicy from "./pages/PrivacyPolicy.jsx";
 import NotFound from "./pages/NotFound.jsx";
+import { SEO_PAGES } from "./data/seoPages";
 const CompetitorVsPage = lazy(() => import("./pages/CompetitorVsPage.jsx"));
+const SeoLandingPage = lazy(() => import("./pages/SeoLandingPage.jsx"));
 
 // Lazy Loaded Protected App Pages
 const Login = lazy(() => import("./pages/Login.jsx"));
@@ -59,7 +61,7 @@ const PropFirm = lazy(() => import("./pages/TraderProblems/PropFirm.jsx"));
 const LotSizeCalculator = lazy(() => import("./pages/TraderProblems/LotSizeCalculator.jsx"));
 
 const INDEXABLE_PATHS = ["/", "/privacy"];
-const isIndexable = (path) => INDEXABLE_PATHS.includes(path) || path.startsWith("/vs/");
+const isIndexable = (path) => INDEXABLE_PATHS.includes(path) || path.startsWith("/vs/") || SEO_PAGES.some((p) => p.path === path.replace(/\/$/, ""));
 
 const RouteSeo = () => {
   const { pathname, search } = useLocation();
@@ -166,6 +168,7 @@ function App() {
             <Route path="/" element={<LandingPage />} />
             <Route path="/privacy" element={<PrivacyPolicy />} />
             <Route path="/vs/:competitorSlug" element={<CompetitorVsPage />} />
+            {SEO_PAGES.map((p) => <Route key={p.path} path={p.path} element={<SeoLandingPage />} />)}
             <Route path="/login" element={<Login />} />
             <Route path="/verify" element={<Verify />} />
 

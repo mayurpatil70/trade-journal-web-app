@@ -9,11 +9,14 @@ import { ArrowRight, MessageSquare, Zap, ShieldCheck, Brain, TrendingUp, Calcula
 const CandlestickScene = lazy(() => import('./CandlestickScene'));
 
 // "What you get" hint chips shown in hero
+const GREEN = { color: '#10b981', bg: 'rgba(16,185,129,0.1)', border: 'rgba(16,185,129,0.25)' };
+const RED = { color: '#f87171', bg: 'rgba(239,68,68,0.1)', border: 'rgba(239,68,68,0.25)' };
+const GRAY = { color: '#d4d4d8', bg: 'rgba(255,255,255,0.05)', border: 'rgba(255,255,255,0.14)' };
 const TRADER_HINTS = [
-  { icon: Brain, label: 'AI Stops Revenge Trades', color: '#ec4899', bg: 'rgba(236,72,153,0.1)', border: 'rgba(236,72,153,0.25)' },
-  { icon: ShieldCheck, label: 'Prop Firm Drawdown Auto-Tracked', color: '#10b981', bg: 'rgba(16,185,129,0.1)', border: 'rgba(16,185,129,0.25)' },
-  { icon: Calculator, label: 'Instant Lot Size Sizing', color: '#10b981', bg: 'rgba(16,185,129,0.1)', border: 'rgba(16,185,129,0.25)' },
-  { icon: TrendingUp, label: 'R-Multiple Analytics Engine', color: '#059669', bg: 'rgba(16,185,129,0.1)', border: 'rgba(16,185,129,0.25)' },
+  { icon: TrendingUp, label: '10 Years of Backtest Data', ...GREEN },
+  { icon: Brain, label: 'AI Psychology Coach', ...RED },
+  { icon: ShieldCheck, label: 'Prop Firm Challenge Tools', ...GRAY },
+  { icon: Calculator, label: '10% Affiliate Rewards', ...GREEN },
 ];
 
 const LIVE_FEEDS = [
@@ -29,12 +32,6 @@ const LIVE_FEEDS = [
 ];
 
 export default function LandingHero() {
-  const isDesktop = typeof window !== 'undefined' && window.innerWidth >= 768;
-  
-  // Create a dummy ref object to pass to CandlestickScene since it expects a scrollProgress ref
-  // but we removed the GSAP pinning here. It will just default to 0.
-  const dummyProgress = { current: 0 };
-
   return (
     <div style={{ position: 'relative', overflow: 'hidden', paddingTop: '80px', paddingBottom: '100px' }}>
       <div
@@ -52,16 +49,10 @@ export default function LandingHero() {
             zIndex: 2,
           }}
         >
-          {/* 3D Candlestick - Desktop Only */}
-          <div
-            className="hidden md:block order-2 md:order-1"
-            style={{ width: '220px', height: '200px', flexShrink: 0 }}
-          >
-            {isDesktop && (
-              <Suspense fallback={<div style={{ width: '100%', height: '100%' }} />}>
-                <CandlestickScene scrollProgress={dummyProgress} />
-              </Suspense>
-            )}
+          <div className="order-2 md:order-1 w-[260px] h-[200px] md:w-[340px] md:h-[300px] shrink-0">
+            <Suspense fallback={null}>
+              <CandlestickScene />
+            </Suspense>
           </div>
 
           {/* Hero Text */}
@@ -82,25 +73,25 @@ export default function LandingHero() {
               letterSpacing: '0.02em',
             }}>
               <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#10b981', display: 'inline-block', animation: 'pulse 2s infinite' }} />
-              Built for Funded & Prop Firm Traders
+              Backtest · Journal · AI Coach for Forex, Gold & Crypto
             </div>
 
             <h1 style={{
-              fontSize: 'clamp(2.5rem, 6vw, 4.2rem)',
+              fontSize: 'clamp(2.2rem, 4.6vw, 3.6rem)',
               fontWeight: 900,
               lineHeight: 1.05,
               letterSpacing: '-0.03em',
               color: 'white',
               marginBottom: '20px',
             }}>
-              Stop Bleeding Capital<br />
+              Backtest 10 Years of Markets.<br />
               <span style={{
                 background: 'linear-gradient(135deg, #10b981 0%, #059669 50%, #10b981 100%)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
                 backgroundClip: 'text',
               }}>
-                to Emotional Mistakes.
+                Journal Every Trade. Master Your Mind.
               </span>
             </h1>
 
@@ -111,7 +102,7 @@ export default function LandingHero() {
               marginBottom: '32px',
               maxWidth: '520px',
             }}>
-              The only trading journal for Forex, Crypto, and Gold that pairs your chart setups with an <strong style={{ color: 'rgba(255,255,255,0.8)' }}>AI psychology guard</strong>, <strong style={{ color: 'rgba(255,255,255,0.8)' }}>prop firm rule tracking</strong>, and <strong style={{ color: 'rgba(255,255,255,0.8)' }}>automated R-multiple analytics</strong> — all for a one-time $11Access Now.
+              Forex Notes is a <strong style={{ color: 'rgba(255,255,255,0.85)' }}>bar replay backtesting platform</strong> with 10 years of historical data, a <strong style={{ color: 'rgba(255,255,255,0.85)' }}>digital trading journal</strong> with an <strong style={{ color: 'rgba(255,255,255,0.85)' }}>AI psychology coach</strong>, and <strong style={{ color: 'rgba(255,255,255,0.85)' }}>prop firm challenge tools</strong> in one app. Plans from $14/month, pay by card or USDT.
             </p>
 
             {/* Trader Hint Chips */}
@@ -165,7 +156,7 @@ export default function LandingHero() {
                 }}
               >
                 <Zap size={16} />
-                Unlock Your Access Now
+                Start Your Free Trial
                 <ArrowRight size={16} />
               </Link>
               <a

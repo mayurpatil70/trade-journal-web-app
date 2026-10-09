@@ -200,8 +200,8 @@ export default function MainLayout() {
         </div>
       )}
       {/* Mobile Header */}
-      <div className="md:hidden fixed top-0 left-0 right-0 h-14 bg-[#101216]/95 border-b border-white/5 flex items-center justify-between px-4 z-40 backdrop-blur-xl">
-        <div className="flex items-center gap-2"><img src="/logo3d.png" alt="ForexNotes" className="h-16 w-auto object-contain drop-shadow-[0_0_12px_rgba(16,185,129,0.5)]" /></div>
+      <div className="md:hidden fixed top-0 left-0 right-0 h-14 glossy-bar flex items-center justify-between px-4 z-40">
+        <div className="flex items-center gap-2"><img src="/logo-256.webp" alt="ForexNotes" className="h-16 w-auto object-contain drop-shadow-[0_0_12px_rgba(16,185,129,0.5)]" /></div>
         <div className="flex items-center gap-1">
         <NotificationBell />
         <button
@@ -219,13 +219,13 @@ export default function MainLayout() {
 
       {/* Sidebar - Premium Trading Cockpit Style */}
       <aside
-        className={`fixed inset-y-0 left-0 z-30 w-[260px] bg-[#0A0B0D] border-r border-white/5 transform transition-transform duration-300 ease-in-out flex flex-col ${
+        className={`fixed inset-y-0 left-0 z-30 w-[260px] glossy-side border-r border-white/5 transform transition-transform duration-300 ease-in-out flex flex-col ${
           isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
         } md:relative md:translate-x-0`}
       >
         {/* Logo */}
         <div className="h-16 flex items-center justify-between px-5 shrink-0 hidden md:flex border-b border-white/5">
-          <div className="flex items-center gap-2"><img src="/logo3d.png" alt="ForexNotes" className="h-16 w-auto object-contain drop-shadow-[0_0_12px_rgba(16,185,129,0.5)]" /></div>
+          <div className="flex items-center gap-2"><img src="/logo-256.webp" alt="ForexNotes" className="h-16 w-auto object-contain drop-shadow-[0_0_12px_rgba(16,185,129,0.5)]" /></div>
           <button
             onClick={() => setIsSearchOpen(true)}
             className="p-1.5 text-gray-500 hover:text-gray-300 rounded-md hover:bg-white/5 transition-colors"
