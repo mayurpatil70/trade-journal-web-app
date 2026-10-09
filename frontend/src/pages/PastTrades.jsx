@@ -19,6 +19,11 @@ import {
   Pencil
 } from "lucide-react";
 
+const tradeStamp = (t) => {
+  const d = new Date(`${t.date}T${t.time || "00:00"}`).getTime();
+  return Number.isNaN(d) ? new Date(t.created_at || 0).getTime() : d;
+};
+
 export default function PastTrades() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -34,7 +39,7 @@ export default function PastTrades() {
       if (!userId) return navigate("/login");
       try {
         const response = await api.get(`/api/trades?userId=${userId}`);
-        const allTrades = response.data?.data || [];
+        const allTrades = [...(response.data?.data || [])].sort((a, b) => tradeStamp(b) - tradeStamp(a));
         setTrades(allTrades);
         
         // Auto open trade if requested via navigation

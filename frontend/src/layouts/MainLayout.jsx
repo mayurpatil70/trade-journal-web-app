@@ -1,5 +1,6 @@
 // frontend/src/layouts/MainLayout.jsx
 import NotificationBell from "../components/NotificationBell.jsx";
+import ThemeToggle from "../components/ThemeToggle.jsx";
 import { useState, useEffect } from "react";
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import PreTradeGate from "../components/PreTradeGate.jsx";
@@ -97,13 +98,8 @@ export default function MainLayout() {
   const userId = localStorage.getItem("userId") || localStorage.getItem("userEmail");
   const isAdmin = userId === "noballondesk@gmail.com" || userId === "akpatil51340@gmail.com";
 
-  // FIX: Enforce Theme Globally on Mount & Route Change
+  // Command palette shortcut
   useEffect(() => {
-    // We enforce a premium dark theme globally for the new design
-    document.documentElement.classList.add("dark");
-    document.body.style.backgroundColor = "#0A0B0D";
-    document.body.style.color = "#FFFFFF";
-
     // Command Palette listener
     const handleKeyDown = (e) => {
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
@@ -203,6 +199,7 @@ export default function MainLayout() {
       <div className="md:hidden fixed top-0 left-0 right-0 h-14 glossy-bar flex items-center justify-between px-4 z-40">
         <div className="flex items-center gap-2"><img src="/logo-256.webp" alt="ForexNotes" className="h-16 w-auto object-contain drop-shadow-[0_0_12px_rgba(16,185,129,0.5)]" /></div>
         <div className="flex items-center gap-1">
+        <ThemeToggle />
         <NotificationBell />
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -354,7 +351,10 @@ export default function MainLayout() {
 
       {/* Main Content Area */}
       <main className="flex-1 overflow-y-auto relative pt-14 md:pt-0 bg-[#0A0B0D]">
-        <NotificationBell className="hidden md:block fixed top-3 right-5 z-40" />
+        <div className="max-md:hidden flex fixed top-3 right-5 z-40 items-center gap-2">
+          <NotificationBell />
+          <ThemeToggle />
+        </div>
         <Outlet />
       </main>
 

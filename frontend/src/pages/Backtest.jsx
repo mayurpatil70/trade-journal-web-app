@@ -3,14 +3,15 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { createChart } from 'lightweight-charts';
 import {
   Play, Pause, StepForward, ChevronLeft, Loader2, SkipBack, Rewind, FastForward,
-  SkipForward, BarChart2, Activity, ChevronRight, X,
+  SkipForward, BarChart2, Activity, ChevronRight, X, ArrowUp, ArrowDown,
 } from 'lucide-react';
 import SymbolPicker from '../components/SymbolPicker';
 import DrawingLayer from '../components/drawing/DrawingLayer';
+import ChartTrading from '../components/backtest/ChartTrading';
 import { marketApi } from '../api/market';
 import {
   createReplay, positionSize, validateOrder, stepReplay, placeOrder, closePosition,
-  cancelPending, modifyPosition, openPnl, computeAnalytics, paginate,
+  cancelPending, modifyPosition, partialClose, openPnl, computeAnalytics, paginate,
 } from '../utils/backtestEngine';
 
 const TFS = ['1m', '5m', '15m', '30m', '1h', '4h', '1d'];
@@ -125,7 +126,7 @@ export default function Backtest() {
   const [editSl, setEditSl] = useState('');
   const [editTp, setEditTp] = useState('');
   const [drawings, setDrawings] = useState([]);
-  const [showRightPane, setShowRightPane] = useState(window.innerWidth > 768);
+  const [showRightPane, setShowRightPane] = useState(false);
   const watch = new URLSearchParams(location.search).has('watch');
 
   const { index } = run;
@@ -148,6 +149,11 @@ export default function Backtest() {
   const candle = candles[index - 1];
   const price = candle?.close;
   const finished = candles.length > 0 && index >= candles.length;
+
+  useEffect(() => {
+    document.body.classList.add('terminal');
+    return () => document.body.classList.remove('terminal');
+  }, []);
 
   useEffect(() => {
     const found = loadSessions().find((s) => s.id === id) || location.state?.draftSession;
@@ -231,7 +237,7 @@ export default function Backtest() {
       priceFormat: { type: 'price', precision: 5, minMove: 0.00001 },
     });
     chartRef.current = chart;
-    const ro = new ResizeObserver(() => chart.applyOptions({ width: el.clientWidth, height: el.clientHeight }));
+    const ro = new ResizeObserver(() => chart.resize(el.clientWidth, el.clientHeight));
     ro.observe(el);
     return () => {
       ro.disconnect();
@@ -271,9 +277,10 @@ export default function Backtest() {
     const add = (p, color, title, lineStyle = 2) => {
       if (Number.isFinite(p)) linesRef.current.push(series.createPriceLine({ price: p, color, lineWidth: 1, lineStyle, title, axisLabelVisible: true }));
     };
-    const o = replay.position ?? replay.pending;
+    const o = replay.pending;
+    if (replay.position) return;
     if (o) {
-      add(o.entry, '#2962FF', replay.position ? 'Entry' : `${replay.pending.type} entry`, 0);
+      add(o.entry, '#2962FF', `${o.type} entry`, 0);
       add(o.sl, '#F23645', 'SL');
       add(o.tp, '#089981', 'TP');
     } else if (tab === 'order' && !watch) {
@@ -395,6 +402,40 @@ export default function Backtest() {
     setTp((side === 'Buy' ? entryNum + d : entryNum - d).toFixed(priceDp(entryNum)));
   };
 
+  const atrDistance = () => {
+    const bars = candlesRef.current.slice(Math.max(index - 15, 0), index);
+    if (bars.length < 2) return NaN;
+    const ranges = bars.slice(1).map((b, i) => Math.max(b.high - b.low, Math.abs(b.high - bars[i].close), Math.abs(b.low - bars[i].close)));
+    return ranges.reduce((a, b) => a + b, 0) / ranges.length;
+  };
+
+  const punch = (punchSide) => {
+    if (!candle || finished || loading) return;
+    const dist = atrDistance() * 1.5;
+    if (!(dist > 0)) return setFormError('Not enough candles to size a stop. Step forward a few bars.');
+    const dir = punchSide === 'Buy' ? 1 : -1;
+    const slP = price - dir * dist;
+    const tpP = price + dir * dist * 2;
+    const u = positionSize({ balance: balanceBase === 'initial' ? replay.initialBalance : replay.balance, riskPct: Number(riskPct), entry: price, sl: slP });
+    if (!(u > 0)) return setFormError('Position size is zero. Check risk %.');
+    setFormError('');
+    setRun((r) => ({ ...r, replay: placeOrder(r.replay, { side: punchSide, type: 'Market', entry: price, sl: slP, tp: tpP, units: u }, candle) }));
+  };
+
+  const modifyExits = useCallback(({ sl: nextSl, tp: nextTp }) => {
+    setRun((r) => (r.replay.position ? { ...r, replay: modifyPosition(r.replay, { sl: nextSl, tp: nextTp }) } : r));
+  }, []);
+
+  const breakEven = () => {
+    const p = replay.position;
+    if (p) modifyExits({ sl: p.entry, tp: p.tp });
+  };
+
+  const partial = () => {
+    if (!replay.position || !candle) return;
+    setRun((r) => ({ ...r, replay: partialClose(r.replay, price, candle.time, 0.5) }));
+  };
+
   const closeNow = () => setRun((r) => ({ ...r, replay: closePosition(r.replay, price, candle.time) }));
   const cancelOrder = () => setRun((r) => ({ ...r, replay: cancelPending(r.replay) }));
 
@@ -419,6 +460,23 @@ export default function Backtest() {
   const journal = useMemo(() => paginate([...replay.trades].reverse(), journalPage, PAGE_SIZE), [replay.trades, journalPage]);
   const livePnl = replay.position && price ? openPnl(replay.position, price) : 0;
   const equity = replay.balance + livePnl;
+  const drawdown = useMemo(() => {
+    const p = replay.position;
+    if (!p) return 0;
+    const dirSign = p.side === 'Buy' ? 1 : -1;
+    let worst = 0;
+    for (let i = index - 1; i >= 0 && candles[i].time >= p.entryTime; i -= 1) {
+      const adverse = dirSign > 0 ? p.entry - candles[i].low : candles[i].high - p.entry;
+      if (adverse > worst) worst = adverse;
+    }
+    return worst * p.units;
+  }, [replay.position, candles, index]);
+  const elapsed = useMemo(() => {
+    const p = replay.position;
+    if (!p || !clockTime) return '-';
+    const mins = Math.max(Math.round((clockTime - p.entryTime) / 60), 0);
+    return mins >= 1440 ? `${Math.floor(mins / 1440)}d ${Math.floor((mins % 1440) / 60)}h` : `${Math.floor(mins / 60)}h ${mins % 60}m`;
+  }, [replay.position, clockTime]);
 
   const stateKey = `${symbol}|${tf}|${candle?.time}|${replay.trades.length}|${replay.position?.id}|${replay.pending?.id}|${riskPct}`;
   useEffect(() => {
@@ -457,8 +515,8 @@ export default function Backtest() {
   );
 
   return (
-    <div className="flex flex-col h-screen bg-[#0A0B0D] text-[#D1D4DC] overflow-hidden font-sans text-xs fixed inset-0 z-[100]">
-      <div className="h-12 border-b border-[#1B1C20] flex items-center justify-between px-3 shrink-0">
+    <div className="flex flex-col h-dvh bg-[#0A0B0D] text-[#D1D4DC] overflow-hidden font-sans text-xs fixed inset-0 z-[100]">
+      <div className="h-12 border-b border-[#1B1C20] flex items-center justify-between px-3 shrink-0 overflow-x-auto whitespace-nowrap gap-2">
         <div className="flex items-center gap-1">
           <button onClick={() => navigate('/sessions')} className="p-1.5 hover:bg-[#1B1C20] rounded text-[#787B86] hover:text-white">
             <ChevronLeft className="w-5 h-5" />
@@ -473,7 +531,7 @@ export default function Backtest() {
                 {TFS.map((t) => <option key={t} value={t} className="bg-[#0A0B0D]">{t}</option>)}
               </select>
               <div className="h-4 w-px bg-[#1B1C20] mx-2" />
-              <button onClick={() => setTab('analytics')} className="flex items-center gap-1 px-2 py-1.5 hover:bg-[#1B1C20] rounded text-[#787B86] hover:text-[#D1D4DC]">
+              <button onClick={() => { setTab('analytics'); setShowRightPane(true); }} className="flex items-center gap-1 px-2 py-1.5 hover:bg-[#1B1C20] rounded text-[#787B86] hover:text-[#D1D4DC]">
                 <BarChart2 className="w-4 h-4" /> Analytics
               </button>
             </>
@@ -517,6 +575,50 @@ export default function Backtest() {
             readOnly={watch}
             resetKey={`${id}|${symbol}`}
           />
+          {!watch && (
+            <ChartTrading
+              chartRef={chartRef}
+              seriesRef={seriesRef}
+              containerRef={chartContainerRef}
+              position={replay.position}
+              price={price}
+              onModify={modifyExits}
+              onClose={closeNow}
+            />
+          )}
+
+          {!watch && composing && (
+            <div className="absolute top-16 right-2 md:top-4 md:right-20 z-50 flex items-stretch rounded-md overflow-hidden border border-[#222429] bg-[#131418] shadow-lg">
+              <button onClick={() => punch('Sell')} disabled={!candle || finished || loading} className="px-3 py-1.5 bg-[#F23645] hover:bg-[#d92c3b] text-white font-bold flex items-center gap-1 disabled:opacity-40">
+                <ArrowDown className="w-3.5 h-3.5" /> Sell
+              </button>
+              <select
+                title="Risk per trade"
+                value={RISKS.includes(Number(riskPct)) ? Number(riskPct) : 'custom'}
+                onChange={(e) => { setRiskPct(Number(e.target.value)); setCustomRisk(false); }}
+                className="bg-[#0A0B0D] text-[#D1D4DC] font-mono px-1.5 outline-none border-x border-[#222429]"
+              >
+                {!RISKS.includes(Number(riskPct)) && <option value="custom">{riskPct}%</option>}
+                {RISKS.map((r) => <option key={r} value={r}>{r}%</option>)}
+              </select>
+              <button onClick={() => punch('Buy')} disabled={!candle || finished || loading} className="px-3 py-1.5 bg-[#089981] hover:bg-[#07806b] text-white font-bold flex items-center gap-1 disabled:opacity-40">
+                Buy <ArrowUp className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          )}
+          {!watch && formError && !showRightPane && (
+            <div className="absolute top-28 right-2 md:top-14 md:right-20 z-50 max-w-[240px] bg-[#131418] border border-[#F23645]/50 text-[#F23645] rounded px-2 py-1">{formError}</div>
+          )}
+
+          {!watch && (
+            <button
+              onClick={() => setShowRightPane((v) => !v)}
+              title={showRightPane ? 'Close panel' : 'Open analytics'}
+              className="md:hidden absolute bottom-10 right-3 z-[90] h-11 w-11 rounded-full bg-[#2962FF] text-white shadow-lg flex items-center justify-center"
+            >
+              {showRightPane ? <X className="w-5 h-5" /> : <BarChart2 className="w-5 h-5" />}
+            </button>
+          )}
 
           {(loading || loadError) && (
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[#0A0B0D]/90 z-40">
@@ -538,11 +640,23 @@ export default function Backtest() {
           </div>
         </div>
 
-        {showRightPane && !watch && (
-          <div className="w-[300px] border-l border-[#1B1C20] bg-[#101114] flex flex-col shrink-0 z-[100] text-[11px] absolute right-0 top-0 bottom-0 md:relative md:w-[300px]">
-            <button onClick={() => setShowRightPane(false)} className="md:hidden absolute -left-8 top-1/2 -translate-y-1/2 bg-[#1B1C20] p-1.5 rounded-l-md border border-[#222429] border-r-0 text-[#787B86] hover:text-white">
-              <ChevronRight className="w-5 h-5" />
-            </button>
+        {!watch && showRightPane && (
+          <div onClick={() => setShowRightPane(false)} className="md:hidden fixed inset-0 z-[105] bg-black/40 backdrop-blur-sm" />
+        )}
+        {!watch && (
+          <div className={`w-[300px] max-w-[88vw] border-l border-[#1B1C20] bg-[#101114] flex flex-col shrink-0 text-[11px] fixed right-0 top-0 bottom-0 z-[110] transition-transform duration-200 ease-out md:static md:z-auto md:translate-x-0 ${showRightPane ? 'translate-x-0' : 'translate-x-full'}`}>
+          <div className="grid grid-cols-3 gap-px bg-[#1B1C20] border-b border-[#1B1C20] shrink-0">
+            {[
+              ['Balance', fmt(replay.balance), ''],
+              ['Win rate', `${fmt(analytics.winRate * 100, 0)}%`, ''],
+              ['P&L', signed(analytics.netPnl + livePnl), analytics.netPnl + livePnl >= 0 ? 'text-[#089981]' : 'text-[#F23645]'],
+            ].map(([label, value, tone]) => (
+              <div key={label} className="bg-[#101114] px-2 py-1.5">
+                <div className="text-[#787B86] text-[9px]">{label}</div>
+                <div className={`font-mono font-semibold ${tone}`}>{value}</div>
+              </div>
+            ))}
+          </div>
           <div className="flex h-12 border-b border-[#1B1C20] text-[#787B86]">
             {tabBtn('order', 'Order', Activity)}
             {tabBtn('journal', 'Journal', ChevronRight)}
@@ -561,6 +675,14 @@ export default function Backtest() {
                       <span className={`font-mono ${livePnl >= 0 ? 'text-[#089981]' : 'text-[#F23645]'}`}>{signed(livePnl)}</span>
                     </div>
                     <div className="text-[#787B86] mb-2">Entry {fmt(replay.position.entry, priceDp(replay.position.entry))}</div>
+                    <div className="grid grid-cols-2 gap-2 mb-2 text-[#787B86]">
+                      <div>Drawdown <span className="font-mono text-[#F23645]">-{fmt(drawdown)}</span></div>
+                      <div>Elapsed <span className="font-mono text-[#D1D4DC]">{elapsed}</span></div>
+                    </div>
+                    <div className="flex gap-2 mb-2">
+                      <button onClick={breakEven} className="flex-1 py-1.5 border border-[#222429] rounded hover:border-[#2962FF] text-[#2962FF] font-semibold">Break even</button>
+                      <button onClick={partial} className="flex-1 py-1.5 border border-[#222429] rounded hover:border-[#2962FF] text-[#2962FF] font-semibold">Partial 50%</button>
+                    </div>
                     <div className="flex gap-2 mb-2">
                       <input type="number" value={editSl} onChange={(e) => setEditSl(e.target.value)} placeholder="SL" className={inputCls} />
                       <input type="number" value={editTp} onChange={(e) => setEditTp(e.target.value)} placeholder="TP" className={inputCls} />
