@@ -1,7 +1,7 @@
 // frontend/src/components/PreTradeGate.jsx
 import { useState, useRef, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { X, Send, ChevronRight, Loader2, ImagePlus, XCircle } from "lucide-react";
+import { X, Send, ChevronRight, Loader2, ImagePlus, XCircle, Maximize2, Minimize2 } from "lucide-react";
 import api from "../api/axios";
 
 // ── Simple inline markdown renderer ──────────────────────────────────────────
@@ -37,6 +37,7 @@ export default function PreTradeGate() {
   const navigate = useNavigate();
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
+  const [expanded, setExpanded] = useState(false);
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [imageFile, setImageFile] = useState(null);   // File object
@@ -155,12 +156,12 @@ export default function PreTradeGate() {
 
   return (
     <div
-      className="fixed bottom-6 right-6 z-50 flex flex-col items-end"
+      className={`fixed z-50 flex flex-col items-end ${expanded && isOpen ? "inset-0 md:inset-6 md:left-auto" : "bottom-6 right-6"}`}
       style={{ fontFamily: "'Inter', sans-serif" }}
     >
       {/* ── Chat Modal ───────────────────────────────────────────────────── */}
       {isOpen && (
-        <div className="mb-4 w-[350px] md:w-[400px] h-[580px] bg-white/80 dark:bg-[#121418]/80 backdrop-blur-xl border border-gray-200 dark:border-white/20 rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom-5">
+        <div className={`${expanded ? "w-full h-full md:w-[min(900px,calc(100vw-3rem))] md:rounded-3xl rounded-none" : "mb-4 w-[calc(100vw-3rem)] max-w-[350px] md:max-w-none md:w-[400px] h-[min(580px,calc(100vh-7rem))] rounded-3xl"} transition-all duration-300 bg-white/80 dark:bg-[#121418]/80 backdrop-blur-xl border border-gray-200 dark:border-white/20 shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom-5`}>
 
           {/* Header */}
           <div className="bg-[#10b981] p-4 flex items-center justify-between shrink-0">
@@ -175,12 +176,24 @@ export default function PreTradeGate() {
                 <p className="text-white/80 text-[10px] uppercase tracking-wider">Powered by FN</p>
               </div>
             </div>
-            <button
-              onClick={() => setIsOpen(false)}
-              className="text-white/80 hover:text-white transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setExpanded((e) => !e)}
+                title={expanded ? "Minimize" : "Expand"}
+                className="text-white/80 hover:text-white transition-colors"
+              >
+                {expanded ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+              </button>
+              <button
+                onClick={() => {
+                  setIsOpen(false);
+                  setExpanded(false);
+                }}
+                className="text-white/80 hover:text-white transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
           </div>
 
           {/* Messages */}
