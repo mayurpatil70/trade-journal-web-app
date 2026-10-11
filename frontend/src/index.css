@@ -285,16 +285,16 @@ SCROLLBAR
 FORM ELEMENTS
 ========================================================= */
 
-input,
-textarea,
-select {
+body:not(.terminal) input,
+body:not(.terminal) textarea,
+body:not(.terminal) select {
   color: var(--foreground);
   background: var(--input);
   border-color: var(--border);
 }
 
-input::placeholder,
-textarea::placeholder {
+body:not(.terminal) input::placeholder,
+body:not(.terminal) textarea::placeholder {
   color: var(--muted-foreground);
 }
 
