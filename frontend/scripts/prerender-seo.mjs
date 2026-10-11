@@ -62,8 +62,8 @@ const landingBody = `<h1>Backtest 10 years of markets. Journal every trade. Mast
 <p><a href="/login">Start your free trial</a></p>${faqHtml(LANDING_FAQS)}`;
 write('/', render({
   path: '/',
-  title: 'Forex Notes | Backtesting, Trading Journal & AI Coach',
-  description: 'Backtest forex, gold and crypto with bar replay on 10 years of data, journal every trade and fix your psychology with an AI coach. From $14/mo.',
+  title: 'Forex Notes | 10-Year Backtesting & AI Trading Journal',
+  description: 'Backtest 10 years of forex, gold and crypto data with bar replay. Digital trading journal with AI psychology analysis to fix your mistakes. From $14/mo.',
   jsonLd: [faqLd(LANDING_FAQS)],
   alternates: HREFLANG_GROUPS.journal,
   body: landingBody,
