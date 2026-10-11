@@ -1,9 +1,11 @@
 import { useEffect, useRef } from 'react';
+import { useTheme } from '../theme-provider';
 
-// Vibrant neon-electric trading palette: high saturation, never muddy or washed out
-const BULL = [16, 215, 140]; // Electric Emerald
-const BEAR = [255, 59, 92];   // Vibrant Crimson Ruby
-
+// Vibrant trading palette: high saturation, never muddy or washed out
+const PALETTE = {
+  dark: { bull: [16, 215, 140], bear: [255, 59, 92] },
+  light: { bull: [16, 185, 129], bear: [225, 29, 72] },
+};
 const COUNT = 14;
 const SPACING = 0.34;
 const LIGHT = (() => {
@@ -25,8 +27,11 @@ const FACES = [
 export default function CandlestickScene() {
   const ref = useRef(null);
   const phaseRef = useRef(0);
+  const { theme } = useTheme();
 
   useEffect(() => {
+    const activePalette = PALETTE[theme === 'light' ? 'light' : 'dark'] || PALETTE.dark;
+    const { bull: BULL, bear: BEAR } = activePalette;
     const canvas = ref.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
@@ -270,7 +275,7 @@ export default function CandlestickScene() {
       ro.disconnect();
       document.removeEventListener('visibilitychange', onVis);
     };
-  }, []);
+  }, [theme]);
 
   return <canvas ref={ref} aria-hidden="true" style={{ width: '100%', height: '100%', display: 'block' }} />;
 }

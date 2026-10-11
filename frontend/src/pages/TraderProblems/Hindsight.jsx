@@ -194,7 +194,7 @@ export default function Hindsight() {
                     crossOrigin="anonymous"
                   />
                 </div>
-                <div className="absolute bottom-4 left-4 bg-[#10b981] text-white px-3 py-1.5 rounded-[2px] text-xs font-bold tracking-widest uppercase shadow-lg">
+                <div className="absolute bottom-4 left-4 bg-emerald-600 text-white px-3 py-1.5 rounded-[2px] text-xs font-bold tracking-widest uppercase shadow-lg">
                   Before (Entry)
                 </div>
               </div>

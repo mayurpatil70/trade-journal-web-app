@@ -80,7 +80,7 @@ export default function ExtraVideos() {
       ref={sectionRef}
       style={{
         padding: '100px 20px',
-        borderTop: '1px solid rgba(255,255,255,0.05)',
+        borderTop: '1px solid rgb(var(--l-fg) / 0.05)',
         position: 'relative',
         zIndex: 1,
       }}
@@ -103,23 +103,23 @@ export default function ExtraVideos() {
           <h2 style={{
             fontSize: 'clamp(1.8rem, 4vw, 2.8rem)',
             fontWeight: 900,
-            color: 'white',
+            color: "var(--l-ink)",
             letterSpacing: '-0.03em',
             lineHeight: 1.1,
           }}>
-            Experience the <span style={{ color: '#10b981' }}>Ecosystem</span>
+            Experience the <span style={{ color: 'var(--l-gain)' }}>Ecosystem</span>
           </h2>
         </div>
 
         {/* 2 vertically 9:16 videos */}
         <div className="flex flex-col md:flex-row gap-6">
-          <div style={{ flex: 1, borderRadius: '20px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)', boxShadow: '0 30px 60px rgba(0,0,0,0.4)', aspectRatio: '9/16' }}>
+          <div style={{ flex: 1, borderRadius: '20px', overflow: 'hidden', background: 'rgb(var(--l-fg) / 0.05)', border: '1px solid rgb(var(--l-fg) / 0.1)', boxShadow: '0 30px 60px rgb(var(--l-shadow) / calc(0.4 * var(--l-sh-k)))', aspectRatio: '9/16' }}>
             <AutoPlayVideo 
               src="https://res.cloudinary.com/b4c8jnri/video/upload/q_auto,f_auto/v1/gemini_generated_video_bea5a79e"
               style={{ width: '100%', height: '100%' }}
             />
           </div>
-          <div style={{ flex: 1, borderRadius: '20px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)', boxShadow: '0 30px 60px rgba(0,0,0,0.4)', aspectRatio: '9/16' }}>
+          <div style={{ flex: 1, borderRadius: '20px', overflow: 'hidden', background: 'rgb(var(--l-fg) / 0.05)', border: '1px solid rgb(var(--l-fg) / 0.1)', boxShadow: '0 30px 60px rgb(var(--l-shadow) / calc(0.4 * var(--l-sh-k)))', aspectRatio: '9/16' }}>
             <AutoPlayVideo 
               src="https://res.cloudinary.com/b4c8jnri/video/upload/q_auto,f_auto/v1/gemini_generated_video_419a1f73"
               style={{ width: '100%', height: '100%' }}
@@ -128,7 +128,7 @@ export default function ExtraVideos() {
         </div>
 
         {/* 1 16:9 video */}
-        <div style={{ width: '100%', borderRadius: '20px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)', boxShadow: '0 30px 60px rgba(0,0,0,0.4)', aspectRatio: '16/9' }}>
+        <div style={{ width: '100%', borderRadius: '20px', overflow: 'hidden', background: 'rgb(var(--l-fg) / 0.05)', border: '1px solid rgb(var(--l-fg) / 0.1)', boxShadow: '0 30px 60px rgb(var(--l-shadow) / calc(0.4 * var(--l-sh-k)))', aspectRatio: '16/9' }}>
           <AutoPlayVideo 
             src="https://res.cloudinary.com/b4c8jnri/video/upload/q_auto,f_auto/v1/gemini_generated_video_e9e377b4"
             style={{ width: '100%', height: '100%' }}

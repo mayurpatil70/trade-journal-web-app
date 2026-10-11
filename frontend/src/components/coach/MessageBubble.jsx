@@ -56,7 +56,7 @@ export default function MessageBubble({ message, isLast, canRegenerate, onRegene
         <div
           className={`px-4 py-3 rounded-3xl text-sm leading-relaxed shadow-sm ${
             isUser
-              ? "bg-[#10b981] text-white whitespace-pre-wrap break-words"
+              ? "bg-emerald-600 text-white whitespace-pre-wrap break-words"
               : "bg-white dark:bg-[#1a1d24] text-gray-800 dark:text-gray-200 border border-gray-100 dark:border-white/5"
           }`}
         >

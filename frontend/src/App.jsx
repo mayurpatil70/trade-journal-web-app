@@ -125,8 +125,8 @@ const PaywallGuard = () => {
 
   if (access === null) {
     return (
-      <div className="flex h-screen bg-[#0a0a0a] items-center justify-center">
-        <Loader2 className="w-8 h-8 text-[#10b981] animate-spin" />
+      <div className="flex h-dvh bg-background items-center justify-center">
+        <Loader2 className="w-8 h-8 text-primary animate-spin" />
       </div>
     );
   }
@@ -153,15 +153,10 @@ const AdminGuard = () => {
   };
 
 function App() {
-  useEffect(() => {
-    document.documentElement.classList.add("dark");
-    localStorage.setItem("theme", "dark");
-  }, []);
-
   return (
     <BrowserRouter>
       <RouteSeo />
-      <Suspense fallback={<div className="flex h-screen bg-[#0a0a0a] items-center justify-center"><Loader2 className="w-8 h-8 text-[#10b981] animate-spin" /></div>}>
+      <Suspense fallback={<div className="flex h-dvh bg-background items-center justify-center"><Loader2 className="w-8 h-8 text-primary animate-spin" /></div>}>
         <ErrorBoundary>
           <Routes>
             {/* Public Landing Pages */}

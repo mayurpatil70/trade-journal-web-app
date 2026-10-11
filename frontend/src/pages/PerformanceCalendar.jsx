@@ -81,8 +81,8 @@ export default function PerformanceCalendar() {
           <p className="text-gray-500 text-sm">Loading performance data...</p>
         </div>
       ) : (
-        <div className="bg-[#101216] border border-white/5 rounded-3xl p-6 shadow-2xl">
-          <div className="grid grid-cols-7 gap-3 mb-3">
+        <div className="bg-[#101216] border border-white/5 rounded-3xl p-2 sm:p-6 shadow-2xl">
+          <div className="grid grid-cols-7 gap-1 sm:gap-3 mb-3">
             {dayNames.map((d, i) => (
               <div key={i} className="text-center text-[10px] font-bold text-gray-500 uppercase tracking-widest">
                 {d}
@@ -90,9 +90,9 @@ export default function PerformanceCalendar() {
             ))}
           </div>
 
-          <div className="grid grid-cols-7 gap-3">
+          <div className="grid grid-cols-7 gap-1 sm:gap-3">
             {Array.from({ length: startingDayIndex }).map((_, i) => (
-              <div key={`empty-${i}`} className="min-h-[120px] bg-white/[0.01] border border-white/[0.02] rounded-2xl"></div>
+              <div key={`empty-${i}`} className="min-h-[64px] sm:min-h-[120px] bg-white/[0.01] border border-white/[0.02] rounded-xl sm:rounded-2xl"></div>
             ))}
 
             {Array.from({ length: daysInMonth }).map((_, i) => {
@@ -109,7 +109,7 @@ export default function PerformanceCalendar() {
                 <div
                   key={dayNum}
                   onClick={() => hasTrades && setSelectedDayTrades({ date: dateString, trades: dayTrades })}
-                  className={`min-h-[120px] rounded-2xl p-3 flex flex-col transition-all relative overflow-hidden group ${
+                  className={`min-h-[64px] sm:min-h-[120px] rounded-xl sm:rounded-2xl p-1.5 sm:p-3 flex flex-col min-w-0 transition-all relative overflow-hidden group ${
                     hasTrades 
                       ? "bg-[#15181D] border border-white/10 cursor-pointer hover:border-purple-500/50 hover:bg-[#1a1e24] shadow-sm"
                       : "bg-[#0c0e12] border border-white/[0.03]"
@@ -120,7 +120,7 @@ export default function PerformanceCalendar() {
                       {dayNum}
                     </span>
                     {hasTrades && (
-                      <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded border ${
+                      <span className={`hidden sm:inline text-[10px] font-bold px-1.5 py-0.5 rounded border ${
                         isPositive ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : "bg-red-500/10 text-red-400 border-red-500/20"
                       }`}>
                         {isPositive ? "+" : ""}{netDayR.toFixed(2)}R
@@ -129,9 +129,15 @@ export default function PerformanceCalendar() {
                   </div>
                   
                   {hasTrades && (
+                    <span className={`sm:hidden mt-0.5 text-[9px] font-bold leading-none ${isPositive ? "text-emerald-400" : "text-red-400"}`}>
+                      {isPositive ? "+" : ""}{netDayR.toFixed(1)}R
+                    </span>
+                  )}
+
+                  {hasTrades && (
                     <div className="mt-auto relative z-10">
                        <div className="flex items-center justify-between mb-1.5">
-                          <span className="text-[10px] text-gray-500 font-medium">{dayTrades.length} trade{dayTrades.length > 1 ? 's' : ''}</span>
+                          <span className="hidden sm:inline text-[10px] text-gray-500 font-medium">{dayTrades.length} trade{dayTrades.length > 1 ? 's' : ''}</span>
                           {brokeRules && <Zap className="w-3 h-3 text-amber-400" />}
                        </div>
                        <div className="flex gap-1 h-1.5 rounded-full overflow-hidden bg-white/5">

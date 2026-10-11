@@ -19,7 +19,7 @@ export default function SeoLandingPage() {
     <div className="min-h-screen bg-black text-gray-300 trading-bg">
       <header className="sticky top-0 z-30 glossy-bar">
         <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
-          <Link to="/" aria-label="Forex Notes home"><BrandLogo width="80" height="71" className="h-11 w-auto" /></Link>
+          <Link to="/" aria-label="Forex Notes home"><BrandLogo width="80" height="64" className="h-11 w-auto" /></Link>
           <Link to="/login" className="btn-glossy-green px-4 py-2 rounded-xl text-sm font-bold">Start free trial</Link>
         </div>
       </header>

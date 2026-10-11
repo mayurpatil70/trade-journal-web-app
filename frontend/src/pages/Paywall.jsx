@@ -127,7 +127,7 @@ function Paywall() {
         <ArrowLeft className="w-4 h-4" /> Back to Dashboard
       </button>
 
-      <h1 className="text-4xl font-bold mb-4">Let's setup your subscription!</h1>
+      <h1 className="text-2xl sm:text-4xl font-bold mb-4">Let's setup your subscription!</h1>
       <p className="text-gray-400 mb-12">Please select the plan you want for your subscription.</p>
 
       {/* Pricing Cards */}
@@ -180,7 +180,7 @@ function Paywall() {
 
             <button 
               onClick={() => handleCryptoPayment('monthly', 14)}
-              className="w-full mt-auto py-3 rounded-full font-medium bg-emerald-600 hover:bg-blue-700 text-white transition-colors"
+              className="w-full mt-auto py-3 rounded-full font-medium bg-emerald-600 hover:bg-emerald-700 text-white transition-colors"
             >
               Upgrade Monthly
             </button>
@@ -210,7 +210,7 @@ function Paywall() {
 
             <button 
               onClick={() => handleCryptoPayment('yearly', 114)}
-              className="w-full mt-auto py-3 rounded-full font-medium bg-emerald-600 hover:bg-blue-700 text-white transition-colors shadow-lg shadow-emerald-500/25"
+              className="w-full mt-auto py-3 rounded-full font-medium bg-emerald-600 hover:bg-emerald-700 text-white transition-colors shadow-lg shadow-emerald-500/25"
             >
               Upgrade Yearly
             </button>
@@ -236,7 +236,7 @@ function Paywall() {
 
             <button 
               onClick={() => handleCryptoPayment('yearly', 114)}
-              className="w-full mt-auto py-3 rounded-full font-medium bg-emerald-600 hover:bg-blue-700 text-white transition-colors shadow-lg shadow-emerald-500/25"
+              className="w-full mt-auto py-3 rounded-full font-medium bg-emerald-600 hover:bg-emerald-700 text-white transition-colors shadow-lg shadow-emerald-500/25"
             >
               Renew Subscription
             </button>
