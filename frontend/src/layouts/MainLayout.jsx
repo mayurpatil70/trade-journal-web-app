@@ -351,7 +351,7 @@ export default function MainLayout() {
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 overflow-y-auto relative pt-14 md:pt-0 bg-[#0A0B0D]">
+      <main className="flex-1 overflow-y-auto relative pt-14 pb-16 md:pt-0 md:pb-0 bg-[#0A0B0D]">
         <div className="max-md:hidden flex fixed top-3 right-5 z-40 items-center gap-2">
           <NotificationBell />
           <ThemeToggle />

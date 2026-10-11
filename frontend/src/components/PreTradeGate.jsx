@@ -38,6 +38,9 @@ export default function PreTradeGate() {
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
   const [expanded, setExpanded] = useState(false);
+  const [hideLabel, setHideLabel] = useState(() => {
+    try { return sessionStorage.getItem("coachLabelHidden") === "1"; } catch { return false; }
+  });
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [imageFile, setImageFile] = useState(null);   // File object
@@ -156,7 +159,7 @@ export default function PreTradeGate() {
 
   return (
     <div
-      className={`fixed z-50 flex flex-col items-end ${expanded && isOpen ? "inset-0 md:inset-6 md:left-auto" : "bottom-6 right-6"}`}
+      className={`fixed z-50 flex flex-col items-end ${expanded && isOpen ? "inset-0 md:inset-6 md:left-auto" : "bottom-4 right-4 md:bottom-6 md:right-6"}`}
       style={{ fontFamily: "'Inter', sans-serif" }}
     >
       {/* ── Chat Modal ───────────────────────────────────────────────────── */}
@@ -310,12 +313,25 @@ export default function PreTradeGate() {
           className="relative flex flex-col items-center cursor-pointer group"
           onClick={() => setIsOpen(true)}
         >
-          <div className="absolute -top-12 bg-white dark:bg-[#1a1d24] text-gray-900 dark:text-white text-xs font-bold px-4 py-2 rounded-3xl shadow-lg border border-gray-100 dark:border-white/10 whitespace-nowrap transform transition-transform group-hover:-translate-y-1">
-            Coach isLIVE
-            <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[8px] border-t-white dark:border-t-[#1a1d24]"></div>
-          </div>
+          {!hideLabel && (
+            <div className="absolute -top-12 right-0 w-max flex items-center gap-2 bg-white dark:bg-[#1a1d24] text-gray-900 dark:text-white text-xs font-bold pl-4 pr-2 py-2 rounded-3xl shadow-lg border border-gray-100 dark:border-white/10 whitespace-nowrap transform transition-transform group-hover:-translate-y-1">
+              Coach isLIVE
+              <button
+                type="button"
+                aria-label="Hide label"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setHideLabel(true);
+                  try { sessionStorage.setItem("coachLabelHidden", "1"); } catch { /* ignore */ }
+                }}
+                className="shrink-0 p-0.5 rounded-full text-muted-foreground hover:text-foreground"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            </div>
+          )}
 
-          <div className="w-16 h-16 rounded-full overflow-hidden shadow-2xl border-[3px] border-[#10b981] bg-[#121418] transform transition-transform group-hover:scale-105">
+          <div className="w-12 h-12 md:w-16 md:h-16 rounded-full overflow-hidden shadow-2xl border-[3px] border-[#10b981] bg-[#121418] transform transition-transform group-hover:scale-105">
             <img
               src={ROBOT_AVATAR}
               alt="AI Trading Coach"
