@@ -198,7 +198,7 @@ export default function MainLayout() {
       )}
       {/* Mobile Header */}
       <div className="md:hidden fixed top-0 left-0 right-0 h-14 glossy-bar flex items-center justify-between px-4 z-40">
-        <div className="flex items-center gap-2"><BrandLogo className="h-16 w-auto object-contain drop-shadow-[0_0_12px_rgba(16,185,129,0.5)]" /></div>
+        <div className="flex items-center gap-2"><BrandLogo className="h-11 w-auto object-contain" /></div>
         <div className="flex items-center gap-1">
         <ThemeToggle />
         <NotificationBell />
@@ -223,7 +223,7 @@ export default function MainLayout() {
       >
         {/* Logo */}
         <div className="h-16 flex items-center justify-between px-5 shrink-0 hidden md:flex border-b border-white/5">
-          <div className="flex items-center gap-2"><BrandLogo className="h-16 w-auto object-contain drop-shadow-[0_0_12px_rgba(16,185,129,0.5)]" /></div>
+          <div className="flex items-center gap-2"><BrandLogo className="h-12 w-auto object-contain" /></div>
           <button
             onClick={() => setIsSearchOpen(true)}
             className="p-1.5 text-gray-500 hover:text-gray-300 rounded-md hover:bg-white/5 transition-colors"
@@ -351,7 +351,7 @@ export default function MainLayout() {
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 overflow-y-auto relative pt-14 md:pt-0 bg-[#0A0B0D]">
+      <main className="flex-1 overflow-y-auto relative pt-14 pb-16 md:pt-0 md:pb-0 bg-[#0A0B0D]">
         <div className="max-md:hidden flex fixed top-3 right-5 z-40 items-center gap-2">
           <NotificationBell />
           <ThemeToggle />

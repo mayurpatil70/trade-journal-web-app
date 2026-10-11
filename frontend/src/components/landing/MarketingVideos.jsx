@@ -85,8 +85,8 @@ export default function MarketingVideos() {
       ref={sectionRef}
       style={{
         padding: '100px 20px',
-        background: 'rgba(0,0,0,0.4)',
-        borderTop: '1px solid rgba(255,255,255,0.05)',
+        background: 'rgb(var(--l-bg-rgb) / 0.4)',
+        borderTop: '1px solid rgb(var(--l-fg) / 0.05)',
         position: 'relative',
         zIndex: 1,
       }}
@@ -117,7 +117,7 @@ export default function MarketingVideos() {
             background: 'rgba(16,185,129,0.1)',
             border: '1px solid rgba(16,185,129,0.25)',
             fontSize: '10px',
-            color: '#10b981',
+            color: 'var(--l-gain)',
             fontWeight: 700,
             letterSpacing: '0.1em',
             textTransform: 'uppercase',
@@ -128,21 +128,21 @@ export default function MarketingVideos() {
           <h2 style={{
             fontSize: 'clamp(1.8rem, 4vw, 2.8rem)',
             fontWeight: 900,
-            color: 'white',
+            color: "var(--l-ink)",
             letterSpacing: '-0.03em',
             lineHeight: 1.1,
             marginBottom: '16px',
           }}>
-            See Forex Notes <span style={{ color: '#10b981' }}>in Action</span>
+            See Forex Notes <span style={{ color: 'var(--l-gain)' }}>in Action</span>
           </h2>
-          <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.45)', lineHeight: 1.7 }}>
+          <p style={{ fontSize: '14px', color: 'rgb(var(--l-fg) / calc(0.45 + var(--l-ta)))', lineHeight: 1.7 }}>
             An AI-powered trading journal for traders who are serious about improving. Watch how our automated dashboard prevents emotional mistakes and tracks your prop firm limits in real-time.
           </p>
         </div>
 
         {/* Video Grid */}
         <div className="flex flex-col md:flex-row gap-8">
-          <div style={{ flex: 1, borderRadius: '20px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)', boxShadow: '0 30px 60px rgba(0,0,0,0.4)' }}>
+          <div style={{ flex: 1, borderRadius: '20px', overflow: 'hidden', background: 'rgb(var(--l-fg) / 0.05)', border: '1px solid rgb(var(--l-fg) / 0.1)', boxShadow: '0 30px 60px rgb(var(--l-shadow) / calc(0.4 * var(--l-sh-k)))' }}>
             <AutoPlayVideo 
               src="https://res.cloudinary.com/b4c8jnri/video/upload/q_auto,f_auto/v1/Video_1.mp4"
               overlayIcon={BrainCircuit}
@@ -151,7 +151,7 @@ export default function MarketingVideos() {
               gradient="linear-gradient(135deg, #ec4899, #8b5cf6)"
             />
           </div>
-          <div style={{ flex: 1, borderRadius: '20px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)', boxShadow: '0 30px 60px rgba(0,0,0,0.4)' }}>
+          <div style={{ flex: 1, borderRadius: '20px', overflow: 'hidden', background: 'rgb(var(--l-fg) / 0.05)', border: '1px solid rgb(var(--l-fg) / 0.1)', boxShadow: '0 30px 60px rgb(var(--l-shadow) / calc(0.4 * var(--l-sh-k)))' }}>
             <AutoPlayVideo 
               src="https://res.cloudinary.com/b4c8jnri/video/upload/q_auto,f_auto/v1/Video.mp4"
               overlayIcon={ShieldAlert}

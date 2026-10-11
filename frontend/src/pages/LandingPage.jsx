@@ -195,18 +195,18 @@ function AnimatedStat({ value, label, color }) {
       style={{
         textAlign: "center",
         padding: "32px 24px",
-        background: "rgba(12,16,24,0.7)",
+        background: "rgb(var(--l-surf) / 0.7)",
         backdropFilter: "blur(20px)",
         WebkitBackdropFilter: "blur(20px)",
-        border: `1px solid ${color}30`,
+        border: `1px solid color-mix(in srgb, ${color} 30%, transparent)`,
         borderRadius: "20px",
         opacity: 0,
       }}
     >
-      <div style={{ fontSize: "clamp(2.5rem,5vw,3.5rem)", fontWeight: 900, color, letterSpacing: "-0.04em", marginBottom: "8px" }}>
+      <div style={{ fontSize: "clamp(2.5rem,5vw,3.5rem)", fontWeight: 900, color: `color-mix(in srgb, ${color} var(--l-tint), var(--l-ink))`, letterSpacing: "-0.04em", marginBottom: "8px" }}>
         {value}
       </div>
-      <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.5)", lineHeight: 1.5 }}>{label}</p>
+      <p style={{ fontSize: "13px", color: "rgb(var(--l-fg) / calc(0.5 + var(--l-ta)))", lineHeight: 1.5 }}>{label}</p>
     </div>
   );
 }
@@ -266,9 +266,9 @@ export default function LandingPage() {
       className="landing-root"
       style={{
         minHeight: "100vh",
-        background: "#000000",
-        color: "white",
-        fontFamily: "'Inter', sans-serif",
+        background: "var(--l-bg)",
+        color: "var(--l-ink)",
+        fontFamily: "var(--font-sans)",
         overflowX: "hidden",
         position: "relative",
       }}
@@ -288,7 +288,7 @@ export default function LandingPage() {
           textAlign: "center",
           fontSize: "12px",
           fontWeight: 800,
-          color: "#fcd34d",
+          color: "var(--l-amber)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -297,7 +297,7 @@ export default function LandingPage() {
           textShadow: "0 0 8px rgba(245,158,11,0.6)",
         }}>
           <span>Forex Notes — Track, analyze, and optimize your trading strategy automatically.</span>
-          <Link to="/login" style={{ color: "#fbbf24", display: "inline-flex", alignItems: "center", gap: "2px", fontWeight: 900, textDecoration: "underline" }}>
+          <Link to="/login" style={{ color: "var(--l-amber)", display: "inline-flex", alignItems: "center", gap: "2px", fontWeight: 900, textDecoration: "underline" }}>
             Claim Access <ChevronRight size={12} />
           </Link>
         </div>
@@ -309,8 +309,8 @@ export default function LandingPage() {
           zIndex: 50,
           backdropFilter: "blur(24px)",
           WebkitBackdropFilter: "blur(24px)",
-          background: "rgba(0,0,0,0.75)",
-          borderBottom: "1px solid rgba(255,255,255,0.06)",
+          background: "rgb(var(--l-bg-rgb) / 0.75)",
+          borderBottom: "1px solid rgb(var(--l-fg) / 0.06)",
         }}>
           <div style={{
             maxWidth: "1200px",
@@ -322,7 +322,7 @@ export default function LandingPage() {
             justifyContent: "space-between",
           }}>
             {/* Logo */}
-            <Link to="/" style={{ display: "flex", alignItems: "center" }}><BrandLogo style={{ height: "60px", width: "auto", objectFit: "contain", filter: "drop-shadow(0 0 12px rgba(16,185,129,0.8))" }} /></Link>
+            <Link to="/" style={{ display: "flex", alignItems: "center" }}><BrandLogo style={{ height: "60px", width: "auto", objectFit: "contain" }} /></Link>
 
             {/* Nav Links */}
             <nav style={{ display: "flex", gap: "32px", alignItems: "center" }}>
@@ -343,12 +343,12 @@ export default function LandingPage() {
                     fontWeight: 700,
                     letterSpacing: "0.06em",
                     textTransform: "uppercase",
-                    color: "rgba(255,255,255,0.5)",
+                    color: "rgb(var(--l-fg) / calc(0.5 + var(--l-ta)))",
                     textDecoration: "none",
                     transition: "color 0.2s",
                   }}
-                  onMouseEnter={e => e.currentTarget.style.color = "white"}
-                  onMouseLeave={e => e.currentTarget.style.color = "rgba(255,255,255,0.5)"}
+                  onMouseEnter={e => e.currentTarget.style.color = "var(--l-ink)"}
+                  onMouseLeave={e => e.currentTarget.style.color = "rgb(var(--l-fg) / calc(0.5 + var(--l-ta)))"}
                   className="hidden md:block"
                 >
                   {label}
@@ -358,16 +358,16 @@ export default function LandingPage() {
 
             {/* Header CTAs */}
             <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-              <ThemeToggle onDark />
+              <ThemeToggle />
               <Link to="/login" style={{
                 fontSize: "11px", fontWeight: 700, letterSpacing: "0.05em",
                 padding: "8px 16px", borderRadius: "8px",
-                color: "rgba(255,255,255,0.6)",
-                background: "transparent", border: "1px solid rgba(255,255,255,0.1)",
+                color: "rgb(var(--l-fg) / calc(0.6 + var(--l-ta)))",
+                background: "transparent", border: "1px solid rgb(var(--l-fg) / 0.1)",
                 textDecoration: "none", transition: "all 0.2s",
               }}
-                onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.06)"; e.currentTarget.style.color = "white"; }}
-                onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "rgba(255,255,255,0.6)"; }}
+                onMouseEnter={e => { e.currentTarget.style.background = "rgb(var(--l-fg) / 0.06)"; e.currentTarget.style.color = "var(--l-ink)"; }}
+                onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "rgb(var(--l-fg) / calc(0.6 + var(--l-ta)))"; }}
               >
                 Sign In
               </Link>
@@ -402,11 +402,11 @@ export default function LandingPage() {
         <FeaturesBento />
 
         {/* ── Stats Row ── */}
-        <section style={{ padding: "80px 20px", borderTop: "1px solid rgba(255,255,255,0.05)" }}>
+        <section style={{ padding: "80px 20px", borderTop: "1px solid rgb(var(--l-fg) / 0.05)" }}>
           <div style={{ maxWidth: "900px", margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px" }}>
-            <AnimatedStat value="3,200+" label="Funded traders using Forex Notes daily" color="#10b981" />
-            <AnimatedStat value="50% OFF" label="Massive discounts on Yearly plan available ($114)" color="#f59e0b" />
-            <AnimatedStat value="94%" label="Users report fewer rule violations within 30 days" color="#10b981" />
+            <AnimatedStat value="3,200+" label="Funded traders using Forex Notes daily" color="var(--l-gain)" />
+            <AnimatedStat value="50% OFF" label="Massive discounts on Yearly plan available ($114)" color="var(--l-amber)" />
+            <AnimatedStat value="94%" label="Users report fewer rule violations within 30 days" color="var(--l-gain)" />
           </div>
         </section>
 
@@ -414,44 +414,44 @@ export default function LandingPage() {
         <section
           id="comparison"
           ref={comparisonRef}
-          style={{ padding: "100px 20px", borderTop: "1px solid rgba(255,255,255,0.05)" }}
+          style={{ padding: "100px 20px", borderTop: "1px solid rgb(var(--l-fg) / 0.05)" }}
         >
           <div style={{ maxWidth: "960px", margin: "0 auto" }}>
             <div style={{ textAlign: "center", marginBottom: "56px" }}>
               <div style={{
                 display: "inline-block",
                 fontSize: "10px", fontWeight: 700, letterSpacing: "0.12em",
-                textTransform: "uppercase", color: "#10b981",
+                textTransform: "uppercase", color: "var(--l-gain)",
                 padding: "5px 14px", borderRadius: "999px",
                 background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.2)",
                 marginBottom: "16px",
               }}>Direct Comparison</div>
               <h2 style={{
                 fontSize: "clamp(1.8rem,4vw,2.8rem)", fontWeight: 900,
-                color: "white", letterSpacing: "-0.03em", lineHeight: 1.1, marginBottom: "12px",
+                color: "var(--l-ink)", letterSpacing: "-0.03em", lineHeight: 1.1, marginBottom: "12px",
               }}>
                 Why Traders Ditch Excel & Notion
               </h2>
-              <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.45)", maxWidth: "480px", margin: "0 auto", lineHeight: 1.7 }}>
+              <p style={{ fontSize: "14px", color: "rgb(var(--l-fg) / calc(0.45 + var(--l-ta)))", maxWidth: "480px", margin: "0 auto", lineHeight: 1.7 }}>
                 Manual spreadsheets leave you blind to emotional drawdown points and prop firm rules.
               </p>
             </div>
 
             <div style={{
-              background: "rgba(12,16,24,0.8)", backdropFilter: "blur(20px)",
+              background: "rgb(var(--l-surf) / 0.8)", backdropFilter: "blur(20px)",
               WebkitBackdropFilter: "blur(20px)",
-              border: "1px solid rgba(255,255,255,0.08)", borderRadius: "20px", overflow: "hidden",
+              border: "1px solid rgb(var(--l-fg) / 0.08)", borderRadius: "20px", overflow: "hidden",
             }}>
               {/* Table Header */}
               <div style={{
                 display: "grid", gridTemplateColumns: "2fr 2fr 2fr",
                 padding: "14px 24px",
-                background: "rgba(255,255,255,0.03)",
-                borderBottom: "1px solid rgba(255,255,255,0.06)",
+                background: "rgb(var(--l-fg) / 0.03)",
+                borderBottom: "1px solid rgb(var(--l-fg) / 0.06)",
               }}>
-                <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(255,255,255,0.35)" }}>Metric</span>
-                <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(255,255,255,0.35)" }}>Spreadsheets / Notion</span>
-                <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "#10b981" }}>Forex Notes ✓</span>
+                <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgb(var(--l-fg) / calc(0.5 + var(--l-ta)))" }}>Metric</span>
+                <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgb(var(--l-fg) / calc(0.5 + var(--l-ta)))" }}>Spreadsheets / Notion</span>
+                <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--l-gain)" }}>Forex Notes ✓</span>
               </div>
               {COMPARISON.map((row, i) => (
                 <div
@@ -460,13 +460,13 @@ export default function LandingPage() {
                   style={{
                     display: "grid", gridTemplateColumns: "2fr 2fr 2fr",
                     padding: "16px 24px",
-                    borderBottom: i < COMPARISON.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none",
+                    borderBottom: i < COMPARISON.length - 1 ? "1px solid rgb(var(--l-fg) / 0.04)" : "none",
                     opacity: 0,
                   }}
                 >
-                  <span style={{ fontSize: "13px", fontWeight: 700, color: "white" }}>{row.metric}</span>
-                  <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.35)" }}>{row.manual}</span>
-                  <span style={{ fontSize: "12px", fontWeight: 700, color: "#10b981", display: "flex", alignItems: "center", gap: "6px" }}>
+                  <span style={{ fontSize: "13px", fontWeight: 700, color: "var(--l-ink)" }}>{row.metric}</span>
+                  <span style={{ fontSize: "12px", color: "rgb(var(--l-fg) / calc(0.5 + var(--l-ta)))" }}>{row.manual}</span>
+                  <span style={{ fontSize: "12px", fontWeight: 700, color: "var(--l-gain)", display: "flex", alignItems: "center", gap: "6px" }}>
                     <CheckCircle2 size={13} /> {row.journal}
                   </span>
                 </div>
@@ -476,18 +476,18 @@ export default function LandingPage() {
         </section>
 
         {/* ── Testimonials Marquee (Real Photos) ── */}
-        <section style={{ padding: "100px 0", borderTop: "1px solid rgba(255,255,255,0.05)", overflow: "hidden" }}>
+        <section style={{ padding: "100px 0", borderTop: "1px solid rgb(var(--l-fg) / 0.05)", overflow: "hidden" }}>
           <div style={{ maxWidth: "960px", margin: "0 auto 56px", textAlign: "center", padding: "0 20px" }}>
             <div style={{
               display: "inline-block", fontSize: "10px", fontWeight: 700, letterSpacing: "0.12em",
-              textTransform: "uppercase", color: "#10b981",
+              textTransform: "uppercase", color: "var(--l-gain)",
               padding: "5px 14px", borderRadius: "999px",
               background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.2)",
               marginBottom: "16px",
             }}>Trader Testimonials</div>
             <h2 style={{
               fontSize: "clamp(1.8rem,4vw,2.8rem)", fontWeight: 900,
-              color: "white", letterSpacing: "-0.03em", lineHeight: 1.1, marginBottom: "12px",
+              color: "var(--l-ink)", letterSpacing: "-0.03em", lineHeight: 1.1, marginBottom: "12px",
             }}>
               Trusted by Funded Traders<br />
               <span style={{
@@ -498,8 +498,8 @@ export default function LandingPage() {
               </span>
             </h2>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "4px", marginTop: "12px" }}>
-              {[...Array(5)].map((_, i) => <Star key={i} size={16} color="#f59e0b" fill="#f59e0b" />)}
-              <span style={{ fontSize: "13px", color: "rgba(255,255,255,0.5)", marginLeft: "8px" }}>4.9/5 from 3,200+ traders</span>
+              {[...Array(5)].map((_, i) => <Star key={i} size={16} color="var(--l-amber)" fill="#f59e0b" />)}
+              <span style={{ fontSize: "13px", color: "rgb(var(--l-fg) / calc(0.5 + var(--l-ta)))", marginLeft: "8px" }}>4.9/5 from 3,200+ traders</span>
             </div>
           </div>
 
@@ -517,24 +517,24 @@ export default function LandingPage() {
                     width: "360px",
                     flexShrink: 0,
                     marginRight: "20px",
-                    background: "rgba(12,16,24,0.8)",
+                    background: "rgb(var(--l-surf) / 0.8)",
                     backdropFilter: "blur(20px)",
                     WebkitBackdropFilter: "blur(20px)",
-                    border: "1px solid rgba(255,255,255,0.08)",
+                    border: "1px solid rgb(var(--l-fg) / 0.08)",
                     borderRadius: "20px",
                     padding: "24px",
-                    boxShadow: "0 8px 32px rgba(0,0,0,0.5)",
+                    boxShadow: "0 8px 32px rgb(var(--l-shadow) / calc(0.5 * var(--l-sh-k)))",
                   }}
                 >
                   {/* Stars */}
                   <div style={{ display: "flex", gap: "3px", marginBottom: "14px" }}>
-                    {[...Array(5)].map((_, j) => <Star key={j} size={12} color="#f59e0b" fill="#f59e0b" />)}
+                    {[...Array(5)].map((_, j) => <Star key={j} size={12} color="var(--l-amber)" fill="#f59e0b" />)}
                   </div>
 
                   {/* Review text */}
                   <p style={{
                     fontSize: "13px",
-                    color: "rgba(255,255,255,0.65)",
+                    color: "rgb(var(--l-fg) / calc(0.65 + var(--l-ta)))",
                     lineHeight: 1.65,
                     marginBottom: "16px",
                     fontStyle: "italic",
@@ -553,7 +553,7 @@ export default function LandingPage() {
                     border: `1px solid ${r.highlightColor}30`,
                     fontSize: "10px",
                     fontWeight: 700,
-                    color: r.highlightColor,
+                    color: `color-mix(in srgb, ${r.highlightColor} var(--l-tint), var(--l-ink))`,
                     marginBottom: "16px",
                     letterSpacing: "0.02em",
                   }}>
@@ -562,7 +562,7 @@ export default function LandingPage() {
                   </div>
 
                   {/* Author */}
-                  <div style={{ display: "flex", alignItems: "center", gap: "12px", borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: "14px" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "12px", borderTop: "1px solid rgb(var(--l-fg) / 0.06)", paddingTop: "14px" }}>
                     <img
                       src={r.photo}
                       alt={r.name}
@@ -571,9 +571,9 @@ export default function LandingPage() {
                         height: 44,
                         borderRadius: "50%",
                         objectFit: "cover",
-                        border: "2px solid rgba(255,255,255,0.1)",
+                        border: "2px solid rgb(var(--l-fg) / 0.1)",
                         flexShrink: 0,
-                        background: "#1a2030",
+                        background: "rgb(var(--l-fg) / 0.08)",
                       }}
                       onError={e => {
                         // Fallback to gradient avatar if image fails
@@ -590,10 +590,10 @@ export default function LandingPage() {
                       {r.name.charAt(0)}
                     </div>
                     <div>
-                      <div style={{ fontSize: "13px", fontWeight: 800, color: "white" }}>
+                      <div style={{ fontSize: "13px", fontWeight: 800, color: "var(--l-ink)" }}>
                         {r.flag} {r.name}
                       </div>
-                      <div style={{ fontSize: "11px", color: "#10b981", fontWeight: 600, marginTop: "2px" }}>
+                      <div style={{ fontSize: "11px", color: "var(--l-gain)", fontWeight: 600, marginTop: "2px" }}>
                         {r.firm}
                       </div>
                     </div>
@@ -607,23 +607,23 @@ export default function LandingPage() {
         {/* ── Pricing ── */}
         <section
           id="pricing"
-          style={{ padding: "100px 20px", borderTop: "1px solid rgba(255,255,255,0.05)" }}
+          style={{ padding: "100px 20px", borderTop: "1px solid rgb(var(--l-fg) / 0.05)" }}
         >
           <div style={{ maxWidth: "640px", margin: "0 auto", textAlign: "center" }}>
             <div style={{
               display: "inline-block", fontSize: "10px", fontWeight: 700, letterSpacing: "0.12em",
-              textTransform: "uppercase", color: "#10b981",
+              textTransform: "uppercase", color: "var(--l-gain)",
               padding: "5px 14px", borderRadius: "999px",
               background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.2)",
               marginBottom: "16px",
             }}>Transparent Pricing</div>
             <h2 style={{
               fontSize: "clamp(1.8rem,4vw,2.8rem)", fontWeight: 900,
-              color: "white", letterSpacing: "-0.03em", lineHeight: 1.1, marginBottom: "12px",
+              color: "var(--l-ink)", letterSpacing: "-0.03em", lineHeight: 1.1, marginBottom: "12px",
             }}>
               Choose Your Plan.<br />Cancel Anytime.
             </h2>
-            <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.45)", marginBottom: "48px", lineHeight: 1.7 }}>
+            <p style={{ fontSize: "14px", color: "rgb(var(--l-fg) / calc(0.45 + var(--l-ta)))", marginBottom: "48px", lineHeight: 1.7 }}>
               Select the best plan that fits your trading journey. Gain instant access today.
             </p>
 
@@ -633,7 +633,7 @@ export default function LandingPage() {
               <div
                 className="pricing-card"
                 style={{
-                  background: "rgba(12,16,24,0.85)",
+                  background: "rgb(var(--l-surf) / 0.85)",
                   backdropFilter: "blur(24px)",
                   WebkitBackdropFilter: "blur(24px)",
                   border: "1px solid rgba(16,185,129,0.35)",
@@ -641,30 +641,32 @@ export default function LandingPage() {
                   padding: "40px",
                   position: "relative",
                   overflow: "hidden",
-                  boxShadow: "0 0 40px rgba(16,185,129,0.05), 0 40px 80px rgba(0,0,0,0.6)",
+                  display: "flex",
+                  flexDirection: "column",
+                  boxShadow: "0 0 40px rgba(16,185,129,0.05), 0 40px 80px rgb(var(--l-shadow) / calc(0.6 * var(--l-sh-k)))",
                 }}
               >
-                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "32px", paddingBottom: "32px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "32px", paddingBottom: "32px", borderBottom: "1px solid rgb(var(--l-fg) / 0.06)" }}>
                   <div>
-                    <h3 style={{ fontSize: "22px", fontWeight: 900, color: "white", letterSpacing: "-0.02em", marginBottom: "6px" }}>
+                    <h3 style={{ fontSize: "22px", fontWeight: 900, color: "var(--l-ink)", letterSpacing: "-0.02em", marginBottom: "6px" }}>
                       Monthly Plan
                     </h3>
-                    <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)" }}>
+                    <p style={{ fontSize: "12px", color: "rgb(var(--l-fg) / calc(0.4 + var(--l-ta)))" }}>
                       Pay as you go access
                     </p>
                   </div>
                   <div style={{ textAlign: "right", flexShrink: 0 }}>
-                    <div style={{ fontSize: "20px", fontWeight: 700, color: "rgba(255,255,255,0.5)", textDecoration: "line-through", marginBottom: "-4px" }}>$19</div>
-                    <div style={{ fontSize: "42px", fontWeight: 900, color: "white", letterSpacing: "-0.04em", lineHeight: 1 }}>$14</div>
-                    <div style={{ fontSize: "12px", fontWeight: 700, color: "rgba(255,255,255,0.4)" }}>/month</div>
-                    <div style={{ fontSize: "10px", fontWeight: 700, color: "#10b981", marginTop: "6px", letterSpacing: "0.02em" }}>+ 10% affiliate rewards</div>
+                    <div style={{ fontSize: "20px", fontWeight: 700, color: "rgb(var(--l-fg) / calc(0.5 + var(--l-ta)))", textDecoration: "line-through", marginBottom: "-4px" }}>$19</div>
+                    <div style={{ fontSize: "42px", fontWeight: 900, color: "var(--l-ink)", letterSpacing: "-0.04em", lineHeight: 1 }}>$14</div>
+                    <div style={{ fontSize: "12px", fontWeight: 700, color: "rgb(var(--l-fg) / calc(0.4 + var(--l-ta)))" }}>/month</div>
+                    <div style={{ fontSize: "10px", fontWeight: 700, color: "var(--l-gain)", marginTop: "6px", letterSpacing: "0.02em" }}>+ 10% affiliate rewards</div>
                   </div>
                 </div>
 
                 <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginBottom: "32px" }}>
                   {PRICING_FEATURES.slice(0, 5).map((item, i) => (
-                    <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: "8px", fontSize: "12px", color: "rgba(255,255,255,0.65)" }}>
-                      <CheckCircle2 size={14} color="#10b981" style={{ flexShrink: 0, marginTop: "1px" }} />
+                    <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: "8px", fontSize: "12px", color: "rgb(var(--l-fg) / calc(0.65 + var(--l-ta)))" }}>
+                      <CheckCircle2 size={14} color="var(--l-gain)" style={{ flexShrink: 0, marginTop: "1px" }} />
                       <span>{item}</span>
                     </div>
                   ))}
@@ -674,10 +676,10 @@ export default function LandingPage() {
                   to="/login"
                   style={{
                     display: "flex", alignItems: "center", justifyContent: "center", gap: "8px",
-                    width: "100%", padding: "16px", borderRadius: "14px",
+                    width: "100%", padding: "16px", borderRadius: "14px", marginTop: "auto",
                     background: "transparent",
                     border: "1px solid rgba(16,185,129,0.4)",
-                    color: "white", fontSize: "14px", fontWeight: 800,
+                    color: "var(--l-ink)", fontSize: "14px", fontWeight: 800,
                     textDecoration: "none", letterSpacing: "0.01em",
                     transition: "all 0.2s",
                   }}
@@ -690,7 +692,7 @@ export default function LandingPage() {
               <div
                 className="pricing-card"
                 style={{
-                  background: "rgba(12,16,24,0.85)",
+                  background: "rgb(var(--l-surf) / 0.85)",
                   backdropFilter: "blur(24px)",
                   WebkitBackdropFilter: "blur(24px)",
                   border: "2px solid #10b981",
@@ -698,7 +700,9 @@ export default function LandingPage() {
                   padding: "40px",
                   position: "relative",
                   overflow: "hidden",
-                  boxShadow: "0 0 80px rgba(16,185,129,0.15), 0 40px 80px rgba(0,0,0,0.6)",
+                  display: "flex",
+                  flexDirection: "column",
+                  boxShadow: "0 0 80px rgba(16,185,129,0.15), 0 40px 80px rgb(var(--l-shadow) / calc(0.6 * var(--l-sh-k)))",
                 }}
               >
                 {/* Glow */}
@@ -720,27 +724,27 @@ export default function LandingPage() {
                   50% OFF YEARLY - HURRY UP GRAB IT ASAP!
                 </div>
 
-                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "32px", paddingBottom: "32px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "32px", paddingBottom: "32px", borderBottom: "1px solid rgb(var(--l-fg) / 0.06)" }}>
                   <div>
-                    <h3 style={{ fontSize: "22px", fontWeight: 900, color: "white", letterSpacing: "-0.02em", marginBottom: "6px" }}>
+                    <h3 style={{ fontSize: "22px", fontWeight: 900, color: "var(--l-ink)", letterSpacing: "-0.02em", marginBottom: "6px" }}>
                       Yearly Plan
                     </h3>
-                    <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)" }}>
+                    <p style={{ fontSize: "12px", color: "rgb(var(--l-fg) / calc(0.4 + var(--l-ta)))" }}>
                       Massive 50% discount! Hurry up, grab it ASAP!
                     </p>
                   </div>
                   <div style={{ textAlign: "right", flexShrink: 0 }}>
-                    <div style={{ fontSize: "20px", fontWeight: 700, color: "rgba(255,255,255,0.5)", textDecoration: "line-through", marginBottom: "-4px" }}>$228</div>
-                    <div style={{ fontSize: "42px", fontWeight: 900, color: "white", letterSpacing: "-0.04em", lineHeight: 1 }}>$114</div>
-                    <div style={{ fontSize: "12px", fontWeight: 700, color: "rgba(255,255,255,0.4)" }}>/year</div>
-                    <div style={{ fontSize: "10px", fontWeight: 700, color: "#10b981", marginTop: "6px", letterSpacing: "0.02em" }}>+ 10% affiliate rewards</div>
+                    <div style={{ fontSize: "20px", fontWeight: 700, color: "rgb(var(--l-fg) / calc(0.5 + var(--l-ta)))", textDecoration: "line-through", marginBottom: "-4px" }}>$228</div>
+                    <div style={{ fontSize: "42px", fontWeight: 900, color: "var(--l-ink)", letterSpacing: "-0.04em", lineHeight: 1 }}>$114</div>
+                    <div style={{ fontSize: "12px", fontWeight: 700, color: "rgb(var(--l-fg) / calc(0.4 + var(--l-ta)))" }}>/year</div>
+                    <div style={{ fontSize: "10px", fontWeight: 700, color: "var(--l-gain)", marginTop: "6px", letterSpacing: "0.02em" }}>+ 10% affiliate rewards</div>
                   </div>
                 </div>
 
                 <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginBottom: "32px" }}>
                   {PRICING_FEATURES.map((item, i) => (
-                    <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: "8px", fontSize: "12px", color: "rgba(255,255,255,0.65)" }}>
-                      <CheckCircle2 size={14} color="#10b981" style={{ flexShrink: 0, marginTop: "1px" }} />
+                    <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: "8px", fontSize: "12px", color: "rgb(var(--l-fg) / calc(0.65 + var(--l-ta)))" }}>
+                      <CheckCircle2 size={14} color="var(--l-gain)" style={{ flexShrink: 0, marginTop: "1px" }} />
                       <span>{item}</span>
                     </div>
                   ))}
@@ -750,7 +754,7 @@ export default function LandingPage() {
                   to="/login"
                   style={{
                     display: "flex", alignItems: "center", justifyContent: "center", gap: "8px",
-                    width: "100%", padding: "16px", borderRadius: "14px",
+                    width: "100%", padding: "16px", borderRadius: "14px", marginTop: "auto",
                     background: "linear-gradient(135deg, #10b981, #047857)",
                     color: "white", fontSize: "14px", fontWeight: 800,
                     textDecoration: "none", letterSpacing: "0.01em",
@@ -769,17 +773,17 @@ export default function LandingPage() {
 
         <ExtraVideos />
 
-        <section id="faq" className="px-5 py-20 border-t border-white/5">
+        <section id="faq" className="px-5 py-20" style={{ borderTop: "1px solid rgb(var(--l-fg) / 0.05)" }}>
           <div className="max-w-3xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-black text-white tracking-tight text-center mb-10">Frequently Asked Questions</h2>
-            <div className="glossy rounded-2xl divide-y divide-white/5">
+            <h2 className="text-3xl md:text-4xl font-black tracking-tight text-center mb-10" style={{ color: "var(--l-ink)" }}>Frequently Asked Questions</h2>
+            <div className="landing-faq rounded-2xl">
               {LANDING_FAQS.map((f) => (
                 <details key={f.q} className="group px-6 py-5">
-                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-semibold text-white">
+                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-semibold" style={{ color: "var(--l-ink)" }}>
                     {f.q}
-                    <ChevronRight size={16} className="shrink-0 text-gray-500 transition-transform group-open:rotate-90" />
+                    <ChevronRight size={16} className="shrink-0 transition-transform group-open:rotate-90" style={{ color: "rgb(var(--l-fg) / calc(0.5 + var(--l-ta)))" }} />
                   </summary>
-                  <p className="mt-2 text-sm text-gray-400 leading-relaxed">{f.a}</p>
+                  <p className="mt-2 text-sm leading-relaxed" style={{ color: "rgb(var(--l-fg) / calc(0.6 + var(--l-ta)))" }}>{f.a}</p>
                 </details>
               ))}
             </div>
@@ -787,10 +791,10 @@ export default function LandingPage() {
         </section>
 
         {/* ── Discord Community CTA ── */}
-        <section style={{ padding: "80px 20px", borderTop: "1px solid rgba(255,255,255,0.05)" }}>
+        <section style={{ padding: "80px 20px", borderTop: "1px solid rgb(var(--l-fg) / 0.05)" }}>
           <div style={{
             maxWidth: "800px", margin: "0 auto",
-            background: "linear-gradient(135deg, rgba(88,101,242,0.15) 0%, rgba(12,16,24,0.9) 100%)",
+            background: "linear-gradient(135deg, rgba(88,101,242,0.15) 0%, rgb(var(--l-surf) / 0.9) 100%)",
             backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)",
             border: "1px solid rgba(88,101,242,0.3)", borderRadius: "24px",
             padding: "56px 40px", textAlign: "center",
@@ -813,11 +817,11 @@ export default function LandingPage() {
             </div>
             <h2 style={{
               fontSize: "clamp(1.5rem,3vw,2.2rem)", fontWeight: 900,
-              color: "white", letterSpacing: "-0.02em", marginBottom: "12px",
+              color: "var(--l-ink)", letterSpacing: "-0.02em", marginBottom: "12px",
             }}>
               Join the Official Forex Notes Community
             </h2>
-            <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.45)", maxWidth: "500px", margin: "0 auto 28px", lineHeight: 1.7 }}>
+            <p style={{ fontSize: "14px", color: "rgb(var(--l-fg) / calc(0.45 + var(--l-ta)))", maxWidth: "500px", margin: "0 auto 28px", lineHeight: 1.7 }}>
               Network with funded traders, share playbook setups, discuss daily market outlooks, and get direct technical support.
             </p>
             <a
@@ -843,9 +847,9 @@ export default function LandingPage() {
 
         {/* ── Footer ── */}
         <footer style={{
-          borderTop: "1px solid rgba(255,255,255,0.05)",
+          borderTop: "1px solid rgb(var(--l-fg) / 0.05)",
           padding: "40px 20px",
-          background: "rgba(0,0,0,0.6)",
+          background: "rgb(var(--l-bg-rgb) / 0.6)",
         }}>
           <div style={{
             maxWidth: "1200px", margin: "0 auto",
@@ -853,8 +857,8 @@ export default function LandingPage() {
             alignItems: "center", justifyContent: "space-between", gap: "16px",
           }}>
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-              <BrandLogo style={{ height: "48px", width: "auto", objectFit: "contain", filter: "drop-shadow(0 0 12px rgba(16,185,129,0.4))" }} />
-              <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)" }}>
+              <BrandLogo style={{ height: "48px", width: "auto", objectFit: "contain" }} />
+              <span style={{ fontSize: "11px", color: "rgb(var(--l-fg) / calc(0.5 + var(--l-ta)))" }}>
                 © {new Date().getFullYear()} All Rights Reserved.
               </span>
             </div>
@@ -868,15 +872,15 @@ export default function LandingPage() {
               ].map(({ href, label, external }) =>
                 external ? (
                   <a key={label} href={href} target="_blank" rel="noopener noreferrer"
-                    style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)", textDecoration: "none", transition: "color 0.2s" }}
-                    onMouseEnter={e => e.currentTarget.style.color = "white"}
-                    onMouseLeave={e => e.currentTarget.style.color = "rgba(255,255,255,0.4)"}
+                    style={{ fontSize: "12px", color: "rgb(var(--l-fg) / calc(0.4 + var(--l-ta)))", textDecoration: "none", transition: "color 0.2s" }}
+                    onMouseEnter={e => e.currentTarget.style.color = "var(--l-ink)"}
+                    onMouseLeave={e => e.currentTarget.style.color = "rgb(var(--l-fg) / calc(0.4 + var(--l-ta)))"}
                   >{label}</a>
                 ) : (
                   <Link key={label} to={href}
-                    style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)", textDecoration: "none", transition: "color 0.2s" }}
-                    onMouseEnter={e => e.currentTarget.style.color = "white"}
-                    onMouseLeave={e => e.currentTarget.style.color = "rgba(255,255,255,0.4)"}
+                    style={{ fontSize: "12px", color: "rgb(var(--l-fg) / calc(0.4 + var(--l-ta)))", textDecoration: "none", transition: "color 0.2s" }}
+                    onMouseEnter={e => e.currentTarget.style.color = "var(--l-ink)"}
+                    onMouseLeave={e => e.currentTarget.style.color = "rgb(var(--l-fg) / calc(0.4 + var(--l-ta)))"}
                   >{label}</Link>
                 )
               )}

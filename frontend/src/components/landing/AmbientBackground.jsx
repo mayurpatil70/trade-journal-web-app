@@ -34,6 +34,17 @@ export default function AmbientBackground() {
         zIndex: 0,
       }}
     >
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          backgroundImage:
+            'linear-gradient(rgb(var(--l-fg) / 0.05) 1px, transparent 1px), linear-gradient(90deg, rgb(var(--l-fg) / 0.05) 1px, transparent 1px)',
+          backgroundSize: '56px 56px',
+          WebkitMaskImage: 'radial-gradient(ellipse at 50% 30%, #000 20%, transparent 75%)',
+          maskImage: 'radial-gradient(ellipse at 50% 30%, #000 20%, transparent 75%)',
+        }}
+      />
       {/* Cyan primary glow */}
       <div
         ref={blob1}
@@ -44,7 +55,7 @@ export default function AmbientBackground() {
           width: '800px',
           height: '600px',
           background:
-            'radial-gradient(ellipse at center, rgba(16,185,129,0.18) 0%, transparent 70%)',
+            'radial-gradient(ellipse at center, rgb(16 185 129 / var(--l-glow-a)) 0%, transparent 70%)',
           filter: 'blur(60px)',
           borderRadius: '50%',
           transform: 'translate(-50%, -50%)',
@@ -61,7 +72,7 @@ export default function AmbientBackground() {
           width: '700px',
           height: '500px',
           background:
-            'radial-gradient(ellipse at center, rgba(124,58,237,0.15) 0%, transparent 70%)',
+            'radial-gradient(ellipse at center, rgb(124 58 237 / calc(var(--l-glow-a) * 0.8)) 0%, transparent 70%)',
           filter: 'blur(80px)',
           borderRadius: '50%',
           transform: 'translate(-30%, -40%)',
@@ -78,7 +89,7 @@ export default function AmbientBackground() {
           width: '600px',
           height: '400px',
           background:
-            'radial-gradient(ellipse at center, rgba(16,185,129,0.12) 0%, transparent 70%)',
+            'radial-gradient(ellipse at center, rgb(16 185 129 / calc(var(--l-glow-a) * 0.65)) 0%, transparent 70%)',
           filter: 'blur(70px)',
           borderRadius: '50%',
           transform: 'translate(-70%, -60%)',

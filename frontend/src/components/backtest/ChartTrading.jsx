@@ -40,12 +40,12 @@ export default function ChartTrading({ chartRef, seriesRef, containerRef, positi
     linesRef.current = [];
     if (!position) return undefined;
     const add = (p, color, title, lineStyle) => {
-      if (Number.isFinite(p)) linesRef.current.push(series.createPriceLine({ price: p, color, lineWidth: 1, lineStyle, title, axisLabelVisible: true }));
+      if (Number.isFinite(p)) linesRef.current.push(series.createPriceLine({ price: p, color, lineWidth: 1, lineStyle, title: typeof title === 'function' ? title() : title, axisLabelVisible: true }));
     };
     const pnl = Number.isFinite(price) ? openPnl(position, price) : 0;
     add(position.entry, BLUE, `${position.side} ${position.units.toFixed(4)} | ${money(pnl)}`, 0);
-    add(sl, RED, levelLabel('SL', sl, position), 2);
-    add(tp, GREEN, levelLabel('TP', tp, position), 2);
+    add(sl, RED, () => levelLabel('SL', sl, position), 2);
+    add(tp, GREEN, () => levelLabel('TP', tp, position), 2);
     return () => {
       linesRef.current.forEach((l) => series.removePriceLine(l));
       linesRef.current = [];

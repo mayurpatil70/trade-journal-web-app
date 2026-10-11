@@ -5,7 +5,7 @@ export default function PrivacyPolicy() {
   return (
     <div className="page-shell" style={{ padding: '80px 20px', fontFamily: 'Inter, sans-serif' }}>
       <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-        <Link to="/" style={{ color: '#10b981', textDecoration: 'none', marginBottom: '40px', display: 'inline-block' }}>
+        <Link to="/" style={{ color: 'var(--gain)', textDecoration: 'none', marginBottom: '40px', display: 'inline-block' }}>
           &larr; Back to Home
         </Link>
         <h1 style={{ fontSize: '2.5rem', fontWeight: 800, marginBottom: '24px' }}>Privacy Policy</h1>
