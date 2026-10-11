@@ -596,6 +596,47 @@ html.light body:not(.terminal) input[type="time"]:not([class*="bg-[#0A0B0D]"]):n
   color-scheme: light;
 }
 
+/* =========================================================
+   DARK LUXURY CARDS (Masterclass Paywall & Promo Popups)
+   Prevent light mode theme remappers from dimming text,
+   crypto addresses, inputs, or badges on dark luxury cards.
+   ========================================================= */
+.dark-luxury-card {
+  color-scheme: dark !important;
+}
+
+html.light body:not(.terminal) .dark-luxury-card,
+html.light body:not(.terminal) .dark-luxury-card * {
+  /* Prevent background and border stripping */
+}
+
+html.light body:not(.terminal) .dark-luxury-card .text-white,
+html.light body:not(.terminal) .dark-luxury-card [class*="text-white"],
+.dark-luxury-card .text-white {
+  color: #ffffff !important;
+}
+
+html.light body:not(.terminal) .dark-luxury-card .text-address-bep20,
+.dark-luxury-card .text-address-bep20 {
+  color: #fef08a !important;
+}
+
+html.light body:not(.terminal) .dark-luxury-card input:not([type="file"]),
+.dark-luxury-card input:not([type="file"]) {
+  color: #ffffff !important;
+  background-color: #0a0b10 !important;
+  border-color: rgba(245, 158, 11, 0.35) !important;
+}
+
+html.light body:not(.terminal) .dark-luxury-card input::placeholder,
+.dark-luxury-card input::placeholder {
+  color: rgba(254, 243, 199, 0.45) !important;
+}
+
+html.light body:not(.terminal) .dark-luxury-card input[type="file"],
+.dark-luxury-card input[type="file"] {
+  color: rgba(254, 243, 199, 0.9) !important;
+}
 
 /* =========================================================
 LEDGER UTILITIES
