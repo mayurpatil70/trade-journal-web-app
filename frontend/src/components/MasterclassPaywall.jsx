@@ -89,16 +89,22 @@ export default function MasterclassPaywall() {
   const PAY_ADDRESS = config.wallets[chain];
 
   return (
-    <div className="bg-gradient-to-br from-[#1a1410] to-[#121418] border border-yellow-500/20 rounded-2xl shadow-[0_0_40px_rgba(234,179,8,0.05)] overflow-hidden mb-8 relative group">
+    <div className="bg-gradient-to-br from-[#161412] via-[#0f1115] to-[#0a0c0f] border border-amber-500/35 rounded-2xl shadow-[0_0_40px_rgba(245,158,11,0.12),0_1px_0_rgba(255,255,255,0.08)_inset] overflow-hidden mb-8 relative group">
       {/* Decorative Glow */}
-      <div className="absolute top-0 right-0 w-64 h-64 bg-yellow-500/10 rounded-full blur-3xl pointer-events-none group-hover:bg-yellow-500/20 transition-colors" />
+      <div className="absolute top-0 right-0 w-80 h-80 bg-gradient-to-br from-amber-500/20 via-yellow-500/10 to-transparent rounded-full blur-3xl pointer-events-none group-hover:from-amber-500/30 transition-all duration-500" />
 
-      <div className="p-6 bg-gradient-to-b from-yellow-500/10 to-transparent border-b border-yellow-500/10 flex flex-col md:flex-row items-center gap-6 text-center md:text-left">
+      <div className="p-6 md:p-8 bg-gradient-to-b from-amber-500/15 via-amber-500/5 to-transparent border-b border-amber-500/20 flex flex-col md:flex-row items-center gap-6 text-center md:text-left relative z-10">
         <div className="flex-1">
-          <h2 className="text-xl font-black text-white mb-1">
+          <h2
+            className="text-xl md:text-2xl font-black mb-1.5 tracking-tight drop-shadow-sm"
+            style={{ color: '#ffffff' }}
+          >
             Prop Firm Pass Masterclass
           </h2>
-          <p className="text-sm text-yellow-500/80 font-medium">
+          <p
+            className="text-sm font-medium leading-relaxed max-w-2xl"
+            style={{ color: 'rgba(254, 243, 199, 0.92)' }}
+          >
             How to pass propfirm challenges: detailed guidance from our industry
             experts. Start to end help for traders until payout arrives.
           </p>
@@ -106,9 +112,25 @@ export default function MasterclassPaywall() {
         {step === 1 && (
           <button
             onClick={() => setStep(2)}
-            className="w-full md:w-auto px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-400 hover:to-yellow-500 text-yellow-950 font-black text-sm rounded-xl transition-all shadow-lg shadow-yellow-500/25 flex items-center justify-center gap-2"
+            className="w-full md:w-auto px-7 py-3.5 font-black text-sm rounded-xl transition-all duration-300 flex items-center justify-center gap-2 tracking-wide cursor-pointer group/btn"
+            style={{
+              background: 'linear-gradient(180deg, #fef08a 0%, #facc15 35%, #eab308 70%, #ca8a04 100%)',
+              color: '#422006',
+              border: '1px solid rgba(254, 240, 138, 0.9)',
+              boxShadow: '0 0 28px rgba(234, 179, 8, 0.55), 0 4px 14px rgba(202, 138, 4, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.9), inset 0 -2px 3px rgba(113, 63, 18, 0.35)',
+              textShadow: '0 1px 0 rgba(255, 255, 255, 0.5)',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-2px) scale(1.02)';
+              e.currentTarget.style.boxShadow = '0 0 38px rgba(234, 179, 8, 0.8), 0 6px 20px rgba(202, 138, 4, 0.5), inset 0 1px 2px rgba(255, 255, 255, 1), inset 0 -2px 3px rgba(113, 63, 18, 0.4)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0) scale(1)';
+              e.currentTarget.style.boxShadow = '0 0 28px rgba(234, 179, 8, 0.55), 0 4px 14px rgba(202, 138, 4, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.9), inset 0 -2px 3px rgba(113, 63, 18, 0.35)';
+            }}
           >
-            Get Access - ${PRICE} <ArrowRight className="w-4 h-4" />
+            <span>Get Access - ${PRICE}</span>
+            <ArrowRight className="w-4 h-4 transition-transform group-hover/btn:translate-x-0.5" />
           </button>
         )}
       </div>
@@ -116,11 +138,11 @@ export default function MasterclassPaywall() {
       {step === 2 && (
         <div className="p-6 md:p-8 space-y-6 animate-in slide-in-from-top-4 relative z-10">
           <div className="bg-black/40 border border-white/5 rounded-xl p-4 text-center max-w-sm mx-auto">
-            <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">
+            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
               Send Exactly
             </p>
             <div className="flex items-center justify-center gap-3">
-              <span className="text-3xl font-black text-white">
+              <span className="text-3xl font-black" style={{ color: '#ffffff' }}>
                 {PRICE.toFixed(2)} USDT
               </span>
               <button
@@ -142,7 +164,7 @@ export default function MasterclassPaywall() {
               <span className="text-red-400">BSC Network only</span>
             </p>
             <div className="flex items-center gap-2 bg-black/40 border border-white/5 rounded-xl p-1.5 pl-4">
-              <span className="text-xs font-mono text-white truncate flex-1">
+              <span className="text-xs font-mono text-white truncate flex-1" style={{ color: '#ffffff' }}>
                 {PAY_ADDRESS}
               </span>
               <button
@@ -208,7 +230,7 @@ export default function MasterclassPaywall() {
           <div className="w-16 h-16 bg-yellow-500/10 rounded-full flex items-center justify-center border border-yellow-500/20 mb-2">
             <ShieldCheck className="w-8 h-8 text-yellow-500" />
           </div>
-          <h3 className="text-2xl font-black text-white">Payment Pending Verification</h3>
+          <h3 className="text-2xl font-black text-white" style={{ color: '#ffffff' }}>Payment Pending Verification</h3>
           <p className="text-sm text-gray-400">
             Your payment has been submitted. Our admin team will verify it shortly.
           </p>

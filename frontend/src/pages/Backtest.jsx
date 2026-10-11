@@ -561,7 +561,15 @@ export default function Backtest() {
             <button title="Faster" className="text-[#787B86] hover:text-white disabled:opacity-30" disabled={speedIdx === SPEEDS.length - 1} onClick={() => setSpeedIdx((i) => i + 1)}><FastForward className="w-4 h-4" /></button>
             {!watch && <button title="Forward 10 bars" disabled={finished || loading} className="text-[#787B86] hover:text-white disabled:opacity-30" onClick={() => advance(10)}><SkipForward className="w-4 h-4" /></button>}
             <span className="text-[#D1D4DC] font-semibold font-mono w-8 text-center">{SPEEDS[speedIdx].label}</span>
-            {!watch && <input type="date" title="Jump to date" onChange={(e) => jumpToDate(e.target.value)} className="bg-[#0A0B0D] border border-[#222429] rounded px-1 py-0.5 text-[#D1D4DC]" />}
+            {!watch && (
+              <input
+                type="date"
+                title="Jump to date"
+                onChange={(e) => jumpToDate(e.target.value)}
+                className="bg-[#0A0B0D] border border-[#222429] rounded px-1.5 py-0.5 text-[#D1D4DC] [color-scheme:dark] cursor-pointer hover:border-[#2962FF] transition-colors"
+                style={{ colorScheme: 'dark' }}
+              />
+            )}
           </div>
 
           <div ref={chartContainerRef} className={`absolute inset-0 ${watch ? '' : 'md:left-11'}`} />

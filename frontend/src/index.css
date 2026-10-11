@@ -568,8 +568,31 @@ html.light body:not(.terminal) textarea {
   color: var(--ink);
 }
 
-html.light body:not(.terminal) input[type="date"],
-html.light body:not(.terminal) input[type="time"] {
+/* Date & Time Picker styling */
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.85;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+input[type="date"]::-webkit-calendar-picker-indicator:hover,
+input[type="time"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+  transform: scale(1.08);
+}
+
+body.terminal input[type="date"],
+body.terminal input[type="time"],
+.dark input[type="date"],
+.dark input[type="time"],
+[class*="bg-[#0A0B0D]"] input[type="date"],
+input[type="date"][class*="bg-[#0A0B0D]"],
+input[type="date"][class*="[color-scheme:dark]"] {
+  color-scheme: dark !important;
+}
+
+html.light body:not(.terminal) input[type="date"]:not([class*="bg-[#0A0B0D]"]):not([class*="[color-scheme:dark]"]),
+html.light body:not(.terminal) input[type="time"]:not([class*="bg-[#0A0B0D]"]):not([class*="[color-scheme:dark]"]) {
   color-scheme: light;
 }
 
@@ -581,7 +604,8 @@ html.light .landing-root {
 html.light .landing-root img,
 html.light .landing-root video,
 html.light .landing-root canvas,
-html.light .landing-root iframe {
+html.light .landing-root iframe,
+html.light .landing-root .gold-banner {
   filter: invert(1) hue-rotate(180deg);
 }
 

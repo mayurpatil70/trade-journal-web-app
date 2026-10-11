@@ -280,25 +280,58 @@ export default function LandingPage() {
       <div style={{ position: "relative", zIndex: 1 }}>
 
         {/* ── Announcement Bar ── */}
-        <div style={{
-          background: "linear-gradient(90deg, rgba(245,158,11,0.2) 0%, rgba(252,211,77,0.25) 50%, rgba(245,158,11,0.2) 100%)",
-          borderBottom: "1px solid rgba(252,211,77,0.4)",
-          boxShadow: "0 0 24px rgba(245,158,11,0.2), inset 0 0 12px rgba(252,211,77,0.15)",
-          padding: "10px 20px",
-          textAlign: "center",
-          fontSize: "12px",
-          fontWeight: 800,
-          color: "#fcd34d",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: "8px",
-          letterSpacing: "0.03em",
-          textShadow: "0 0 8px rgba(245,158,11,0.6)",
-        }}>
+        <div
+          className="gold-banner"
+          style={{
+            position: "relative",
+            background: "linear-gradient(180deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.04) 48%, rgba(0,0,0,0.12) 50%, rgba(0,0,0,0.3) 100%), linear-gradient(90deg, #78350f 0%, #92400e 15%, #b45309 35%, #d97706 50%, #b45309 65%, #92400e 85%, #78350f 100%)",
+            borderBottom: "1px solid rgba(253, 224, 71, 0.75)",
+            boxShadow: "0 4px 20px rgba(180, 83, 9, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.6), inset 0 -1px 2px rgba(0, 0, 0, 0.4)",
+            padding: "9px 20px",
+            textAlign: "center",
+            fontSize: "12px",
+            fontWeight: 800,
+            color: "#fffbeb",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "10px",
+            letterSpacing: "0.025em",
+            textShadow: "0 1px 2px rgba(0, 0, 0, 0.7)",
+            zIndex: 10,
+          }}
+        >
           <span>Forex Notes — Track, analyze, and optimize your trading strategy automatically.</span>
-          <Link to="/login" style={{ color: "#fbbf24", display: "inline-flex", alignItems: "center", gap: "2px", fontWeight: 900, textDecoration: "underline" }}>
-            Claim Access <ChevronRight size={12} />
+          <Link
+            to="/login"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "4px",
+              padding: "2px 10px",
+              borderRadius: "999px",
+              background: "linear-gradient(180deg, #fef08a 0%, #facc15 35%, #f59e0b 70%, #d97706 100%)",
+              color: "#422006",
+              fontWeight: 900,
+              fontSize: "11px",
+              letterSpacing: "0.03em",
+              textDecoration: "none",
+              border: "1px solid rgba(254, 240, 138, 0.95)",
+              boxShadow: "0 2px 8px rgba(0, 0, 0, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.9), inset 0 -1px 1px rgba(113, 63, 18, 0.4)",
+              textShadow: "0 1px 0 rgba(255, 255, 255, 0.4)",
+              transition: "transform 0.15s ease, box-shadow 0.15s ease",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = "scale(1.05)";
+              e.currentTarget.style.boxShadow = "0 3px 12px rgba(234, 179, 8, 0.6), inset 0 1px 1px rgba(255, 255, 255, 1)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = "scale(1)";
+              e.currentTarget.style.boxShadow = "0 2px 8px rgba(0, 0, 0, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.9), inset 0 -1px 1px rgba(113, 63, 18, 0.4)";
+            }}
+          >
+            <span>Claim Access</span>
+            <ChevronRight size={12} strokeWidth={3} />
           </Link>
         </div>
 
