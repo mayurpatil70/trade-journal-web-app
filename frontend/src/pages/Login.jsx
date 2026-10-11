@@ -55,7 +55,7 @@ export default function Login() {
       <div className="w-full max-w-md glossy rounded-3xl p-8 sm:p-10 flex flex-col items-center text-center">
         {/* Logo & Branding */}
         <div className="flex flex-col items-center mb-8">
-          <BrandLogo width="96" height="85" className="h-20 w-auto mb-4" />
+          <BrandLogo width="96" height="77" className="h-20 w-auto mb-4" />
           <h1 className="text-3xl font-bold tracking-tight text-white mb-2">
             Forex Notes
           </h1>
