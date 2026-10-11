@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { ChevronDown, Search, Loader2 } from 'lucide-react';
 import { marketApi } from '../api/market';
 
@@ -26,13 +27,38 @@ export default function SymbolPicker({ value, onChange, target = 'chart', label,
   const [hasMore, setHasMore] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [pos, setPos] = useState(null);
   const rootRef = useRef(null);
+  const menuRef = useRef(null);
 
   useEffect(() => {
     if (!open) return;
-    const close = (e) => rootRef.current && !rootRef.current.contains(e.target) && setOpen(false);
+    const close = (e) => {
+      if (rootRef.current?.contains(e.target) || menuRef.current?.contains(e.target)) return;
+      setOpen(false);
+    };
     document.addEventListener('mousedown', close);
     return () => document.removeEventListener('mousedown', close);
+  }, [open]);
+
+  useLayoutEffect(() => {
+    if (!open) return;
+    const place = () => {
+      const r = rootRef.current?.getBoundingClientRect();
+      if (!r) return;
+      const width = Math.min(420, window.innerWidth * 0.92);
+      const left = Math.max(8, Math.min(r.left, window.innerWidth - width - 8));
+      const below = window.innerHeight - r.bottom;
+      const flip = below < 360 && r.top > below;
+      setPos(flip ? { left, width, bottom: window.innerHeight - r.top + 4 } : { left, width, top: r.bottom + 4 });
+    };
+    place();
+    window.addEventListener('resize', place);
+    window.addEventListener('scroll', place, true);
+    return () => {
+      window.removeEventListener('resize', place);
+      window.removeEventListener('scroll', place, true);
+    };
   }, [open]);
 
   useEffect(() => {
@@ -81,11 +107,11 @@ export default function SymbolPicker({ value, onChange, target = 'chart', label,
     <div ref={rootRef} className={`relative ${className}`}>
       {label && <span className="block text-xs text-gray-400">{label}</span>}
       {trigger}
-      {open && (
-        <div className="absolute left-0 top-full z-[200] mt-1 w-[min(420px,92vw)] rounded-xl border border-white/10 bg-[#101216] p-2 shadow-2xl">
+      {open && pos && createPortal(
+        <div ref={menuRef} style={pos} className="fixed z-[500] rounded-xl border border-white/10 bg-[#101216] p-2 shadow-2xl">
           <div className="flex items-center gap-2 rounded-lg border border-white/10 bg-[#0a0a0a] px-2">
             <Search className="h-4 w-4 text-gray-500" />
-            <input autoFocus value={q} onChange={(e) => { setQ(e.target.value); setPage(1); }} placeholder="Search symbol or name" className="w-full bg-transparent py-2 text-sm text-white outline-none" />
+            <input autoFocus style={{ background: "transparent" }} value={q} onChange={(e) => { setQ(e.target.value); setPage(1); }} placeholder="Search symbol or name" className="w-full bg-transparent py-2 text-sm text-white outline-none" />
           </div>
           <div className="mt-2 flex gap-1 overflow-x-auto text-xs">
             {TABS.map((t) => (
@@ -94,7 +120,7 @@ export default function SymbolPicker({ value, onChange, target = 'chart', label,
               </button>
             ))}
           </div>
-          <div className="mt-2 max-h-72 overflow-y-auto">
+          <div className="mt-2 max-h-[min(18rem,50vh)] overflow-y-auto">
             {items.map((e) => {
               const reason = blockReason(e, target);
               return (
@@ -117,7 +143,8 @@ export default function SymbolPicker({ value, onChange, target = 'chart', label,
           {target === 'mt5' && tab === 'crypto' && (
             <p className="mt-2 border-t border-white/5 px-2 pt-2 text-[11px] text-amber-300">Crypto pairs run on the Binance bot. The MT5 bot covers forex, indices and futures.</p>
           )}
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

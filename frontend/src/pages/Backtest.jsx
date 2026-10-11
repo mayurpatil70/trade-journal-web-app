@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { createChart } from 'lightweight-charts';
 import {
@@ -150,7 +150,7 @@ export default function Backtest() {
   const price = candle?.close;
   const finished = candles.length > 0 && index >= candles.length;
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     document.body.classList.add('terminal');
     return () => document.body.classList.remove('terminal');
   }, []);
