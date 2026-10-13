@@ -404,25 +404,25 @@ export default function LotSizeCalculator() {
 
         {/* Right Output Card (5 Cols) - Glowing Hero Card */}
         <div className="lg:col-span-5 space-y-6">
-          <div className="relative overflow-hidden rounded-3xl p-6 sm:p-8 bg-gradient-to-b from-[#121418] via-[#101b2b] to-[#0c1219] border border-[#10b981]/40 shadow-[0_0_50px_rgba(16,185,129,0.18)] text-white space-y-6">
+          <div className="relative overflow-hidden rounded-3xl p-6 sm:p-8 dark:bg-gradient-to-b dark:from-[#121418] dark:via-[#101b2b] dark:to-[#0c1219] bg-white border border-emerald-500/30 dark:border-[#10b981]/40 shadow-xl dark:shadow-[0_0_50px_rgba(16,185,129,0.18)] text-gray-900 dark:text-white space-y-6">
             <div className="flex justify-between items-center">
-              <span className="text-xs font-bold text-emerald-400 uppercase tracking-widest flex items-center gap-1.5">
+              <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest flex items-center gap-1.5">
                 <Zap className="w-4 h-4" /> Recommended Execution
               </span>
-              <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+              <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 dark:border-emerald-500/30">
                 Safe Lot
               </span>
             </div>
 
             {/* Giant Lot Display */}
             <div className="text-center py-4 space-y-2">
-              <p className="text-xs text-gray-400 font-medium">Standard Lots</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">Standard Lots</p>
               <div className="flex items-center justify-center gap-3">
-                <span className="text-6xl sm:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-emerald-400 to-emerald-400 drop-shadow-[0_0_25px_rgba(52,211,153,0.4)]">
+                <span className="text-6xl sm:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-emerald-500 dark:from-emerald-400 dark:via-emerald-400 dark:to-emerald-400 drop-shadow-[0_0_25px_rgba(52,211,153,0.3)]">
                   {lotSize.toFixed(2)}
                 </span>
               </div>
-              <p className="text-xs text-emerald-400/90 font-medium">
+              <p className="text-xs text-emerald-600 dark:text-emerald-400/90 font-medium">
                 {selectedSymbol === "Other" && customSymbol ? customSymbol : instrument.symbol} • {pipDistance.toFixed(1)} {instrument.type === "index" ? "pts" : "pips"} Stop Loss
               </p>
             </div>
@@ -449,16 +449,16 @@ export default function LotSizeCalculator() {
             </button>
 
             {/* Metrics Breakdown Grid */}
-            <div className="grid grid-cols-2 gap-3 pt-4 border-t border-white/10 text-xs">
-              <div className="p-3.5 rounded-xl bg-white/5 border border-white/5 space-y-1">
-                <span className="text-gray-400">Total Cash at Risk</span>
-                <p className="text-lg font-black text-red-400">
+            <div className="grid grid-cols-2 gap-3 pt-4 border-t border-gray-200 dark:border-white/10 text-xs">
+              <div className="p-3.5 rounded-xl bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/5 space-y-1">
+                <span className="text-gray-500 dark:text-gray-400">Total Cash at Risk</span>
+                <p className="text-lg font-black text-red-500 dark:text-red-400">
                   -${totalDollarRisk.toFixed(2)}
                 </p>
               </div>
-              <div className="p-3.5 rounded-xl bg-white/5 border border-white/5 space-y-1">
-                <span className="text-gray-400">Pip Value</span>
-                <p className="text-lg font-black text-cyan-300">
+              <div className="p-3.5 rounded-xl bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/5 space-y-1">
+                <span className="text-gray-500 dark:text-gray-400">Pip Value</span>
+                <p className="text-lg font-black text-cyan-600 dark:text-cyan-300">
                   ${currentPipValue}/pip
                 </p>
               </div>
@@ -466,26 +466,26 @@ export default function LotSizeCalculator() {
 
             {/* Risk-to-Reward Targets */}
             <div className="space-y-2 pt-2">
-              <p className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
-                <Target className="w-3.5 h-3.5 text-emerald-400" />
+              <p className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
+                <Target className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                 Target Profits by R:R
               </p>
               <div className="grid grid-cols-3 gap-2 text-center text-xs">
-                <div className="p-2.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
-                  <span className="text-gray-400 block text-[10px]">1:1 RR</span>
-                  <span className="font-bold text-emerald-400">
+                <div className="p-2.5 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20">
+                  <span className="text-gray-500 dark:text-gray-400 block text-[10px]">1:1 RR</span>
+                  <span className="font-bold text-emerald-600 dark:text-emerald-400">
                     +${totalDollarRisk.toFixed(0)}
                   </span>
                 </div>
-                <div className="p-2.5 rounded-lg bg-emerald-500/15 border border-emerald-500/30">
-                  <span className="text-gray-400 block text-[10px]">1:2 RR</span>
-                  <span className="font-bold text-emerald-300">
+                <div className="p-2.5 rounded-lg bg-emerald-100/50 dark:bg-emerald-500/15 border border-emerald-200 dark:border-emerald-500/30">
+                  <span className="text-gray-500 dark:text-gray-400 block text-[10px]">1:2 RR</span>
+                  <span className="font-bold text-emerald-600 dark:text-emerald-300">
                     +${(totalDollarRisk * 2).toFixed(0)}
                   </span>
                 </div>
-                <div className="p-2.5 rounded-lg bg-emerald-500/20 border border-emerald-500/40">
-                  <span className="text-gray-400 block text-[10px]">1:3 RR</span>
-                  <span className="font-bold text-emerald-200">
+                <div className="p-2.5 rounded-lg bg-emerald-100 dark:bg-emerald-500/20 border border-emerald-300 dark:border-emerald-500/40">
+                  <span className="text-gray-500 dark:text-gray-400 block text-[10px]">1:3 RR</span>
+                  <span className="font-bold text-emerald-700 dark:text-emerald-200">
                     +${(totalDollarRisk * 3).toFixed(0)}
                   </span>
                 </div>

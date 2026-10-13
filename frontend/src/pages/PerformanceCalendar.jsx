@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
+import AccountFilter from "../components/AccountFilter";
 import {
   Calendar as CalendarIcon,
   ChevronLeft,
@@ -19,6 +20,7 @@ export default function PerformanceCalendar() {
   const [loading, setLoading] = useState(true);
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDayTrades, setSelectedDayTrades] = useState(null);
+  const [selectedAccount, setSelectedAccount] = useState("");
 
   useEffect(() => {
     const fetchTrades = async () => {
@@ -35,6 +37,10 @@ export default function PerformanceCalendar() {
     };
     fetchTrades();
   }, [navigate]);
+
+  const filteredTrades = selectedAccount
+    ? trades.filter((t) => t.account_name === selectedAccount)
+    : trades;
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
@@ -60,18 +66,26 @@ export default function PerformanceCalendar() {
           </h1>
           <p className="text-gray-500 mt-1 text-[13px]">
             Visualize your daily P&L, trading frequency, and consistency.
+            {selectedAccount && <span className="ml-2 text-emerald-400 font-medium">· {selectedAccount}</span>}
           </p>
         </div>
-        <div className="flex items-center gap-3 bg-[#101216] border border-white/5 rounded-xl p-1.5 shadow-lg">
-          <button onClick={handlePrevMonth} className="p-2 text-gray-500 hover:text-white hover:bg-white/5 rounded-lg transition-colors">
-            <ChevronLeft className="w-4 h-4" />
-          </button>
-          <span className="text-sm font-bold text-white min-w-[120px] text-center">
-            {monthNames[month]} {year}
-          </span>
-          <button onClick={handleNextMonth} className="p-2 text-gray-500 hover:text-white hover:bg-white/5 rounded-lg transition-colors">
-            <ChevronRight className="w-4 h-4" />
-          </button>
+        <div className="flex flex-wrap items-center gap-3">
+          <AccountFilter
+            trades={trades}
+            selectedAccount={selectedAccount}
+            onChange={setSelectedAccount}
+          />
+          <div className="flex items-center gap-3 bg-[#101216] border border-white/5 rounded-xl p-1.5 shadow-lg">
+            <button onClick={handlePrevMonth} className="p-2 text-gray-500 hover:text-white hover:bg-white/5 rounded-lg transition-colors">
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            <span className="text-sm font-bold text-white min-w-[120px] text-center">
+              {monthNames[month]} {year}
+            </span>
+            <button onClick={handleNextMonth} className="p-2 text-gray-500 hover:text-white hover:bg-white/5 rounded-lg transition-colors">
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
         </div>
       </div>
 
@@ -98,7 +112,7 @@ export default function PerformanceCalendar() {
             {Array.from({ length: daysInMonth }).map((_, i) => {
               const dayNum = i + 1;
               const dateString = `${year}-${String(month + 1).padStart(2, "0")}-${String(dayNum).padStart(2, "0")}`;
-              const dayTrades = trades.filter((t) => (t.date || "").slice(0, 10) === dateString);
+              const dayTrades = filteredTrades.filter((t) => (t.date || "").slice(0, 10) === dateString);
               
               const netDayR = dayTrades.reduce((acc, t) => acc + parseFloat(t.r_multiple || 0), 0);
               const hasTrades = dayTrades.length > 0;

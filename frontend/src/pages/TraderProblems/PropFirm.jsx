@@ -312,25 +312,25 @@ export default function PropFirm() {
         {/* Right Output Panel (5 Cols) */}
         <div className="lg:col-span-5 space-y-6">
           <div
-            className={`relative overflow-hidden rounded-3xl p-6 sm:p-8 border backdrop-blur-xl text-white space-y-6 ${
+            className={`relative overflow-hidden rounded-3xl p-6 sm:p-8 border backdrop-blur-xl text-gray-900 dark:text-white space-y-6 shadow-xl ${
               isDailyBreached || isOverallBreached
-                ? "bg-gradient-to-b from-red-950 via-[#180a0a] to-[#121418] border-red-500/60 shadow-[0_0_40px_rgba(239,68,68,0.3)]"
+                ? "bg-white border-red-500/40 dark:bg-gradient-to-b dark:from-red-950 dark:via-[#180a0a] dark:to-[#121418] dark:border-red-500/60 dark:shadow-[0_0_40px_rgba(239,68,68,0.3)]"
                 : isCritical
-                  ? "bg-gradient-to-b from-amber-950 via-[#1a140a] to-[#121418] border-amber-500/60 shadow-[0_0_40px_rgba(245,158,11,0.25)]"
-                  : "bg-gradient-to-b from-emerald-950/60 via-[#0a1812] to-[#121418] border-emerald-500/40 shadow-[0_0_40px_rgba(16,185,129,0.2)]"
+                  ? "bg-white border-amber-500/40 dark:bg-gradient-to-b dark:from-amber-950 dark:via-[#1a140a] dark:to-[#121418] dark:border-amber-500/60 dark:shadow-[0_0_40px_rgba(245,158,11,0.25)]"
+                  : "bg-white border-emerald-500/30 dark:bg-gradient-to-b dark:from-emerald-950/60 dark:via-[#0a1812] dark:to-[#121418] dark:border-emerald-500/40 dark:shadow-[0_8px_40px_rgba(16,185,129,0.25)]"
             }`}
           >
             <div className="flex justify-between items-center">
-              <span className="text-xs font-bold uppercase tracking-widest text-gray-300">
+              <span className="text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-gray-300">
                 Live Protection Status
               </span>
               <span
                 className={`px-3 py-1 rounded-full text-[10px] font-black uppercase border ${
                   isDailyBreached || isOverallBreached
-                    ? "bg-red-500/20 text-red-400 border-red-500/40"
+                    ? "bg-red-500/10 dark:bg-red-500/20 text-red-600 dark:text-red-400 border-red-500/30 dark:border-red-500/40"
                     : isCritical
-                      ? "bg-amber-500/20 text-amber-400 border-amber-500/40"
-                      : "bg-emerald-500/20 text-emerald-400 border-emerald-500/40"
+                      ? "bg-amber-500/10 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 border-amber-500/30 dark:border-amber-500/40"
+                      : "bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-500/30 dark:border-emerald-500/40"
                 }`}
               >
                 {isDailyBreached
@@ -345,16 +345,16 @@ export default function PropFirm() {
 
             {/* Remaining Daily Buffer Display */}
             <div className="text-center py-2 space-y-1">
-              <span className="text-xs text-gray-400 font-medium uppercase tracking-wider">
+              <span className="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wider">
                 Max Allowed Loss Remaining Today
               </span>
               <p
                 className={`text-5xl sm:text-6xl font-black ${
                   isDailyBreached
-                    ? "text-red-500"
+                    ? "text-red-600 dark:text-red-500"
                     : isCritical
-                      ? "text-amber-400"
-                      : "text-emerald-400"
+                      ? "text-amber-600 dark:text-amber-400"
+                      : "text-emerald-600 dark:text-emerald-400"
                 }`}
               >
                 ${dailyBufferRemaining.toLocaleString(undefined, {
@@ -362,7 +362,7 @@ export default function PropFirm() {
                   maximumFractionDigits: 2,
                 })}
               </p>
-              <p className="text-xs text-gray-400">
+              <p className="text-xs text-gray-500 dark:text-gray-400">
                 Today's Daily Cap: -${maxDailyLossAllowed.toLocaleString()}
               </p>
             </div>
@@ -370,12 +370,12 @@ export default function PropFirm() {
             {/* Gauge Progress Bar */}
             <div className="space-y-1.5">
               <div className="flex justify-between text-xs font-bold">
-                <span className="text-gray-400">Daily Drawdown Used</span>
-                <span className={dailyDrawdownUsedPercent > 70 ? "text-red-400" : "text-emerald-400"}>
+                <span className="text-gray-500 dark:text-gray-400">Daily Drawdown Used</span>
+                <span className={dailyDrawdownUsedPercent > 70 ? "text-red-500 dark:text-red-400" : "text-emerald-600 dark:text-emerald-400"}>
                   {dailyDrawdownUsedPercent.toFixed(1)}%
                 </span>
               </div>
-              <div className="w-full h-3 bg-white/10 rounded-full overflow-hidden p-0.5">
+              <div className="w-full h-3 bg-gray-100 dark:bg-white/10 rounded-full overflow-hidden p-0.5">
                 <div
                   className={`h-full rounded-full transition-all duration-500 ${
                     dailyDrawdownUsedPercent >= 80
@@ -388,20 +388,20 @@ export default function PropFirm() {
             </div>
 
             {/* Trailing Max Buffer */}
-            <div className="p-4 rounded-xl bg-white/5 border border-white/10 space-y-2">
+            <div className="p-4 rounded-xl bg-gray-50 dark:bg-black/20 border border-gray-200 dark:border-white/10 space-y-2">
               <div className="flex justify-between items-center text-xs">
-                <span className="text-gray-400 font-medium">Trailing Breach Level:</span>
-                <span className="font-bold text-red-300">${trailingBreachLevel.toLocaleString()}</span>
+                <span className="text-gray-500 dark:text-gray-400 font-medium">Trailing Breach Level:</span>
+                <span className="font-bold text-red-600 dark:text-red-300">${trailingBreachLevel.toLocaleString()}</span>
               </div>
               <div className="flex justify-between items-center text-xs">
-                <span className="text-gray-400 font-medium">Total Buffer to Termination:</span>
-                <span className="font-bold text-emerald-400">${overallBufferRemaining.toLocaleString()}</span>
+                <span className="text-gray-500 dark:text-gray-400 font-medium">Total Buffer to Termination:</span>
+                <span className="font-bold text-emerald-600 dark:text-emerald-400">${overallBufferRemaining.toLocaleString()}</span>
               </div>
             </div>
 
             {/* Advisory note */}
-            <div className="p-3.5 rounded-xl bg-white/5 border border-white/5 text-xs text-gray-300 leading-relaxed flex items-start gap-2">
-              <HelpCircle className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+            <div className="p-3.5 rounded-xl bg-gray-50 dark:bg-black/20 border border-gray-200 dark:border-white/10 text-xs text-gray-600 dark:text-gray-300 leading-relaxed flex items-start gap-2">
+              <HelpCircle className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
               <span>
                 Tip: If your drawdown used passes <strong>50%</strong>, reduce your lot size by half immediately to prevent emotional spiral.
               </span>

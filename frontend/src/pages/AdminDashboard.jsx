@@ -8,6 +8,9 @@ import {
   Trash2,
   ExternalLink,
   Copy,
+  UserCheck,
+  UserX,
+  Activity,
 } from "lucide-react";
 import api from "../api/axios";
 
@@ -19,6 +22,10 @@ export default function AdminDashboard() {
     recentOrders: [],
     accounts: [],
   });
+
+  const [usersPage, setUsersPage] = useState(1);
+  const [ordersPage, setOrdersPage] = useState(1);
+  const ROWS = 10;
 
   const fetchData = async () => {
     try {
@@ -77,6 +84,17 @@ export default function AdminDashboard() {
 
   const { metrics = {}, recentOrders = [], accounts = [], withdrawals = [], affiliates = [] } = data || {};
 
+  const totalRegistered = accounts?.length || 0;
+  const paidMembersCount = accounts?.filter(acc => recentOrders?.some(ord => ord.user_id === acc.id && ord.status === 'paid')).length || 0;
+  const notSubscribedCount = accounts?.filter(acc => !recentOrders?.some(ord => ord.user_id === acc.id && ord.status === 'paid')).length || 0;
+  const pendingOrdersCount = recentOrders?.filter(o => o.status === "pending").length || 0;
+
+  const paginatedOrders = recentOrders.slice((ordersPage - 1) * ROWS, ordersPage * ROWS);
+  const totalOrderPages = Math.max(1, Math.ceil(recentOrders.length / ROWS));
+
+  const paginatedUsers = accounts.slice((usersPage - 1) * ROWS, usersPage * ROWS);
+  const totalUserPages = Math.max(1, Math.ceil(accounts.length / ROWS));
+
   const handleUpdateWithdrawal = async (id, status) => {
     try {
       await api.put(`/api/admin/withdrawal/${id}`, { status });
@@ -107,8 +125,8 @@ export default function AdminDashboard() {
       {activeTab === "overview" && (
         <>
         {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-        {/* Revenue */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+        {/* Total Revenue */}
         <div className="bg-[#0a0a0a]/60 backdrop-blur-xl border border-white/10 rounded-2xl p-6 shadow-xl">
           <div className="flex items-center justify-between mb-4">
             <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Total Revenue</span>
@@ -120,19 +138,43 @@ export default function AdminDashboard() {
           <p className="text-xs text-emerald-400 font-medium mt-2">{metrics.paidOrdersCount || 0} confirmed USDT payments</p>
         </div>
 
-        {/* Active Users */}
+        {/* Total Registered */}
         <div className="bg-[#0a0a0a]/60 backdrop-blur-xl border border-white/10 rounded-2xl p-6 shadow-xl">
           <div className="flex items-center justify-between mb-4">
-            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Active SAAS Users</span>
+            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Total Registered</span>
             <div className="w-8 h-8 rounded-xl bg-[#10b981]/10 border border-[#10b981]/20 flex items-center justify-center">
               <Users className="w-4 h-4 text-[#10b981]" />
             </div>
           </div>
-          <p className="text-4xl font-black text-white">{accounts?.length || 0}</p>
+          <p className="text-4xl font-black text-white">{totalRegistered}</p>
           <p className="text-xs text-[#10b981] font-medium mt-2">Registered users total</p>
         </div>
 
-        {/* Pending Payments */}
+        {/* Paid Members */}
+        <div className="bg-[#0a0a0a]/60 backdrop-blur-xl border border-white/10 rounded-2xl p-6 shadow-xl">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Paid Members</span>
+            <div className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
+              <UserCheck className="w-4 h-4 text-emerald-400" />
+            </div>
+          </div>
+          <p className="text-4xl font-black text-white">{paidMembersCount}</p>
+          <p className="text-xs text-emerald-400 font-medium mt-2">Active paid subscribers</p>
+        </div>
+
+        {/* Not Subscribed */}
+        <div className="bg-[#0a0a0a]/60 backdrop-blur-xl border border-white/10 rounded-2xl p-6 shadow-xl">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Not Subscribed</span>
+            <div className="w-8 h-8 rounded-xl bg-gray-500/10 border border-gray-500/20 flex items-center justify-center">
+              <UserX className="w-4 h-4 text-gray-400" />
+            </div>
+          </div>
+          <p className="text-4xl font-black text-white">{notSubscribedCount}</p>
+          <p className="text-xs text-gray-400 font-medium mt-2">Unsubscribed accounts</p>
+        </div>
+
+        {/* Pending Review */}
         <div className="bg-[#0a0a0a]/60 backdrop-blur-xl border border-white/10 rounded-2xl p-6 shadow-xl">
           <div className="flex items-center justify-between mb-4">
             <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Pending Review</span>
@@ -140,10 +182,20 @@ export default function AdminDashboard() {
               <ShieldCheck className="w-4 h-4 text-amber-400" />
             </div>
           </div>
-          <p className="text-4xl font-black text-white">
-            {recentOrders?.filter(o => o.status === "pending").length || 0}
-          </p>
+          <p className="text-4xl font-black text-white">{pendingOrdersCount}</p>
           <p className="text-xs text-amber-400 font-medium mt-2">Awaiting payment verification</p>
+        </div>
+
+        {/* Active SAAS Users */}
+        <div className="bg-[#0a0a0a]/60 backdrop-blur-xl border border-white/10 rounded-2xl p-6 shadow-xl">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Active SAAS Users</span>
+            <div className="w-8 h-8 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
+              <Activity className="w-4 h-4 text-blue-400" />
+            </div>
+          </div>
+          <p className="text-4xl font-black text-white">{metrics.activeAccounts || totalRegistered}</p>
+          <p className="text-xs text-blue-400 font-medium mt-2">Platform active accounts</p>
         </div>
       </div>
 
@@ -163,7 +215,7 @@ export default function AdminDashboard() {
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5 text-xs">
-              {recentOrders?.length > 0 ? recentOrders.map((ord) => (
+              {paginatedOrders?.length > 0 ? paginatedOrders.map((ord) => (
                 <tr key={ord.id} className="hover:bg-white/[0.02] transition-colors">
                   <td className="py-3 pr-4 font-mono text-gray-400 max-w-[120px] truncate">
                     {ord.user_id?.substring(0, 16)}...
@@ -219,6 +271,29 @@ export default function AdminDashboard() {
             </tbody>
           </table>
         </div>
+
+        {/* Pagination for Orders */}
+        <div className="flex items-center justify-between pt-4 border-t border-white/5 mt-4 text-xs text-gray-400">
+          <span>
+            Page <strong className="text-white">{ordersPage}</strong> of {totalOrderPages}
+          </span>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setOrdersPage(p => Math.max(1, p - 1))}
+              disabled={ordersPage <= 1}
+              className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white disabled:opacity-40 disabled:cursor-not-allowed transition-all font-medium"
+            >
+              Previous
+            </button>
+            <button
+              onClick={() => setOrdersPage(p => Math.min(totalOrderPages, p + 1))}
+              disabled={ordersPage >= totalOrderPages}
+              className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white disabled:opacity-40 disabled:cursor-not-allowed transition-all font-medium"
+            >
+              Next
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Users Table */}
@@ -229,37 +304,86 @@ export default function AdminDashboard() {
             <thead>
               <tr className="border-b border-white/5 text-[10px] font-bold text-gray-500 uppercase tracking-widest">
                 <th className="pb-3 pr-4">Email</th>
+                <th className="pb-3 pr-4">Subscription</th>
                 <th className="pb-3 pr-4">Discord</th>
+                <th className="pb-3 pr-4">Trades</th>
                 <th className="pb-3 pr-4">Joined</th>
                 <th className="pb-3 text-right">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5 text-xs">
-              {accounts?.length > 0 ? accounts.map((acc) => (
-                <tr key={acc.id} className="hover:bg-white/[0.02] transition-colors">
-                  <td className="py-3 pr-4 font-medium text-white">{acc.email || "Unknown"}</td>
-                  <td className="py-3 pr-4">
-                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${acc.discord_verified ? "bg-indigo-500/10 text-indigo-400 border border-indigo-500/20" : "bg-gray-500/10 text-gray-500 border border-gray-500/20"}`}>
-                      {acc.discord_verified ? "Verified" : "Not linked"}
-                    </span>
-                  </td>
-                  <td className="py-3 pr-4 text-gray-500 font-mono">
-                    {acc.created_at ? new Date(acc.created_at).toLocaleDateString() : "N/A"}
-                  </td>
-                  <td className="py-3 text-right">
-                    <button onClick={() => handleDeleteUser(acc.id)}
-                      className="bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white border border-red-500/20 px-3 py-1.5 rounded-xl text-[10px] uppercase font-bold transition-all flex items-center gap-1 ml-auto">
-                      <Trash2 className="w-3 h-3" /> Delete
-                    </button>
-                  </td>
-                </tr>
-              )) : (
+              {paginatedUsers?.length > 0 ? paginatedUsers.map((acc) => {
+                const isPaid = recentOrders?.some(ord => ord.user_id === acc.id && ord.status === 'paid');
+                const isPending = !isPaid && recentOrders?.some(ord => ord.user_id === acc.id && ord.status === 'pending');
+                const tradeCount = acc.trade_count ?? acc.tradeCount ?? acc.trades_count ?? (Array.isArray(acc.trades) ? acc.trades.length : 0);
+
+                return (
+                  <tr key={acc.id} className="hover:bg-white/[0.02] transition-colors">
+                    <td className="py-3 pr-4 font-medium text-white">{acc.email || "Unknown"}</td>
+                    <td className="py-3 pr-4">
+                      {isPaid ? (
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                          Paid
+                        </span>
+                      ) : isPending ? (
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                          Pending
+                        </span>
+                      ) : (
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-gray-500/10 text-gray-400 border border-gray-500/20">
+                          Not Subscribed
+                        </span>
+                      )}
+                    </td>
+                    <td className="py-3 pr-4">
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${acc.discord_verified ? "bg-indigo-500/10 text-indigo-400 border border-indigo-500/20" : "bg-gray-500/10 text-gray-500 border border-gray-500/20"}`}>
+                        {acc.discord_verified ? "Verified" : "Not linked"}
+                      </span>
+                    </td>
+                    <td className="py-3 pr-4 font-mono text-gray-300">
+                      {tradeCount}
+                    </td>
+                    <td className="py-3 pr-4 text-gray-500 font-mono">
+                      {acc.created_at ? new Date(acc.created_at).toLocaleDateString() : "N/A"}
+                    </td>
+                    <td className="py-3 text-right">
+                      <button onClick={() => handleDeleteUser(acc.id)}
+                        className="bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white border border-red-500/20 px-3 py-1.5 rounded-xl text-[10px] uppercase font-bold transition-all flex items-center gap-1 ml-auto">
+                        <Trash2 className="w-3 h-3" /> Delete
+                      </button>
+                    </td>
+                  </tr>
+                );
+              }) : (
                 <tr>
-                  <td colSpan={4} className="py-10 text-center text-gray-600 text-sm">No users found.</td>
+                  <td colSpan={6} className="py-10 text-center text-gray-600 text-sm">No users found.</td>
                 </tr>
               )}
             </tbody>
           </table>
+        </div>
+
+        {/* Pagination for Users */}
+        <div className="flex items-center justify-between pt-4 border-t border-white/5 mt-4 text-xs text-gray-400">
+          <span>
+            Page <strong className="text-white">{usersPage}</strong> of {totalUserPages}
+          </span>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setUsersPage(p => Math.max(1, p - 1))}
+              disabled={usersPage <= 1}
+              className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white disabled:opacity-40 disabled:cursor-not-allowed transition-all font-medium"
+            >
+              Previous
+            </button>
+            <button
+              onClick={() => setUsersPage(p => Math.min(totalUserPages, p + 1))}
+              disabled={usersPage >= totalUserPages}
+              className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white disabled:opacity-40 disabled:cursor-not-allowed transition-all font-medium"
+            >
+              Next
+            </button>
+          </div>
         </div>
       </div>
       {/* Incomplete Registrations Table */}
