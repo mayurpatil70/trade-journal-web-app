@@ -1,13 +1,15 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
+import AccountFilter from "../components/AccountFilter";
 import { Loader2, ShieldCheck, AlertTriangle, Crosshair, ChevronRight } from "lucide-react";
 
 export default function Mistakes() {
   const navigate = useNavigate();
-  const [trades, setTrades] = useState([]);
+  const [allTrades, setAllTrades] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedAccount, setSelectedAccount] = useState("");
   const itemsPerPage = 10;
 
   useEffect(() => {
@@ -16,7 +18,7 @@ export default function Mistakes() {
       if (!userId) return navigate("/login");
       try {
         const response = await api.get(`/api/trades?userId=${userId}`);
-        setTrades(response.data?.data || []);
+        setAllTrades(response.data?.data || []);
       } catch (error) {
         console.error("Failed to fetch trades:", error);
       } finally {
@@ -25,6 +27,18 @@ export default function Mistakes() {
     };
     fetchTrades();
   }, [navigate]);
+
+  // Filter trades by selected account
+  const trades = useMemo(() => {
+    if (!selectedAccount) return allTrades;
+    return allTrades.filter((t) => t.account_name === selectedAccount);
+  }, [allTrades, selectedAccount]);
+
+  // Reset page when account changes
+  const handleAccountChange = (acc) => {
+    setSelectedAccount(acc);
+    setCurrentPage(1);
+  };
 
   if (loading) {
     return (
@@ -37,16 +51,16 @@ export default function Mistakes() {
   // Identify unforced errors (Losses where rules were broken)
   const unforcedErrors = trades.filter(t => t.result === 'loss' && t.rule_break === 'yes');
   const costOfMistakes = unforcedErrors.reduce((acc, t) => acc + parseFloat(t.r_multiple || 0), 0);
-  
+
   // Setups that are losing money
   const setups = {};
   trades.forEach(t => {
-     if (!t.setup) return;
-     if (!setups[t.setup]) setups[t.setup] = { total: 0, r: 0 };
-     setups[t.setup].total++;
-     setups[t.setup].r += parseFloat(t.r_multiple || 0);
+    if (!t.setup) return;
+    if (!setups[t.setup]) setups[t.setup] = { total: 0, r: 0 };
+    setups[t.setup].total++;
+    setups[t.setup].r += parseFloat(t.r_multiple || 0);
   });
-  
+
   const losingSetups = Object.entries(setups)
      .map(([name, data]) => ({ name, ...data }))
      .filter(s => s.r < 0)
@@ -54,24 +68,37 @@ export default function Mistakes() {
 
   return (
     <div className="w-full max-w-7xl mx-auto font-sans pb-24 px-4 md:px-8 mt-6">
-      <div className="mb-10">
-        <h1 className="text-2xl font-semibold text-white flex items-center gap-3">
-          <ShieldCheck className="w-6 h-6 text-amber-400" /> Mistake Lab
-        </h1>
-        <p className="text-gray-500 mt-1 text-[13px]">
-          Identify what is draining your account and costing you R.
-        </p>
+      {/* Header with account filter */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
+        <div>
+          <h1 className="text-2xl font-semibold text-white flex items-center gap-3">
+            <ShieldCheck className="w-6 h-6 text-amber-400" /> Mistake Lab
+          </h1>
+          <p className="text-gray-500 mt-1 text-[13px]">
+            Identify what is draining your account and costing you R.
+            {selectedAccount && <span className="ml-2 text-amber-400 font-medium">· {selectedAccount}</span>}
+          </p>
+        </div>
+        <AccountFilter
+          trades={allTrades}
+          selectedAccount={selectedAccount}
+          onChange={handleAccountChange}
+        />
       </div>
 
       {trades.length === 0 ? (
          <div className="bg-[#101216] border border-white/5 rounded-2xl p-10 flex flex-col items-center justify-center text-center">
             <AlertTriangle className="w-12 h-12 text-gray-600 mb-4" />
             <h2 className="text-lg font-bold text-white mb-2">No data yet</h2>
-            <p className="text-gray-500 text-sm">Log some trades to identify your mistakes.</p>
+            <p className="text-gray-500 text-sm">
+              {selectedAccount
+                ? `No trades found for "${selectedAccount}". Try selecting a different account.`
+                : "Log some trades to identify your mistakes."}
+            </p>
          </div>
       ) : (
         <div className="space-y-6">
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
              {/* Unforced Errors */}
              <div className="bg-[#101216] border border-white/5 rounded-2xl p-6 relative overflow-hidden flex flex-col justify-between">
@@ -104,7 +131,7 @@ export default function Mistakes() {
                 </div>
              </div>
           </div>
-          
+
           {/* Mistake Log */}
           <div className="bg-[#101216] border border-white/5 rounded-2xl shadow-xl overflow-hidden mt-6">
              <div className="p-5 border-b border-white/5 bg-[#0A0B0D]">
@@ -119,6 +146,9 @@ export default function Mistakes() {
                               <div className="flex items-center gap-2 mb-1">
                                  <span className="text-xs font-bold text-white">{t.asset}</span>
                                  <span className="text-[10px] text-gray-500">{t.date}</span>
+                                 {t.account_name && t.account_name !== 'Default Account' && (
+                                   <span className="bg-white/5 text-gray-400 px-2 py-0.5 rounded text-[9px] uppercase tracking-wider font-bold border border-white/10">{t.account_name}</span>
+                                 )}
                                  <span className="bg-red-500/10 text-red-400 px-2 py-0.5 rounded text-[9px] uppercase tracking-wider font-bold border border-red-500/20">Rule Broken</span>
                               </div>
                               <p className="text-xs text-gray-400">Lesson: {t.lesson || "No lesson recorded"}</p>
@@ -129,11 +159,11 @@ export default function Mistakes() {
                            </div>
                         </div>
                       ))}
-                      
+
                       {/* Pagination Controls */}
                       {Math.ceil(unforcedErrors.length / itemsPerPage) > 1 && (
                         <div className="flex justify-center items-center gap-4 mt-6 pt-4 border-t border-white/5">
-                          <button 
+                          <button
                             disabled={currentPage === 1}
                             onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                             className="px-3 py-1.5 bg-[#101216] border border-white/5 rounded-lg text-xs text-gray-300 hover:bg-white/5 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
@@ -143,7 +173,7 @@ export default function Mistakes() {
                           <span className="text-xs text-gray-400">
                             Page <strong className="text-white">{currentPage}</strong> of {Math.ceil(unforcedErrors.length / itemsPerPage)}
                           </span>
-                          <button 
+                          <button
                             disabled={currentPage === Math.ceil(unforcedErrors.length / itemsPerPage)}
                             onClick={() => setCurrentPage(prev => Math.min(prev + 1, Math.ceil(unforcedErrors.length / itemsPerPage)))}
                             className="px-3 py-1.5 bg-[#101216] border border-white/5 rounded-lg text-xs text-gray-300 hover:bg-white/5 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
@@ -153,7 +183,7 @@ export default function Mistakes() {
                         </div>
                       )}
                    </div>
-                )}
+               )}
              </div>
           </div>
 

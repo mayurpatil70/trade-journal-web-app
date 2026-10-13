@@ -15,7 +15,9 @@ import {
   ArrowLeft,
   Activity,
   Check,
-  UploadCloud
+  UploadCloud,
+  Briefcase,
+  Plus,
 } from "lucide-react";
 
 export default function AddTrade() {
@@ -23,6 +25,11 @@ export default function AddTrade() {
   const location = useLocation();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [step, setStep] = useState(1);
+
+  // Account management
+  const [existingAccounts, setExistingAccounts] = useState([]);
+  const [accountInputMode, setAccountInputMode] = useState("select"); // 'select' | 'new'
+  const [newAccountName, setNewAccountName] = useState("");
 
   const assets = ["XAUUSD", "BTCUSD", "ETHUSD", "XAGUSD", "Other"];
   const setups = ["FVG", "SMT", "Liquidity Sweep", "Order Block", "Breakout", "Pullback", "Other"];
@@ -51,6 +58,7 @@ export default function AddTrade() {
     emotionBefore: "",
     emotionAfter: "",
     psychNote: "",
+    accountName: "",
   });
 
   const [customFields, setCustomFields] = useState({});
@@ -58,16 +66,43 @@ export default function AddTrade() {
 
   // Real-time R:R Calculations
   const [calcRR, setCalcRR] = useState(0);
-  
+
+  // Fetch existing accounts from user's trades
+  useEffect(() => {
+    const fetchAccounts = async () => {
+      const userId = localStorage.getItem("userId") || localStorage.getItem("userEmail");
+      if (!userId) return;
+      try {
+        const res = await api.get(`/api/trades?userId=${userId}`);
+        const trades = res.data?.data || [];
+        const names = new Set();
+        trades.forEach((t) => {
+          if (t.account_name && t.account_name.trim() && t.account_name !== "Default Account") {
+            names.add(t.account_name.trim());
+          }
+        });
+        const accountList = Array.from(names).sort();
+        setExistingAccounts(accountList);
+        if (accountList.length > 0) {
+          setAccountInputMode("select");
+          setFormData((prev) => ({ ...prev, accountName: accountList[0] }));
+        } else {
+          setAccountInputMode("new");
+        }
+      } catch (e) {
+        setAccountInputMode("new");
+      }
+    };
+    fetchAccounts();
+  }, []);
+
   useEffect(() => {
     if (formData.entry && formData.sl && formData.tp) {
       const entry = parseFloat(formData.entry);
       const sl = parseFloat(formData.sl);
       const tp = parseFloat(formData.tp);
-      
       const risk = Math.abs(entry - sl);
       const reward = Math.abs(tp - entry);
-      
       if (risk > 0) {
         setCalcRR((reward / risk).toFixed(2));
       } else {
@@ -88,17 +123,22 @@ export default function AddTrade() {
     }
   };
 
+  // Resolve final account name
+  const resolvedAccountName = accountInputMode === "new"
+    ? (newAccountName.trim() || "Default Account")
+    : (formData.accountName || existingAccounts[0] || "Default Account");
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (step !== 6) {
-       nextStep();
-       return;
+      nextStep();
+      return;
     }
 
     if (!images[0] || !images[1]) {
-       alert("Please upload both Before and After chart images before saving.");
-       return;
+      alert("Please upload both Before and After chart images before saving.");
+      return;
     }
 
     setIsSubmitting(true);
@@ -113,7 +153,9 @@ export default function AddTrade() {
     try {
       const submitData = new FormData();
       submitData.append("userId", userId);
+      submitData.append("accountName", resolvedAccountName);
       Object.keys(formData).forEach((key) => {
+        if (key === "accountName") return; // already appended above
         const val = formData[key] === "Other" && customFields[key] ? customFields[key] : formData[key];
         submitData.append(key, val);
       });
@@ -167,7 +209,7 @@ export default function AddTrade() {
       <div className="flex items-center justify-between mb-10 relative">
         <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-[2px] bg-white/5 z-0"></div>
         <div className="absolute left-0 top-1/2 -translate-y-1/2 h-[2px] bg-emerald-500 z-0 transition-all duration-300" style={{ width: `${((step - 1) / 5) * 100}%` }}></div>
-        
+
         {steps.map(s => (
           <div key={s.num} className="relative z-10 flex flex-col items-center gap-2">
             <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-colors duration-300 ${step >= s.num ? 'bg-emerald-500 text-white' : 'bg-[#15181D] border border-white/10 text-gray-500'}`}>
@@ -181,11 +223,71 @@ export default function AddTrade() {
       {/* FORM CONTAINER */}
       <div className="bg-[#101216] border border-white/5 rounded-3xl p-6 md:p-10 shadow-2xl relative overflow-hidden min-h-[400px]">
         <form onSubmit={handleSubmit} className="relative z-10">
-          
+
           {/* STEP 1: MARKET */}
           {step === 1 && (
             <div className="space-y-6 animate-in fade-in slide-in-from-right-4">
               <h2 className="text-xl font-semibold text-white mb-6">Market Context</h2>
+
+              {/* ── ACCOUNT SELECTOR (above Asset/Pair) ── */}
+              <div className="bg-[#0A0B0D] border border-emerald-500/15 rounded-2xl p-5">
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="p-1.5 bg-emerald-500/10 rounded-lg">
+                    <Briefcase className="w-4 h-4 text-emerald-400" />
+                  </div>
+                  <label className="text-[13px] font-semibold text-white">Trading Account</label>
+                </div>
+
+                {existingAccounts.length === 0 || accountInputMode === "new" ? (
+                  // No existing accounts — show text input
+                  <div>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        placeholder="e.g. FTMO Challenge, Personal Account..."
+                        value={newAccountName}
+                        onChange={(e) => setNewAccountName(e.target.value)}
+                        className={inputClass}
+                      />
+                    </div>
+                    {existingAccounts.length > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => setAccountInputMode("select")}
+                        className="mt-2 text-[11px] text-emerald-400 hover:text-emerald-300 transition-colors flex items-center gap-1"
+                      >
+                        ← Back to existing accounts
+                      </button>
+                    )}
+                    <p className="text-[11px] text-gray-500 mt-2">Enter a name to identify this trading account.</p>
+                  </div>
+                ) : (
+                  // Has existing accounts — show dropdown
+                  <div>
+                    <div className="relative">
+                      <select
+                        value={formData.accountName}
+                        onChange={(e) => setFormData({ ...formData, accountName: e.target.value })}
+                        className={selectClass}
+                      >
+                        {existingAccounts.map((acc) => (
+                          <option key={acc} value={acc} className="bg-[#15181D] text-white">{acc}</option>
+                        ))}
+                      </select>
+                      <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => { setAccountInputMode("new"); setNewAccountName(""); }}
+                      className="mt-3 flex items-center gap-1.5 text-[11px] font-semibold text-emerald-400 hover:text-emerald-300 transition-colors border border-emerald-500/20 px-3 py-1.5 rounded-lg bg-emerald-500/5 hover:bg-emerald-500/10"
+                    >
+                      <Plus className="w-3 h-3" /> Add New Account
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Asset & Direction */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className={labelClass}>Asset / Pair</label>
@@ -233,16 +335,15 @@ export default function AddTrade() {
           {step === 2 && (
             <div className="space-y-6 animate-in fade-in slide-in-from-right-4">
               <h2 className="text-xl font-semibold text-white mb-6">Execution Parameters</h2>
-              
+
               {/* Real-time Visualization */}
               <div className="bg-[#15181D] border border-white/5 rounded-2xl p-6 mb-6">
                  <div className="flex justify-between items-end mb-4">
                     <span className="text-xs text-gray-500 font-semibold uppercase tracking-widest">Trade Architecture</span>
                     {calcRR > 0 && <span className="text-sm font-bold text-emerald-400">1 : {calcRR} R:R</span>}
                  </div>
-                 
+
                  <div className="relative h-20 flex flex-col justify-center">
-                    {/* Simplified Visualizer */}
                     <div className="w-full flex items-center">
                        {formData.direction === "LONG" ? (
                          <>
@@ -353,7 +454,7 @@ export default function AddTrade() {
                   <div className="p-2 bg-purple-500/10 rounded-lg"><Brain className="w-5 h-5 text-purple-400" /></div>
                   <h2 className="text-xl font-semibold text-white">Psychology Tracker</h2>
                </div>
-               
+
                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {["emotionBefore", "emotionAfter"].map((field, idx) => (
                     <div key={field}>
@@ -369,7 +470,7 @@ export default function AddTrade() {
                     </div>
                   ))}
                </div>
-               
+
                <div>
                   <label className={labelClass}>Psychological State / Notes</label>
                   <textarea name="psychNote" placeholder="What were you feeling during execution? Did you hesitate? Did you move your stop loss early?" value={formData.psychNote} onChange={handleChange} className={textareaClass} />
@@ -422,20 +523,20 @@ export default function AddTrade() {
                </div>
             </div>
           )}
-          
+
           {/* NAVIGATION FOOTER */}
           <div className="mt-10 pt-6 border-t border-white/5 flex items-center justify-between">
              <button type="button" onClick={prevStep} disabled={step === 1} className="px-6 py-3 rounded-xl font-semibold text-sm text-gray-400 hover:text-white hover:bg-white/5 disabled:opacity-0 transition-all flex items-center gap-2">
                 <ArrowLeft className="w-4 h-4" /> Back
              </button>
-             
+
              {step < 6 ? (
                <button type="button" onClick={nextStep} className="px-8 py-3 rounded-xl bg-white text-black font-bold text-sm hover:bg-gray-200 transition-all flex items-center gap-2">
                   Continue <ArrowRight className="w-4 h-4" />
                </button>
              ) : (
                <button type="submit" disabled={isSubmitting || !images[0] || !images[1]} className="px-8 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white font-bold text-sm transition-all shadow-lg shadow-emerald-500/30 flex items-center gap-2 disabled:opacity-50 disabled:hover:bg-emerald-500 disabled:cursor-not-allowed">
-                  {isSubmitting ? <><Loader2 className="w-4 h-4 animate-spin" /> Saving...</> : <><Save className="w-4 h-4" /> Save Trade</>}
+                 {isSubmitting ? <><Loader2 className="w-4 h-4 animate-spin" /> Saving...</> : <><Save className="w-4 h-4" /> Save Trade</>}
                </button>
              )}
           </div>

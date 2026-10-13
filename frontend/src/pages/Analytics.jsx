@@ -1,12 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
+import AccountFilter from "../components/AccountFilter";
 import { Loader2, Activity, Target, Zap, BarChart3, TrendingUp, Clock, Compass } from "lucide-react";
 
 export default function Analytics() {
   const navigate = useNavigate();
-  const [trades, setTrades] = useState([]);
+  const [allTrades, setAllTrades] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedAccount, setSelectedAccount] = useState("");
 
   useEffect(() => {
     const fetchTrades = async () => {
@@ -14,7 +16,7 @@ export default function Analytics() {
       if (!userId) return navigate("/login");
       try {
         const response = await api.get(`/api/trades?userId=${userId}`);
-        setTrades(response.data?.data || []);
+        setAllTrades(response.data?.data || []);
       } catch (error) {
         console.error("Failed to fetch trades:", error);
       } finally {
@@ -23,6 +25,12 @@ export default function Analytics() {
     };
     fetchTrades();
   }, [navigate]);
+
+  // Filter trades by selected account
+  const trades = useMemo(() => {
+    if (!selectedAccount) return allTrades;
+    return allTrades.filter((t) => t.account_name === selectedAccount);
+  }, [allTrades, selectedAccount]);
 
   if (loading) {
     return (
@@ -36,56 +44,69 @@ export default function Analytics() {
   const totalTrades = trades.length;
   const wins = trades.filter((t) => (t.result || "").toLowerCase() === "win");
   const winRate = totalTrades ? (wins.length / totalTrades) * 100 : 0;
-  
+
   // Setup Performance
   const setups = {};
   trades.forEach(t => {
-     if (!t.setup) return;
-     if (!setups[t.setup]) setups[t.setup] = { total: 0, wins: 0, r: 0 };
-     setups[t.setup].total++;
-     if (t.result === 'win') setups[t.setup].wins++;
-     setups[t.setup].r += parseFloat(t.r_multiple || 0);
+    if (!t.setup) return;
+    if (!setups[t.setup]) setups[t.setup] = { total: 0, wins: 0, r: 0 };
+    setups[t.setup].total++;
+    if (t.result === 'win') setups[t.setup].wins++;
+    setups[t.setup].r += parseFloat(t.r_multiple || 0);
   });
   const setupArray = Object.entries(setups).map(([name, data]) => ({
-     name, 
-     winRate: (data.wins / data.total) * 100, 
-     netR: data.r,
-     total: data.total 
+    name,
+    winRate: (data.wins / data.total) * 100,
+    netR: data.r,
+    total: data.total
   })).sort((a,b) => b.netR - a.netR);
 
   // Session Performance
   const sessions = {};
   trades.forEach(t => {
-     if (!t.session) return;
-     if (!sessions[t.session]) sessions[t.session] = { total: 0, wins: 0, r: 0 };
-     sessions[t.session].total++;
-     if (t.result === 'win') sessions[t.session].wins++;
-     sessions[t.session].r += parseFloat(t.r_multiple || 0);
+    if (!t.session) return;
+    if (!sessions[t.session]) sessions[t.session] = { total: 0, wins: 0, r: 0 };
+    sessions[t.session].total++;
+    if (t.result === 'win') sessions[t.session].wins++;
+    sessions[t.session].r += parseFloat(t.r_multiple || 0);
   });
   const sessionArray = Object.entries(sessions).map(([name, data]) => ({
-     name, winRate: (data.wins / data.total) * 100, netR: data.r, total: data.total
+    name, winRate: (data.wins / data.total) * 100, netR: data.r, total: data.total
   })).sort((a,b) => b.netR - a.netR);
 
   return (
     <div className="w-full max-w-7xl mx-auto font-sans pb-24 px-4 md:px-8 mt-6">
-      <div className="mb-10">
-        <h1 className="text-2xl font-semibold text-white flex items-center gap-3">
-          <Activity className="w-6 h-6 text-emerald-400" /> Strategy Analytics
-        </h1>
-        <p className="text-gray-500 mt-1 text-[13px]">
-          Discover your statistical edge based on actual execution data.
-        </p>
+      {/* Header with account filter */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
+        <div>
+          <h1 className="text-2xl font-semibold text-white flex items-center gap-3">
+            <Activity className="w-6 h-6 text-emerald-400" /> Strategy Analytics
+          </h1>
+          <p className="text-gray-500 mt-1 text-[13px]">
+            Discover your statistical edge based on actual execution data.
+            {selectedAccount && <span className="ml-2 text-emerald-400 font-medium">· {selectedAccount}</span>}
+          </p>
+        </div>
+        <AccountFilter
+          trades={allTrades}
+          selectedAccount={selectedAccount}
+          onChange={setSelectedAccount}
+        />
       </div>
 
       {totalTrades === 0 ? (
          <div className="bg-[#101216] border border-white/5 rounded-2xl p-10 flex flex-col items-center justify-center text-center">
             <BarChart3 className="w-12 h-12 text-gray-600 mb-4" />
             <h2 className="text-lg font-bold text-white mb-2">Not enough data</h2>
-            <p className="text-gray-500 text-sm">Log some trades to start analyzing your statistical edge.</p>
+            <p className="text-gray-500 text-sm">
+              {selectedAccount
+                ? `No trades found for "${selectedAccount}". Try selecting a different account.`
+                : "Log some trades to start analyzing your statistical edge."}
+            </p>
          </div>
       ) : (
         <div className="space-y-6">
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
              <div className="bg-[#101216] border border-white/5 rounded-2xl p-6 relative overflow-hidden">
                 <div className="absolute top-0 right-0 p-6 opacity-10"><Target className="w-16 h-16 text-emerald-400" /></div>

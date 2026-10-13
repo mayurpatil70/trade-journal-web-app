@@ -56,6 +56,8 @@ export const createTrade = async (req, res) => {
       emotion_before: tradeData.emotionBefore,
       emotion_after: tradeData.emotionAfter,
       psych_note: tradeData.psychNote,
+      // Account name for multi-account support
+      account_name: tradeData.accountName || 'Default Account',
       // Maintain old images array for backwards compatibility
       images: imageUrls,
       // NEW FIELDS for Phase 3 Tools:

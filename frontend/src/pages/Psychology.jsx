@@ -1,12 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
+import AccountFilter from "../components/AccountFilter";
 import { Loader2, Brain, Activity, TrendingDown, Target } from "lucide-react";
 
 export default function Psychology() {
   const navigate = useNavigate();
-  const [trades, setTrades] = useState([]);
+  const [allTrades, setAllTrades] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedAccount, setSelectedAccount] = useState("");
 
   useEffect(() => {
     const fetchTrades = async () => {
@@ -14,7 +16,7 @@ export default function Psychology() {
       if (!userId) return navigate("/login");
       try {
         const response = await api.get(`/api/trades?userId=${userId}`);
-        setTrades(response.data?.data || []);
+        setAllTrades(response.data?.data || []);
       } catch (error) {
         console.error("Failed to fetch trades:", error);
       } finally {
@@ -23,6 +25,12 @@ export default function Psychology() {
     };
     fetchTrades();
   }, [navigate]);
+
+  // Filter trades by selected account
+  const trades = useMemo(() => {
+    if (!selectedAccount) return allTrades;
+    return allTrades.filter((t) => t.account_name === selectedAccount);
+  }, [allTrades, selectedAccount]);
 
   if (loading) {
     return (
@@ -33,53 +41,66 @@ export default function Psychology() {
   }
 
   const totalTrades = trades.length;
-  
+
   // Group by Emotion Before
   const emotions = {};
   trades.forEach(t => {
-     if (!t.emotion_before) return;
-     const e = t.emotion_before;
-     if (!emotions[e]) emotions[e] = { total: 0, wins: 0, r: 0 };
-     emotions[e].total++;
-     if (t.result === 'win') emotions[e].wins++;
-     emotions[e].r += parseFloat(t.r_multiple || 0);
+    if (!t.emotion_before) return;
+    const e = t.emotion_before;
+    if (!emotions[e]) emotions[e] = { total: 0, wins: 0, r: 0 };
+    emotions[e].total++;
+    if (t.result === 'win') emotions[e].wins++;
+    emotions[e].r += parseFloat(t.r_multiple || 0);
   });
-  
+
   const emotionArray = Object.entries(emotions).map(([name, data]) => ({
-     name, 
-     winRate: (data.wins / data.total) * 100, 
-     netR: data.r,
-     total: data.total 
+    name,
+    winRate: (data.wins / data.total) * 100,
+    netR: data.r,
+    total: data.total
   })).sort((a,b) => b.netR - a.netR);
 
   // Group by Rule Breaking
   const rulesFollowed = trades.filter(t => t.rule_break === 'no' || !t.rule_break);
   const rulesBroken = trades.filter(t => t.rule_break === 'yes');
-  
+
   const rFollowed = rulesFollowed.reduce((acc, t) => acc + parseFloat(t.r_multiple || 0), 0);
   const rBroken = rulesBroken.reduce((acc, t) => acc + parseFloat(t.r_multiple || 0), 0);
 
   return (
     <div className="w-full max-w-7xl mx-auto font-sans pb-24 px-4 md:px-8 mt-6">
-      <div className="mb-10">
-        <h1 className="text-2xl font-semibold text-white flex items-center gap-3">
-          <Brain className="w-6 h-6 text-purple-400" /> Psychology Lab
-        </h1>
-        <p className="text-gray-500 mt-1 text-[13px]">
-          Understand how your emotional state affects your profitability.
-        </p>
+      {/* Header with account filter */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
+        <div>
+          <h1 className="text-2xl font-semibold text-white flex items-center gap-3">
+            <Brain className="w-6 h-6 text-purple-400" /> Psychology Lab
+          </h1>
+          <p className="text-gray-500 mt-1 text-[13px]">
+            Understand how your emotional state affects your profitability.
+            {selectedAccount && <span className="ml-2 text-purple-400 font-medium">· {selectedAccount}</span>}
+          </p>
+        </div>
+        <AccountFilter
+          trades={allTrades}
+          selectedAccount={selectedAccount}
+          onChange={setSelectedAccount}
+        />
       </div>
 
       {totalTrades === 0 ? (
          <div className="bg-[#101216] border border-white/5 rounded-2xl p-10 flex flex-col items-center justify-center text-center">
             <Brain className="w-12 h-12 text-gray-600 mb-4" />
             <h2 className="text-lg font-bold text-white mb-2">No psychology data</h2>
-            <p className="text-gray-500 text-sm">Log some trades and track your emotions.</p>
+            <p className="text-gray-500 text-sm">
+              {selectedAccount
+                ? `No trades found for "${selectedAccount}". Try selecting a different account.`
+                : "Log some trades and track your emotions."}
+            </p>
          </div>
       ) : (
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-             
+
              {/* Discipline Impact */}
              <div className="bg-[#101216] border border-white/5 rounded-2xl p-6 flex flex-col justify-between">
                 <div>
