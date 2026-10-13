@@ -32,7 +32,12 @@ export const requestLogin = async (req, res) => {
     const clientUrl = process.env.FRONTEND_URL || "http://localhost:5173";
     const magicLink = `${clientUrl}/verify?token=${token}&email=${encodeURIComponent(email)}`;
 
-    const { error: emailError } = await resend.emails.send({
+    // ── SPEED FIX: Respond immediately, send email in background ──
+    // The user sees "check inbox" instantly instead of waiting 2-4s for Resend API.
+    res.json({ message: "Login link sent successfully." });
+
+    // Fire-and-forget email send (runs after response is sent)
+    resend.emails.send({
       from: "ForexNotes <auth@forexnotes.in>",
       to: email,
       subject: "ForexNotes - Secure Login",
@@ -43,14 +48,16 @@ export const requestLogin = async (req, res) => {
         <p><a href="${magicLink}" style="display:inline-block;background:#10b981;color:#000;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:bold">Sign in</a></p>
         <p style="color:#666;font-size:12px">If you didn't request this email, you can safely ignore it.</p>
       </div>`,
+    }).catch((emailError) => {
+      // Log email failure but don't crash — the DB already has the token
+      console.error("Email send failed (background):", emailError.message);
     });
-
-    if (emailError) throw new Error(emailError.message);
-
-    res.json({ message: "Login link sent successfully." });
   } catch (error) {
     console.error("Auth Error:", error.message);
-    res.status(500).json({ error: "Could not send the login link. Please try again." });
+    // Only send error if response hasn't been sent yet
+    if (!res.headersSent) {
+      res.status(500).json({ error: "Could not send the login link. Please try again." });
+    }
   }
 };
 

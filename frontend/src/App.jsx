@@ -9,9 +9,13 @@ import {
   Outlet,
 } from "react-router-dom";
 import { Loader2 } from "lucide-react";
-import api from "./api/axios";
+import api, { isSessionValid, clearSession } from "./api/axios";
 
-// Public Pages (Landing Page remains eagerly loaded for SEO/LCP)
+// CRITICAL: ErrorBoundary MUST be eagerly imported — it cannot be lazy-loaded
+// because if it fails to load, there's nothing to catch the error (causes #310 crash loop)
+import ErrorBoundary from "./components/ErrorBoundary.jsx";
+
+// Public Pages (eagerly loaded for SEO/LCP)
 import LandingPage from "./pages/LandingPage.jsx";
 import PrivacyPolicy from "./pages/PrivacyPolicy.jsx";
 import NotFound from "./pages/NotFound.jsx";
@@ -26,7 +30,6 @@ const DiscordGate = lazy(() => import("./pages/DiscordGate.jsx"));
 const DiscordCallback = lazy(() => import("./pages/DiscordCallback.jsx"));
 const Paywall = lazy(() => import("./pages/Paywall.jsx"));
 
-const ErrorBoundary = lazy(() => import("./components/ErrorBoundary.jsx"));
 const EconomicCalendar = lazy(() => import("./pages/EconomicCalendar.jsx"));
 const AddTrade = lazy(() => import("./pages/AddTrade.jsx"));
 const PastTrades = lazy(() => import("./pages/PastTrades.jsx"));
@@ -40,7 +43,7 @@ const AffiliateDashboard = lazy(() => import("./pages/AffiliateDashboard.jsx"));
 const AdminDashboard = lazy(() => import("./pages/AdminDashboard.jsx"));
 const Charts = lazy(() => import("./pages/Charts.jsx"));
 
-// New Premium Workspaces
+// Premium Workspaces
 const Analytics = lazy(() => import("./pages/Analytics.jsx"));
 const Psychology = lazy(() => import("./pages/Psychology.jsx"));
 const Mistakes = lazy(() => import("./pages/Mistakes.jsx"));
@@ -67,7 +70,11 @@ const RouteSeo = () => {
   const { pathname, search } = useLocation();
 
   useEffect(() => {
-    const searchParams = new URLSearchParams(search); const refCode = searchParams.get("ref"); if (refCode) { localStorage.setItem("referred_by", refCode); } const indexable = isIndexable(pathname);
+    const searchParams = new URLSearchParams(search);
+    const refCode = searchParams.get("ref");
+    if (refCode) localStorage.setItem("referred_by", refCode);
+
+    const indexable = isIndexable(pathname);
     let robots = document.querySelector('meta[name="robots"]');
     if (!robots) {
       robots = document.createElement("meta");
@@ -82,13 +89,13 @@ const RouteSeo = () => {
   return null;
 };
 
-// GUARD 1: Basic Authentication
+// GUARD 1: Authentication — checks localStorage AND session validity (24-hour window)
 const AuthGuard = () => {
-  const isAuthenticated =
-    localStorage.getItem("userId") ||
-    localStorage.getItem("token") ||
-    localStorage.getItem("userEmail");
-  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  if (!isSessionValid()) {
+    // Session expired or missing — clean up and redirect
+    clearSession();
+    return <Navigate to="/login" replace />;
+  }
   return <Outlet />;
 };
 
@@ -99,7 +106,7 @@ const PaywallGuard = () => {
   useEffect(() => {
     const checkStatus = async () => {
       const userId = localStorage.getItem("userId") || localStorage.getItem("userEmail");
-      
+
       // ADMIN BYPASS
       if (userId === "noballondesk@gmail.com" || userId === "akpatil51340@gmail.com") {
         setAccess('allow');
@@ -117,7 +124,10 @@ const PaywallGuard = () => {
           setAccess('allow');
         }
       } catch (error) {
-        setAccess('paywall');
+        // If 401, the axios interceptor will handle logout
+        if (error.response?.status !== 401) {
+          setAccess('paywall');
+        }
       }
     };
     checkStatus();
@@ -133,7 +143,7 @@ const PaywallGuard = () => {
 
   if (access === 'discord') return <Navigate to="/link-discord" replace />;
   if (access === 'paywall') return <Navigate to="/paywall" replace />;
-  
+
   return <Outlet />;
 };
 

@@ -1,7 +1,7 @@
 // frontend/src/pages/Verify.jsx
 import { useEffect, useState, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import api from "../api/axios";
+import api, { saveSession } from "../api/axios";
 import { Loader2, CheckCircle, AlertTriangle, ArrowRight } from "lucide-react";
 
 export default function Verify() {
@@ -37,9 +37,8 @@ export default function Verify() {
         const discordVerified = response.data.discordVerified;
         const hasPaid = response.data.hasPaid; // Extracted from backend response
 
-        if (userId) localStorage.setItem("userId", userId);
-        if (authToken) localStorage.setItem("token", authToken);
-        localStorage.setItem("userEmail", email);
+        // Save session with timestamp for 24-hour persistence
+        saveSession({ userId, token: authToken, email });
 
         setStatus("success");
 
