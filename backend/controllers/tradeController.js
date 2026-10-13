@@ -133,6 +133,32 @@ export const deleteAllTrades = async (req, res) => {
   }
 };
 
+export const deleteTrade = async (req, res) => {
+  try {
+    const { userId } = req;
+    const { id } = req.params;
+
+    if (!userId) {
+      return res
+        .status(401)
+        .json({ success: false, error: "Unauthorized: Missing User ID" });
+    }
+
+    const { error } = await supabase
+      .from("trades")
+      .delete()
+      .eq("id", id)
+      .eq("user_id", userId);
+
+    if (error) throw error;
+
+    res.status(200).json({ success: true, message: "Trade deleted successfully." });
+  } catch (error) {
+    console.error("Delete Trade Error:", error);
+    res.status(500).json({ success: false, error: "Failed to delete trade." });
+  }
+};
+
 export const exportTrades = async (req, res) => {
   try {
     const { userId } = req;

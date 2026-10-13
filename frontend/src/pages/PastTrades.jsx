@@ -16,7 +16,8 @@ import {
   Clock,
   ArrowRight,
   Brain,
-  Pencil
+  Pencil,
+  Trash2,
 } from "lucide-react";
 
 const tradeStamp = (t) => {
@@ -37,6 +38,17 @@ export default function PastTrades() {
   const [search, setSearch] = useState("");
   const [resultFilter, setResultFilter] = useState("");
   const [selectedTrade, setSelectedTrade] = useState(null);
+
+  const handleDeleteTrade = async (tradeId) => {
+    if (!window.confirm('Delete this trade permanently? This cannot be undone.')) return;
+    try {
+      await api.delete(`/api/trades/${tradeId}`);
+      setTrades(prev => prev.filter(t => t.id !== tradeId));
+      setSelectedTrade(null);
+    } catch (err) {
+      alert('Failed to delete trade. Please try again.');
+    }
+  };
 
   useEffect(() => {
     const fetchTrades = async () => {
@@ -216,13 +228,24 @@ export default function PastTrades() {
                   </div>
                   
                   {/* Right: R-Multiple & Media */}
-                  <div className="flex items-center justify-between md:justify-end gap-6 border-t md:border-t-0 md:border-l border-white/5 pt-3 md:pt-0 md:pl-6 md:w-[25%]">
+                  <div className="flex items-center justify-between md:justify-end gap-4 border-t md:border-t-0 md:border-l border-white/5 pt-3 md:pt-0 md:pl-6 md:w-[25%]">
                      <div className="flex items-center gap-2">
                         {hasImages && <ImageIcon className="w-4 h-4 text-gray-600 group-hover:text-emerald-400 transition-colors" />}
                      </div>
                      <div className={`px-3 py-1.5 rounded-lg border text-sm font-bold ${isWin ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : "bg-red-500/10 text-red-400 border-red-500/20"}`}>
                        {isWin ? "+" : ""}{r.toFixed(2)}R
                      </div>
+                     <button
+                       type="button"
+                       onClick={(e) => {
+                         e.stopPropagation();
+                         handleDeleteTrade(t.id);
+                       }}
+                       className="p-1.5 opacity-0 group-hover:opacity-100 hover:bg-red-500/20 text-gray-500 hover:text-red-400 rounded-lg transition-all"
+                       title="Delete Trade"
+                     >
+                       <Trash2 className="w-4 h-4" />
+                     </button>
                      <ChevronRight className="w-5 h-5 text-gray-600 group-hover:text-white transition-colors hidden md:block" />
                   </div>
                 </div>
@@ -269,7 +292,17 @@ export default function PastTrades() {
                    <h2 className="text-xl font-bold text-white">{selectedTrade.asset}</h2>
                    <span className="text-gray-500 text-sm">• {selectedTrade.date}</span>
                 </div>
-                <div className="flex items-center gap-2"><button onClick={() => navigate(`/add-trade?edit=${selectedTrade.id}`)} className="p-2 bg-white/5 hover:bg-white/10 rounded-lg text-emerald-400 transition-colors" title="Edit Trade"><Pencil className="w-4 h-4" /></button><button onClick={() => setSelectedTrade(null)} className="p-2 bg-white/5 hover:bg-white/10 rounded-lg text-gray-400 transition-colors"><X className="w-4 h-4" /></button></div>
+                <div className="flex items-center gap-2">
+                  <button onClick={() => navigate(`/add-trade?edit=${selectedTrade.id}`)} className="p-2 bg-white/5 hover:bg-white/10 rounded-lg text-emerald-400 transition-colors" title="Edit Trade">
+                    <Pencil className="w-4 h-4" />
+                  </button>
+                  <button onClick={() => handleDeleteTrade(selectedTrade.id)} className="p-2 bg-red-500/10 hover:bg-red-500 rounded-lg text-red-400 hover:text-white transition-all" title="Delete Trade">
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                  <button onClick={() => setSelectedTrade(null)} className="p-2 bg-white/5 hover:bg-white/10 rounded-lg text-gray-400 transition-colors">
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
              </div>
              
              {/* Body */}

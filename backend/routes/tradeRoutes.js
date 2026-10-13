@@ -6,6 +6,7 @@ import {
   createTrade,
   getTrades,
   deleteAllTrades,
+  deleteTrade,
   exportTrades,
 } from "../controllers/tradeController.js";
 
@@ -21,6 +22,9 @@ router.get("/", getTrades);
 
 // Danger Zone: wipe all user trades
 router.delete("/all", deleteAllTrades);
+
+// Delete single trade
+router.delete("/:id", deleteTrade);
 
 // Export to CSV, Excel, DOC, or PDF
 router.get("/export", exportTrades);
