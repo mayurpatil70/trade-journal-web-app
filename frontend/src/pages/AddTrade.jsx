@@ -18,6 +18,7 @@ import {
   UploadCloud,
   Briefcase,
   Plus,
+  AlertCircle,
 } from "lucide-react";
 
 export default function AddTrade() {
@@ -25,6 +26,7 @@ export default function AddTrade() {
   const location = useLocation();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [step, setStep] = useState(1);
+  const [fieldErrors, setFieldErrors] = useState({});
 
   // Account management
   const [existingAccounts, setExistingAccounts] = useState([]);
@@ -76,6 +78,7 @@ export default function AddTrade() {
     risk: "",
     result: "win",
     rMultiple: "",
+    r_multiple: "",
     ruleBreak: "no",
     reason: "",
     lesson: "",
@@ -140,8 +143,22 @@ export default function AddTrade() {
     }
   }, [formData.entry, formData.sl, formData.tp]);
 
-  const handleChange = (e) =>
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => {
+      const updated = { ...prev, [name]: value };
+      if (name === "rMultiple") updated.r_multiple = value;
+      if (name === "r_multiple") updated.rMultiple = value;
+      return updated;
+    });
+    if (fieldErrors[name]) {
+      setFieldErrors((prev) => ({ ...prev, [name]: null }));
+    }
+    if (name === "rMultiple" && fieldErrors.r_multiple) {
+      setFieldErrors((prev) => ({ ...prev, r_multiple: null }));
+    }
+  };
+
   const handleCustomChange = (e) =>
     setCustomFields({ ...customFields, [e.target.name]: e.target.value });
 
@@ -160,11 +177,67 @@ export default function AddTrade() {
       ? newAccountName.trim() || "Default Account"
       : formData.accountName || existingAccounts[0] || "Default Account";
 
+  const validateStep = (s) => {
+    const errors = {};
+    if (s === 1) {
+      const acc =
+        accountInputMode === "new"
+          ? newAccountName
+          : formData.accountName || resolvedAccountName;
+      if (!acc || !acc.trim()) {
+        errors.account_name = "Trading account is required";
+      }
+      if (
+        !formData.asset?.trim() ||
+        (formData.asset === "Other" && !customFields.asset?.trim())
+      ) {
+        errors.asset = "Asset/pair is required";
+      }
+      if (!formData.direction) errors.direction = "Direction is required";
+      if (!formData.date) errors.date = "Date is required";
+      if (!formData.session) errors.session = "Session is required";
+    }
+    if (s === 2) {
+      if (!formData.entry) errors.entry = "Entry price is required";
+      if (!formData.sl) errors.sl = "Stop loss is required";
+      if (!formData.result) errors.result = "Result is required";
+      const rVal =
+        formData.r_multiple !== undefined && formData.r_multiple !== ""
+          ? formData.r_multiple
+          : formData.rMultiple;
+      if (!rVal && rVal !== 0 && rVal !== "0") {
+        errors.r_multiple = "R-multiple is required";
+      }
+    }
+    return errors;
+  };
+
+  const handleContinue = () => {
+    const errs = validateStep(step);
+    if (Object.keys(errs).length > 0) {
+      setFieldErrors(errs);
+      return;
+    }
+    setFieldErrors({});
+    nextStep();
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (step !== 6) {
-      nextStep();
+      handleContinue();
+      return;
+    }
+
+    const s1Errors = validateStep(1);
+    const s2Errors = validateStep(2);
+    const allErrors = { ...s1Errors, ...s2Errors };
+    if (Object.keys(allErrors).length > 0) {
+      setFieldErrors(allErrors);
+      if (Object.keys(s1Errors).length > 0) setStep(1);
+      else if (Object.keys(s2Errors).length > 0) setStep(2);
+      alert("Please fill in all mandatory fields before submitting.");
       return;
     }
 
@@ -281,6 +354,19 @@ export default function AddTrade() {
 
       {/* FORM CONTAINER */}
       <div className="bg-[#101216] border border-white/5 rounded-3xl p-6 md:p-10 shadow-2xl relative overflow-hidden min-h-[400px]">
+        {/* INLINE VALIDATION ALERT */}
+        {Object.keys(fieldErrors).some((k) => fieldErrors[k]) && (
+          <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs flex items-center gap-3 animate-in fade-in">
+            <AlertCircle className="w-5 h-5 flex-shrink-0 text-red-400" />
+            <div>
+              <p className="font-bold">Please complete all mandatory fields:</p>
+              <p className="text-[11px] text-red-300/80 mt-0.5">
+                {Object.values(fieldErrors).filter(Boolean).join(" • ")}
+              </p>
+            </div>
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="relative z-10">
           {/* STEP 1: MARKET */}
           {step === 1 && (
@@ -296,7 +382,7 @@ export default function AddTrade() {
                     <Briefcase className="w-4 h-4 text-emerald-400" />
                   </div>
                   <label className="text-[13px] font-semibold text-white">
-                    Trading Account
+                    Trading Account <span className="text-red-400">*</span>
                   </label>
                 </div>
 
@@ -308,10 +394,18 @@ export default function AddTrade() {
                         type="text"
                         placeholder="e.g. FTMO Challenge, Personal Account..."
                         value={newAccountName}
-                        onChange={(e) => setNewAccountName(e.target.value)}
-                        className={inputClass}
+                        onChange={(e) => {
+                          setNewAccountName(e.target.value);
+                          if (fieldErrors.account_name) {
+                            setFieldErrors((prev) => ({ ...prev, account_name: null }));
+                          }
+                        }}
+                        className={`${inputClass} ${fieldErrors.account_name ? "border-red-500 focus:ring-red-500 ring-1 ring-red-500" : ""}`}
                       />
                     </div>
+                    {fieldErrors.account_name && (
+                      <p className="text-red-400 text-xs mt-1">{fieldErrors.account_name}</p>
+                    )}
                     {existingAccounts.length > 0 && (
                       <button
                         type="button"
@@ -331,13 +425,16 @@ export default function AddTrade() {
                     <div className="relative">
                       <select
                         value={formData.accountName}
-                        onChange={(e) =>
+                        onChange={(e) => {
                           setFormData({
                             ...formData,
                             accountName: e.target.value,
-                          })
-                        }
-                        className={selectClass}
+                          });
+                          if (fieldErrors.account_name) {
+                            setFieldErrors((prev) => ({ ...prev, account_name: null }));
+                          }
+                        }}
+                        className={`${selectClass} ${fieldErrors.account_name ? "border-red-500 focus:ring-red-500 ring-1 ring-red-500" : ""}`}
                       >
                         {existingAccounts.map((acc) => (
                           <option
@@ -351,6 +448,9 @@ export default function AddTrade() {
                       </select>
                       <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
                     </div>
+                    {fieldErrors.account_name && (
+                      <p className="text-red-400 text-xs mt-1">{fieldErrors.account_name}</p>
+                    )}
                     <button
                       type="button"
                       onClick={() => {
@@ -368,13 +468,15 @@ export default function AddTrade() {
               {/* Asset & Direction */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className={labelClass}>Asset / Pair</label>
+                  <label className={labelClass}>
+                    Asset / Pair <span className="text-red-400">*</span>
+                  </label>
                   <div className="relative">
                     <select
                       name="asset"
                       value={formData.asset}
                       onChange={handleChange}
-                      className={selectClass}
+                      className={`${selectClass} ${fieldErrors.asset ? "border-red-500 focus:ring-red-500 ring-1 ring-red-500" : ""}`}
                     >
                       {assets.map((a) => (
                         <option
@@ -388,6 +490,9 @@ export default function AddTrade() {
                     </select>
                     <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
                   </div>
+                  {fieldErrors.asset && (
+                    <p className="text-red-400 text-xs mt-1">{fieldErrors.asset}</p>
+                  )}
                   {formData.asset === "Other" && (
                     <input
                       type="text"
@@ -400,36 +505,49 @@ export default function AddTrade() {
                   )}
                 </div>
                 <div>
-                  <label className={labelClass}>Direction</label>
-                  <div className="flex gap-3">
+                  <label className={labelClass}>
+                    Direction <span className="text-red-400">*</span>
+                  </label>
+                  <div className={`flex gap-3 p-0.5 rounded-xl ${fieldErrors.direction ? "border border-red-500 ring-1 ring-red-500" : ""}`}>
                     <button
                       type="button"
-                      onClick={() =>
-                        setFormData({ ...formData, direction: "LONG" })
-                      }
+                      onClick={() => {
+                        setFormData({ ...formData, direction: "LONG" });
+                        if (fieldErrors.direction) {
+                          setFieldErrors((prev) => ({ ...prev, direction: null }));
+                        }
+                      }}
                       className={`flex-1 py-3.5 rounded-xl font-bold text-sm transition-colors border ${formData.direction === "LONG" ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400" : "bg-[#15181D] border-white/10 text-gray-500 hover:text-white"}`}
                     >
                       LONG ▲
                     </button>
                     <button
                       type="button"
-                      onClick={() =>
-                        setFormData({ ...formData, direction: "SHORT" })
-                      }
+                      onClick={() => {
+                        setFormData({ ...formData, direction: "SHORT" });
+                        if (fieldErrors.direction) {
+                          setFieldErrors((prev) => ({ ...prev, direction: null }));
+                        }
+                      }}
                       className={`flex-1 py-3.5 rounded-xl font-bold text-sm transition-colors border ${formData.direction === "SHORT" ? "bg-red-500/10 border-red-500/30 text-red-400" : "bg-[#15181D] border-white/10 text-gray-500 hover:text-white"}`}
                     >
                       SHORT ▼
                     </button>
                   </div>
+                  {fieldErrors.direction && (
+                    <p className="text-red-400 text-xs mt-1">{fieldErrors.direction}</p>
+                  )}
                 </div>
                 <div>
-                  <label className={labelClass}>Session</label>
+                  <label className={labelClass}>
+                    Session <span className="text-red-400">*</span>
+                  </label>
                   <div className="relative">
                     <select
                       name="session"
                       value={formData.session}
                       onChange={handleChange}
-                      className={selectClass}
+                      className={`${selectClass} ${fieldErrors.session ? "border-red-500 focus:ring-red-500 ring-1 ring-red-500" : ""}`}
                     >
                       {["London", "New York", "Asian", "Sydney", "Other"].map(
                         (s) => (
@@ -445,18 +563,26 @@ export default function AddTrade() {
                     </select>
                     <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
                   </div>
+                  {fieldErrors.session && (
+                    <p className="text-red-400 text-xs mt-1">{fieldErrors.session}</p>
+                  )}
                 </div>
                 <div className="space-y-6">
                   <div>
-                    <label className={labelClass}>Date</label>
+                    <label className={labelClass}>
+                      Date <span className="text-red-400">*</span>
+                    </label>
                     <input
                       type="date"
                       name="date"
                       value={formData.date}
                       onChange={handleChange}
-                      className={`${inputClass} [color-scheme:dark]`}
+                      className={`${inputClass} [color-scheme:dark] ${fieldErrors.date ? "border-red-500 focus:ring-red-500 ring-1 ring-red-500" : ""}`}
                       required
                     />
+                    {fieldErrors.date && (
+                      <p className="text-red-400 text-xs mt-1">{fieldErrors.date}</p>
+                    )}
                   </div>
                   <div>
                     <label className={labelClass}>Time</label>
@@ -571,28 +697,38 @@ export default function AddTrade() {
 
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div>
-                  <label className={labelClass}>Entry Price</label>
+                  <label className={labelClass}>
+                    Entry Price <span className="text-red-400">*</span>
+                  </label>
                   <input
                     type="number"
                     step="any"
                     name="entry"
                     value={formData.entry}
                     onChange={handleChange}
-                    className={inputClass}
+                    className={`${inputClass} ${fieldErrors.entry ? "border-red-500 focus:ring-red-500 ring-1 ring-red-500" : ""}`}
                     placeholder="0.00"
                   />
+                  {fieldErrors.entry && (
+                    <p className="text-red-400 text-xs mt-1">{fieldErrors.entry}</p>
+                  )}
                 </div>
                 <div>
-                  <label className={labelClass}>Stop Loss</label>
+                  <label className={labelClass}>
+                    Stop Loss <span className="text-red-400">*</span>
+                  </label>
                   <input
                     type="number"
                     step="any"
                     name="sl"
                     value={formData.sl}
                     onChange={handleChange}
-                    className={inputClass}
+                    className={`${inputClass} ${fieldErrors.sl ? "border-red-500 focus:ring-red-500 ring-1 ring-red-500" : ""}`}
                     placeholder="0.00"
                   />
+                  {fieldErrors.sl && (
+                    <p className="text-red-400 text-xs mt-1">{fieldErrors.sl}</p>
+                  )}
                 </div>
                 <div>
                   <label className={labelClass}>Take Profit</label>
@@ -617,6 +753,73 @@ export default function AddTrade() {
                     className={inputClass}
                     placeholder="1.0"
                   />
+                </div>
+              </div>
+
+              {/* Trade Result & R-Multiple */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+                <div>
+                  <label className={labelClass}>
+                    Trade Result <span className="text-red-400">*</span>
+                  </label>
+                  <div className={`flex gap-2 p-1 rounded-xl ${fieldErrors.result ? "border border-red-500 ring-1 ring-red-500" : ""}`}>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setFormData({ ...formData, result: "win" });
+                        if (fieldErrors.result) {
+                          setFieldErrors((prev) => ({ ...prev, result: null }));
+                        }
+                      }}
+                      className={`flex-1 py-3.5 rounded-xl font-bold text-sm transition-colors border ${formData.result === "win" ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400" : "bg-[#15181D] border-white/10 text-gray-500 hover:text-white"}`}
+                    >
+                      WIN ✓
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setFormData({ ...formData, result: "loss" });
+                        if (fieldErrors.result) {
+                          setFieldErrors((prev) => ({ ...prev, result: null }));
+                        }
+                      }}
+                      className={`flex-1 py-3.5 rounded-xl font-bold text-sm transition-colors border ${formData.result === "loss" ? "bg-red-500/10 border-red-500/30 text-red-400" : "bg-[#15181D] border-white/10 text-gray-500 hover:text-white"}`}
+                    >
+                      LOSS ✗
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setFormData({ ...formData, result: "be" });
+                        if (fieldErrors.result) {
+                          setFieldErrors((prev) => ({ ...prev, result: null }));
+                        }
+                      }}
+                      className={`flex-1 py-3.5 rounded-xl font-bold text-sm transition-colors border ${formData.result === "be" ? "bg-gray-500/20 border-gray-500/50 text-gray-300" : "bg-[#15181D] border-white/10 text-gray-500 hover:text-white"}`}
+                    >
+                      BE —
+                    </button>
+                  </div>
+                  {fieldErrors.result && (
+                    <p className="text-red-400 text-xs mt-1">{fieldErrors.result}</p>
+                  )}
+                </div>
+                <div>
+                  <label className={labelClass}>
+                    Net R-Multiple <span className="text-red-400">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    step="0.1"
+                    name="rMultiple"
+                    value={formData.rMultiple}
+                    onChange={handleChange}
+                    className={`${inputClass} ${fieldErrors.r_multiple ? "border-red-500 focus:ring-red-500 ring-1 ring-red-500" : ""}`}
+                    placeholder="e.g. 2.5 or -1.0"
+                  />
+                  {fieldErrors.r_multiple && (
+                    <p className="text-red-400 text-xs mt-1">{fieldErrors.r_multiple}</p>
+                  )}
                 </div>
               </div>
             </div>
@@ -660,48 +863,6 @@ export default function AddTrade() {
                       className={`${inputClass} mt-3`}
                     />
                   )}
-                </div>
-                <div>
-                  <label className={labelClass}>Trade Result</label>
-                  <div className="flex gap-2">
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setFormData({ ...formData, result: "win" })
-                      }
-                      className={`flex-1 py-3.5 rounded-xl font-bold text-sm transition-colors border ${formData.result === "win" ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400" : "bg-[#15181D] border-white/10 text-gray-500 hover:text-white"}`}
-                    >
-                      WIN ✓
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setFormData({ ...formData, result: "loss" })
-                      }
-                      className={`flex-1 py-3.5 rounded-xl font-bold text-sm transition-colors border ${formData.result === "loss" ? "bg-red-500/10 border-red-500/30 text-red-400" : "bg-[#15181D] border-white/10 text-gray-500 hover:text-white"}`}
-                    >
-                      LOSS ✗
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setFormData({ ...formData, result: "be" })}
-                      className={`flex-1 py-3.5 rounded-xl font-bold text-sm transition-colors border ${formData.result === "be" ? "bg-gray-500/20 border-gray-500/50 text-gray-300" : "bg-[#15181D] border-white/10 text-gray-500 hover:text-white"}`}
-                    >
-                      BE —
-                    </button>
-                  </div>
-                </div>
-                <div>
-                  <label className={labelClass}>Net R-Multiple</label>
-                  <input
-                    type="number"
-                    step="0.1"
-                    name="rMultiple"
-                    value={formData.rMultiple}
-                    onChange={handleChange}
-                    className={inputClass}
-                    placeholder="e.g. 2.5 or -1.0"
-                  />
                 </div>
                 <div>
                   <label className={labelClass}>Rule Broken?</label>
@@ -897,7 +1058,7 @@ export default function AddTrade() {
             {step < 6 ? (
               <button
                 type="button"
-                onClick={nextStep}
+                onClick={handleContinue}
                 className="px-8 py-3 rounded-xl bg-white text-black font-bold text-sm hover:bg-gray-200 transition-all flex items-center gap-2"
               >
                 Continue <ArrowRight className="w-4 h-4" />
