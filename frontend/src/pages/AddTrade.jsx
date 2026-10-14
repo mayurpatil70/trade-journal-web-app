@@ -109,6 +109,13 @@ export default function AddTrade() {
     const saved = localStorage.getItem("journal_account_balance");
     return saved && Number(saved) > 0 ? Number(saved) : DEFAULT_ACCOUNT_BALANCE;
   });
+  const [balanceInput, setBalanceInput] = useState(() => String(accountBalance));
+
+  const formattedEquity = useMemo(() => {
+    const num = Number(accountBalance);
+    if (!num || Number.isNaN(num)) return "$0";
+    return `$${num.toLocaleString()}`;
+  }, [accountBalance]);
 
   const [customFields, setCustomFields] = useState({});
   const [images, setImages] = useState([null, null]);
@@ -222,22 +229,18 @@ export default function AddTrade() {
 
     if (detected && detected !== accountBalance) {
       setAccountBalance(detected);
+      setBalanceInput(String(detected));
     }
   }, [formData.accountName]);
 
-  const handleBalanceChange = (newBal) => {
-    const val = Number(newBal);
+  const recalculateFromEquity = (newEquity) => {
+    const val = Number(newEquity);
     if (!val || val <= 0) return;
-    setAccountBalance(val);
-    try {
-      localStorage.setItem("journal_account_balance", String(val));
-    } catch (e) {}
-
-    // Recalculate risk % if lot size is present
     const activeAsset =
       formData.asset === "Other" && customFields.asset
         ? customFields.asset
         : formData.asset;
+
     if (
       formData.lotSize &&
       formData.entry &&
@@ -273,6 +276,28 @@ export default function AddTrade() {
         setFormData((p) => ({ ...p, lotSize: String(calcLots) }));
       }
     }
+  };
+
+  const handleBalanceInputChange = (rawVal) => {
+    const cleaned = rawVal.replace(/[^0-9.]/g, "");
+    setBalanceInput(cleaned);
+    const num = parseFloat(cleaned);
+    if (!Number.isNaN(num) && num > 0) {
+      setAccountBalance(num);
+      try {
+        localStorage.setItem("journal_account_balance", String(num));
+      } catch (e) {}
+      recalculateFromEquity(num);
+    }
+  };
+
+  const applyPresetBalance = (presetNum) => {
+    setBalanceInput(String(presetNum));
+    setAccountBalance(presetNum);
+    try {
+      localStorage.setItem("journal_account_balance", String(presetNum));
+    } catch (e) {}
+    recalculateFromEquity(presetNum);
   };
 
   const stopDist = useMemo(() => {
@@ -1203,8 +1228,8 @@ export default function AddTrade() {
                         account risk
                       </span>
                     </label>
-                    <span className="text-[11px] text-gray-400 font-mono">
-                      of ${(accountBalance / 1000).toFixed(0)}k balance
+                    <span className="text-[11px] text-emerald-400 font-mono font-medium bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20">
+                      of {formattedEquity} equity
                     </span>
                   </div>
                   <input
@@ -1265,78 +1290,134 @@ export default function AddTrade() {
               </div>
 
               {/* Lot Size & Risk Calculator Panel */}
-              <div className="bg-[#121418] border border-white/10 rounded-2xl p-4">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-white/5">
-                  <div className="flex items-center gap-2">
-                    <div className="p-1.5 bg-emerald-500/10 text-emerald-400 rounded-lg">
-                      <Calculator className="w-4 h-4" />
+              <div className="bg-[#121418] border border-white/10 rounded-2xl p-5 space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3.5 border-b border-white/5">
+                  <div className="flex items-center gap-2.5">
+                    <div className="p-2 bg-emerald-500/10 text-emerald-400 rounded-xl border border-emerald-500/20">
+                      <Calculator className="w-5 h-5" />
                     </div>
                     <div>
-                      <span className="text-xs font-semibold text-white">
-                        Lot Size & Risk Calculator
-                      </span>
-                      <span className="ml-2 text-[10px] text-gray-400 font-mono">
-                        ({formData.asset} • {assetMultiplier >= 1000 ? `$${assetMultiplier.toLocaleString()}/pt` : `$${assetMultiplier}/pt`} per lot)
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-bold text-white tracking-wide">
+                          Lot Size & Risk Calculator
+                        </span>
+                        <span className="text-[10px] text-emerald-400 font-mono bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                          Live Engine
+                        </span>
+                      </div>
+                      <p className="text-xs text-gray-400 font-mono mt-0.5">
+                        {formData.asset} • {assetMultiplier >= 1000 ? `$${assetMultiplier.toLocaleString()}/pt` : `$${assetMultiplier}/pt`} per lot
+                      </p>
                     </div>
                   </div>
 
-                  {/* Account Balance Config */}
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-[11px] text-gray-400 font-mono">Account Balance:</span>
-                    <div className="flex items-center gap-1 bg-black/40 border border-white/10 rounded-lg px-2 py-1">
-                      <span className="text-xs text-gray-500">$</span>
-                      <input
-                        type="number"
-                        value={accountBalance}
-                        onChange={(e) => handleBalanceChange(Number(e.target.value))}
-                        className="w-20 bg-transparent text-xs font-mono font-bold text-white outline-none"
-                      />
-                    </div>
-                    <div className="flex items-center gap-1">
-                      {BALANCE_PRESETS.map((b) => (
-                        <button
-                          key={b}
-                          type="button"
-                          onClick={() => handleBalanceChange(b)}
-                          className={`px-1.5 py-0.5 text-[10px] rounded font-mono transition-colors border ${
-                            accountBalance === b
-                              ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/40 font-bold"
-                              : "bg-white/5 text-gray-500 border-white/10 hover:text-white"
-                          }`}
-                        >
-                          ${b / 1000}k
-                        </button>
-                      ))}
-                    </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-gray-400 font-mono">Current Equity:</span>
+                    <span className="text-xs font-bold text-emerald-400 font-mono bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20">
+                      {formattedEquity}
+                    </span>
                   </div>
                 </div>
 
-                {/* Live Sizing Breakdown */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-3">
-                  <div className="bg-black/30 rounded-xl p-2.5 border border-white/5">
-                    <p className="text-[10px] text-gray-500 uppercase tracking-widest">SL Distance</p>
-                    <p className="text-xs font-bold text-white font-mono mt-0.5">
-                      {stopDist > 0 ? `${stopDist.toFixed(2)} pts` : "—"}
-                    </p>
+                {/* Calculator Body: Left = Full-Size Down Column for Account Equity, Right = Live Sizing Breakdown */}
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-stretch">
+                  {/* Down Column: Editable Account Equity Input (Full size like other inputs!) */}
+                  <div className="md:col-span-5 bg-[#15181D]/60 border border-white/5 p-4 rounded-2xl space-y-3 flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <label className="text-[12px] font-semibold text-gray-300 uppercase tracking-wider flex items-center gap-1.5">
+                          <span>Account Equity</span>
+                          <span className="text-[10px] text-emerald-400 font-mono bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">
+                            capital
+                          </span>
+                        </label>
+                        <span className="text-[11px] text-gray-400 font-mono">
+                          USD ($)
+                        </span>
+                      </div>
+                      <div className="relative">
+                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-mono font-bold text-[15px] pointer-events-none">
+                          $
+                        </span>
+                        <input
+                          type="text"
+                          inputMode="decimal"
+                          name="accountEquity"
+                          value={balanceInput}
+                          onChange={(e) => handleBalanceInputChange(e.target.value)}
+                          className={`${inputClass} pl-8 text-[15px] font-mono font-bold`}
+                          placeholder="e.g. 5000"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <p className="text-[10px] text-gray-400 uppercase tracking-wider font-semibold mb-1.5">
+                        Quick Equity Presets:
+                      </p>
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        {BALANCE_PRESETS.map((preset) => {
+                          const isSelected = Number(accountBalance) === preset;
+                          return (
+                            <button
+                              key={preset}
+                              type="button"
+                              onClick={() => applyPresetBalance(preset)}
+                              className={`px-2.5 py-1 text-[11px] rounded font-mono transition-colors border ${
+                                isSelected
+                                  ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/40 font-bold"
+                                  : "bg-white/5 text-gray-400 border-white/10 hover:bg-white/10 hover:text-white"
+                              }`}
+                            >
+                              ${preset >= 1000 ? `${preset / 1000}k` : preset}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
                   </div>
-                  <div className="bg-black/30 rounded-xl p-2.5 border border-white/5">
-                    <p className="text-[10px] text-gray-500 uppercase tracking-widest">Dollar Risk</p>
-                    <p className="text-xs font-bold text-red-400 font-mono mt-0.5">
-                      {cashRisk > 0 ? `$${cashRisk.toFixed(2)}` : "—"}
-                    </p>
-                  </div>
-                  <div className="bg-black/30 rounded-xl p-2.5 border border-white/5">
-                    <p className="text-[10px] text-gray-500 uppercase tracking-widest">Calculated Lot</p>
-                    <p className="text-xs font-bold text-emerald-400 font-mono mt-0.5">
-                      {formData.lotSize ? `${formData.lotSize} lots` : "—"}
-                    </p>
-                  </div>
-                  <div className="bg-black/30 rounded-xl p-2.5 border border-white/5">
-                    <p className="text-[10px] text-gray-500 uppercase tracking-widest">Account Risk %</p>
-                    <p className="text-xs font-bold text-blue-400 font-mono mt-0.5">
-                      {formData.risk ? `${Number(formData.risk).toFixed(2)}%` : "—"}
-                    </p>
+
+                  {/* Right: Live Sizing Breakdown */}
+                  <div className="md:col-span-7 grid grid-cols-2 gap-3">
+                    <div className="bg-[#15181D]/60 rounded-2xl p-4 border border-white/5 flex flex-col justify-between">
+                      <div className="flex items-center justify-between">
+                        <p className="text-[11px] text-gray-400 uppercase tracking-wider font-semibold">SL Distance</p>
+                        <span className="text-[10px] text-gray-500 font-mono">pts</span>
+                      </div>
+                      <p className="text-base sm:text-lg font-bold text-white font-mono mt-2">
+                        {stopDist > 0 ? `${stopDist.toFixed(2)} pts` : "—"}
+                      </p>
+                    </div>
+
+                    <div className="bg-[#15181D]/60 rounded-2xl p-4 border border-white/5 flex flex-col justify-between">
+                      <div className="flex items-center justify-between">
+                        <p className="text-[11px] text-gray-400 uppercase tracking-wider font-semibold">Dollar Risk</p>
+                        <span className="text-[10px] text-red-400/80 font-mono">max loss</span>
+                      </div>
+                      <p className="text-base sm:text-lg font-bold text-red-400 font-mono mt-2">
+                        {cashRisk > 0 ? `$${cashRisk.toFixed(2)}` : "—"}
+                      </p>
+                    </div>
+
+                    <div className="bg-[#15181D]/60 rounded-2xl p-4 border border-white/5 flex flex-col justify-between">
+                      <div className="flex items-center justify-between">
+                        <p className="text-[11px] text-gray-400 uppercase tracking-wider font-semibold">Target Lot</p>
+                        <span className="text-[10px] text-emerald-400/80 font-mono">position</span>
+                      </div>
+                      <p className="text-base sm:text-lg font-bold text-emerald-400 font-mono mt-2">
+                        {formData.lotSize ? `${formData.lotSize} lots` : "—"}
+                      </p>
+                    </div>
+
+                    <div className="bg-[#15181D]/60 rounded-2xl p-4 border border-white/5 flex flex-col justify-between">
+                      <div className="flex items-center justify-between">
+                        <p className="text-[11px] text-gray-400 uppercase tracking-wider font-semibold">Account Risk %</p>
+                        <span className="text-[10px] text-blue-400/80 font-mono">of equity</span>
+                      </div>
+                      <p className="text-base sm:text-lg font-bold text-blue-400 font-mono mt-2">
+                        {formData.risk ? `${Number(formData.risk).toFixed(2)}%` : "—"}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
