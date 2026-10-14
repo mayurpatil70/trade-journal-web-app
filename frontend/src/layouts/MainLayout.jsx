@@ -368,26 +368,20 @@ export default function MainLayout() {
       {/* Main Content Area */}
       <main className="flex-1 overflow-y-auto relative pt-14 pb-16 md:pt-0 md:pb-0 bg-[#0A0B0D]">
         {announcement && !dismissedAnn && (
-          <div
-            className={`w-full px-4 py-2.5 text-xs font-semibold flex items-center justify-between border-b shadow-sm z-30 transition-all ${
-              announcement.type === "warning"
-                ? "bg-amber-500/15 text-amber-300 border-amber-500/25"
-                : announcement.type === "success"
-                ? "bg-emerald-500/15 text-emerald-300 border-emerald-500/25"
-                : "bg-blue-500/15 text-blue-300 border-blue-500/25"
-            }`}
-          >
-            <div className="flex items-center gap-2 mx-auto">
-              <img src="/logo3d.png" alt="ForexNotes" className="w-4 h-4 object-contain shrink-0" />
-              <span>{announcement.message}</span>
+          <div className="fixed top-3 left-1/2 -translate-x-1/2 z-50 max-w-[92vw] sm:max-w-xl animate-in fade-in slide-in-from-top-4 duration-300 pointer-events-auto">
+            <div className="relative overflow-hidden flex items-center gap-2.5 px-4 py-2 sm:px-5 sm:py-2.5 rounded-full bg-gradient-to-r from-red-600 via-rose-600 to-red-600 text-white shadow-[0_8px_30px_rgba(239,68,68,0.55)] border border-red-300/40 ring-1 ring-white/25 backdrop-blur-md before:absolute before:inset-x-0 before:top-0 before:h-1/2 before:bg-gradient-to-b before:from-white/25 before:to-transparent before:pointer-events-none">
+              <img src="/logo3d.png" alt="ForexNotes" className="w-5 h-5 object-contain shrink-0 drop-shadow-md" />
+              <span className="text-white font-bold text-xs sm:text-[13px] tracking-wide drop-shadow-sm truncate">
+                {announcement.message}
+              </span>
+              <button
+                onClick={() => setDismissedAnn(true)}
+                className="ml-1.5 p-1 rounded-full text-white/80 hover:text-white hover:bg-white/20 transition-all cursor-pointer shrink-0"
+                title="Dismiss announcement"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
             </div>
-            <button
-              onClick={() => setDismissedAnn(true)}
-              className="text-gray-400 hover:text-white p-1 rounded-lg cursor-pointer"
-              title="Dismiss announcement"
-            >
-              <X className="w-4 h-4" />
-            </button>
           </div>
         )}
         <div className="max-md:hidden flex fixed top-3 right-5 z-40 items-center gap-2">

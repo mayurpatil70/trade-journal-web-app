@@ -3,6 +3,7 @@ import { useEffect, useState, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import api, { saveSession } from "../api/axios";
 import { Loader2, CheckCircle, AlertTriangle, ArrowRight } from "lucide-react";
+import Logo3DLoader from "../components/Logo3DLoader";
 
 export default function Verify() {
   const [searchParams] = useSearchParams();
@@ -64,23 +65,16 @@ export default function Verify() {
     verifyToken();
   }, [searchParams, navigate]);
 
+  if (status === "authenticating") {
+    return <Logo3DLoader title="FOREX NOTES" subtitle="Authenticating your secure login link..." />;
+  }
+
   return (
     <div
       className="min-h-screen bg-[#020202] text-white flex items-center justify-center p-6"
       style={{ fontFamily: "'Inter', sans-serif" }}
     >
       <div className="w-full max-w-md bg-[#121418] border border-white/5 rounded-2xl p-8 sm:p-10 shadow-2xl flex flex-col items-center text-center">
-        {status === "authenticating" && (
-          <div className="flex flex-col items-center animate-in fade-in duration-300">
-            <Loader2 className="w-12 h-12 text-[#10b981] animate-spin mb-6" />
-            <h2 className="text-xl font-bold text-white mb-2">
-              Authenticating...
-            </h2>
-            <p className="text-sm text-gray-400">
-              Verifying your secure magic link.
-            </p>
-          </div>
-        )}
 
         {status === "success" && (
           <div className="flex flex-col items-center animate-in fade-in zoom-in-95 duration-300">

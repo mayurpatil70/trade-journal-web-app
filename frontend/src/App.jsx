@@ -133,11 +133,7 @@ const DiscordGateGuard = () => {
   }, []);
 
   if (discordStatus === null) {
-    return (
-      <div className="flex h-dvh bg-[#0a0a0a] items-center justify-center">
-        <Loader2 className="w-8 h-8 text-[#10b981] animate-spin" />
-      </div>
-    );
+    return <Logo3DLoader title="FOREX NOTES" subtitle="Loading your workspace..." />;
   }
 
   if (discordStatus === 'discord') {
@@ -188,11 +184,7 @@ const PaywallGuard = () => {
   }, []);
 
   if (access === null) {
-    return (
-      <div className="flex h-dvh bg-[#0a0a0a] items-center justify-center">
-        <Loader2 className="w-8 h-8 text-[#10b981] animate-spin" />
-      </div>
-    );
+    return <Logo3DLoader title="FOREX NOTES" subtitle="Loading your workspace..." />;
   }
 
   if (access === 'discord') return <Navigate to="/link-discord" replace />;
@@ -216,7 +208,7 @@ function App() {
   return (
     <BrowserRouter>
       <RouteSeo />
-      <Suspense fallback={<div className="flex h-dvh bg-[#0a0a0a] items-center justify-center"><Loader2 className="w-8 h-8 text-[#10b981] animate-spin" /></div>}>
+      <Suspense fallback={<Logo3DLoader title="FOREX NOTES" subtitle="Loading your workspace..." />}>
         <ErrorBoundary>
           <Routes>
             {/* Public Landing Pages */}

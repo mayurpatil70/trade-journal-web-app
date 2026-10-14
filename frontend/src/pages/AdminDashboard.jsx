@@ -1649,20 +1649,19 @@ export default function AdminDashboard() {
               />
             </div>
 
-            {/* Live Preview */}
+            {/* Live Preview (Mobile Notch Notification) */}
             <div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400 block mb-1.5">Live Preview</span>
-              <div
-                className={`p-3 rounded-xl border text-xs flex items-center gap-2 ${
-                  broadcastType === "warning"
-                    ? "bg-amber-500/10 border-amber-500/30 text-amber-800 dark:text-amber-300"
-                    : broadcastType === "success"
-                    ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-800 dark:text-emerald-300"
-                    : "bg-blue-500/10 border-blue-500/30 text-blue-800 dark:text-blue-300"
-                }`}
-              >
-                <img src="/logo3d.png" alt="ForexNotes" className="w-4 h-4 object-contain shrink-0" />
-                <span className="font-medium">{broadcastMessage || "No announcement text entered yet."}</span>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400 block mb-2">Live Preview (Top Mobile Notch)</span>
+              <div className="py-4 px-4 bg-gray-950/60 dark:bg-black/60 rounded-2xl border border-dashed border-gray-300 dark:border-white/10 flex items-center justify-center">
+                <div className="relative overflow-hidden flex items-center gap-2.5 px-4 py-2 sm:px-5 sm:py-2.5 rounded-full bg-gradient-to-r from-red-600 via-rose-600 to-red-600 text-white shadow-[0_8px_30px_rgba(239,68,68,0.55)] border border-red-300/40 ring-1 ring-white/25 before:absolute before:inset-x-0 before:top-0 before:h-1/2 before:bg-gradient-to-b before:from-white/25 before:to-transparent before:pointer-events-none">
+                  <img src="/logo3d.png" alt="ForexNotes" className="w-5 h-5 object-contain shrink-0 drop-shadow-md" />
+                  <span className="text-white font-bold text-xs sm:text-[13px] tracking-wide drop-shadow-sm">
+                    {broadcastMessage || "Scheduled system maintenance at 11 PM today"}
+                  </span>
+                  <div className="ml-1.5 p-0.5 rounded-full text-white/80 hover:text-white cursor-pointer shrink-0">
+                    <X className="w-3.5 h-3.5" />
+                  </div>
+                </div>
               </div>
             </div>
 
