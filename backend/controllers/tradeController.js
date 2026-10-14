@@ -99,13 +99,31 @@ export const createTrade = async (req, res) => {
       }
     }
 
+    const rawLotSize =
+      tradeData.lotSize !== undefined && tradeData.lotSize !== "" && tradeData.lotSize !== null
+        ? normaliseTradeNumber(tradeData.lotSize)
+        : tradeData.lot_size !== undefined && tradeData.lot_size !== "" && tradeData.lot_size !== null
+        ? normaliseTradeNumber(tradeData.lot_size)
+        : null;
+
     // Parse executions if they exist (usually sent as JSON string in FormData)
     let parsedExecutions = [];
     if (tradeData.executions) {
       try {
-        parsedExecutions = JSON.parse(tradeData.executions);
+        parsedExecutions =
+          typeof tradeData.executions === "string"
+            ? JSON.parse(tradeData.executions)
+            : tradeData.executions;
       } catch (e) {
         console.error("Failed to parse executions:", e);
+      }
+    }
+
+    if (rawLotSize !== null) {
+      if (Array.isArray(parsedExecutions) && parsedExecutions.length > 0) {
+        parsedExecutions = parsedExecutions.map((e) => ({ ...e, lot_size: rawLotSize }));
+      } else {
+        parsedExecutions = [{ lot_size: rawLotSize }];
       }
     }
 
@@ -163,7 +181,19 @@ export const createTrade = async (req, res) => {
 
     if (error) throw error;
 
-    res.status(201).json({ success: true, data: data[0] });
+    const savedTrade = data?.[0]
+      ? {
+          ...data[0],
+          lot_size:
+            data[0].lot_size !== undefined && data[0].lot_size !== null
+              ? data[0].lot_size
+              : data[0].executions?.[0]?.lot_size !== undefined
+              ? data[0].executions[0].lot_size
+              : rawLotSize,
+        }
+      : data?.[0];
+
+    res.status(201).json({ success: true, data: savedTrade });
   } catch (error) {
     console.error("Trade Creation Error:", error);
     res.status(500).json({ success: false, error: "Failed to save trade." });
@@ -190,7 +220,17 @@ export const getTrades = async (req, res) => {
 
     if (error) throw error;
 
-    res.status(200).json({ success: true, data });
+    const enriched = (data || []).map((t) => ({
+      ...t,
+      lot_size:
+        t.lot_size !== undefined && t.lot_size !== null
+          ? t.lot_size
+          : t.executions?.[0]?.lot_size !== undefined
+          ? t.executions[0].lot_size
+          : null,
+    }));
+
+    res.status(200).json({ success: true, data: enriched });
   } catch (error) {
     console.error("Fetch Trades Error:", error);
     res.status(500).json({ success: false, error: "Failed to fetch trades." });
@@ -310,6 +350,37 @@ export const updateTrade = async (req, res) => {
         ? existing.risk
         : 1.0;
 
+    const rawLotSize =
+      tradeData.lotSize !== undefined && tradeData.lotSize !== "" && tradeData.lotSize !== null
+        ? normaliseTradeNumber(tradeData.lotSize)
+        : tradeData.lot_size !== undefined && tradeData.lot_size !== "" && tradeData.lot_size !== null
+        ? normaliseTradeNumber(tradeData.lot_size)
+        : undefined;
+
+    let parsedExecutions = undefined;
+    if (tradeData.executions !== undefined) {
+      try {
+        parsedExecutions =
+          typeof tradeData.executions === "string"
+            ? JSON.parse(tradeData.executions || "[]")
+            : tradeData.executions;
+      } catch (e) {
+        parsedExecutions = [];
+      }
+    } else if (existing.executions) {
+      parsedExecutions = Array.isArray(existing.executions)
+        ? [...existing.executions]
+        : [existing.executions];
+    }
+
+    if (rawLotSize !== undefined && rawLotSize !== null) {
+      if (Array.isArray(parsedExecutions) && parsedExecutions.length > 0) {
+        parsedExecutions = parsedExecutions.map((e) => ({ ...e, lot_size: rawLotSize }));
+      } else {
+        parsedExecutions = [{ lot_size: rawLotSize }];
+      }
+    }
+
     const updateFields = {
       ...(tradeData.date !== undefined && { date: tradeData.date }),
       ...(tradeData.time !== undefined && { time: tradeData.time }),
@@ -333,6 +404,7 @@ export const updateTrade = async (req, res) => {
       images: imageUrls,
       before_image: imageUrls[0] || null,
       after_image: imageUrls[1] || null,
+      ...(parsedExecutions !== undefined && { executions: parsedExecutions }),
     };
 
     const { data, error } = await supabase
@@ -344,7 +416,19 @@ export const updateTrade = async (req, res) => {
 
     if (error) throw error;
 
-    res.status(200).json({ success: true, data: data[0] });
+    const updatedTrade = data?.[0]
+      ? {
+          ...data[0],
+          lot_size:
+            data[0].lot_size !== undefined && data[0].lot_size !== null
+              ? data[0].lot_size
+              : data[0].executions?.[0]?.lot_size !== undefined
+              ? data[0].executions[0].lot_size
+              : rawLotSize,
+        }
+      : data?.[0];
+
+    res.status(200).json({ success: true, data: updatedTrade });
   } catch (error) {
     console.error("Update Trade Error:", error);
     res.status(500).json({ success: false, error: "Failed to update trade." });
@@ -544,6 +628,8 @@ export const exportTrades = async (req, res) => {
           }),
         );
 
+        const lotVal = trade.lot_size || trade.executions?.[0]?.lot_size;
+
         // 8 Metrics in a 2x4 Table
         const metricsRows = [
           [
@@ -569,7 +655,7 @@ export const exportTrades = async (req, res) => {
               color: "0F172A",
             },
             {
-              label: "RISK %",
+              label: lotVal ? `RISK % (${lotVal}L)` : "RISK %",
               val: trade.risk ? `${Number(trade.risk).toFixed(2)}%` : "—",
               color: "0F172A",
             },
@@ -892,6 +978,8 @@ export const exportTrades = async (req, res) => {
           doc.fillColor("#64748B").fontSize(9.5).font("Helvetica-Bold").text(`Account: ${trade.account_name}`, 370, 53, { width: 175, align: "right" });
         }
 
+        const lotVal = trade.lot_size || trade.executions?.[0]?.lot_size;
+
         // 2. Metrics Grid (2 rows x 4 cols = 8 cards)
         const metrics = [
           [
@@ -917,7 +1005,7 @@ export const exportTrades = async (req, res) => {
               color: "#0F172A",
             },
             {
-              label: "RISK %",
+              label: lotVal ? `RISK % (${lotVal}L)` : "RISK %",
               val: trade.risk ? `${Number(trade.risk).toFixed(2)}%` : "—",
               color: "#0F172A",
             },

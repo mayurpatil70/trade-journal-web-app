@@ -432,6 +432,9 @@ export default function Settings() {
                 const selIsLoss =
                   (selectedTrade.result || "").toLowerCase() === "loss" ||
                   selR < 0;
+                const selLot =
+                  selectedTrade.lot_size ??
+                  selectedTrade.executions?.[0]?.lot_size;
                 return (
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     {[
@@ -453,9 +456,11 @@ export default function Settings() {
                       { label: "Stop Loss", value: selectedTrade.sl ?? "—" },
                       { label: "Take Profit", value: selectedTrade.tp ?? "—" },
                       {
-                        label: "Risk %",
+                        label: selLot ? `Risk % (${selLot}L)` : "Risk %",
                         value: selectedTrade.risk
                           ? `${Number(selectedTrade.risk).toFixed(2)}%`
+                          : selLot
+                          ? `${selLot} Lots`
                           : "—",
                       },
                     ].map((s, i) => (

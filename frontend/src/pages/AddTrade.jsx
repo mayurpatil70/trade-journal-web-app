@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import api from "../api/axios";
 import {
@@ -19,7 +19,19 @@ import {
   Briefcase,
   Plus,
   AlertCircle,
+  Calculator,
 } from "lucide-react";
+import {
+  DEFAULT_ACCOUNT_BALANCE,
+  BALANCE_PRESETS,
+  LOT_PRESETS,
+  RISK_PERCENT_PRESETS,
+  getAssetMultiplier,
+  calculateStopDistance,
+  calculateCashRisk,
+  calculateRiskPercent,
+  calculateLotSize,
+} from "../utils/lotSizeCalculator.js";
 
 export default function AddTrade() {
   const navigate = useNavigate();
@@ -79,6 +91,7 @@ export default function AddTrade() {
     entry: "",
     sl: "",
     tp: "",
+    lotSize: "",
     risk: "1.00",
     result: "win",
     rMultiple: "",
@@ -90,6 +103,11 @@ export default function AddTrade() {
     emotionAfter: "",
     psychNote: "",
     accountName: "",
+  });
+
+  const [accountBalance, setAccountBalance] = useState(() => {
+    const saved = localStorage.getItem("journal_account_balance");
+    return saved && Number(saved) > 0 ? Number(saved) : DEFAULT_ACCOUNT_BALANCE;
   });
 
   const [customFields, setCustomFields] = useState({});
@@ -156,6 +174,12 @@ export default function AddTrade() {
             entry: t.entry !== null && t.entry !== undefined ? String(t.entry) : "",
             sl: t.sl !== null && t.sl !== undefined ? String(t.sl) : "",
             tp: t.tp !== null && t.tp !== undefined ? String(t.tp) : "",
+            lotSize:
+              t.lot_size !== null && t.lot_size !== undefined
+                ? String(t.lot_size)
+                : t.executions?.[0]?.lot_size !== null && t.executions?.[0]?.lot_size !== undefined
+                ? String(t.executions[0].lot_size)
+                : "",
             risk:
               t.risk !== null && t.risk !== undefined
                 ? Number.isInteger(Number(t.risk))
@@ -184,6 +208,96 @@ export default function AddTrade() {
     fetchTradeToEdit();
   }, [editTradeId]);
 
+  // Auto-detect account balance from account name if present
+  useEffect(() => {
+    if (!formData.accountName) return;
+    const lower = formData.accountName.toLowerCase();
+    let detected = null;
+    if (lower.includes("200k") || lower.includes("200000")) detected = 200000;
+    else if (lower.includes("100k") || lower.includes("100000")) detected = 100000;
+    else if (lower.includes("50k") || lower.includes("50000")) detected = 50000;
+    else if (lower.includes("25k") || lower.includes("25000")) detected = 25000;
+    else if (lower.includes("10k") || lower.includes("10000")) detected = 10000;
+    else if (lower.includes("5k") || lower.includes("5000")) detected = 5000;
+
+    if (detected && detected !== accountBalance) {
+      setAccountBalance(detected);
+    }
+  }, [formData.accountName]);
+
+  const handleBalanceChange = (newBal) => {
+    const val = Number(newBal);
+    if (!val || val <= 0) return;
+    setAccountBalance(val);
+    try {
+      localStorage.setItem("journal_account_balance", String(val));
+    } catch (e) {}
+
+    // Recalculate risk % if lot size is present
+    const activeAsset =
+      formData.asset === "Other" && customFields.asset
+        ? customFields.asset
+        : formData.asset;
+    if (
+      formData.lotSize &&
+      formData.entry &&
+      formData.sl &&
+      !Number.isNaN(Number(formData.entry)) &&
+      !Number.isNaN(Number(formData.sl))
+    ) {
+      const calcRisk = calculateRiskPercent({
+        asset: activeAsset,
+        entry: formData.entry,
+        sl: formData.sl,
+        lotSize: formData.lotSize,
+        balance: val,
+      });
+      if (calcRisk !== null) {
+        setFormData((p) => ({ ...p, risk: calcRisk.toFixed(2) }));
+      }
+    } else if (
+      formData.risk &&
+      formData.entry &&
+      formData.sl &&
+      !Number.isNaN(Number(formData.entry)) &&
+      !Number.isNaN(Number(formData.sl))
+    ) {
+      const calcLots = calculateLotSize({
+        asset: activeAsset,
+        entry: formData.entry,
+        sl: formData.sl,
+        riskPercent: formData.risk,
+        balance: val,
+      });
+      if (calcLots !== null) {
+        setFormData((p) => ({ ...p, lotSize: String(calcLots) }));
+      }
+    }
+  };
+
+  const stopDist = useMemo(() => {
+    return calculateStopDistance(formData.entry, formData.sl);
+  }, [formData.entry, formData.sl]);
+
+  const activeAssetSymbol = useMemo(() => {
+    return formData.asset === "Other" && customFields.asset
+      ? customFields.asset
+      : formData.asset;
+  }, [formData.asset, customFields.asset]);
+
+  const cashRisk = useMemo(() => {
+    return calculateCashRisk({
+      asset: activeAssetSymbol,
+      entry: formData.entry,
+      sl: formData.sl,
+      lotSize: formData.lotSize,
+    });
+  }, [activeAssetSymbol, formData.entry, formData.sl, formData.lotSize]);
+
+  const assetMultiplier = useMemo(() => {
+    return getAssetMultiplier(activeAssetSymbol, formData.entry);
+  }, [activeAssetSymbol, formData.entry]);
+
   useEffect(() => {
     if (formData.entry && formData.sl && formData.tp) {
       const entry = parseFloat(formData.entry);
@@ -203,6 +317,10 @@ export default function AddTrade() {
     const { name, value } = e.target;
     setFormData((prev) => {
       const updated = { ...prev, [name]: value };
+      const currentAsset =
+        updated.asset === "Other" && customFields.asset
+          ? customFields.asset
+          : updated.asset;
 
       if (name === "rMultiple" || name === "r_multiple") {
         let val = value;
@@ -214,12 +332,102 @@ export default function AddTrade() {
         updated.r_multiple = val;
       }
 
-      if (["entry", "sl", "tp", "direction"].includes(name)) {
+      // If user is editing lot size, calculate risk % automatically
+      if (name === "lotSize") {
+        updated.lotSize = value;
+        if (
+          value &&
+          updated.entry &&
+          updated.sl &&
+          !Number.isNaN(Number(updated.entry)) &&
+          !Number.isNaN(Number(updated.sl))
+        ) {
+          const calcRisk = calculateRiskPercent({
+            asset: currentAsset,
+            entry: updated.entry,
+            sl: updated.sl,
+            lotSize: value,
+            balance: accountBalance,
+          });
+          if (calcRisk !== null) {
+            updated.risk = calcRisk.toFixed(2);
+          }
+        }
+      }
+
+      // If user is editing risk %, calculate lot size automatically
+      if (name === "risk") {
+        updated.risk = value;
+        if (
+          value &&
+          updated.entry &&
+          updated.sl &&
+          !Number.isNaN(Number(updated.entry)) &&
+          !Number.isNaN(Number(updated.sl))
+        ) {
+          const calcLots = calculateLotSize({
+            asset: currentAsset,
+            entry: updated.entry,
+            sl: updated.sl,
+            riskPercent: value,
+            balance: accountBalance,
+          });
+          if (calcLots !== null) {
+            updated.lotSize = String(calcLots);
+          }
+        }
+      }
+
+      if (["entry", "sl", "tp", "direction", "asset"].includes(name)) {
         const entry =
           name === "entry" ? Number(value) : Number(updated.entry || 0);
         const sl = name === "sl" ? Number(value) : Number(updated.sl || 0);
         const tp = name === "tp" ? Number(value) : Number(updated.tp || 0);
         const direction = name === "direction" ? value : updated.direction;
+        const assetForCalc =
+          name === "asset"
+            ? value === "Other" && customFields.asset
+              ? customFields.asset
+              : value
+            : currentAsset;
+
+        // Recalculate Risk % if lot size is filled
+        if (
+          updated.lotSize &&
+          !Number.isNaN(entry) &&
+          !Number.isNaN(sl) &&
+          entry > 0 &&
+          sl > 0
+        ) {
+          const calcRisk = calculateRiskPercent({
+            asset: assetForCalc,
+            entry,
+            sl,
+            lotSize: updated.lotSize,
+            balance: accountBalance,
+          });
+          if (calcRisk !== null) {
+            updated.risk = calcRisk.toFixed(2);
+          }
+        } else if (
+          updated.risk &&
+          !Number.isNaN(entry) &&
+          !Number.isNaN(sl) &&
+          entry > 0 &&
+          sl > 0
+        ) {
+          // If risk % is filled but not lot size, calculate lot size
+          const calcLots = calculateLotSize({
+            asset: assetForCalc,
+            entry,
+            sl,
+            riskPercent: updated.risk,
+            balance: accountBalance,
+          });
+          if (calcLots !== null) {
+            updated.lotSize = String(calcLots);
+          }
+        }
 
         if (
           !Number.isNaN(entry) &&
@@ -852,7 +1060,8 @@ export default function AddTrade() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {/* Row 1: Price Levels */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
                   <label className={labelClass}>
                     Entry Price <span className="text-red-400">*</span>
@@ -873,9 +1082,16 @@ export default function AddTrade() {
                   )}
                 </div>
                 <div>
-                  <label className={labelClass}>
-                    Stop Loss <span className="text-red-400">*</span>
-                  </label>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-[12px] font-semibold text-gray-400 uppercase tracking-wider">
+                      Stop Loss <span className="text-red-400">*</span>
+                    </label>
+                    {stopDist > 0 && (
+                      <span className="text-[11px] text-gray-400 font-mono">
+                        ({stopDist.toFixed(2)} pts)
+                      </span>
+                    )}
+                  </div>
                   <input
                     type="number"
                     step="any"
@@ -903,19 +1119,93 @@ export default function AddTrade() {
                     placeholder="0.00"
                   />
                 </div>
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <label className="text-[12px] font-semibold text-gray-400 uppercase tracking-wider">
-                      Risk %
+              </div>
+
+              {/* Row 2: Lot Size & Risk % */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Lot Size Input */}
+                <div className="bg-[#15181D]/60 border border-white/5 p-4 rounded-2xl space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="text-[12px] font-semibold text-gray-300 uppercase tracking-wider flex items-center gap-1.5">
+                      <span>Lot Size</span>
+                      <span className="text-[10px] text-emerald-400 font-mono bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">
+                        position
+                      </span>
                     </label>
-                    {formData.entry &&
-                      formData.sl &&
-                      !Number.isNaN(Number(formData.entry)) &&
-                      !Number.isNaN(Number(formData.sl)) && (
-                        <span className="text-[11px] text-gray-400 font-mono">
-                          (SL: {Math.abs(Number(formData.entry) - Number(formData.sl)).toFixed(2)} pts)
-                        </span>
-                      )}
+                    {cashRisk > 0 && (
+                      <span className="text-[11px] text-emerald-400 font-mono font-semibold">
+                        ${cashRisk.toFixed(2)} Risk
+                      </span>
+                    )}
+                  </div>
+                  <input
+                    type="number"
+                    step="any"
+                    name="lotSize"
+                    value={formData.lotSize}
+                    onChange={handleChange}
+                    className={inputClass}
+                    placeholder="e.g. 0.50"
+                  />
+                  {/* Quick Lot Presets */}
+                  <div className="flex items-center gap-1.5 pt-1 flex-wrap">
+                    {LOT_PRESETS.map((preset) => {
+                      const isSelected =
+                        formData.lotSize !== "" &&
+                        Number(formData.lotSize) === preset;
+                      return (
+                        <button
+                          key={preset}
+                          type="button"
+                          onClick={() => {
+                            const newLots = String(preset);
+                            setFormData((p) => {
+                              const updated = { ...p, lotSize: newLots };
+                              if (
+                                updated.entry &&
+                                updated.sl &&
+                                !Number.isNaN(Number(updated.entry)) &&
+                                !Number.isNaN(Number(updated.sl))
+                              ) {
+                                const calcRisk = calculateRiskPercent({
+                                  asset: activeAssetSymbol,
+                                  entry: updated.entry,
+                                  sl: updated.sl,
+                                  lotSize: newLots,
+                                  balance: accountBalance,
+                                });
+                                if (calcRisk !== null) {
+                                  updated.risk = calcRisk.toFixed(2);
+                                }
+                              }
+                              return updated;
+                            });
+                          }}
+                          className={`px-2 py-1 text-[11px] rounded font-mono transition-colors border ${
+                            isSelected
+                              ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/40 font-semibold"
+                              : "bg-white/5 text-gray-400 border-white/10 hover:bg-white/10 hover:text-white"
+                          }`}
+                        >
+                          {preset}L
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Risk % Input */}
+                <div className="bg-[#15181D]/60 border border-white/5 p-4 rounded-2xl space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="text-[12px] font-semibold text-gray-300 uppercase tracking-wider flex items-center gap-1.5">
+                      <span>Risk %</span>
+                      <span className="text-[10px] text-blue-400 font-mono bg-blue-500/10 px-1.5 py-0.5 rounded border border-blue-500/20">
+                        account risk
+                      </span>
+                    </label>
+                    <span className="text-[11px] text-gray-400 font-mono">
+                      of ${(accountBalance / 1000).toFixed(0)}k balance
+                    </span>
                   </div>
                   <input
                     type="number"
@@ -926,8 +1216,9 @@ export default function AddTrade() {
                     className={inputClass}
                     placeholder="1.00"
                   />
-                  <div className="flex items-center gap-1.5 mt-2 flex-wrap">
-                    {[0.25, 0.5, 1.0, 2.0].map((preset) => {
+                  {/* Quick Risk Presets */}
+                  <div className="flex items-center gap-1.5 pt-1 flex-wrap">
+                    {RISK_PERCENT_PRESETS.map((preset) => {
                       const isSelected =
                         formData.risk !== "" &&
                         Number(formData.risk) === preset;
@@ -935,15 +1226,33 @@ export default function AddTrade() {
                         <button
                           key={preset}
                           type="button"
-                          onClick={() =>
-                            setFormData((p) => ({
-                              ...p,
-                              risk: preset.toFixed(2),
-                            }))
-                          }
+                          onClick={() => {
+                            const newRisk = preset.toFixed(2);
+                            setFormData((p) => {
+                              const updated = { ...p, risk: newRisk };
+                              if (
+                                updated.entry &&
+                                updated.sl &&
+                                !Number.isNaN(Number(updated.entry)) &&
+                                !Number.isNaN(Number(updated.sl))
+                              ) {
+                                const calcLots = calculateLotSize({
+                                  asset: activeAssetSymbol,
+                                  entry: updated.entry,
+                                  sl: updated.sl,
+                                  riskPercent: newRisk,
+                                  balance: accountBalance,
+                                });
+                                if (calcLots !== null) {
+                                  updated.lotSize = String(calcLots);
+                                }
+                              }
+                              return updated;
+                            });
+                          }}
                           className={`px-2 py-1 text-[11px] rounded font-mono transition-colors border ${
                             isSelected
-                              ? "bg-blue-500/20 text-blue-400 border-blue-500/30 font-semibold"
+                              ? "bg-blue-500/20 text-blue-400 border-blue-500/40 font-semibold"
                               : "bg-white/5 text-gray-400 border-white/10 hover:bg-white/10 hover:text-white"
                           }`}
                         >
@@ -951,6 +1260,83 @@ export default function AddTrade() {
                         </button>
                       );
                     })}
+                  </div>
+                </div>
+              </div>
+
+              {/* Lot Size & Risk Calculator Panel */}
+              <div className="bg-[#121418] border border-white/10 rounded-2xl p-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-white/5">
+                  <div className="flex items-center gap-2">
+                    <div className="p-1.5 bg-emerald-500/10 text-emerald-400 rounded-lg">
+                      <Calculator className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <span className="text-xs font-semibold text-white">
+                        Lot Size & Risk Calculator
+                      </span>
+                      <span className="ml-2 text-[10px] text-gray-400 font-mono">
+                        ({formData.asset} • {assetMultiplier >= 1000 ? `$${assetMultiplier.toLocaleString()}/pt` : `$${assetMultiplier}/pt`} per lot)
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Account Balance Config */}
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-[11px] text-gray-400 font-mono">Account Balance:</span>
+                    <div className="flex items-center gap-1 bg-black/40 border border-white/10 rounded-lg px-2 py-1">
+                      <span className="text-xs text-gray-500">$</span>
+                      <input
+                        type="number"
+                        value={accountBalance}
+                        onChange={(e) => handleBalanceChange(Number(e.target.value))}
+                        className="w-20 bg-transparent text-xs font-mono font-bold text-white outline-none"
+                      />
+                    </div>
+                    <div className="flex items-center gap-1">
+                      {BALANCE_PRESETS.map((b) => (
+                        <button
+                          key={b}
+                          type="button"
+                          onClick={() => handleBalanceChange(b)}
+                          className={`px-1.5 py-0.5 text-[10px] rounded font-mono transition-colors border ${
+                            accountBalance === b
+                              ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/40 font-bold"
+                              : "bg-white/5 text-gray-500 border-white/10 hover:text-white"
+                          }`}
+                        >
+                          ${b / 1000}k
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Live Sizing Breakdown */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-3">
+                  <div className="bg-black/30 rounded-xl p-2.5 border border-white/5">
+                    <p className="text-[10px] text-gray-500 uppercase tracking-widest">SL Distance</p>
+                    <p className="text-xs font-bold text-white font-mono mt-0.5">
+                      {stopDist > 0 ? `${stopDist.toFixed(2)} pts` : "—"}
+                    </p>
+                  </div>
+                  <div className="bg-black/30 rounded-xl p-2.5 border border-white/5">
+                    <p className="text-[10px] text-gray-500 uppercase tracking-widest">Dollar Risk</p>
+                    <p className="text-xs font-bold text-red-400 font-mono mt-0.5">
+                      {cashRisk > 0 ? `$${cashRisk.toFixed(2)}` : "—"}
+                    </p>
+                  </div>
+                  <div className="bg-black/30 rounded-xl p-2.5 border border-white/5">
+                    <p className="text-[10px] text-gray-500 uppercase tracking-widest">Calculated Lot</p>
+                    <p className="text-xs font-bold text-emerald-400 font-mono mt-0.5">
+                      {formData.lotSize ? `${formData.lotSize} lots` : "—"}
+                    </p>
+                  </div>
+                  <div className="bg-black/30 rounded-xl p-2.5 border border-white/5">
+                    <p className="text-[10px] text-gray-500 uppercase tracking-widest">Account Risk %</p>
+                    <p className="text-xs font-bold text-blue-400 font-mono mt-0.5">
+                      {formData.risk ? `${Number(formData.risk).toFixed(2)}%` : "—"}
+                    </p>
                   </div>
                 </div>
               </div>
