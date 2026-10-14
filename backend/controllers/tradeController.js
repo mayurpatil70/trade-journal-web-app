@@ -172,12 +172,23 @@ export const createTrade = async (req, res) => {
       before_image: imageUrls[0] || null,
       after_image: imageUrls[1] || null,
       executions: parsedExecutions,
+      ...(rawLotSize !== null && { lot_size: rawLotSize }),
     };
 
-    const { data, error } = await supabase
+    let { data, error } = await supabase
       .from("trades")
       .insert([insertData])
       .select();
+
+    if (error && error.message && error.message.includes("lot_size")) {
+      delete insertData.lot_size;
+      const retry = await supabase
+        .from("trades")
+        .insert([insertData])
+        .select();
+      data = retry.data;
+      error = retry.error;
+    }
 
     if (error) throw error;
 
@@ -405,14 +416,27 @@ export const updateTrade = async (req, res) => {
       before_image: imageUrls[0] || null,
       after_image: imageUrls[1] || null,
       ...(parsedExecutions !== undefined && { executions: parsedExecutions }),
+      ...(rawLotSize !== undefined && { lot_size: rawLotSize }),
     };
 
-    const { data, error } = await supabase
+    let { data, error } = await supabase
       .from("trades")
       .update(updateFields)
       .eq("id", id)
       .eq("user_id", userId)
       .select();
+
+    if (error && error.message && error.message.includes("lot_size")) {
+      delete updateFields.lot_size;
+      const retry = await supabase
+        .from("trades")
+        .update(updateFields)
+        .eq("id", id)
+        .eq("user_id", userId)
+        .select();
+      data = retry.data;
+      error = retry.error;
+    }
 
     if (error) throw error;
 
