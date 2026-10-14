@@ -415,4 +415,31 @@ router.post("/announcement", (req, res) => {
   }
 });
 
+// Admin: Toggle Discord verified status for user
+router.post("/user/:userId/toggle-discord", async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { verified } = req.body;
+    const isVerified = Boolean(verified);
+
+    const { data: updatedUser, error } = await supabase
+      .from("users")
+      .update({ discord_verified: isVerified })
+      .eq("id", userId)
+      .select()
+      .maybeSingle();
+
+    if (error) throw error;
+
+    res.json({
+      success: true,
+      message: `User Discord verification ${isVerified ? "enabled" : "disabled"}.`,
+      user: updatedUser,
+    });
+  } catch (error) {
+    console.error("Toggle discord error:", error);
+    res.status(500).json({ success: false, error: "Failed to update user Discord status." });
+  }
+});
+
 export default router;

@@ -100,6 +100,53 @@ const AuthGuard = () => {
   return <Outlet />;
 };
 
+// GUARD 1.5: Strict Discord Enforcer (Must link Discord before accessing Paywall or Dashboard)
+const DiscordGateGuard = () => {
+  const [discordStatus, setDiscordStatus] = useState(null); // null = loading, 'allow', 'discord'
+
+  useEffect(() => {
+    const checkDiscord = async () => {
+      const userId = localStorage.getItem("userId") || "";
+      const userEmail = (localStorage.getItem("userEmail") || "").toLowerCase().trim();
+      const adminEmails = ["noballondesk@gmail.com", "noballondesk@gamil.com", "akpatil51340@gmail.com"];
+
+      // ADMIN BYPASS
+      if (adminEmails.includes(userEmail) || adminEmails.includes(userId.toLowerCase().trim())) {
+        setDiscordStatus('allow');
+        return;
+      }
+
+      try {
+        const response = await api.get(`/api/subscriptions/status/${userId || userEmail}`);
+        if (response.data?.isAdmin || response.data?.discordVerified) {
+          setDiscordStatus('allow');
+        } else {
+          setDiscordStatus('discord');
+        }
+      } catch (err) {
+        if (err.response?.status !== 401) {
+          setDiscordStatus('discord');
+        }
+      }
+    };
+    checkDiscord();
+  }, []);
+
+  if (discordStatus === null) {
+    return (
+      <div className="flex h-dvh bg-[#0a0a0a] items-center justify-center">
+        <Loader2 className="w-8 h-8 text-[#10b981] animate-spin" />
+      </div>
+    );
+  }
+
+  if (discordStatus === 'discord') {
+    return <Navigate to="/link-discord" replace />;
+  }
+
+  return <Outlet />;
+};
+
 // GUARD 2: The Paywall Enforcer
 const PaywallGuard = () => {
   const [access, setAccess] = useState(null); // null = loading, 'allow', 'paywall', 'discord'
@@ -184,13 +231,16 @@ function App() {
             <Route element={<AuthGuard />}>
               <Route path="/link-discord" element={<DiscordGate />} />
               <Route path="/discord/callback" element={<DiscordCallback />} />
-              <Route path="/paywall" element={<Paywall />} />
 
-              {/* Guard 2: Must be logged in AND Paid (or Admin) */}
-              <Route element={<PaywallGuard />}>
-                <Route path="/backtest/:id" element={<Backtest />} />
-                <Route path="/backtest" element={<Navigate to="/sessions" replace />} />
-                <Route path="/" element={<MainLayout />}>
+              {/* Guard 1.5: Strict Discord Gatekeeper — No one can access Paywall or App without joining Discord */}
+              <Route element={<DiscordGateGuard />}>
+                <Route path="/paywall" element={<Paywall />} />
+
+                {/* Guard 2: Must be logged in AND Paid (or Active Trial / Admin) */}
+                <Route element={<PaywallGuard />}>
+                  <Route path="/backtest/:id" element={<Backtest />} />
+                  <Route path="/backtest" element={<Navigate to="/sessions" replace />} />
+                  <Route path="/" element={<MainLayout />}>
                   <Route path="dashboard" element={<Dashboard />} />
                   <Route path="add-trade" element={<AddTrade />} />
                   <Route path="news" element={<EconomicCalendar />} />
@@ -226,9 +276,10 @@ function App() {
                 </Route>
               </Route>
             </Route>
+          </Route>
 
-            {/* 404 Catch All */}
-            <Route path="*" element={<NotFound />} />
+          {/* 404 Catch All */}
+          <Route path="*" element={<NotFound />} />
           </Routes>
         </ErrorBoundary>
       </Suspense>

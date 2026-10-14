@@ -29,6 +29,8 @@ import {
   Send,
   Sliders,
   Check,
+  XCircle,
+  Ban,
 } from "lucide-react";
 import api from "../api/axios";
 
@@ -174,14 +176,55 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleToggleDiscord = async (userId, currentStatus) => {
+    const newStatus = !currentStatus;
+    const actionText = newStatus ? "manually verify Discord for" : "unlink Discord from";
+    if (!window.confirm(`Are you sure you want to ${actionText} this user?`)) return;
+
+    try {
+      setActionLoadingId(userId);
+      const res = await api.post(`/api/admin/user/${userId}/toggle-discord`, { verified: newStatus });
+      if (res.data.success) {
+        await fetchData();
+        if (selectedUserForModal && selectedUserForModal.id === userId) {
+          setSelectedUserForModal((prev) => ({ ...prev, discord_verified: newStatus }));
+        }
+      }
+    } catch (error) {
+      alert(error.response?.data?.error || "Failed to update Discord status");
+    } finally {
+      setActionLoadingId(null);
+    }
+  };
+
   const handleGrantAccess = async (userId, type, days = 30) => {
-    const label = type === "revoke" ? "revoke all access for" : `grant ${days} days of ${type} access to`;
-    if (!window.confirm(`Are you sure you want to ${label} this user?`)) return;
+    const targetUser = data.accounts.find((a) => a.id === userId);
+    const userEmail = targetUser?.email || userId;
+
+    if (type === "revoke") {
+      const confirmed = window.confirm(
+        `🛑 CANCEL & REVOKE ACCESS:\n\nAre you sure you want to CANCEL all subscriptions and trial access for ${userEmail}?\n\nTheir access will be immediately terminated and they will be locked out of the dashboard.`
+      );
+      if (!confirmed) return;
+    } else {
+      if (targetUser && !targetUser.discord_verified) {
+        const proceed = window.confirm(
+          `⚠️ DISCORD GATE REMINDER:\n\n${userEmail} has NOT joined or verified Discord yet!\n\nEven after granting ${days} days of ${type} access, they will be STOPPED at the Discord Gate and CANNOT enter /dashboard until they join Discord (or until you manually verify their Discord).\n\nDo you still want to proceed?`
+        );
+        if (!proceed) return;
+      } else {
+        const confirmed = window.confirm(
+          `Grant ${days} days of ${type.toUpperCase()} access to ${userEmail}?`
+        );
+        if (!confirmed) return;
+      }
+    }
 
     try {
       setActionLoadingId(userId);
       const res = await api.post(`/api/admin/user/${userId}/grant-access`, { type, days });
       if (res.data.success) {
+        alert(type === "revoke" ? `Access successfully revoked for ${userEmail}.` : `Granted ${days} days of ${type} access to ${userEmail}.`);
         await fetchData();
         // Update user inside modal if open
         if (selectedUserForModal && selectedUserForModal.id === userId) {
@@ -948,24 +991,24 @@ export default function AdminDashboard() {
 
                           <td className="py-3 pr-4">
                             {isPaid ? (
-                              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                                <CheckCircle className="w-3 h-3" /> Paid Pro
+                              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30">
+                                <CheckCircle className="w-3 h-3" /> Paid Pro (Active)
                               </span>
                             ) : isTrial ? (
-                              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
-                                <Clock className="w-3 h-3" /> Trial Active
+                              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-blue-500/15 text-blue-700 dark:text-blue-400 border border-blue-500/30">
+                                <Clock className="w-3 h-3" /> Trial (Active)
                               </span>
                             ) : isPending ? (
-                              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/30">
                                 Pending Review
                               </span>
                             ) : isExpired ? (
-                              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20">
-                                Expired
+                              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-rose-500/15 text-rose-700 dark:text-rose-400 border border-rose-500/30">
+                                Expired (No Access)
                               </span>
                             ) : (
-                              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-500/10 text-slate-700 dark:text-slate-300 border border-slate-500/20">
-                                Free / Unsubscribed
+                              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-500/15 text-slate-700 dark:text-slate-300 border border-slate-500/30">
+                                Not Subscribed (No Access)
                               </span>
                             )}
                           </td>
@@ -990,15 +1033,25 @@ export default function AdminDashboard() {
                           </td>
 
                           <td className="py-3 pr-4">
-                            <span
-                              className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                                acc.discord_verified
-                                  ? "bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20"
-                                  : "bg-gray-100 dark:bg-gray-500/10 text-gray-500 border border-gray-200 dark:border-gray-500/20"
-                              }`}
-                            >
-                              {acc.discord_verified ? "Linked" : "No Discord"}
-                            </span>
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              <span
+                                className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                                  acc.discord_verified
+                                    ? "bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 border border-indigo-500/30"
+                                    : "bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/30"
+                                }`}
+                              >
+                                {acc.discord_verified ? "Linked" : "No Discord"}
+                              </span>
+                              <button
+                                onClick={() => handleToggleDiscord(acc.id, acc.discord_verified)}
+                                disabled={actionLoadingId === acc.id}
+                                title={acc.discord_verified ? "Click to unlink Discord" : "Click to manually verify Discord"}
+                                className="text-[10px] font-bold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
+                              >
+                                {acc.discord_verified ? "Unlink" : "Verify"}
+                              </button>
+                            </div>
                           </td>
 
                           <td className="py-3 pr-4 text-gray-500 font-mono text-[11px]">
@@ -1016,13 +1069,25 @@ export default function AdminDashboard() {
                                 <Eye className="w-3.5 h-3.5" />
                               </button>
 
+                              {/* PROMINENT CANCEL ACCESS BUTTON: For active Pro or Trial */}
+                              {(isPaid || isTrial) && (
+                                <button
+                                  onClick={() => handleGrantAccess(acc.id, "revoke")}
+                                  disabled={actionLoadingId === acc.id}
+                                  title="Immediately cancel and revoke active subscription or trial"
+                                  className="px-2.5 py-1 rounded-lg bg-rose-500/20 hover:bg-rose-500 hover:text-white border border-rose-500/40 text-rose-700 dark:text-rose-400 text-[10px] font-black transition-all flex items-center gap-1 cursor-pointer disabled:opacity-50 shadow-sm"
+                                >
+                                  <XCircle className="w-3.5 h-3.5" /> Cancel Access
+                                </button>
+                              )}
+
                               <button
                                 onClick={() => handleGrantAccess(acc.id, "paid", 30)}
                                 disabled={actionLoadingId === acc.id}
                                 title="Grant 30 days active subscription"
                                 className="px-2 py-1 rounded-lg bg-emerald-500/10 hover:bg-emerald-500 hover:text-white border border-emerald-500/20 text-emerald-700 dark:text-emerald-400 text-[10px] font-bold transition-all disabled:opacity-50 cursor-pointer"
                               >
-                                +30d
+                                +30d Pro
                               </button>
 
                               <button
@@ -1031,7 +1096,7 @@ export default function AdminDashboard() {
                                 title="Grant 1 Year active subscription"
                                 className="px-2 py-1 rounded-lg bg-[#10b981]/15 hover:bg-[#10b981] hover:text-black border border-[#10b981]/30 text-[#0d9468] dark:text-[#10b981] text-[10px] font-bold transition-all disabled:opacity-50 cursor-pointer"
                               >
-                                +1y
+                                +1y Pro
                               </button>
 
                               <button
@@ -1040,7 +1105,7 @@ export default function AdminDashboard() {
                                 title="Grant 7-day trial"
                                 className="px-2 py-1 rounded-lg bg-blue-500/10 hover:bg-blue-500 hover:text-white border border-blue-500/20 text-blue-700 dark:text-blue-400 text-[10px] font-bold transition-all disabled:opacity-50 cursor-pointer"
                               >
-                                +7d
+                                +7d Trial
                               </button>
 
                               <button
@@ -1054,17 +1119,6 @@ export default function AdminDashboard() {
                               >
                                 Custom
                               </button>
-
-                              {(isPaid || isTrial) && (
-                                <button
-                                  onClick={() => handleGrantAccess(acc.id, "revoke")}
-                                  disabled={actionLoadingId === acc.id}
-                                  title="Revoke subscription"
-                                  className="px-2 py-1 rounded-lg bg-amber-500/10 hover:bg-amber-500 hover:text-white border border-amber-500/20 text-amber-700 dark:text-amber-400 text-[10px] font-bold transition-all disabled:opacity-50 cursor-pointer"
-                                >
-                                  Revoke
-                                </button>
-                              )}
 
                               <button
                                 onClick={() => handleDeleteUser(acc.id)}
@@ -1861,7 +1915,20 @@ export default function AdminDashboard() {
                         : "bg-gray-500/15 text-gray-700 dark:text-gray-400 border border-gray-500/30"
                     }`}
                   >
-                    {selectedUserForModal.subscription_status}
+                    {selectedUserForModal.subscription_status === "paid"
+                      ? "PAID ACTIVE"
+                      : selectedUserForModal.subscription_status === "trial"
+                      ? "TRIAL ACTIVE"
+                      : "NOT SUBSCRIBED (NO ACCESS)"}
+                  </span>
+                  <span
+                    className={`px-2 py-0.5 rounded-md text-[10px] font-semibold border ${
+                      selectedUserForModal.discord_verified
+                        ? "bg-indigo-500/15 text-indigo-700 dark:text-indigo-400 border-indigo-500/30"
+                        : "bg-amber-500/15 text-amber-700 dark:text-amber-400 border-amber-500/30"
+                    }`}
+                  >
+                    {selectedUserForModal.discord_verified ? "Discord: Linked & Verified" : "Discord: NOT LINKED"}
                   </span>
                   <span className="text-[10px] text-gray-500 bg-gray-100 dark:bg-white/5 px-2 py-0.5 rounded-md border border-gray-200 dark:border-white/5">
                     Plan: {selectedUserForModal.current_plan || "None"}
@@ -1901,9 +1968,17 @@ export default function AdminDashboard() {
               </button>
               <button
                 onClick={() => handleGrantAccess(selectedUserForModal.id, "revoke")}
-                className="px-2.5 py-1 bg-amber-500/10 hover:bg-amber-500 hover:text-white text-amber-700 dark:text-amber-400 text-xs font-bold rounded-lg border border-amber-500/20 transition-all cursor-pointer"
+                className="px-2.5 py-1 bg-rose-500/15 hover:bg-rose-600 hover:text-white text-rose-600 dark:text-rose-400 text-xs font-bold rounded-lg border border-rose-500/30 transition-all cursor-pointer flex items-center gap-1"
+                title="Immediately revoke all access and lock user out"
               >
-                Revoke
+                <XCircle className="w-3.5 h-3.5" />
+                Cancel / Revoke Access
+              </button>
+              <button
+                onClick={() => handleToggleDiscord(selectedUserForModal.id, selectedUserForModal.discord_verified)}
+                className="px-2.5 py-1 bg-indigo-500/10 hover:bg-indigo-600 hover:text-white text-indigo-600 dark:text-indigo-400 text-xs font-bold rounded-lg border border-indigo-500/20 transition-all cursor-pointer"
+              >
+                {selectedUserForModal.discord_verified ? "Unlink Discord" : "Verify Discord"}
               </button>
               <button
                 onClick={() => handleDeleteUser(selectedUserForModal.id)}
