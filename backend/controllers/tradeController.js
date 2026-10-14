@@ -1,7 +1,19 @@
 // backend/controllers/tradeController.js
 import { Parser } from "json2csv";
 import ExcelJS from "exceljs";
-import { Document, Packer, Paragraph, TextRun, ImageRun } from "docx";
+import {
+  Document,
+  Packer,
+  Paragraph,
+  TextRun,
+  ImageRun,
+  Table,
+  TableRow,
+  TableCell,
+  WidthType,
+  PageBreak,
+  BorderStyle,
+} from "docx";
 import PDFDocument from "pdfkit";
 import { supabase } from "../config/supabase.js";
 import { uploadToCloudinary } from "../utils/cloudinary.js";
@@ -333,10 +345,29 @@ export const updateTrade = async (req, res) => {
   }
 };
 
+const getExportNormalizedR = (trade) => {
+  const isLoss = (trade.result || "").toLowerCase() === "loss";
+  const isBe = (trade.result || "").toLowerCase() === "be";
+  const num = Number(trade.r_multiple ?? 0);
+  if (isLoss) {
+    if (num > 0) return -num;
+    if (num === 0) return -1;
+    return num;
+  }
+  if (isBe) return 0;
+  return num;
+};
+
+const isExportTradeWin = (trade) => {
+  const res = (trade.result || "").toLowerCase();
+  if (res === "loss" || res === "be") return false;
+  return res === "win" || getExportNormalizedR(trade) > 0;
+};
+
 export const exportTrades = async (req, res) => {
   try {
     const { userId } = req;
-    const { format } = req.query;
+    const { format, tradeId } = req.query;
 
     if (!userId) {
       return res
@@ -344,15 +375,23 @@ export const exportTrades = async (req, res) => {
         .json({ success: false, error: "Unauthorized: Missing User ID" });
     }
 
-    const { data: trades, error } = await supabase
+    let query = supabase
       .from("trades")
       .select(
-        "date, time, asset, direction, session, setup, result, r_multiple, entry, sl, tp, images, before_image, after_image",
+        "id, date, time, asset, direction, session, setup, result, r_multiple, entry, sl, tp, risk, rule_break, reason, lesson, emotion_before, emotion_after, psych_note, account_name, images, before_image, after_image",
       )
-      .eq("user_id", userId)
-      .order("date", { ascending: false })
-      .order("time", { ascending: false, nullsFirst: false })
-      .order("created_at", { ascending: false });
+      .eq("user_id", userId);
+
+    if (tradeId) {
+      query = query.eq("id", tradeId);
+    } else {
+      query = query
+        .order("date", { ascending: false })
+        .order("time", { ascending: false, nullsFirst: false })
+        .order("created_at", { ascending: false });
+    }
+
+    const { data: trades, error } = await query;
 
     if (error) throw error;
 
@@ -386,6 +425,7 @@ export const exportTrades = async (req, res) => {
       worksheet.columns = [
         { header: "Date", key: "date", width: 12 },
         { header: "Time", key: "time", width: 10 },
+        { header: "Account", key: "account_name", width: 15 },
         { header: "Asset", key: "asset", width: 12 },
         { header: "Direction", key: "direction", width: 10 },
         { header: "Session", key: "session", width: 12 },
@@ -395,6 +435,9 @@ export const exportTrades = async (req, res) => {
         { header: "Entry", key: "entry", width: 12 },
         { header: "SL", key: "sl", width: 12 },
         { header: "TP", key: "tp", width: 12 },
+        { header: "Risk %", key: "risk", width: 10 },
+        { header: "Analysis", key: "reason", width: 30 },
+        { header: "Lesson", key: "lesson", width: 30 },
         { header: "Screenshots", key: "shots", width: 40 },
       ];
 
@@ -403,6 +446,7 @@ export const exportTrades = async (req, res) => {
         const imgs = imagesOf(trade);
         const row = worksheet.addRow({
           ...trade,
+          r_multiple: getExportNormalizedR(trade),
           shots: imgs.length ? "" : "-",
         });
         if (!imgs.length) return;
@@ -413,12 +457,12 @@ export const exportTrades = async (req, res) => {
             extension: img.type,
           });
           worksheet.addImage(imageId, {
-            tl: { col: 11 + i, row: row.number - 1 },
+            tl: { col: 15 + i, row: row.number - 1 },
             ext: { width: 200, height: 190 },
           });
         });
       });
-      [12, 13].forEach((c) => (worksheet.getColumn(c + 1).width = 30));
+      [16, 17].forEach((c) => (worksheet.getColumn(c + 1).width = 30));
       res.header(
         "Content-Type",
         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -430,45 +474,344 @@ export const exportTrades = async (req, res) => {
 
     if (format === "doc") {
       const imagesOf = await loadTradeImages(trades);
-      const rows = trades.flatMap((t) => [
-        new Paragraph({
-          spacing: { before: 200 },
-          children: [
-            new TextRun({
-              text: `${t.date} ${t.time || ""} | ${t.asset} | ${t.direction || ""} | Setup: ${t.setup || "N/A"} | Result: ${t.result || "N/A"} | R: ${t.r_multiple ?? "N/A"}`,
-              font: "Arial",
-            }),
+
+      const tableBorder = {
+        style: BorderStyle.SINGLE,
+        size: 1,
+        color: "E2E8F0",
+      };
+      const cellBorders = {
+        top: tableBorder,
+        bottom: tableBorder,
+        left: tableBorder,
+        right: tableBorder,
+      };
+
+      const tradeSections = [];
+
+      trades.forEach((trade, tradeIdx) => {
+        const normR = getExportNormalizedR(trade);
+        const isWin = isExportTradeWin(trade);
+        const isLoss = (trade.result || "").toLowerCase() === "loss" || normR < 0;
+        const resultColor = isLoss ? "DC2626" : isWin ? "16A34A" : "475569";
+        const resultText = (trade.result || (normR >= 0 ? "WIN" : "LOSS")).toUpperCase();
+        const rColor = isLoss ? "DC2626" : isWin ? "16A34A" : "475569";
+        const rText = `${normR >= 0 ? "+" : ""}${normR.toFixed(2)}R`;
+        const direction = (trade.direction || "LONG").toUpperCase();
+        const isLong = direction === "LONG";
+
+        const elements = [];
+
+        // Title Header
+        elements.push(
+          new Paragraph({
+            spacing: { before: 80, after: 140 },
+            children: [
+              new TextRun({
+                text: `[${direction}] `,
+                bold: true,
+                color: isLong ? "059669" : "7E22CE",
+                size: 24,
+              }),
+              new TextRun({
+                text: `${trade.asset || "BTCUSD"} `,
+                bold: true,
+                color: "0F172A",
+                size: 28,
+              }),
+              new TextRun({
+                text: `• ${trade.date || ""}${trade.time ? `  ${trade.time}` : ""} `,
+                color: "64748B",
+                size: 20,
+              }),
+              ...(trade.account_name
+                ? [
+                    new TextRun({
+                      text: `• Account: ${trade.account_name}`,
+                      bold: true,
+                      color: "64748B",
+                      size: 20,
+                    }),
+                  ]
+                : []),
+            ],
+          }),
+        );
+
+        // 8 Metrics in a 2x4 Table
+        const metricsRows = [
+          [
+            { label: "NET R", val: rText, color: rColor },
+            { label: "RESULT", val: resultText, color: resultColor },
+            { label: "SETUP", val: trade.setup || "—", color: "0F172A" },
+            { label: "SESSION", val: trade.session || "—", color: "0F172A" },
           ],
-        }),
-        ...imagesOf(t).map(
-          (img) =>
-            new Paragraph({
+          [
+            {
+              label: "ENTRY",
+              val: trade.entry !== null && trade.entry !== undefined ? String(trade.entry) : "—",
+              color: "0F172A",
+            },
+            {
+              label: "STOP LOSS",
+              val: trade.sl !== null && trade.sl !== undefined ? String(trade.sl) : "—",
+              color: "0F172A",
+            },
+            {
+              label: "TAKE PROFIT",
+              val: trade.tp !== null && trade.tp !== undefined ? String(trade.tp) : "—",
+              color: "0F172A",
+            },
+            {
+              label: "RISK %",
+              val: trade.risk ? `${Number(trade.risk).toFixed(2)}%` : "—",
+              color: "0F172A",
+            },
+          ],
+        ];
+
+        const metricsTable = new Table({
+          width: { size: 100, type: WidthType.PERCENTAGE },
+          rows: metricsRows.map(
+            (row) =>
+              new TableRow({
+                children: row.map(
+                  (col) =>
+                    new TableCell({
+                      width: { size: 25, type: WidthType.PERCENTAGE },
+                      borders: cellBorders,
+                      shading: { fill: "F8FAFC" },
+                      margins: { top: 90, bottom: 90, left: 110, right: 110 },
+                      children: [
+                        new Paragraph({
+                          children: [
+                            new TextRun({
+                              text: col.label,
+                              bold: true,
+                              size: 15,
+                              color: "64748B",
+                            }),
+                          ],
+                        }),
+                        new Paragraph({
+                          children: [
+                            new TextRun({
+                              text: col.val,
+                              bold: true,
+                              size: 22,
+                              color: col.color,
+                            }),
+                          ],
+                        }),
+                      ],
+                    }),
+                ),
+              }),
+          ),
+        });
+        elements.push(metricsTable);
+
+        // Notes and Psychology Table (2 columns)
+        const notesAndPsychTable = new Table({
+          width: { size: 100, type: WidthType.PERCENTAGE },
+          margins: { top: 120 },
+          rows: [
+            new TableRow({
               children: [
-                new ImageRun({
-                  type: img.type === "jpeg" ? "jpg" : img.type,
-                  data: img.buffer,
-                  transformation: { width: 450, height: 260 },
+                // Left Column: Analysis & Lesson
+                new TableCell({
+                  width: { size: 50, type: WidthType.PERCENTAGE },
+                  borders: cellBorders,
+                  shading: { fill: "F8FAFC" },
+                  margins: { top: 100, bottom: 100, left: 120, right: 120 },
+                  children: [
+                    new Paragraph({
+                      children: [
+                        new TextRun({
+                          text: "◎ ANALYSIS",
+                          bold: true,
+                          size: 18,
+                          color: "059669",
+                        }),
+                      ],
+                    }),
+                    new Paragraph({
+                      spacing: { after: 120 },
+                      children: [
+                        new TextRun({
+                          text: trade.reason || "No analysis recorded.",
+                          size: 18,
+                          color: "334155",
+                        }),
+                      ],
+                    }),
+                    new Paragraph({
+                      children: [
+                        new TextRun({
+                          text: "↗ LESSON",
+                          bold: true,
+                          size: 18,
+                          color: "059669",
+                        }),
+                      ],
+                    }),
+                    new Paragraph({
+                      children: [
+                        new TextRun({
+                          text: trade.lesson || "No lesson recorded.",
+                          size: 18,
+                          color: "334155",
+                        }),
+                      ],
+                    }),
+                  ],
+                }),
+                // Right Column: Psychology
+                new TableCell({
+                  width: { size: 50, type: WidthType.PERCENTAGE },
+                  borders: cellBorders,
+                  shading: { fill: "F8FAFC" },
+                  margins: { top: 100, bottom: 100, left: 120, right: 120 },
+                  children: [
+                    new Paragraph({
+                      children: [
+                        new TextRun({
+                          text: "◈ PSYCHOLOGY",
+                          bold: true,
+                          size: 18,
+                          color: "7C3AED",
+                        }),
+                      ],
+                    }),
+                    new Paragraph({
+                      children: [
+                        new TextRun({
+                          text: "Emotion Before: ",
+                          bold: true,
+                          size: 16,
+                          color: "64748B",
+                        }),
+                        new TextRun({
+                          text: `${trade.emotion_before || "—"}    →    `,
+                          bold: true,
+                          size: 18,
+                          color: "0F172A",
+                        }),
+                        new TextRun({
+                          text: "Emotion After: ",
+                          bold: true,
+                          size: 16,
+                          color: "64748B",
+                        }),
+                        new TextRun({
+                          text: trade.emotion_after || "—",
+                          bold: true,
+                          size: 18,
+                          color: "0F172A",
+                        }),
+                      ],
+                    }),
+                    new Paragraph({
+                      spacing: { before: 80 },
+                      children: [
+                        new TextRun({
+                          text: "Psychological Notes:",
+                          bold: true,
+                          size: 16,
+                          color: "64748B",
+                        }),
+                      ],
+                    }),
+                    new Paragraph({
+                      children: [
+                        new TextRun({
+                          text: trade.psych_note || "No notes recorded.",
+                          size: 18,
+                          color: "334155",
+                        }),
+                      ],
+                    }),
+                  ],
                 }),
               ],
             }),
-        ),
-      ]);
+          ],
+        });
+        elements.push(new Paragraph({ spacing: { before: 80 } }));
+        elements.push(notesAndPsychTable);
+
+        // Execution Evidence
+        elements.push(
+          new Paragraph({
+            spacing: { before: 140, after: 80 },
+            children: [
+              new TextRun({
+                text: "▨ EXECUTION EVIDENCE",
+                bold: true,
+                size: 18,
+                color: "64748B",
+              }),
+            ],
+          }),
+        );
+
+        const imgs = imagesOf(trade);
+        if (imgs && imgs.length > 0) {
+          imgs.forEach((img) => {
+            try {
+              elements.push(
+                new Paragraph({
+                  spacing: { after: 100 },
+                  children: [
+                    new ImageRun({
+                      type: img.type === "jpeg" ? "jpg" : img.type,
+                      data: img.buffer,
+                      transformation: { width: 500, height: 270 },
+                    }),
+                  ],
+                }),
+              );
+            } catch (err) {
+              console.error("Failed to insert image into docx:", err);
+            }
+          });
+        } else {
+          elements.push(
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: "No execution evidence screenshots attached.",
+                  italics: true,
+                  size: 18,
+                  color: "94A3B8",
+                }),
+              ],
+            }),
+          );
+        }
+
+        // 1 TRADE PER PAGE
+        if (tradeIdx < trades.length - 1) {
+          elements.push(new Paragraph({ children: [new PageBreak()] }));
+        }
+
+        tradeSections.push(...elements);
+      });
 
       const doc = new Document({
         sections: [
           {
-            children: [
-              new Paragraph({
-                children: [
-                  new TextRun({
-                    text: "Trade Journey Export",
-                    bold: true,
-                    size: 28,
-                  }),
-                ],
-              }),
-              ...rows,
-            ],
+            properties: {
+              page: {
+                margin: {
+                  top: 720,
+                  bottom: 720,
+                  left: 720,
+                  right: 720,
+                },
+              },
+            },
+            children: tradeSections,
           },
         ],
       });
@@ -478,39 +821,190 @@ export const exportTrades = async (req, res) => {
         "Content-Type",
         "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
       );
-      res.attachment("Trade_Journey_Export.docx");
+      const filename = trades.length === 1
+        ? `trade_${trades[0].asset || "detail"}_${trades[0].date || "export"}.docx`
+        : `trade_journal_${new Date().toISOString().slice(0, 10)}.docx`;
+      res.attachment(filename);
       return res.send(buffer);
     }
 
     if (format === "pdf") {
       const imagesOf = await loadTradeImages(trades);
-      const doc = new PDFDocument({ margin: 40, size: "A4" });
+      const doc = new PDFDocument({
+        margin: 36,
+        size: "A4",
+        autoFirstPage: false,
+      });
+
       res.header("Content-Type", "application/pdf");
-      res.attachment("Trade_Journey_Export.pdf");
+      const filename = trades.length === 1
+        ? `trade_${trades[0].asset || "detail"}_${trades[0].date || "export"}.pdf`
+        : `trade_journal_${new Date().toISOString().slice(0, 10)}.pdf`;
+      res.attachment(filename);
 
       doc.pipe(res);
-      doc
-        .fontSize(20)
-        .text("Trade Journey Export", { align: "center" })
-        .moveDown();
 
-      trades.forEach((t) => {
-        doc
-          .fontSize(11)
-          .text(
-            `${t.date} ${t.time || ""} | ${t.asset} | ${t.direction || ""} | Setup: ${t.setup || "N/A"} | Result: ${t.result || "N/A"} | R: ${t.r_multiple ?? "N/A"}`,
-          );
-        doc.moveDown(0.4);
-        imagesOf(t).forEach((img) => {
-          if (doc.y > 560) doc.addPage();
-          try {
-            doc.image(img.buffer, { fit: [480, 250] });
-          } catch {
-            return;
-          }
-          doc.moveDown(0.4);
+      trades.forEach((trade, tradeIdx) => {
+        doc.addPage({ margin: 36, size: "A4" });
+
+        const normR = getExportNormalizedR(trade);
+        const isWin = isExportTradeWin(trade);
+        const isLoss = (trade.result || "").toLowerCase() === "loss" || normR < 0;
+        const resultColor = isLoss ? "#DC2626" : isWin ? "#16A34A" : "#475569";
+        const resultText = (trade.result || (normR >= 0 ? "WIN" : "LOSS")).toUpperCase();
+        const rColor = isLoss ? "#DC2626" : isWin ? "#16A34A" : "#475569";
+        const rText = `${normR >= 0 ? "+" : ""}${normR.toFixed(2)}R`;
+        const direction = (trade.direction || "LONG").toUpperCase();
+        const isLong = direction === "LONG";
+
+        // 1. Outer Container Card matching Screenshot 2
+        doc.roundedRect(36, 36, 523, 755, 14).fillAndStroke("#FFFFFF", "#E2E8F0");
+
+        // Header Background
+        doc.roundedRect(36, 36, 523, 44, 14).fillAndStroke("#F8FAFC", "#E2E8F0");
+
+        // Direction Pill
+        if (isLong) {
+          doc.roundedRect(50, 48, 48, 20, 5).fill("#ECFDF5");
+          doc.fillColor("#059669").fontSize(9).font("Helvetica-Bold").text("LONG", 50, 53, { width: 48, align: "center" });
+        } else {
+          doc.roundedRect(50, 48, 48, 20, 5).fill("#F3E8FF");
+          doc.fillColor("#7E22CE").fontSize(9).font("Helvetica-Bold").text("SHORT", 50, 53, { width: 48, align: "center" });
+        }
+
+        // Asset Name
+        const assetName = trade.asset || "BTCUSD";
+        doc.fillColor("#0F172A").fontSize(15).font("Helvetica-Bold").text(assetName, 108, 50);
+
+        // Date and Time
+        const assetWidth = doc.widthOfString(assetName);
+        const dateTimeStr = `• ${trade.date || ""}${trade.time ? `  ${trade.time}` : ""}`;
+        doc.fillColor("#64748B").fontSize(10.5).font("Helvetica").text(dateTimeStr, 114 + assetWidth, 53);
+
+        // Account Name Badge (Right Side)
+        if (trade.account_name) {
+          doc.fillColor("#64748B").fontSize(9.5).font("Helvetica-Bold").text(`Account: ${trade.account_name}`, 370, 53, { width: 175, align: "right" });
+        }
+
+        // 2. Metrics Grid (2 rows x 4 cols = 8 cards)
+        const metrics = [
+          [
+            { label: "NET R", val: rText, color: rColor },
+            { label: "RESULT", val: resultText, color: resultColor },
+            { label: "SETUP", val: trade.setup || "—", color: "#0F172A" },
+            { label: "SESSION", val: trade.session || "—", color: "#0F172A" },
+          ],
+          [
+            {
+              label: "ENTRY",
+              val: trade.entry !== null && trade.entry !== undefined ? String(trade.entry) : "—",
+              color: "#0F172A",
+            },
+            {
+              label: "STOP LOSS",
+              val: trade.sl !== null && trade.sl !== undefined ? String(trade.sl) : "—",
+              color: "#0F172A",
+            },
+            {
+              label: "TAKE PROFIT",
+              val: trade.tp !== null && trade.tp !== undefined ? String(trade.tp) : "—",
+              color: "#0F172A",
+            },
+            {
+              label: "RISK %",
+              val: trade.risk ? `${Number(trade.risk).toFixed(2)}%` : "—",
+              color: "#0F172A",
+            },
+          ],
+        ];
+
+        const cardW = 117;
+        const cardH = 46;
+        const gapX = 9;
+        const startX = 50;
+
+        metrics.forEach((row, rowIdx) => {
+          const cardY = 92 + rowIdx * (cardH + 8);
+          row.forEach((m, colIdx) => {
+            const cardX = startX + colIdx * (cardW + gapX);
+            doc.roundedRect(cardX, cardY, cardW, cardH, 7).fillAndStroke("#F8FAFC", "#E2E8F0");
+            doc.fillColor("#64748B").fontSize(7.5).font("Helvetica-Bold").text(m.label, cardX + 9, cardY + 7);
+            doc.fillColor(m.color).fontSize(12.5).font("Helvetica-Bold").text(m.val, cardX + 9, cardY + 22, { width: cardW - 18, ellipsis: true });
+          });
         });
-        doc.moveDown(0.6);
+
+        // 3. Middle Section: Analysis & Lesson (Left) and Psychology (Right)
+        // Analysis
+        doc.fillColor("#059669").fontSize(8.5).font("Helvetica-Bold").text("◎  ANALYSIS", 50, 202);
+        doc.roundedRect(50, 214, 240, 68, 7).fillAndStroke("#F8FAFC", "#E2E8F0");
+        doc.fillColor("#334155").fontSize(8.5).font("Helvetica").text(trade.reason || "No analysis recorded.", 58, 222, { width: 224, height: 52, ellipsis: true });
+
+        // Lesson
+        doc.fillColor("#059669").fontSize(8.5).font("Helvetica-Bold").text("↗  LESSON", 50, 290);
+        doc.roundedRect(50, 302, 240, 68, 7).fillAndStroke("#F8FAFC", "#E2E8F0");
+        doc.fillColor("#334155").fontSize(8.5).font("Helvetica").text(trade.lesson || "No lesson recorded.", 58, 310, { width: 224, height: 52, ellipsis: true });
+
+        // Psychology (Right Column)
+        doc.fillColor("#7C3AED").fontSize(8.5).font("Helvetica-Bold").text("◈  PSYCHOLOGY", 304, 202);
+        doc.roundedRect(304, 214, 241, 156, 7).fillAndStroke("#F8FAFC", "#E2E8F0");
+
+        // Emotion Flow
+        doc.fillColor("#64748B").fontSize(7).font("Helvetica-Bold").text("EMOTION BEFORE", 314, 224);
+        doc.fillColor("#0F172A").fontSize(10.5).font("Helvetica-Bold").text(trade.emotion_before || "—", 314, 235, { width: 85, ellipsis: true });
+
+        doc.fillColor("#94A3B8").fontSize(12).font("Helvetica").text("→", 405, 235);
+
+        doc.fillColor("#64748B").fontSize(7).font("Helvetica-Bold").text("EMOTION AFTER", 428, 224);
+        doc.fillColor("#0F172A").fontSize(10.5).font("Helvetica-Bold").text(trade.emotion_after || "—", 428, 235, { width: 105, ellipsis: true });
+
+        // Divider
+        doc.moveTo(314, 258).lineTo(535, 258).lineWidth(0.5).stroke("#E2E8F0");
+
+        // Psychological Notes
+        doc.fillColor("#64748B").fontSize(7).font("Helvetica-Bold").text("PSYCHOLOGICAL NOTES", 314, 266);
+        doc.fillColor("#334155").fontSize(8.5).font("Helvetica").text(trade.psych_note || "No notes recorded.", 314, 278, { width: 221, height: 84, ellipsis: true });
+
+        // 4. Execution Evidence
+        doc.fillColor("#64748B").fontSize(8.5).font("Helvetica-Bold").text("▨  EXECUTION EVIDENCE", 50, 380);
+
+        const imgs = imagesOf(trade);
+        const evidenceY = 394;
+        const evidenceH = 374;
+
+        if (!imgs || imgs.length === 0) {
+          doc.roundedRect(50, evidenceY, 495, 120, 7).fillAndStroke("#F8FAFC", "#E2E8F0");
+          doc.fillColor("#94A3B8").fontSize(9.5).font("Helvetica").text("No execution evidence screenshots attached.", 50, evidenceY + 52, { width: 495, align: "center" });
+        } else if (imgs.length === 1) {
+          doc.roundedRect(50, evidenceY, 495, evidenceH, 7).fillAndStroke("#F8FAFC", "#E2E8F0");
+          try {
+            doc.image(imgs[0].buffer, 56, evidenceY + 8, { fit: [483, evidenceH - 16], align: "center", valign: "center" });
+          } catch {
+            doc.fillColor("#EF4444").fontSize(9).text("Failed to render screenshot.", 56, evidenceY + 20);
+          }
+        } else {
+          const imgBoxW = 242;
+          doc.roundedRect(50, evidenceY, imgBoxW, evidenceH, 7).fillAndStroke("#F8FAFC", "#E2E8F0");
+          try {
+            doc.image(imgs[0].buffer, 56, evidenceY + 8, { fit: [imgBoxW - 12, evidenceH - 16], align: "center", valign: "center" });
+          } catch {
+            doc.fillColor("#EF4444").fontSize(9).text("Failed to render screenshot 1.", 56, evidenceY + 20);
+          }
+
+          doc.roundedRect(303, evidenceY, imgBoxW, evidenceH, 7).fillAndStroke("#F8FAFC", "#E2E8F0");
+          try {
+            doc.image(imgs[1].buffer, 309, evidenceY + 8, { fit: [imgBoxW - 12, evidenceH - 16], align: "center", valign: "center" });
+          } catch {
+            doc.fillColor("#EF4444").fontSize(9).text("Failed to render screenshot 2.", 309, evidenceY + 20);
+          }
+        }
+
+        // Footer inside card
+        doc.fillColor("#94A3B8").fontSize(7.5).font("Helvetica").text(
+          `Trade Journal • Page ${tradeIdx + 1} of ${trades.length} • Generated on ${new Date().toISOString().slice(0, 10)}`,
+          36,
+          776,
+          { width: 523, align: "center" }
+        );
       });
 
       doc.end();

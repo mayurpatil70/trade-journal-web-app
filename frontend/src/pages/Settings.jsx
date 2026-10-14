@@ -1,5 +1,6 @@
 // frontend/src/pages/Settings.jsx
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Settings as SettingsIcon,
   Trash2,
@@ -13,14 +14,37 @@ import {
   FileText,
   Table,
   FileType,
+  X,
+  Pencil,
+  Eye,
+  Brain,
+  Target,
+  ArrowRight,
+  Image as ImageIcon,
 } from "lucide-react";
 import api from "../api/axios";
 
+const normalizeTradeR = (t) => {
+  if (!t) return 0;
+  const isLoss = (t.result || "").toLowerCase() === "loss";
+  const isBe = (t.result || "").toLowerCase() === "be";
+  const num = Number(t.r_multiple ?? t.rMultiple ?? 0);
+  if (isLoss) {
+    if (num > 0) return -num;
+    if (num === 0) return -1;
+    return num;
+  }
+  if (isBe) return 0;
+  return num;
+};
+
 export default function Settings() {
+  const navigate = useNavigate();
   const [exporting, setExporting] = useState("");
   const [deleting, setDeleting] = useState(false);
   const [historyTrades, setHistoryTrades] = useState([]);
   const [loadingHistory, setLoadingHistory] = useState(true);
+  const [selectedTrade, setSelectedTrade] = useState(null);
 
   useEffect(() => {
     const fetchHistory = async () => {
@@ -41,31 +65,51 @@ export default function Settings() {
     fetchHistory();
   }, []);
 
-  const handleExport = async (format) => {
+  const handleExport = async (format, tradeId = null) => {
     const userId =
       localStorage.getItem("userId") || localStorage.getItem("userEmail");
     if (!userId) return alert("User session not found.");
 
-    setExporting(format);
+    const exportKey = tradeId ? `${format}-${tradeId}` : format;
+    setExporting(exportKey);
     try {
-      const response = await api.get(
-        `/api/trades/export?userId=${userId}&format=${format}`,
-        { responseType: "blob", timeout: 120000 }
-      );
+      const urlQuery = tradeId
+        ? `/api/trades/export?userId=${userId}&format=${format}&tradeId=${tradeId}`
+        : `/api/trades/export?userId=${userId}&format=${format}`;
+
+      const response = await api.get(urlQuery, {
+        responseType: "blob",
+        timeout: 120000,
+      });
 
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement("a");
       link.href = url;
       const ext = { excel: "xlsx", doc: "docx" }[format] || format;
-      link.setAttribute("download", `trade_journal.${ext}`);
+      const downloadName = tradeId && selectedTrade
+        ? `trade_${selectedTrade.asset || "detail"}_${selectedTrade.date || "export"}.${ext}`
+        : `trade_journal.${ext}`;
+      link.setAttribute("download", downloadName);
       document.body.appendChild(link);
       link.click();
       link.remove();
     } catch (error) {
       console.error(error);
-      alert(`Failed to export your journal as ${format.toUpperCase()}.`);
+      alert(`Failed to export as ${format.toUpperCase()}.`);
     } finally {
       setExporting("");
+    }
+  };
+
+  const handleDeleteTrade = async (tradeId) => {
+    if (!window.confirm("Are you sure you want to delete this trade?")) return;
+    try {
+      await api.delete(`/api/trades/${tradeId}`);
+      setHistoryTrades((prev) => prev.filter((t) => t.id !== tradeId));
+      if (selectedTrade?.id === tradeId) setSelectedTrade(null);
+    } catch (error) {
+      console.error("Delete Trade Error:", error);
+      alert("Failed to delete trade.");
     }
   };
 
@@ -83,6 +127,7 @@ export default function Settings() {
     try {
       await api.delete(`/api/trades/all?userId=${userId}`);
       setHistoryTrades([]);
+      setSelectedTrade(null);
       alert("All trades have been wiped successfully.");
     } catch (error) {
       console.error(error);
@@ -95,8 +140,8 @@ export default function Settings() {
   const exportFormats = [
     { fmt: "csv", label: "CSV", icon: <Table className="w-5 h-5" />, color: "from-emerald-500/20 to-green-500/20", border: "border-emerald-500/20", text: "text-emerald-400" },
     { fmt: "excel", label: "Excel", icon: <Table className="w-5 h-5" />, color: "from-emerald-500/20 to-emerald-500/20", border: "border-emerald-500/20", text: "text-emerald-400" },
-    { fmt: "doc", label: "Word", icon: <FileText className="w-5 h-5" />, color: "from-violet-500/20 to-purple-500/20", border: "border-violet-500/20", text: "text-violet-400" },
-    { fmt: "pdf", label: "PDF", icon: <FileType className="w-5 h-5" />, color: "from-red-500/20 to-rose-500/20", border: "border-red-500/20", text: "text-red-400" },
+    { fmt: "doc", label: "Word (1 Trade / Page)", icon: <FileText className="w-5 h-5" />, color: "from-violet-500/20 to-purple-500/20", border: "border-violet-500/20", text: "text-violet-400" },
+    { fmt: "pdf", label: "PDF (1 Trade / Page)", icon: <FileType className="w-5 h-5" />, color: "from-red-500/20 to-rose-500/20", border: "border-red-500/20", text: "text-red-400" },
   ];
 
   return (
@@ -131,10 +176,9 @@ export default function Settings() {
             <h2 className="text-base font-bold text-gray-900 dark:text-white">
               Export Journal Data
             </h2>
-            <span className="text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded uppercase tracking-wider font-bold">Trades + Daily Notes</span>
           </div>
           <p className="text-xs text-gray-500 dark:text-gray-400 mb-6">
-            Download a complete combined copy of your trading journal logs and your daily Pre/Post market notes.
+            Download a clean copy of your trading journal. PDF and Word exports format each trade on its own dedicated page with execution parameters, notes, and chart screenshots.
           </p>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             {exportFormats.map(({ fmt, label, icon, color, border, text }) => (
@@ -161,17 +205,24 @@ export default function Settings() {
 
         {/* Journal History Logs */}
         <div className="bg-white/60 dark:bg-white/[0.03] border border-gray-200/80 dark:border-white/10 rounded-2xl p-6 md:p-8 shadow-xl backdrop-blur-xl">
-          <div className="flex items-center gap-3 mb-2 pb-4 border-b border-gray-200/80 dark:border-white/10">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-500/20 to-emerald-500/20 border border-emerald-500/20 flex items-center justify-center">
-              <BookOpen className="w-4 h-4 text-emerald-400" />
+          <div className="flex items-center justify-between mb-2 pb-4 border-b border-gray-200/80 dark:border-white/10">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-500/20 to-emerald-500/20 border border-emerald-500/20 flex items-center justify-center">
+                <BookOpen className="w-4 h-4 text-emerald-400" />
+              </div>
+              <div>
+                <h2 className="text-base font-bold text-gray-900 dark:text-white">
+                  Journal History Logs
+                </h2>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Click any trade row below to inspect its full trade architecture, psychology, and screenshots.
+                </p>
+              </div>
             </div>
-            <h2 className="text-base font-bold text-gray-900 dark:text-white">
-              Journal History Logs
-            </h2>
+            <span className="text-xs font-semibold text-gray-400 bg-gray-100 dark:bg-white/5 px-2.5 py-1 rounded-lg border border-gray-200 dark:border-white/10">
+              {historyTrades.length} {historyTrades.length === 1 ? "Trade" : "Trades"}
+            </span>
           </div>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mb-6">
-            Review your most recent trades directly from your settings before exporting.
-          </p>
 
           <div className="w-full overflow-x-auto">
             {loadingHistory ? (
@@ -186,10 +237,10 @@ export default function Settings() {
               <table className="w-full text-left border-collapse min-w-[700px]">
                 <thead>
                   <tr className="border-b border-gray-200/80 dark:border-white/10">
-                    {["Date", "Asset", "Direction", "Setup", "Net R"].map((h, i) => (
+                    {["Date", "Asset", "Direction", "Setup", "Net R", ""].map((h, i) => (
                       <th
-                        key={h}
-                        className={`pb-3 text-[10px] font-bold text-gray-400 uppercase tracking-widest ${i === 4 ? "text-right" : ""}`}
+                        key={i}
+                        className={`pb-3 text-[10px] font-bold text-gray-400 uppercase tracking-widest ${i === 4 ? "text-right" : i === 5 ? "text-right w-24" : ""}`}
                       >
                         {h}
                       </th>
@@ -197,46 +248,62 @@ export default function Settings() {
                   </tr>
                 </thead>
                 <tbody>
-                  {historyTrades.map((trade) => (
-                    <tr
-                      key={trade.id}
-                      className="border-b border-gray-100/80 dark:border-white/5 hover:bg-white/40 dark:hover:bg-white/[0.02] transition-colors"
-                    >
-                      <td className="py-4 text-sm text-gray-900 dark:text-white font-medium flex items-center gap-2">
-                        <Calendar className="w-4 h-4 text-gray-400" /> {trade.date}
-                      </td>
-                      <td className="py-4 text-sm text-gray-900 dark:text-white font-bold">
-                        {trade.asset}
-                      </td>
-                      <td className="py-4 text-sm font-bold">
-                        <span
-                          className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] border w-fit ${
-                            trade.direction === "LONG"
-                              ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
-                              : "bg-red-500/10 text-red-400 border-red-500/20"
-                          }`}
-                        >
-                          {trade.direction === "LONG" ? (
-                            <TrendingUp className="w-3 h-3" />
-                          ) : (
-                            <TrendingDown className="w-3 h-3" />
-                          )}
-                          {trade.direction}
-                        </span>
-                      </td>
-                      <td className="py-4 text-sm text-gray-500 dark:text-gray-400">
-                        {trade.setup || "N/A"}
-                      </td>
-                      <td className="py-4 text-sm font-black text-right">
-                        <span
-                          className={trade.r_multiple >= 0 ? "text-emerald-400" : "text-red-400"}
-                        >
-                          {trade.r_multiple > 0 ? "+" : ""}
-                          {trade.r_multiple}R
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
+                  {historyTrades.map((trade) => {
+                    const normR = normalizeTradeR(trade);
+                    const isLoss = (trade.result || "").toLowerCase() === "loss" || normR < 0;
+                    return (
+                      <tr
+                        key={trade.id}
+                        onClick={() => setSelectedTrade(trade)}
+                        className="border-b border-gray-100/80 dark:border-white/5 hover:bg-emerald-500/[0.04] dark:hover:bg-white/[0.03] transition-colors cursor-pointer group"
+                      >
+                        <td className="py-4 text-sm text-gray-900 dark:text-white font-medium flex items-center gap-2">
+                          <Calendar className="w-4 h-4 text-gray-400" /> {trade.date}
+                        </td>
+                        <td className="py-4 text-sm text-gray-900 dark:text-white font-bold">
+                          {trade.asset}
+                        </td>
+                        <td className="py-4 text-sm font-bold">
+                          <span
+                            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] border w-fit ${
+                              trade.direction === "LONG"
+                                ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                                : "bg-purple-500/10 text-purple-400 border-purple-500/20"
+                            }`}
+                          >
+                            {trade.direction === "LONG" ? (
+                              <TrendingUp className="w-3 h-3" />
+                            ) : (
+                              <TrendingDown className="w-3 h-3" />
+                            )}
+                            {trade.direction}
+                          </span>
+                        </td>
+                        <td className="py-4 text-sm text-gray-500 dark:text-gray-400">
+                          {trade.setup || "N/A"}
+                        </td>
+                        <td className="py-4 text-sm font-black text-right">
+                          <span className={isLoss ? "text-red-400" : "text-emerald-400"}>
+                            {normR >= 0 ? "+" : ""}
+                            {normR.toFixed(2)}R
+                          </span>
+                        </td>
+                        <td className="py-4 text-sm text-right">
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedTrade(trade);
+                            }}
+                            className="p-1.5 rounded-lg bg-gray-100 dark:bg-white/5 hover:bg-emerald-500/20 text-gray-600 dark:text-gray-300 hover:text-emerald-400 transition-colors inline-flex items-center gap-1 text-xs font-semibold px-2.5"
+                            title="View Trade Detail"
+                          >
+                            <Eye className="w-3.5 h-3.5" /> View
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             )}
@@ -268,6 +335,239 @@ export default function Settings() {
           </button>
         </div>
       </div>
+
+      {/* TRADE DETAIL MODAL (Matching Screenshot 2) */}
+      {selectedTrade && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div
+            className="absolute inset-0 bg-black/80 backdrop-blur-md"
+            onClick={() => setSelectedTrade(null)}
+          />
+
+          <div className="relative w-full max-w-4xl max-h-[90vh] bg-[#101216] border border-white/10 rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95 duration-200">
+            {/* Header */}
+            <div className="px-6 py-5 border-b border-white/5 flex items-center justify-between bg-[#0A0B0D]">
+              <div className="flex items-center gap-3">
+                <span
+                  className={`px-2.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-widest ${
+                    selectedTrade.direction === "LONG"
+                      ? "bg-emerald-500/10 text-emerald-400"
+                      : "bg-purple-500/10 text-purple-400"
+                  }`}
+                >
+                  {selectedTrade.direction}
+                </span>
+                <h2 className="text-xl font-bold text-white">
+                  {selectedTrade.asset}
+                </h2>
+                <span className="text-gray-500 text-sm">
+                  • {selectedTrade.date}{selectedTrade.time ? ` • ${selectedTrade.time}` : ""}
+                </span>
+                {selectedTrade.account_name && (
+                  <span className="text-xs text-gray-400 bg-white/5 px-2 py-0.5 rounded border border-white/10 font-medium">
+                    {selectedTrade.account_name}
+                  </span>
+                )}
+              </div>
+              <div className="flex items-center gap-2">
+                {/* Single Trade Export Buttons */}
+                <button
+                  type="button"
+                  onClick={() => handleExport("pdf", selectedTrade.id)}
+                  disabled={exporting === `pdf-${selectedTrade.id}`}
+                  className="px-2.5 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors border border-red-500/20"
+                  title="Export this trade as PDF"
+                >
+                  {exporting === `pdf-${selectedTrade.id}` ? (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  ) : (
+                    <FileType className="w-3.5 h-3.5" />
+                  )}
+                  PDF
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleExport("doc", selectedTrade.id)}
+                  disabled={exporting === `doc-${selectedTrade.id}`}
+                  className="px-2.5 py-1.5 bg-violet-500/10 hover:bg-violet-500/20 text-violet-400 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors border border-violet-500/20"
+                  title="Export this trade as Word Document"
+                >
+                  {exporting === `doc-${selectedTrade.id}` ? (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  ) : (
+                    <FileText className="w-3.5 h-3.5" />
+                  )}
+                  Word
+                </button>
+                <button
+                  onClick={() =>
+                    navigate(`/add-trade?edit=${selectedTrade.id}`)
+                  }
+                  className="p-2 bg-white/5 hover:bg-white/10 rounded-lg text-emerald-400 transition-colors"
+                  title="Edit Trade"
+                >
+                  <Pencil className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => handleDeleteTrade(selectedTrade.id)}
+                  className="p-2 bg-red-500/10 hover:bg-red-500 rounded-lg text-red-400 hover:text-white transition-all"
+                  title="Delete Trade"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => setSelectedTrade(null)}
+                  className="p-2 bg-white/5 hover:bg-white/10 rounded-lg text-gray-400 transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            {/* Body */}
+            <div className="flex-1 overflow-y-auto p-6 space-y-8">
+              {/* Top Stats */}
+              {(() => {
+                const selR = normalizeTradeR(selectedTrade);
+                const selIsLoss =
+                  (selectedTrade.result || "").toLowerCase() === "loss" ||
+                  selR < 0;
+                return (
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {[
+                      {
+                        label: "Net R",
+                        value: `${selR >= 0 ? "+" : ""}${selR.toFixed(2)}R`,
+                        isNet: true,
+                        isLoss: selIsLoss,
+                      },
+                      {
+                        label: "Result",
+                        value: selectedTrade.result?.toUpperCase(),
+                        isResult: true,
+                        isLoss: selIsLoss,
+                      },
+                      { label: "Setup", value: selectedTrade.setup || "—" },
+                      { label: "Session", value: selectedTrade.session || "—" },
+                      { label: "Entry", value: selectedTrade.entry ?? "—" },
+                      { label: "Stop Loss", value: selectedTrade.sl ?? "—" },
+                      { label: "Take Profit", value: selectedTrade.tp ?? "—" },
+                      {
+                        label: "Risk %",
+                        value: selectedTrade.risk
+                          ? `${Number(selectedTrade.risk).toFixed(2)}%`
+                          : "—",
+                      },
+                    ].map((s, i) => (
+                      <div
+                        key={i}
+                        className="bg-[#15181D] border border-white/5 p-4 rounded-xl"
+                      >
+                        <p className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">
+                          {s.label}
+                        </p>
+                        <p
+                          className={`text-[15px] font-bold ${
+                            s.isNet || s.isResult
+                              ? s.isLoss
+                                ? "text-red-400"
+                                : "text-emerald-400"
+                              : "text-white"
+                          }`}
+                        >
+                          {s.value}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                );
+              })()}
+
+              {/* Notes & Psychology */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <div>
+                    <h3 className="text-xs font-semibold text-emerald-400 uppercase tracking-widest mb-2 flex items-center gap-2">
+                      <Target className="w-3 h-3" /> Analysis
+                    </h3>
+                    <p className="text-sm text-gray-300 leading-relaxed bg-[#15181D] border border-white/5 p-4 rounded-xl min-h-[100px] whitespace-pre-wrap">
+                      {selectedTrade.reason || "No analysis recorded."}
+                    </p>
+                  </div>
+                  <div>
+                    <h3 className="text-xs font-semibold text-emerald-400 uppercase tracking-widest mb-2 flex items-center gap-2">
+                      <TrendingUp className="w-3 h-3" /> Lesson
+                    </h3>
+                    <p className="text-sm text-gray-300 leading-relaxed bg-[#15181D] border border-white/5 p-4 rounded-xl min-h-[100px] whitespace-pre-wrap">
+                      {selectedTrade.lesson || "No lesson recorded."}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="bg-[#15181D] border border-white/5 p-5 rounded-xl flex flex-col">
+                  <h3 className="text-xs font-semibold text-purple-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                    <Brain className="w-3 h-3" /> Psychology
+                  </h3>
+                  <div className="flex items-center gap-4 mb-4 pb-4 border-b border-white/5">
+                    <div className="flex-1">
+                      <p className="text-[10px] text-gray-500 uppercase mb-1">
+                        Emotion Before
+                      </p>
+                      <p className="text-sm font-semibold text-white">
+                        {selectedTrade.emotion_before || "—"}
+                      </p>
+                    </div>
+                    <ArrowRight className="w-4 h-4 text-gray-600" />
+                    <div className="flex-1">
+                      <p className="text-[10px] text-gray-500 uppercase mb-1">
+                        Emotion After
+                      </p>
+                      <p className="text-sm font-semibold text-white">
+                        {selectedTrade.emotion_after || "—"}
+                      </p>
+                    </div>
+                  </div>
+                  <p className="text-[10px] text-gray-500 uppercase mb-2">
+                    Psychological Notes
+                  </p>
+                  <p className="text-sm text-gray-300 leading-relaxed flex-1 whitespace-pre-wrap">
+                    {selectedTrade.psych_note || "No notes recorded."}
+                  </p>
+                </div>
+              </div>
+
+              {/* Execution Evidence Screenshots */}
+              {selectedTrade.images && selectedTrade.images.length > 0 && (
+                <div>
+                  <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                    <ImageIcon className="w-3 h-3" /> Execution Evidence
+                  </h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {selectedTrade.images.map((img, i) => (
+                      <div
+                        key={i}
+                        onClick={() => window.open(img, "_blank")}
+                        className="relative aspect-video rounded-xl overflow-hidden border border-white/10 group cursor-pointer"
+                      >
+                        <img
+                          src={img}
+                          alt="Trade Chart"
+                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        />
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                          <span className="bg-black/80 text-white text-xs px-3 py-1.5 rounded-lg border border-white/20">
+                            View Full Size
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

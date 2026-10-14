@@ -732,7 +732,7 @@ export default function AddTrade() {
                       name="date"
                       value={formData.date}
                       onChange={handleChange}
-                      className={`${inputClass} ${fieldErrors.date ? "border-red-500 focus:ring-red-500 ring-1 ring-red-500" : ""}`}
+                      className={`${inputClass} dark:[color-scheme:dark] [color-scheme:light] ${fieldErrors.date ? "border-red-500 focus:ring-red-500 ring-1 ring-red-500" : ""}`}
                       required
                     />
                     {fieldErrors.date && (
@@ -748,7 +748,7 @@ export default function AddTrade() {
                       name="time"
                       value={formData.time}
                       onChange={handleChange}
-                      className={`${inputClass} [color-scheme:dark]`}
+                      className={`${inputClass} dark:[color-scheme:dark] [color-scheme:light]`}
                       required
                     />
                   </div>

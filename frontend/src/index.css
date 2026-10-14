@@ -698,68 +698,97 @@ input[type="time"]::-webkit-calendar-picker-indicator:hover {
   transform: scale(1.08);
 }
 
-body.terminal input[type="date"],
-body.terminal input[type="time"],
+/* =========================================================
+   DATE & TIME PICKERS: Theme-Aware Styling
+   ========================================================= */
+
+/* Common Picker Indicator Hover & Transitions */
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+input[type="date"]::-webkit-calendar-picker-indicator:hover,
+input[type="time"]::-webkit-calendar-picker-indicator:hover {
+  transform: scale(1.08);
+}
+
+/* DARK MODE: Pickers in dark theme, terminal, or dark cards */
 .dark input[type="date"],
 .dark input[type="time"],
+html.dark input[type="date"],
+html.dark input[type="time"],
+body.terminal input[type="date"],
+body.terminal input[type="time"],
 [class*="bg-[#0A0B0D]"] input[type="date"],
+[class*="bg-[#0A0B0D]"] input[type="time"],
 input[type="date"][class*="bg-[#0A0B0D]"],
-input[type="date"][class*="[color-scheme:dark]"] {
+input[type="time"][class*="bg-[#0A0B0D]"],
+.dark-luxury-card input[type="date"],
+.dark-luxury-card input[type="time"] {
   color-scheme: dark !important;
+  color: #ffffff !important;
 }
 
-html.light
-  body:not(.terminal)
-  input[type="date"]:not([class*="bg-[#0A0B0D]"]):not(
-    [class*="[color-scheme:dark]"]
-  ),
-html.light
-  body:not(.terminal)
-  input[type="time"]:not([class*="bg-[#0A0B0D]"]):not(
-    [class*="[color-scheme:dark]"]
-  ) {
+.dark input[type="date"]::-webkit-datetime-edit,
+.dark input[type="date"]::-webkit-datetime-edit-fields-wrapper,
+.dark input[type="date"]::-webkit-datetime-edit-text,
+.dark input[type="date"]::-webkit-datetime-edit-month-field,
+.dark input[type="date"]::-webkit-datetime-edit-day-field,
+.dark input[type="date"]::-webkit-datetime-edit-year-field,
+.dark input[type="time"]::-webkit-datetime-edit,
+.dark input[type="time"]::-webkit-datetime-edit-fields-wrapper,
+.dark input[type="time"]::-webkit-datetime-edit-text,
+.dark input[type="time"]::-webkit-datetime-edit-hour-field,
+.dark input[type="time"]::-webkit-datetime-edit-minute-field,
+.dark input[type="time"]::-webkit-datetime-edit-ampm-field,
+html.dark input[type="date"]::-webkit-datetime-edit,
+html.dark input[type="date"]::-webkit-datetime-edit-fields-wrapper,
+html.dark input[type="date"]::-webkit-datetime-edit-text,
+html.dark input[type="time"]::-webkit-datetime-edit,
+html.dark input[type="time"]::-webkit-datetime-edit-fields-wrapper,
+html.dark input[type="time"]::-webkit-datetime-edit-text {
+  color: #ffffff !important;
+}
+
+.dark input[type="date"]::-webkit-calendar-picker-indicator,
+.dark input[type="time"]::-webkit-calendar-picker-indicator,
+html.dark input[type="date"]::-webkit-calendar-picker-indicator,
+html.dark input[type="time"]::-webkit-calendar-picker-indicator {
+  filter: none !important;
+  opacity: 0.85;
+}
+
+/* LIGHT MODE: Pickers match UI components */
+html.light body:not(.terminal) input[type="date"]:not([class*="bg-[#0A0B0D]"]):not(.dark-luxury-card input),
+html.light body:not(.terminal) input[type="time"]:not([class*="bg-[#0A0B0D]"]):not(.dark-luxury-card input) {
   color-scheme: light !important;
-  background-color: #ffffff !important;
-  color: #0f172a !important;
-  border-color: rgba(148, 163, 184, 0.8) !important;
-  box-shadow: 0 0 0 1px rgba(148, 163, 184, 0.15);
+  color: var(--ink) !important;
 }
 
-html.light
-  body:not(.terminal)
-  input[type="time"]:not([class*="bg-[#0A0B0D]"]):not(
-    [class*="[color-scheme:dark]"]
-  ) {
-  color-scheme: dark !important;
-  background-color: #0f172a !important;
-  color: #f8fafc !important;
-  border-color: rgba(71, 85, 105, 0.9) !important;
-  box-shadow: 0 0 0 1px rgba(148, 163, 184, 0.16);
+html.light body:not(.terminal) input[type="date"]:not([class*="bg-[#0A0B0D]"]):not(.dark-luxury-card input)::-webkit-datetime-edit,
+html.light body:not(.terminal) input[type="date"]:not([class*="bg-[#0A0B0D]"]):not(.dark-luxury-card input)::-webkit-datetime-edit-fields-wrapper,
+html.light body:not(.terminal) input[type="date"]:not([class*="bg-[#0A0B0D]"]):not(.dark-luxury-card input)::-webkit-datetime-edit-text,
+html.light body:not(.terminal) input[type="date"]:not([class*="bg-[#0A0B0D]"]):not(.dark-luxury-card input)::-webkit-datetime-edit-month-field,
+html.light body:not(.terminal) input[type="date"]:not([class*="bg-[#0A0B0D]"]):not(.dark-luxury-card input)::-webkit-datetime-edit-day-field,
+html.light body:not(.terminal) input[type="date"]:not([class*="bg-[#0A0B0D]"]):not(.dark-luxury-card input)::-webkit-datetime-edit-year-field,
+html.light body:not(.terminal) input[type="time"]:not([class*="bg-[#0A0B0D]"]):not(.dark-luxury-card input)::-webkit-datetime-edit,
+html.light body:not(.terminal) input[type="time"]:not([class*="bg-[#0A0B0D]"]):not(.dark-luxury-card input)::-webkit-datetime-edit-fields-wrapper,
+html.light body:not(.terminal) input[type="time"]:not([class*="bg-[#0A0B0D]"]):not(.dark-luxury-card input)::-webkit-datetime-edit-text,
+html.light body:not(.terminal) input[type="time"]:not([class*="bg-[#0A0B0D]"]):not(.dark-luxury-card input)::-webkit-datetime-edit-hour-field,
+html.light body:not(.terminal) input[type="time"]:not([class*="bg-[#0A0B0D]"]):not(.dark-luxury-card input)::-webkit-datetime-edit-minute-field,
+html.light body:not(.terminal) input[type="time"]:not([class*="bg-[#0A0B0D]"]):not(.dark-luxury-card input)::-webkit-datetime-edit-ampm-field {
+  color: var(--ink) !important;
 }
 
-html.light body:not(.terminal) input[type="time"]::-webkit-datetime-edit,
-html.light
-  body:not(.terminal)
-  input[type="time"]::-webkit-datetime-edit-fields-wrapper,
-html.light body:not(.terminal) input[type="time"]::-webkit-datetime-edit-text {
-  color: #f8fafc !important;
+html.light body:not(.terminal) input[type="date"]:not([class*="bg-[#0A0B0D]"]):not(.dark-luxury-card input)::-webkit-calendar-picker-indicator,
+html.light body:not(.terminal) input[type="time"]:not([class*="bg-[#0A0B0D]"]):not(.dark-luxury-card input)::-webkit-calendar-picker-indicator {
+  filter: none !important;
+  opacity: 0.65;
 }
-
-html.light
-  body:not(.terminal)
-  input[type="time"]::-webkit-calendar-picker-indicator {
-  filter: invert(1) brightness(1.2);
-  opacity: 1;
-}
-
-html.light
-  body:not(.terminal)
-  input[type="date"]::-webkit-calendar-picker-indicator,
-html.light
-  body:not(.terminal)
-  input[type="time"]::-webkit-calendar-picker-indicator {
-  filter: contrast(0.9) saturate(0.9);
-  opacity: 1;
+html.light body:not(.terminal) input[type="date"]:not([class*="bg-[#0A0B0D]"]):not(.dark-luxury-card input)::-webkit-calendar-picker-indicator:hover,
+html.light body:not(.terminal) input[type="time"]:not([class*="bg-[#0A0B0D]"]):not(.dark-luxury-card input)::-webkit-calendar-picker-indicator:hover {
+  opacity: 0.95;
 }
 
 /* =========================================================
