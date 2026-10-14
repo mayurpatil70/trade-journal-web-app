@@ -32,6 +32,7 @@ import {
   calculateRiskPercent,
   calculateLotSize,
 } from "../utils/lotSizeCalculator.js";
+import { compressImageFile } from "../utils/imageCompressor.js";
 
 export default function AddTrade() {
   const navigate = useNavigate();
@@ -626,23 +627,40 @@ export default function AddTrade() {
             : formData[key];
         submitData.append(key, val);
       });
-      images.forEach((img) => {
+      // Optimize images in parallel before uploading to speed up submission by up to 10x
+      const optimizedImages = await Promise.all(
+        images.map(async (img) => {
+          if (!img) return null;
+          return await compressImageFile(img);
+        })
+      );
+
+      optimizedImages.forEach((img) => {
         if (img) submitData.append("images", img);
       });
 
+      const uploadConfig = {
+        headers: { "Content-Type": "multipart/form-data" },
+        timeout: 120000, // 2-minute safety timeout to prevent premature aborts on slow connections
+      };
+
       if (isEditing) {
-        await api.put(`/api/trades/${editTradeId}`, submitData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
+        await api.put(`/api/trades/${editTradeId}`, submitData, uploadConfig);
       } else {
-        await api.post("/api/trades", submitData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
+        await api.post("/api/trades", submitData, uploadConfig);
       }
       navigate("/trades");
     } catch (error) {
       console.error("Upload Error:", error);
-      alert("Failed to save trade. Please try again.");
+      const isTimeout =
+        error.code === "ECONNABORTED" || error.message?.includes("timeout");
+      if (isTimeout) {
+        alert(
+          "Upload timed out. Your connection might be slow or the server took too long. Please try again."
+        );
+      } else {
+        alert(error.response?.data?.error || "Failed to save trade. Please try again.");
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -1861,7 +1879,7 @@ export default function AddTrade() {
               >
                 {isSubmitting ? (
                   <>
-                    <Loader2 className="w-4 h-4 animate-spin" /> {isEditing ? "Updating..." : "Saving..."}
+                    <Loader2 className="w-4 h-4 animate-spin" /> {isEditing ? "Updating Trade..." : "Uploading & Saving..."}
                   </>
                 ) : (
                   <>

@@ -93,10 +93,10 @@ export const createTrade = async (req, res) => {
 
     const imageUrls = [];
     if (req.files && req.files.length > 0) {
-      for (const file of req.files) {
-        const url = await uploadToCloudinary(file.buffer);
-        imageUrls.push(url);
-      }
+      const uploaded = await Promise.all(
+        req.files.map((file) => uploadToCloudinary(file.buffer))
+      );
+      imageUrls.push(...uploaded);
     }
 
     const rawLotSize =
@@ -327,10 +327,10 @@ export const updateTrade = async (req, res) => {
 
     const imageUrls = [...(existing.images || [])];
     if (req.files && req.files.length > 0) {
-      for (const file of req.files) {
-        const url = await uploadToCloudinary(file.buffer);
-        imageUrls.push(url);
-      }
+      const uploaded = await Promise.all(
+        req.files.map((file) => uploadToCloudinary(file.buffer))
+      );
+      imageUrls.push(...uploaded);
     }
 
     const entry = normaliseTradeNumber(tradeData.entry !== undefined ? tradeData.entry : existing.entry);
