@@ -3,7 +3,17 @@ import { requireAuth } from "../middlewares/requireAuth.js";
 import { requireAdmin } from "../middlewares/requireAdmin.js";
 import { supabase } from "../config/supabase.js";
 
-const router = express.Router();
+let globalAnnouncement = {
+  active: false,
+  message: "",
+  type: "info",
+  updatedAt: new Date().toISOString(),
+};
+
+// Public announcement check (no auth required)
+router.get("/public/announcement", (req, res) => {
+  res.json({ success: true, announcement: globalAnnouncement });
+});
 
 router.use(requireAuth, requireAdmin);
 
@@ -29,7 +39,7 @@ router.get("/metrics", async (req, res) => {
         .order("created_at", { ascending: false }),
       supabase
         .from("trades")
-        .select("id, user_id, date, created_at, asset, result, r_multiple")
+        .select("id, user_id, date, created_at, asset, result, r_multiple, pnl, direction")
         .order("created_at", { ascending: false })
         .limit(1000),
       supabase
@@ -330,6 +340,78 @@ router.put("/withdrawal/:id", async (req, res) => {
     res
       .status(500)
       .json({ success: false, error: "Failed to update withdrawal." });
+  }
+});
+
+// Admin: Provision / Create user directly
+router.post("/user/create", async (req, res) => {
+  try {
+    const { email, type = "paid", days = 30 } = req.body;
+    if (!email || !email.includes("@")) {
+      return res.status(400).json({ success: false, error: "A valid email address is required." });
+    }
+
+    const cleanEmail = email.toLowerCase().trim();
+
+    // 1. Upsert into users table
+    const { data: user, error: userError } = await supabase
+      .from("users")
+      .upsert({ email: cleanEmail }, { onConflict: "email" })
+      .select()
+      .single();
+
+    if (userError) throw userError;
+
+    const userId = user.id;
+    const futureDate = new Date();
+    futureDate.setDate(futureDate.getDate() + Number(days));
+
+    // 2. Provision profile access
+    const updatePayload = {
+      id: userId,
+      email: cleanEmail,
+      account_status: type === "paid" ? "active" : "trial",
+      ...(type === "paid"
+        ? { subscription_ends_at: futureDate.toISOString(), current_plan: Number(days) >= 365 ? "yearly" : "monthly" }
+        : { trial_ends_at: futureDate.toISOString(), account_status: "trial" }
+      ),
+    };
+
+    const { error: profileError } = await supabase
+      .from("profiles")
+      .upsert(updatePayload, { onConflict: "id" });
+
+    if (profileError) throw profileError;
+
+    res.json({
+      success: true,
+      message: `User ${cleanEmail} successfully provisioned with ${days} days ${type} access.`,
+      user: { ...user, ...updatePayload },
+    });
+  } catch (error) {
+    console.error("Create user error:", error);
+    res.status(500).json({ success: false, error: error.message || "Failed to provision user." });
+  }
+});
+
+// Admin: Get system broadcast announcement
+router.get("/announcement", (req, res) => {
+  res.json({ success: true, announcement: globalAnnouncement });
+});
+
+// Admin: Update system broadcast announcement
+router.post("/announcement", (req, res) => {
+  try {
+    const { active, message, type = "info" } = req.body;
+    globalAnnouncement = {
+      active: Boolean(active),
+      message: String(message || ""),
+      type: type || "info",
+      updatedAt: new Date().toISOString(),
+    };
+    res.json({ success: true, message: "Broadcast updated successfully.", announcement: globalAnnouncement });
+  } catch (error) {
+    res.status(500).json({ success: false, error: "Failed to update announcement." });
   }
 });
 

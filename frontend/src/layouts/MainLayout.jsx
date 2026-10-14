@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import PreTradeGate from "../components/PreTradeGate.jsx";
 import PromoPopup from "../components/PromoPopup.jsx";
+import api from "../api/axios";
 import {
   LayoutDashboard,
   PlusCircle,
@@ -98,6 +99,21 @@ export default function MainLayout() {
 
   const userId = localStorage.getItem("userId") || localStorage.getItem("userEmail");
   const isAdmin = userId === "noballondesk@gmail.com" || userId === "akpatil51340@gmail.com";
+
+  // System broadcast announcement
+  const [announcement, setAnnouncement] = useState(null);
+  const [dismissedAnn, setDismissedAnn] = useState(false);
+
+  useEffect(() => {
+    api
+      .get("/api/admin/public/announcement")
+      .then((res) => {
+        if (res.data?.success && res.data.announcement?.active && res.data.announcement?.message) {
+          setAnnouncement(res.data.announcement);
+        }
+      })
+      .catch(() => {});
+  }, [location.pathname]);
 
   // Command palette shortcut
   useEffect(() => {
@@ -352,6 +368,29 @@ export default function MainLayout() {
 
       {/* Main Content Area */}
       <main className="flex-1 overflow-y-auto relative pt-14 pb-16 md:pt-0 md:pb-0 bg-[#0A0B0D]">
+        {announcement && !dismissedAnn && (
+          <div
+            className={`w-full px-4 py-2.5 text-xs font-semibold flex items-center justify-between border-b shadow-sm z-30 transition-all ${
+              announcement.type === "warning"
+                ? "bg-amber-500/15 text-amber-300 border-amber-500/25"
+                : announcement.type === "success"
+                ? "bg-emerald-500/15 text-emerald-300 border-emerald-500/25"
+                : "bg-blue-500/15 text-blue-300 border-blue-500/25"
+            }`}
+          >
+            <div className="flex items-center gap-2 mx-auto">
+              <Sparkles className="w-4 h-4 shrink-0 text-[#10b981]" />
+              <span>{announcement.message}</span>
+            </div>
+            <button
+              onClick={() => setDismissedAnn(true)}
+              className="text-gray-400 hover:text-white p-1 rounded-lg cursor-pointer"
+              title="Dismiss announcement"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        )}
         <div className="max-md:hidden flex fixed top-3 right-5 z-40 items-center gap-2">
           <NotificationBell />
           <ThemeToggle />
