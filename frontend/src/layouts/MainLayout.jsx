@@ -26,7 +26,6 @@ import {
   User,
   CreditCard,
   CheckCircle2,
-  Sparkles,
   ShieldCheck,
   Zap,
   Lock,
@@ -379,7 +378,7 @@ export default function MainLayout() {
             }`}
           >
             <div className="flex items-center gap-2 mx-auto">
-              <Sparkles className="w-4 h-4 shrink-0 text-[#10b981]" />
+              <img src="/logo3d.png" alt="ForexNotes" className="w-4 h-4 object-contain shrink-0" />
               <span>{announcement.message}</span>
             </div>
             <button
@@ -409,7 +408,7 @@ export default function MainLayout() {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center px-4 py-3 border-b border-white/5">
-              <Sparkles className="w-5 h-5 text-gray-400 mr-3" />
+              <img src="/logo3d.png" alt="ForexNotes" className="w-5 h-5 object-contain mr-3 shrink-0" />
               <input
                 type="text"
                 placeholder="Search trades, analytics, or actions..."

@@ -342,7 +342,7 @@ export default function Dashboard() {
                 onClick={() => navigate("/affiliate")}
                 className="relative flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold text-black bg-gradient-to-r from-amber-400 to-yellow-300 hover:from-amber-300 hover:to-yellow-200 transition-all shadow-md shadow-amber-500/30 hover:shadow-amber-400/50 hover:scale-105 active:scale-95"
               >
-                <Sparkles className="w-3 h-3" /> Get 10% Off with Affiliate
+                <img src="/logo3d.png" alt="ForexNotes" className="w-3.5 h-3.5 object-contain inline-block shrink-0" /> Get 10% Off with Affiliate
               </button>
               <button onClick={() => navigate("/news")} className="text-[12px] font-semibold text-emerald-400 hover:text-cyan-300 flex items-center gap-1 transition-colors">
                 View Calendar <ArrowRight className="w-3 h-3" />
@@ -497,9 +497,3 @@ export default function Dashboard() {
     </div>
   );
 }
-
-const Sparkles = ({ className }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-    <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/>
-  </svg>
-);

@@ -1,9 +1,13 @@
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import ScrollTrigger from 'gsap/ScrollTrigger';
-import { Database, Activity, Newspaper, Printer, Bot, Users, Headphones, ShieldCheck, Star, GraduationCap } from 'lucide-react';
+import { Database, Activity, Newspaper, Printer, Bot, Users, Headphones, ShieldCheck, GraduationCap } from 'lucide-react';
 
 gsap.registerPlugin(ScrollTrigger);
+
+const Logo3DIcon = ({ size = 28 }) => (
+  <img src="/logo3d.png" alt="ForexNotes" style={{ width: size, height: size }} className="object-contain" />
+);
 
 const features = [
   {
@@ -98,7 +102,7 @@ const features = [
     wide: true,
   },
   {
-    icon: Star,
+    icon: Logo3DIcon,
     title: 'Annual Real-Life Trader Events',
     description: 'We host an exclusive real-life event once a year for our members to celebrate glory, network, and grow together.',
     tag: 'Community',

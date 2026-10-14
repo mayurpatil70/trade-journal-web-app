@@ -13,7 +13,6 @@ import {
   CheckCircle2,
   Lock,
   MessageSquare,
-  Sparkles,
   ChevronRight,
   Zap,
   TrendingUp,

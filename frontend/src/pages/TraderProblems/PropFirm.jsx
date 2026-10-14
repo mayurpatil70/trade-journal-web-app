@@ -9,7 +9,6 @@ import {
   TrendingDown,
   Lock,
   Layers,
-  Sparkles,
 } from "lucide-react";
 
 const FIRM_PRESETS = [

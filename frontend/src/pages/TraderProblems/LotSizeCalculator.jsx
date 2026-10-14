@@ -9,7 +9,6 @@ import {
   TrendingUp,
   Target,
   AlertCircle,
-  Sparkles,
   Zap,
 } from "lucide-react";
 
@@ -164,7 +163,7 @@ export default function LotSizeCalculator() {
           </div>
 
           <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white/40 dark:bg-white/5 border border-white/20 dark:border-white/10 text-xs font-semibold text-gray-600 dark:text-gray-300">
-            <Sparkles className="w-4 h-4 text-emerald-400" />
+            <img src="/logo3d.png" alt="ForexNotes" className="w-4 h-4 object-contain shrink-0" />
             <span>Multi-Asset Pip Engine</span>
           </div>
         </div>

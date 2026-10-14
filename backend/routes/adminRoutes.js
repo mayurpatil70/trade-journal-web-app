@@ -1,7 +1,16 @@
 import express from "express";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
 import { requireAuth } from "../middlewares/requireAuth.js";
 import { requireAdmin } from "../middlewares/requireAdmin.js";
 import { supabase } from "../config/supabase.js";
+
+const router = express.Router();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const ANNOUNCEMENT_FILE = path.join(__dirname, "../data/announcement.json");
 
 let globalAnnouncement = {
   active: false,
@@ -9,6 +18,19 @@ let globalAnnouncement = {
   type: "info",
   updatedAt: new Date().toISOString(),
 };
+
+// Attempt to load previously saved announcement from disk
+try {
+  if (fs.existsSync(ANNOUNCEMENT_FILE)) {
+    const raw = fs.readFileSync(ANNOUNCEMENT_FILE, "utf-8");
+    const parsed = JSON.parse(raw);
+    if (parsed && typeof parsed === "object") {
+      globalAnnouncement = { ...globalAnnouncement, ...parsed };
+    }
+  }
+} catch (loadErr) {
+  console.warn("Could not load persisted announcement:", loadErr.message);
+}
 
 // Public announcement check (no auth required)
 router.get("/public/announcement", (req, res) => {
@@ -409,8 +431,20 @@ router.post("/announcement", (req, res) => {
       type: type || "info",
       updatedAt: new Date().toISOString(),
     };
+
+    try {
+      const dataDir = path.dirname(ANNOUNCEMENT_FILE);
+      if (!fs.existsSync(dataDir)) {
+        fs.mkdirSync(dataDir, { recursive: true });
+      }
+      fs.writeFileSync(ANNOUNCEMENT_FILE, JSON.stringify(globalAnnouncement, null, 2), "utf-8");
+    } catch (fsErr) {
+      console.warn("Failed to write announcement file to disk:", fsErr.message);
+    }
+
     res.json({ success: true, message: "Broadcast updated successfully.", announcement: globalAnnouncement });
   } catch (error) {
+    console.error("Announcement update error:", error);
     res.status(500).json({ success: false, error: "Failed to update announcement." });
   }
 });

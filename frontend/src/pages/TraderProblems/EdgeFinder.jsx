@@ -6,7 +6,6 @@ import {
   TrendingDown,
   AlertTriangle,
   Loader2,
-  Sparkles,
 } from "lucide-react";
 import api from "../../api/axios";
 
@@ -84,7 +83,7 @@ export default function EdgeFinder() {
           </div>
         ) : leaks.length === 0 && edges.length === 0 ? (
           <div className="py-12 text-center text-gray-500 text-sm">
-            <Sparkles className="w-8 h-8 text-[#10b981] mx-auto mb-2 opacity-60" />
+            <img src="/logo3d.png" alt="ForexNotes" className="w-10 h-10 object-contain mx-auto mb-2 drop-shadow" />
             <p className="font-bold text-gray-800 dark:text-gray-200 mb-1">
               No Edge Insights Available Yet
             </p>

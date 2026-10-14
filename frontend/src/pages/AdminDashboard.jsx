@@ -13,7 +13,6 @@ import {
   Activity,
   Search,
   RefreshCw,
-  Sparkles,
   Calendar,
   AlertTriangle,
   CheckCircle,
@@ -287,7 +286,7 @@ export default function AdminDashboard() {
         setTimeout(() => setBroadcastSuccess(false), 3000);
       }
     } catch (error) {
-      alert("Failed to save broadcast announcement");
+      alert(error.response?.data?.error || error.message || "Failed to save broadcast announcement");
     } finally {
       setBroadcastSaving(false);
     }
@@ -1662,7 +1661,7 @@ export default function AdminDashboard() {
                     : "bg-blue-500/10 border-blue-500/30 text-blue-800 dark:text-blue-300"
                 }`}
               >
-                <Sparkles className="w-4 h-4 shrink-0" />
+                <img src="/logo3d.png" alt="ForexNotes" className="w-4 h-4 object-contain shrink-0" />
                 <span className="font-medium">{broadcastMessage || "No announcement text entered yet."}</span>
               </div>
             </div>
