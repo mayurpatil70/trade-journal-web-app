@@ -105,17 +105,23 @@ const PaywallGuard = () => {
 
   useEffect(() => {
     const checkStatus = async () => {
-      const userId = localStorage.getItem("userId") || localStorage.getItem("userEmail");
+      const userId = localStorage.getItem("userId") || "";
+      const userEmail = (localStorage.getItem("userEmail") || "").toLowerCase().trim();
+      const adminEmails = ["noballondesk@gmail.com", "noballondesk@gamil.com", "akpatil51340@gmail.com"];
 
       // ADMIN BYPASS
-      if (userId === "noballondesk@gmail.com" || userId === "akpatil51340@gmail.com") {
+      if (adminEmails.includes(userEmail) || adminEmails.includes(userId.toLowerCase().trim())) {
         setAccess('allow');
         return;
       }
 
       try {
-        const response = await api.get(`/api/subscriptions/status/${userId}`);
-        const { hasPaid, discordVerified } = response.data;
+        const response = await api.get(`/api/subscriptions/status/${userId || userEmail}`);
+        const { hasPaid, discordVerified, isAdmin } = response.data;
+        if (isAdmin) {
+          setAccess('allow');
+          return;
+        }
         if (!discordVerified) {
           setAccess('discord');
         } else if (!hasPaid) {
@@ -149,18 +155,14 @@ const PaywallGuard = () => {
 
 // GUARD 3: Admin Only
 const AdminGuard = () => {
-    const id = localStorage.getItem("userId") || "";
-    const email = (localStorage.getItem("userEmail") || "").toLowerCase().trim();
-    if (
-      id === "noballondesk@gmail.com" || 
-      id === "akpatil51340@gmail.com" || 
-      email === "noballondesk@gmail.com" || 
-      email === "akpatil51340@gmail.com"
-    ) {
-      return <Outlet />;
-    }
-    return <Navigate to="/dashboard" replace />;
-  };
+  const id = (localStorage.getItem("userId") || "").toLowerCase().trim();
+  const email = (localStorage.getItem("userEmail") || "").toLowerCase().trim();
+  const adminEmails = ["noballondesk@gmail.com", "noballondesk@gamil.com", "akpatil51340@gmail.com"];
+  if (adminEmails.includes(id) || adminEmails.includes(email)) {
+    return <Outlet />;
+  }
+  return <Navigate to="/dashboard" replace />;
+};
 
 function App() {
   return (
@@ -201,12 +203,12 @@ function App() {
                   <Route path="profile" element={<Profile />} />
                   <Route path="support" element={<Support />} />
                   <Route path="affiliate" element={<AffiliateDashboard />} />
-                  <Route path="admin" element={<AdminDashboard />} />
                   <Route path="charts" element={<Charts />} />
                   <Route path="sessions" element={<Sessions />} />
 
                   {/* Admin Only Routes */}
                   <Route element={<AdminGuard />}>
+                    <Route path="admin" element={<AdminDashboard />} />
                     <Route path="admin/trading-bot" element={<TradingBotDashboard />} />
                     <Route path="admin/setup" element={<BotSetupPage />} />
                   </Route>

@@ -47,8 +47,18 @@ router.get("/status/:userId", async (req, res) => {
       .eq("id", req.params.userId)
       .maybeSingle();
 
-    if (user && user.email === process.env.ADMIN_EMAIL) {
-      return res.json({ success: true, hasPaid: true, discordVerified: true });
+    const adminEmails = [
+      ...(process.env.ADMIN_EMAIL || "").split(","),
+      "noballondesk@gmail.com",
+      "noballondesk@gamil.com",
+      "akpatil51340@gmail.com",
+    ]
+      .map((e) => e.trim().toLowerCase())
+      .filter(Boolean);
+
+    const userEmail = (user?.email || "").trim().toLowerCase();
+    if (user && adminEmails.includes(userEmail)) {
+      return res.json({ success: true, hasPaid: true, discordVerified: true, isAdmin: true });
     }
 
     const { data: profile, error } = await supabase

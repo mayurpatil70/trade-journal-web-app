@@ -38,7 +38,7 @@ function render({ path, title, description, jsonLd = [], alternates, body, robot
     ...jsonLd.map(ld),
   ].join('\n  ');
   html = html.replace('</head>', `  ${extra}\n</head>`);
-  return html.replace('<div id="root"></div>', `<div id="root"><main style="max-width:860px;margin:0 auto;padding:32px 20px;line-height:1.6">${body}${footer}</main></div>`);
+  return html.replace('<div id="root"></div>', `<div id="root"><main class="seo-prerender-shell" style="max-width:860px;margin:0 auto;padding:32px 20px;line-height:1.6;position:relative;z-index:1">${body}${footer}</main></div>`);
 }
 
 const write = (path, html) => {

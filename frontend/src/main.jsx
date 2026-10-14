@@ -15,3 +15,14 @@ createRoot(document.getElementById("root")).render(
     </ThemeProvider>
   </StrictMode>,
 );
+
+// Gracefully dissolve initial 3D circular loading screen once the app tree has mounted
+if (typeof window !== "undefined") {
+  // Give a pleasant 400ms duration for the circular 3D logo animation, then smoothly transition
+  setTimeout(() => {
+    if (typeof window.__dismissLoader === "function") {
+      window.__dismissLoader();
+    }
+  }, 400);
+}
+
