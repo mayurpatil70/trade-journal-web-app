@@ -147,8 +147,41 @@ export default function AddTrade() {
     const { name, value } = e.target;
     setFormData((prev) => {
       const updated = { ...prev, [name]: value };
+
       if (name === "rMultiple") updated.r_multiple = value;
       if (name === "r_multiple") updated.rMultiple = value;
+
+      if (["entry", "sl", "tp", "direction"].includes(name)) {
+        const entry =
+          name === "entry" ? Number(value) : Number(updated.entry || 0);
+        const sl = name === "sl" ? Number(value) : Number(updated.sl || 0);
+        const tp = name === "tp" ? Number(value) : Number(updated.tp || 0);
+        const direction = name === "direction" ? value : updated.direction;
+
+        if (!Number.isNaN(entry) && !Number.isNaN(sl) && entry !== 0) {
+          const riskPct = Math.abs(((entry - sl) / entry) * 100);
+          updated.risk = Number.isFinite(riskPct) ? riskPct.toFixed(2) : "";
+        }
+
+        if (
+          !Number.isNaN(entry) &&
+          !Number.isNaN(sl) &&
+          !Number.isNaN(tp) &&
+          entry !== 0 &&
+          sl !== entry
+        ) {
+          const rMultipleVal =
+            direction === "SHORT"
+              ? (entry - tp) / (sl - entry)
+              : (tp - entry) / (entry - sl);
+
+          if (Number.isFinite(rMultipleVal)) {
+            updated.rMultiple = rMultipleVal.toFixed(2);
+            updated.r_multiple = rMultipleVal.toFixed(2);
+          }
+        }
+      }
+
       return updated;
     });
     if (fieldErrors[name]) {
@@ -207,6 +240,30 @@ export default function AddTrade() {
           : formData.rMultiple;
       if (!rVal && rVal !== 0 && rVal !== "0") {
         errors.r_multiple = "R-multiple is required";
+      }
+    }
+    if (s === 3) {
+      const setupValue =
+        formData.setup === "Other" ? customFields.setup : formData.setup;
+      if (!setupValue || !String(setupValue).trim()) {
+        errors.setup = "Setup is required";
+      }
+    }
+    if (s === 4) {
+      if (!formData.emotionBefore)
+        errors.emotionBefore = "Emotion before trade is required";
+      if (!formData.emotionAfter)
+        errors.emotionAfter = "Emotion after trade is required";
+      if (!formData.psychNote || !String(formData.psychNote).trim()) {
+        errors.psychNote = "Psychology notes are required";
+      }
+    }
+    if (s === 5) {
+      if (!formData.reason || !String(formData.reason).trim()) {
+        errors.reason = "Trade analysis is required";
+      }
+      if (!formData.lesson || !String(formData.lesson).trim()) {
+        errors.lesson = "Lessons are required";
       }
     }
     return errors;
@@ -397,14 +454,19 @@ export default function AddTrade() {
                         onChange={(e) => {
                           setNewAccountName(e.target.value);
                           if (fieldErrors.account_name) {
-                            setFieldErrors((prev) => ({ ...prev, account_name: null }));
+                            setFieldErrors((prev) => ({
+                              ...prev,
+                              account_name: null,
+                            }));
                           }
                         }}
                         className={`${inputClass} ${fieldErrors.account_name ? "border-red-500 focus:ring-red-500 ring-1 ring-red-500" : ""}`}
                       />
                     </div>
                     {fieldErrors.account_name && (
-                      <p className="text-red-400 text-xs mt-1">{fieldErrors.account_name}</p>
+                      <p className="text-red-400 text-xs mt-1">
+                        {fieldErrors.account_name}
+                      </p>
                     )}
                     {existingAccounts.length > 0 && (
                       <button
@@ -431,7 +493,10 @@ export default function AddTrade() {
                             accountName: e.target.value,
                           });
                           if (fieldErrors.account_name) {
-                            setFieldErrors((prev) => ({ ...prev, account_name: null }));
+                            setFieldErrors((prev) => ({
+                              ...prev,
+                              account_name: null,
+                            }));
                           }
                         }}
                         className={`${selectClass} ${fieldErrors.account_name ? "border-red-500 focus:ring-red-500 ring-1 ring-red-500" : ""}`}
@@ -449,7 +514,9 @@ export default function AddTrade() {
                       <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
                     </div>
                     {fieldErrors.account_name && (
-                      <p className="text-red-400 text-xs mt-1">{fieldErrors.account_name}</p>
+                      <p className="text-red-400 text-xs mt-1">
+                        {fieldErrors.account_name}
+                      </p>
                     )}
                     <button
                       type="button"
@@ -491,7 +558,9 @@ export default function AddTrade() {
                     <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
                   </div>
                   {fieldErrors.asset && (
-                    <p className="text-red-400 text-xs mt-1">{fieldErrors.asset}</p>
+                    <p className="text-red-400 text-xs mt-1">
+                      {fieldErrors.asset}
+                    </p>
                   )}
                   {formData.asset === "Other" && (
                     <input
@@ -508,13 +577,18 @@ export default function AddTrade() {
                   <label className={labelClass}>
                     Direction <span className="text-red-400">*</span>
                   </label>
-                  <div className={`flex gap-3 p-0.5 rounded-xl ${fieldErrors.direction ? "border border-red-500 ring-1 ring-red-500" : ""}`}>
+                  <div
+                    className={`flex gap-3 p-0.5 rounded-xl ${fieldErrors.direction ? "border border-red-500 ring-1 ring-red-500" : ""}`}
+                  >
                     <button
                       type="button"
                       onClick={() => {
                         setFormData({ ...formData, direction: "LONG" });
                         if (fieldErrors.direction) {
-                          setFieldErrors((prev) => ({ ...prev, direction: null }));
+                          setFieldErrors((prev) => ({
+                            ...prev,
+                            direction: null,
+                          }));
                         }
                       }}
                       className={`flex-1 py-3.5 rounded-xl font-bold text-sm transition-colors border ${formData.direction === "LONG" ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400" : "bg-[#15181D] border-white/10 text-gray-500 hover:text-white"}`}
@@ -526,7 +600,10 @@ export default function AddTrade() {
                       onClick={() => {
                         setFormData({ ...formData, direction: "SHORT" });
                         if (fieldErrors.direction) {
-                          setFieldErrors((prev) => ({ ...prev, direction: null }));
+                          setFieldErrors((prev) => ({
+                            ...prev,
+                            direction: null,
+                          }));
                         }
                       }}
                       className={`flex-1 py-3.5 rounded-xl font-bold text-sm transition-colors border ${formData.direction === "SHORT" ? "bg-red-500/10 border-red-500/30 text-red-400" : "bg-[#15181D] border-white/10 text-gray-500 hover:text-white"}`}
@@ -535,7 +612,9 @@ export default function AddTrade() {
                     </button>
                   </div>
                   {fieldErrors.direction && (
-                    <p className="text-red-400 text-xs mt-1">{fieldErrors.direction}</p>
+                    <p className="text-red-400 text-xs mt-1">
+                      {fieldErrors.direction}
+                    </p>
                   )}
                 </div>
                 <div>
@@ -564,7 +643,9 @@ export default function AddTrade() {
                     <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
                   </div>
                   {fieldErrors.session && (
-                    <p className="text-red-400 text-xs mt-1">{fieldErrors.session}</p>
+                    <p className="text-red-400 text-xs mt-1">
+                      {fieldErrors.session}
+                    </p>
                   )}
                 </div>
                 <div className="space-y-6">
@@ -577,11 +658,13 @@ export default function AddTrade() {
                       name="date"
                       value={formData.date}
                       onChange={handleChange}
-                      className={`${inputClass} [color-scheme:dark] ${fieldErrors.date ? "border-red-500 focus:ring-red-500 ring-1 ring-red-500" : ""}`}
+                      className={`${inputClass} ${fieldErrors.date ? "border-red-500 focus:ring-red-500 ring-1 ring-red-500" : ""}`}
                       required
                     />
                     {fieldErrors.date && (
-                      <p className="text-red-400 text-xs mt-1">{fieldErrors.date}</p>
+                      <p className="text-red-400 text-xs mt-1">
+                        {fieldErrors.date}
+                      </p>
                     )}
                   </div>
                   <div>
@@ -710,7 +793,9 @@ export default function AddTrade() {
                     placeholder="0.00"
                   />
                   {fieldErrors.entry && (
-                    <p className="text-red-400 text-xs mt-1">{fieldErrors.entry}</p>
+                    <p className="text-red-400 text-xs mt-1">
+                      {fieldErrors.entry}
+                    </p>
                   )}
                 </div>
                 <div>
@@ -727,7 +812,9 @@ export default function AddTrade() {
                     placeholder="0.00"
                   />
                   {fieldErrors.sl && (
-                    <p className="text-red-400 text-xs mt-1">{fieldErrors.sl}</p>
+                    <p className="text-red-400 text-xs mt-1">
+                      {fieldErrors.sl}
+                    </p>
                   )}
                 </div>
                 <div>
@@ -751,7 +838,8 @@ export default function AddTrade() {
                     value={formData.risk}
                     onChange={handleChange}
                     className={inputClass}
-                    placeholder="1.0"
+                    placeholder="Auto"
+                    readOnly
                   />
                 </div>
               </div>
@@ -762,7 +850,9 @@ export default function AddTrade() {
                   <label className={labelClass}>
                     Trade Result <span className="text-red-400">*</span>
                   </label>
-                  <div className={`flex gap-2 p-1 rounded-xl ${fieldErrors.result ? "border border-red-500 ring-1 ring-red-500" : ""}`}>
+                  <div
+                    className={`flex gap-2 p-1 rounded-xl ${fieldErrors.result ? "border border-red-500 ring-1 ring-red-500" : ""}`}
+                  >
                     <button
                       type="button"
                       onClick={() => {
@@ -801,7 +891,9 @@ export default function AddTrade() {
                     </button>
                   </div>
                   {fieldErrors.result && (
-                    <p className="text-red-400 text-xs mt-1">{fieldErrors.result}</p>
+                    <p className="text-red-400 text-xs mt-1">
+                      {fieldErrors.result}
+                    </p>
                   )}
                 </div>
                 <div>
@@ -815,10 +907,13 @@ export default function AddTrade() {
                     value={formData.rMultiple}
                     onChange={handleChange}
                     className={`${inputClass} ${fieldErrors.r_multiple ? "border-red-500 focus:ring-red-500 ring-1 ring-red-500" : ""}`}
-                    placeholder="e.g. 2.5 or -1.0"
+                    placeholder="Auto"
+                    readOnly
                   />
                   {fieldErrors.r_multiple && (
-                    <p className="text-red-400 text-xs mt-1">{fieldErrors.r_multiple}</p>
+                    <p className="text-red-400 text-xs mt-1">
+                      {fieldErrors.r_multiple}
+                    </p>
                   )}
                 </div>
               </div>
@@ -833,13 +928,15 @@ export default function AddTrade() {
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className={labelClass}>Strategy / Setup</label>
+                  <label className={labelClass}>
+                    Strategy / Setup <span className="text-red-400">*</span>
+                  </label>
                   <div className="relative">
                     <select
                       name="setup"
                       value={formData.setup}
                       onChange={handleChange}
-                      className={selectClass}
+                      className={`${selectClass} ${fieldErrors.setup ? "border-red-500 focus:ring-red-500 ring-1 ring-red-500" : ""}`}
                     >
                       {setups.map((s) => (
                         <option
@@ -862,6 +959,11 @@ export default function AddTrade() {
                       onChange={handleCustomChange}
                       className={`${inputClass} mt-3`}
                     />
+                  )}
+                  {fieldErrors.setup && (
+                    <p className="text-red-400 text-xs mt-1">
+                      {fieldErrors.setup}
+                    </p>
                   )}
                 </div>
                 <div>
@@ -909,14 +1011,15 @@ export default function AddTrade() {
                     <label className={labelClass}>
                       {idx === 0
                         ? "Emotion Before Trade"
-                        : "Emotion After Trade"}
+                        : "Emotion After Trade"}{" "}
+                      <span className="text-red-400">*</span>
                     </label>
                     <div className="relative">
                       <select
                         name={field}
                         value={formData[field]}
                         onChange={handleChange}
-                        className={selectClass}
+                        className={`${selectClass} ${fieldErrors[field] ? "border-red-500 focus:ring-red-500 ring-1 ring-red-500" : ""}`}
                       >
                         <option value="" className="bg-[#15181D] text-white">
                           Select emotion...
@@ -943,21 +1046,32 @@ export default function AddTrade() {
                         className={`${inputClass} mt-3`}
                       />
                     )}
+                    {fieldErrors[field] && (
+                      <p className="text-red-400 text-xs mt-1">
+                        {fieldErrors[field]}
+                      </p>
+                    )}
                   </div>
                 ))}
               </div>
 
               <div>
                 <label className={labelClass}>
-                  Psychological State / Notes
+                  Psychological State / Notes{" "}
+                  <span className="text-red-400">*</span>
                 </label>
                 <textarea
                   name="psychNote"
                   placeholder="What were you feeling during execution? Did you hesitate? Did you move your stop loss early?"
                   value={formData.psychNote}
                   onChange={handleChange}
-                  className={textareaClass}
+                  className={`${textareaClass} ${fieldErrors.psychNote ? "border-red-500 focus:ring-red-500 ring-1 ring-red-500" : ""}`}
                 />
+                {fieldErrors.psychNote && (
+                  <p className="text-red-400 text-xs mt-1">
+                    {fieldErrors.psychNote}
+                  </p>
+                )}
               </div>
             </div>
           )}
@@ -970,25 +1084,38 @@ export default function AddTrade() {
               </h2>
               <div>
                 <label className={labelClass}>
-                  Why did I take this trade? (Confluence)
+                  Why did I take this trade? (Confluence){" "}
+                  <span className="text-red-400">*</span>
                 </label>
                 <textarea
                   name="reason"
                   placeholder="e.g., 15m order block + structural shift on 1m..."
                   value={formData.reason}
                   onChange={handleChange}
-                  className={textareaClass}
+                  className={`${textareaClass} ${fieldErrors.reason ? "border-red-500 focus:ring-red-500 ring-1 ring-red-500" : ""}`}
                 />
+                {fieldErrors.reason && (
+                  <p className="text-red-400 text-xs mt-1">
+                    {fieldErrors.reason}
+                  </p>
+                )}
               </div>
               <div>
-                <label className={labelClass}>Lessons & Mistakes</label>
+                <label className={labelClass}>
+                  Lessons & Mistakes <span className="text-red-400">*</span>
+                </label>
                 <textarea
                   name="lesson"
                   placeholder="What went right? What went wrong? What will I do differently?"
                   value={formData.lesson}
                   onChange={handleChange}
-                  className={textareaClass}
+                  className={`${textareaClass} ${fieldErrors.lesson ? "border-red-500 focus:ring-red-500 ring-1 ring-red-500" : ""}`}
                 />
+                {fieldErrors.lesson && (
+                  <p className="text-red-400 text-xs mt-1">
+                    {fieldErrors.lesson}
+                  </p>
+                )}
               </div>
             </div>
           )}

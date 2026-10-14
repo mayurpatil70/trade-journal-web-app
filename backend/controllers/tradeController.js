@@ -7,6 +7,42 @@ import { supabase } from "../config/supabase.js";
 import { uploadToCloudinary } from "../utils/cloudinary.js";
 import { loadTradeImages, tradeImageUrls } from "../utils/exportImages.js";
 
+const normaliseTradeNumber = (value) => {
+  if (value === null || value === undefined || value === "") return null;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
+};
+
+const calculateRiskPercent = (entry, sl) => {
+  if (entry === null || sl === null || entry === 0) return null;
+  return Math.abs(((entry - sl) / entry) * 100);
+};
+
+const calculateRMultiple = (entry, sl, tp, direction) => {
+  if (
+    entry === null ||
+    sl === null ||
+    tp === null ||
+    entry === 0 ||
+    !direction
+  ) {
+    return null;
+  }
+
+  const risk = Math.abs(entry - sl);
+  if (risk === 0) return 0;
+
+  const gain = direction === "LONG" ? tp - entry : entry - tp;
+  const result = direction === "LONG" ? tp - entry : entry - tp;
+  const pnl = Math.abs(result) * (direction === "LONG" ? 1 : 1);
+
+  if (direction === "LONG") {
+    return (tp - entry) / (entry - sl);
+  }
+
+  return (entry - tp) / (sl - entry);
+};
+
 export const createTrade = async (req, res) => {
   try {
     const { userId } = req;
@@ -36,6 +72,16 @@ export const createTrade = async (req, res) => {
       }
     }
 
+    const entry = normaliseTradeNumber(tradeData.entry);
+    const sl = normaliseTradeNumber(tradeData.sl);
+    const tp = normaliseTradeNumber(tradeData.tp);
+    const computedRisk = calculateRiskPercent(entry, sl);
+
+    const rMultipleValue =
+      tradeData.rMultiple !== undefined && tradeData.rMultiple !== ""
+        ? normaliseTradeNumber(tradeData.rMultiple)
+        : calculateRMultiple(entry, sl, tp, tradeData.direction);
+
     const insertData = {
       user_id: userId,
       date: tradeData.date,
@@ -44,26 +90,27 @@ export const createTrade = async (req, res) => {
       direction: tradeData.direction,
       session: tradeData.session,
       setup: tradeData.setup,
-      entry: tradeData.entry ? parseFloat(tradeData.entry) : null,
-      sl: tradeData.sl ? parseFloat(tradeData.sl) : null,
-      tp: tradeData.tp ? parseFloat(tradeData.tp) : null,
-      risk: tradeData.risk ? parseFloat(tradeData.risk) : null,
+      entry,
+      sl,
+      tp,
+      risk:
+        computedRisk ??
+        (tradeData.risk !== undefined && tradeData.risk !== ""
+          ? normaliseTradeNumber(tradeData.risk)
+          : null),
       result: tradeData.result,
-      r_multiple: tradeData.rMultiple ? parseFloat(tradeData.rMultiple) : null,
+      r_multiple: rMultipleValue,
       rule_break: tradeData.ruleBreak,
       reason: tradeData.reason,
       lesson: tradeData.lesson,
       emotion_before: tradeData.emotionBefore,
       emotion_after: tradeData.emotionAfter,
       psych_note: tradeData.psychNote,
-      // Account name for multi-account support
-      account_name: tradeData.accountName || 'Default Account',
-      // Maintain old images array for backwards compatibility
+      account_name: tradeData.accountName || "Default Account",
       images: imageUrls,
-      // NEW FIELDS for Phase 3 Tools:
-      before_image: imageUrls[0] || null, // First image is assumed to be 'Before'
-      after_image: imageUrls[1] || null, // Second image is assumed to be 'After'
-      executions: parsedExecutions, // Array of partial exits
+      before_image: imageUrls[0] || null,
+      after_image: imageUrls[1] || null,
+      executions: parsedExecutions,
     };
 
     const { data, error } = await supabase
@@ -152,7 +199,9 @@ export const deleteTrade = async (req, res) => {
 
     if (error) throw error;
 
-    res.status(200).json({ success: true, message: "Trade deleted successfully." });
+    res
+      .status(200)
+      .json({ success: true, message: "Trade deleted successfully." });
   } catch (error) {
     console.error("Delete Trade Error:", error);
     res.status(500).json({ success: false, error: "Failed to delete trade." });
@@ -189,10 +238,16 @@ export const exportTrades = async (req, res) => {
     }
 
     if (format === "csv") {
-      const rows = trades.map(({ images, before_image, after_image, ...t }) => ({
-        ...t,
-        image_urls: tradeImageUrls({ images, before_image, after_image }).join(" | "),
-      }));
+      const rows = trades.map(
+        ({ images, before_image, after_image, ...t }) => ({
+          ...t,
+          image_urls: tradeImageUrls({
+            images,
+            before_image,
+            after_image,
+          }).join(" | "),
+        }),
+      );
       const csv = new Parser().parse(rows);
       res.header("Content-Type", "text/csv");
       res.attachment("Trade_Journey_Export.csv");
@@ -221,11 +276,17 @@ export const exportTrades = async (req, res) => {
       const imagesOf = await loadTradeImages(trades);
       trades.forEach((trade) => {
         const imgs = imagesOf(trade);
-        const row = worksheet.addRow({ ...trade, shots: imgs.length ? "" : "-" });
+        const row = worksheet.addRow({
+          ...trade,
+          shots: imgs.length ? "" : "-",
+        });
         if (!imgs.length) return;
         row.height = 150;
         imgs.slice(0, 3).forEach((img, i) => {
-          const imageId = workbook.addImage({ buffer: img.buffer, extension: img.type });
+          const imageId = workbook.addImage({
+            buffer: img.buffer,
+            extension: img.type,
+          });
           worksheet.addImage(imageId, {
             tl: { col: 11 + i, row: row.number - 1 },
             ext: { width: 200, height: 190 },
