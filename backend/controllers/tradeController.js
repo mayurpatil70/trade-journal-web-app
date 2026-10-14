@@ -112,8 +112,6 @@ export const createTrade = async (req, res) => {
     const entry = normaliseTradeNumber(tradeData.entry);
     const sl = normaliseTradeNumber(tradeData.sl);
     const tp = normaliseTradeNumber(tradeData.tp);
-    const computedRisk = calculateRiskPercent(entry, sl);
-
     const plannedRR = calculateRMultiple(entry, sl, tp, tradeData.direction);
     const rawRMultiple =
       tradeData.rMultiple !== undefined && tradeData.rMultiple !== ""
@@ -126,6 +124,11 @@ export const createTrade = async (req, res) => {
       plannedRR
     );
 
+    const userRisk =
+      tradeData.risk !== undefined && tradeData.risk !== "" && tradeData.risk !== null
+        ? normaliseTradeNumber(tradeData.risk)
+        : null;
+
     const insertData = {
       user_id: userId,
       date: tradeData.date,
@@ -137,11 +140,7 @@ export const createTrade = async (req, res) => {
       entry,
       sl,
       tp,
-      risk:
-        computedRisk ??
-        (tradeData.risk !== undefined && tradeData.risk !== ""
-          ? normaliseTradeNumber(tradeData.risk)
-          : null),
+      risk: userRisk !== null ? userRisk : 1.0,
       result: tradeData.result,
       r_multiple: rMultipleValue,
       rule_break: tradeData.ruleBreak,
@@ -289,7 +288,6 @@ export const updateTrade = async (req, res) => {
     const direction = tradeData.direction || existing.direction;
     const result = tradeData.result || existing.result;
 
-    const computedRisk = calculateRiskPercent(entry, sl);
     const plannedRR = calculateRMultiple(entry, sl, tp, direction);
     const rawRMultiple =
       tradeData.rMultiple !== undefined && tradeData.rMultiple !== ""
@@ -299,6 +297,18 @@ export const updateTrade = async (req, res) => {
         : null;
 
     const rMultipleValue = sanitizeRMultiple(result, rawRMultiple, plannedRR);
+
+    const userRisk =
+      tradeData.risk !== undefined && tradeData.risk !== "" && tradeData.risk !== null
+        ? normaliseTradeNumber(tradeData.risk)
+        : undefined;
+
+    const riskValue =
+      userRisk !== undefined
+        ? userRisk
+        : existing.risk !== null && existing.risk !== undefined
+        ? existing.risk
+        : 1.0;
 
     const updateFields = {
       ...(tradeData.date !== undefined && { date: tradeData.date }),
@@ -310,11 +320,7 @@ export const updateTrade = async (req, res) => {
       entry,
       sl,
       tp,
-      risk:
-        computedRisk ??
-        (tradeData.risk !== undefined && tradeData.risk !== ""
-          ? normaliseTradeNumber(tradeData.risk)
-          : existing.risk),
+      risk: riskValue,
       result,
       r_multiple: rMultipleValue,
       ...(tradeData.ruleBreak !== undefined && { rule_break: tradeData.ruleBreak }),

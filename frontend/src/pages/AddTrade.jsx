@@ -79,7 +79,7 @@ export default function AddTrade() {
     entry: "",
     sl: "",
     tp: "",
-    risk: "",
+    risk: "1.00",
     result: "win",
     rMultiple: "",
     r_multiple: "",
@@ -156,7 +156,12 @@ export default function AddTrade() {
             entry: t.entry !== null && t.entry !== undefined ? String(t.entry) : "",
             sl: t.sl !== null && t.sl !== undefined ? String(t.sl) : "",
             tp: t.tp !== null && t.tp !== undefined ? String(t.tp) : "",
-            risk: t.risk !== null && t.risk !== undefined ? String(t.risk) : "",
+            risk:
+              t.risk !== null && t.risk !== undefined
+                ? Number.isInteger(Number(t.risk))
+                  ? String(t.risk)
+                  : Number(t.risk).toFixed(2)
+                : "1.00",
             result: resResult,
             rMultiple: rVal,
             r_multiple: rVal,
@@ -215,11 +220,6 @@ export default function AddTrade() {
         const sl = name === "sl" ? Number(value) : Number(updated.sl || 0);
         const tp = name === "tp" ? Number(value) : Number(updated.tp || 0);
         const direction = name === "direction" ? value : updated.direction;
-
-        if (!Number.isNaN(entry) && !Number.isNaN(sl) && entry !== 0) {
-          const riskPct = Math.abs(((entry - sl) / entry) * 100);
-          updated.risk = Number.isFinite(riskPct) ? riskPct.toFixed(2) : "";
-        }
 
         if (
           !Number.isNaN(entry) &&
@@ -904,7 +904,19 @@ export default function AddTrade() {
                   />
                 </div>
                 <div>
-                  <label className={labelClass}>Risk %</label>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-[12px] font-semibold text-gray-400 uppercase tracking-wider">
+                      Risk %
+                    </label>
+                    {formData.entry &&
+                      formData.sl &&
+                      !Number.isNaN(Number(formData.entry)) &&
+                      !Number.isNaN(Number(formData.sl)) && (
+                        <span className="text-[11px] text-gray-400 font-mono">
+                          (SL: {Math.abs(Number(formData.entry) - Number(formData.sl)).toFixed(2)} pts)
+                        </span>
+                      )}
+                  </div>
                   <input
                     type="number"
                     step="any"
@@ -912,9 +924,34 @@ export default function AddTrade() {
                     value={formData.risk}
                     onChange={handleChange}
                     className={inputClass}
-                    placeholder="Auto"
-                    readOnly
+                    placeholder="1.00"
                   />
+                  <div className="flex items-center gap-1.5 mt-2 flex-wrap">
+                    {[0.25, 0.5, 1.0, 2.0].map((preset) => {
+                      const isSelected =
+                        formData.risk !== "" &&
+                        Number(formData.risk) === preset;
+                      return (
+                        <button
+                          key={preset}
+                          type="button"
+                          onClick={() =>
+                            setFormData((p) => ({
+                              ...p,
+                              risk: preset.toFixed(2),
+                            }))
+                          }
+                          className={`px-2 py-1 text-[11px] rounded font-mono transition-colors border ${
+                            isSelected
+                              ? "bg-blue-500/20 text-blue-400 border-blue-500/30 font-semibold"
+                              : "bg-white/5 text-gray-400 border-white/10 hover:bg-white/10 hover:text-white"
+                          }`}
+                        >
+                          {preset.toFixed(2)}%
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
 
