@@ -28,6 +28,25 @@ const tradeStamp = (t) => {
   return Number.isNaN(d) ? 0 : d;
 };
 
+const normalizeTradeR = (t) => {
+  if (!t) return 0;
+  const res = (t.result || "").toLowerCase().trim();
+  let r = parseFloat(t.r_multiple);
+  if (Number.isNaN(r)) r = 0;
+  if (res === "loss" && r > 0) return -1;
+  if (res === "be") return 0;
+  if (res === "win" && r < 0) return Math.abs(r);
+  return r;
+};
+
+const isTradeWin = (t) => {
+  if (!t) return false;
+  const res = (t.result || "").toLowerCase().trim();
+  if (res === "win") return true;
+  if (res === "loss" || res === "be") return false;
+  return normalizeTradeR(t) > 0;
+};
+
 export default function PastTrades() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -87,7 +106,9 @@ export default function PastTrades() {
       `${t.asset} ${t.setup} ${t.session} ${t.account_name || ""}`
         .toLowerCase()
         .includes(search.toLowerCase());
-    const matchesResult = !resultFilter || t.result === resultFilter;
+    const matchesResult =
+      !resultFilter ||
+      (t.result || "").toLowerCase() === resultFilter.toLowerCase();
     const matchesDirection =
       !directionFilter || t.direction === directionFilter;
     const matchesSession = !sessionFilter || t.session === sessionFilter;
@@ -256,8 +277,8 @@ export default function PastTrades() {
         ) : (
           <>
             {currentTrades.map((t, idx) => {
-              const r = parseFloat(t.r_multiple || 0);
-              const isWin = r >= 0;
+              const r = normalizeTradeR(t);
+              const isWin = isTradeWin(t);
               const hasImages = t.images && t.images.length > 0;
 
               return (
@@ -418,42 +439,61 @@ export default function PastTrades() {
             {/* Body */}
             <div className="flex-1 overflow-y-auto p-6 space-y-8">
               {/* Top Stats */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {[
-                  {
-                    label: "Net R",
-                    value: `${parseFloat(selectedTrade.r_multiple || 0).toFixed(2)}R`,
-                    isNet: true,
-                  },
-                  {
-                    label: "Result",
-                    value: selectedTrade.result?.toUpperCase(),
-                  },
-                  { label: "Setup", value: selectedTrade.setup },
-                  { label: "Session", value: selectedTrade.session },
-                  { label: "Entry", value: selectedTrade.entry || "—" },
-                  { label: "Stop Loss", value: selectedTrade.sl || "—" },
-                  { label: "Take Profit", value: selectedTrade.tp || "—" },
-                  {
-                    label: "Risk %",
-                    value: selectedTrade.risk ? `${selectedTrade.risk}%` : "—",
-                  },
-                ].map((s, i) => (
-                  <div
-                    key={i}
-                    className="bg-[#15181D] border border-white/5 p-4 rounded-xl"
-                  >
-                    <p className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">
-                      {s.label}
-                    </p>
-                    <p
-                      className={`text-[15px] font-bold ${s.isNet ? (parseFloat(selectedTrade.r_multiple) >= 0 ? "text-emerald-400" : "text-red-400") : "text-white"}`}
-                    >
-                      {s.value}
-                    </p>
+              {(() => {
+                const selR = normalizeTradeR(selectedTrade);
+                const selIsLoss =
+                  (selectedTrade.result || "").toLowerCase() === "loss" ||
+                  selR < 0;
+                return (
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {[
+                      {
+                        label: "Net R",
+                        value: `${selR >= 0 ? "+" : ""}${selR.toFixed(2)}R`,
+                        isNet: true,
+                        isLoss: selIsLoss,
+                      },
+                      {
+                        label: "Result",
+                        value: selectedTrade.result?.toUpperCase(),
+                        isResult: true,
+                        isLoss: selIsLoss,
+                      },
+                      { label: "Setup", value: selectedTrade.setup },
+                      { label: "Session", value: selectedTrade.session },
+                      { label: "Entry", value: selectedTrade.entry || "—" },
+                      { label: "Stop Loss", value: selectedTrade.sl || "—" },
+                      { label: "Take Profit", value: selectedTrade.tp || "—" },
+                      {
+                        label: "Risk %",
+                        value: selectedTrade.risk
+                          ? `${Number(selectedTrade.risk).toFixed(2)}%`
+                          : "—",
+                      },
+                    ].map((s, i) => (
+                      <div
+                        key={i}
+                        className="bg-[#15181D] border border-white/5 p-4 rounded-xl"
+                      >
+                        <p className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">
+                          {s.label}
+                        </p>
+                        <p
+                          className={`text-[15px] font-bold ${
+                            s.isNet || s.isResult
+                              ? s.isLoss
+                                ? "text-red-400"
+                                : "text-emerald-400"
+                              : "text-white"
+                          }`}
+                        >
+                          {s.value}
+                        </p>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
+                );
+              })()}
 
               {/* Notes & Psychology */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

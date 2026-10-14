@@ -14,6 +14,25 @@ import {
   Zap,
 } from "lucide-react";
 
+const normalizeTradeR = (t) => {
+  if (!t) return 0;
+  const res = (t.result || "").toLowerCase().trim();
+  let r = parseFloat(t.r_multiple);
+  if (Number.isNaN(r)) r = 0;
+  if (res === "loss" && r > 0) return -1;
+  if (res === "be") return 0;
+  if (res === "win" && r < 0) return Math.abs(r);
+  return r;
+};
+
+const isTradeWin = (t) => {
+  if (!t) return false;
+  const res = (t.result || "").toLowerCase().trim();
+  if (res === "win") return true;
+  if (res === "loss" || res === "be") return false;
+  return normalizeTradeR(t) > 0;
+};
+
 export default function PerformanceCalendar() {
   const navigate = useNavigate();
   const [trades, setTrades] = useState([]);
@@ -114,7 +133,7 @@ export default function PerformanceCalendar() {
               const dateString = `${year}-${String(month + 1).padStart(2, "0")}-${String(dayNum).padStart(2, "0")}`;
               const dayTrades = filteredTrades.filter((t) => (t.date || "").slice(0, 10) === dateString);
               
-              const netDayR = dayTrades.reduce((acc, t) => acc + parseFloat(t.r_multiple || 0), 0);
+              const netDayR = dayTrades.reduce((acc, t) => acc + normalizeTradeR(t), 0);
               const hasTrades = dayTrades.length > 0;
               const isPositive = netDayR >= 0;
               const brokeRules = dayTrades.some((t) => t.rule_break === "yes");
@@ -156,7 +175,7 @@ export default function PerformanceCalendar() {
                        </div>
                        <div className="flex gap-1 h-1.5 rounded-full overflow-hidden bg-white/5">
                           {dayTrades.map((t, idx) => (
-                             <div key={idx} className={`flex-1 ${parseFloat(t.r_multiple) >= 0 ? "bg-emerald-500" : "bg-red-500"}`} />
+                             <div key={idx} className={`flex-1 ${normalizeTradeR(t) >= 0 ? "bg-emerald-500" : "bg-red-500"}`} />
                           ))}
                        </div>
                     </div>
@@ -192,8 +211,8 @@ export default function PerformanceCalendar() {
              
              <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-[#0A0B0D]">
                {selectedDayTrades.trades.map((t, idx) => {
-                 const r = parseFloat(t.r_multiple || 0);
-                 const isWin = r >= 0;
+                 const r = normalizeTradeR(t);
+                 const isWin = isTradeWin(t);
                  return (
                    <div key={idx} onClick={() => navigate("/trades", { state: { openTradeId: t.id } })} className="bg-[#15181D] border border-white/5 rounded-xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 cursor-pointer hover:bg-white/5 transition-colors">
                       <div className="flex items-center gap-4">

@@ -14,7 +14,9 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 export const requestLogin = async (req, res) => {
   const email = String(req.body?.email || "").trim();
   if (!EMAIL_RE.test(email)) {
-    return res.status(400).json({ error: "Please enter a valid email address." });
+    return res
+      .status(400)
+      .json({ error: "Please enter a valid email address." });
   }
   const token = crypto.randomBytes(32).toString("hex");
   const expires = new Date(Date.now() + 15 * 60000).toISOString();
@@ -37,26 +39,30 @@ export const requestLogin = async (req, res) => {
     res.json({ message: "Login link sent successfully." });
 
     // Fire-and-forget email send (runs after response is sent)
-    resend.emails.send({
-      from: "ForexNotes <auth@forexnotes.in>",
-      to: email,
-      subject: "ForexNotes - Secure Login",
-      text: `Sign in to ForexNotes: ${magicLink}\n\nThis link expires in 15 minutes. If you didn't request it, ignore this email.`,
-      html: `<div style="font-family:Arial,sans-serif;max-width:480px;margin:auto;padding:24px">
+    resend.emails
+      .send({
+        from: "ForexNotes <auth@forexnotes.in>",
+        to: email,
+        subject: "ForexNotes - Secure Login",
+        text: `Sign in to ForexNotes: ${magicLink}\n\nThis link expires in 15 minutes. If you didn't request it, ignore this email.`,
+        html: `<div style="font-family:Arial,sans-serif;max-width:480px;margin:auto;padding:24px">
         <h2 style="margin:0 0 12px">Sign in to ForexNotes</h2>
-        <p>Click the button below to access your trading journal. This link expires in 15 minutes.</p>
+        <p>Click the button below to access your Setup Backtesting & Digital Trading journal. This link expires in 15 minutes.</p>
         <p><a href="${magicLink}" style="display:inline-block;background:#10b981;color:#000;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:bold">Sign in</a></p>
         <p style="color:#666;font-size:12px">If you didn't request this email, you can safely ignore it.</p>
       </div>`,
-    }).catch((emailError) => {
-      // Log email failure but don't crash — the DB already has the token
-      console.error("Email send failed (background):", emailError.message);
-    });
+      })
+      .catch((emailError) => {
+        // Log email failure but don't crash — the DB already has the token
+        console.error("Email send failed (background):", emailError.message);
+      });
   } catch (error) {
     console.error("Auth Error:", error.message);
     // Only send error if response hasn't been sent yet
     if (!res.headersSent) {
-      res.status(500).json({ error: "Could not send the login link. Please try again." });
+      res
+        .status(500)
+        .json({ error: "Could not send the login link. Please try again." });
     }
   }
 };

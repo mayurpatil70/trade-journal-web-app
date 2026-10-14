@@ -48,23 +48,39 @@ export default function Mistakes() {
     );
   }
 
+  const normalizeTradeR = (t) => {
+    if (!t) return 0;
+    const res = (t.result || "").toLowerCase().trim();
+    let r = parseFloat(t.r_multiple);
+    if (Number.isNaN(r)) r = 0;
+    if (res === "loss" && r > 0) return -1;
+    if (res === "be") return 0;
+    if (res === "win" && r < 0) return Math.abs(r);
+    return r;
+  };
+
   // Identify unforced errors (Losses where rules were broken)
-  const unforcedErrors = trades.filter(t => t.result === 'loss' && t.rule_break === 'yes');
-  const costOfMistakes = unforcedErrors.reduce((acc, t) => acc + parseFloat(t.r_multiple || 0), 0);
+  const unforcedErrors = trades.filter(
+    (t) => (t.result || "").toLowerCase() === "loss" && t.rule_break === "yes"
+  );
+  const costOfMistakes = unforcedErrors.reduce(
+    (acc, t) => acc + normalizeTradeR(t),
+    0
+  );
 
   // Setups that are losing money
   const setups = {};
-  trades.forEach(t => {
+  trades.forEach((t) => {
     if (!t.setup) return;
     if (!setups[t.setup]) setups[t.setup] = { total: 0, r: 0 };
     setups[t.setup].total++;
-    setups[t.setup].r += parseFloat(t.r_multiple || 0);
+    setups[t.setup].r += normalizeTradeR(t);
   });
 
   const losingSetups = Object.entries(setups)
-     .map(([name, data]) => ({ name, ...data }))
-     .filter(s => s.r < 0)
-     .sort((a,b) => a.r - b.r);
+    .map(([name, data]) => ({ name, ...data }))
+    .filter((s) => s.r < 0)
+    .sort((a, b) => a.r - b.r);
 
   return (
     <div className="w-full max-w-7xl mx-auto font-sans pb-24 px-4 md:px-8 mt-6">

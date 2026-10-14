@@ -24,6 +24,10 @@ import {
 export default function AddTrade() {
   const navigate = useNavigate();
   const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const editTradeId = searchParams.get("edit");
+  const isEditing = Boolean(editTradeId);
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [step, setStep] = useState(1);
   const [fieldErrors, setFieldErrors] = useState({});
@@ -128,6 +132,53 @@ export default function AddTrade() {
     fetchAccounts();
   }, []);
 
+  // Fetch trade data when editing an existing trade
+  useEffect(() => {
+    if (!editTradeId) return;
+    const fetchTradeToEdit = async () => {
+      const userId =
+        localStorage.getItem("userId") || localStorage.getItem("userEmail");
+      if (!userId) return;
+      try {
+        const res = await api.get(`/api/trades?userId=${userId}`);
+        const trades = res.data?.data || [];
+        const t = trades.find((x) => x.id === editTradeId);
+        if (t) {
+          const resResult = (t.result || "win").toLowerCase();
+          const rVal = t.r_multiple !== null && t.r_multiple !== undefined ? String(t.r_multiple) : "";
+          setFormData({
+            date: t.date || new Date().toISOString().slice(0, 10),
+            time: t.time || "12:00",
+            asset: t.asset || "XAUUSD",
+            direction: t.direction || "LONG",
+            session: t.session || "London",
+            setup: t.setup || "FVG",
+            entry: t.entry !== null && t.entry !== undefined ? String(t.entry) : "",
+            sl: t.sl !== null && t.sl !== undefined ? String(t.sl) : "",
+            tp: t.tp !== null && t.tp !== undefined ? String(t.tp) : "",
+            risk: t.risk !== null && t.risk !== undefined ? String(t.risk) : "",
+            result: resResult,
+            rMultiple: rVal,
+            r_multiple: rVal,
+            ruleBreak: t.rule_break || "no",
+            reason: t.reason || "",
+            lesson: t.lesson || "",
+            emotionBefore: t.emotion_before || "",
+            emotionAfter: t.emotion_after || "",
+            psychNote: t.psych_note || "",
+            accountName: t.account_name || "",
+          });
+          if (t.account_name) {
+            setAccountInputMode("select");
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load trade for editing:", err);
+      }
+    };
+    fetchTradeToEdit();
+  }, [editTradeId]);
+
   useEffect(() => {
     if (formData.entry && formData.sl && formData.tp) {
       const entry = parseFloat(formData.entry);
@@ -148,8 +199,15 @@ export default function AddTrade() {
     setFormData((prev) => {
       const updated = { ...prev, [name]: value };
 
-      if (name === "rMultiple") updated.r_multiple = value;
-      if (name === "r_multiple") updated.rMultiple = value;
+      if (name === "rMultiple" || name === "r_multiple") {
+        let val = value;
+        // If result is loss and user typed a positive number, keep negative formatting
+        if (updated.result === "loss" && val && Number(val) > 0) {
+          val = `-${val}`;
+        }
+        updated.rMultiple = val;
+        updated.r_multiple = val;
+      }
 
       if (["entry", "sl", "tp", "direction"].includes(name)) {
         const entry =
@@ -176,8 +234,18 @@ export default function AddTrade() {
               : (tp - entry) / (entry - sl);
 
           if (Number.isFinite(rMultipleVal)) {
-            updated.rMultiple = rMultipleVal.toFixed(2);
-            updated.r_multiple = rMultipleVal.toFixed(2);
+            if (updated.result === "win") {
+              updated.rMultiple = rMultipleVal.toFixed(2);
+              updated.r_multiple = rMultipleVal.toFixed(2);
+            } else if (updated.result === "loss") {
+              if (!updated.rMultiple || Number(updated.rMultiple) >= 0) {
+                updated.rMultiple = "-1.00";
+                updated.r_multiple = "-1.00";
+              }
+            } else if (updated.result === "be") {
+              updated.rMultiple = "0.00";
+              updated.r_multiple = "0.00";
+            }
           }
         }
       }
@@ -298,7 +366,7 @@ export default function AddTrade() {
       return;
     }
 
-    if (!images[0] || !images[1]) {
+    if (!isEditing && (!images[0] || !images[1])) {
       alert("Please upload both Before and After chart images before saving.");
       return;
     }
@@ -329,9 +397,15 @@ export default function AddTrade() {
         if (img) submitData.append("images", img);
       });
 
-      await api.post("/api/trades", submitData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      if (isEditing) {
+        await api.put(`/api/trades/${editTradeId}`, submitData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+      } else {
+        await api.post("/api/trades", submitData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+      }
       navigate("/trades");
     } catch (error) {
       console.error("Upload Error:", error);
@@ -368,10 +442,10 @@ export default function AddTrade() {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-2xl font-semibold text-white flex items-center gap-2">
-            <Target className="w-6 h-6 text-emerald-400" /> Log Trade
+            <Target className="w-6 h-6 text-emerald-400" /> {isEditing ? "Edit Trade" : "Log Trade"}
           </h1>
           <p className="text-sm text-gray-500 mt-1">
-            Capture your edge efficiently.
+            {isEditing ? "Update your trade parameters and outcome." : "Capture your edge efficiently."}
           </p>
         </div>
         <button
@@ -856,7 +930,18 @@ export default function AddTrade() {
                     <button
                       type="button"
                       onClick={() => {
-                        setFormData({ ...formData, result: "win" });
+                        const targetR =
+                          calcRR > 0
+                            ? Number(calcRR).toFixed(2)
+                            : formData.rMultiple && Number(formData.rMultiple) > 0
+                            ? formData.rMultiple
+                            : "1.00";
+                        setFormData((prev) => ({
+                          ...prev,
+                          result: "win",
+                          rMultiple: targetR,
+                          r_multiple: targetR,
+                        }));
                         if (fieldErrors.result) {
                           setFieldErrors((prev) => ({ ...prev, result: null }));
                         }
@@ -868,7 +953,16 @@ export default function AddTrade() {
                     <button
                       type="button"
                       onClick={() => {
-                        setFormData({ ...formData, result: "loss" });
+                        const lossR =
+                          formData.rMultiple && Number(formData.rMultiple) < 0
+                            ? formData.rMultiple
+                            : "-1.00";
+                        setFormData((prev) => ({
+                          ...prev,
+                          result: "loss",
+                          rMultiple: lossR,
+                          r_multiple: lossR,
+                        }));
                         if (fieldErrors.result) {
                           setFieldErrors((prev) => ({ ...prev, result: null }));
                         }
@@ -880,7 +974,12 @@ export default function AddTrade() {
                     <button
                       type="button"
                       onClick={() => {
-                        setFormData({ ...formData, result: "be" });
+                        setFormData((prev) => ({
+                          ...prev,
+                          result: "be",
+                          rMultiple: "0.00",
+                          r_multiple: "0.00",
+                        }));
                         if (fieldErrors.result) {
                           setFieldErrors((prev) => ({ ...prev, result: null }));
                         }
@@ -897,19 +996,79 @@ export default function AddTrade() {
                   )}
                 </div>
                 <div>
-                  <label className={labelClass}>
-                    Net R-Multiple <span className="text-red-400">*</span>
-                  </label>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className={labelClass}>
+                      Net R-Multiple <span className="text-red-400">*</span>
+                    </label>
+                    <span className="text-[11px] text-gray-400 font-mono">
+                      {formData.result === "loss" && "(Loss: -1R or custom)"}
+                      {formData.result === "win" && calcRR > 0 && `(Target: +${calcRR}R)`}
+                      {formData.result === "be" && "(Break-even: 0R)"}
+                    </span>
+                  </div>
                   <input
                     type="number"
-                    step="0.1"
+                    step="any"
                     name="rMultiple"
                     value={formData.rMultiple}
                     onChange={handleChange}
-                    className={`${inputClass} ${fieldErrors.r_multiple ? "border-red-500 focus:ring-red-500 ring-1 ring-red-500" : ""}`}
-                    placeholder="Auto"
-                    readOnly
+                    className={`${inputClass} ${fieldErrors.r_multiple ? "border-red-500 focus:ring-red-500 ring-1 ring-red-500" : ""} ${formData.result === "loss" ? "text-red-400 font-bold" : formData.result === "win" ? "text-emerald-400 font-bold" : "text-gray-300 font-bold"}`}
+                    placeholder={formData.result === "loss" ? "-1.00" : "0.00"}
                   />
+                  {/* Preset helpers */}
+                  <div className="flex items-center gap-1.5 mt-2">
+                    {formData.result === "loss" ? (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => setFormData((p) => ({ ...p, rMultiple: "-1.00", r_multiple: "-1.00" }))}
+                          className="px-2.5 py-1 text-[11px] rounded bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20 font-mono transition-colors"
+                        >
+                          -1.00R (Full SL)
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setFormData((p) => ({ ...p, rMultiple: "-0.50", r_multiple: "-0.50" }))}
+                          className="px-2.5 py-1 text-[11px] rounded bg-white/5 text-gray-300 border border-white/10 hover:bg-white/10 font-mono transition-colors"
+                        >
+                          -0.50R (Half)
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setFormData((p) => ({ ...p, rMultiple: "-1.50", r_multiple: "-1.50" }))}
+                          className="px-2.5 py-1 text-[11px] rounded bg-white/5 text-gray-300 border border-white/10 hover:bg-white/10 font-mono transition-colors"
+                        >
+                          -1.50R (Slippage)
+                        </button>
+                      </>
+                    ) : formData.result === "win" ? (
+                      <>
+                        {calcRR > 0 && (
+                          <button
+                            type="button"
+                            onClick={() => setFormData((p) => ({ ...p, rMultiple: String(calcRR), r_multiple: String(calcRR) }))}
+                            className="px-2.5 py-1 text-[11px] rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 font-mono transition-colors"
+                          >
+                            +{calcRR}R (Target TP)
+                          </button>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => setFormData((p) => ({ ...p, rMultiple: "1.00", r_multiple: "1.00" }))}
+                          className="px-2.5 py-1 text-[11px] rounded bg-white/5 text-gray-300 border border-white/10 hover:bg-white/10 font-mono transition-colors"
+                        >
+                          +1.00R
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setFormData((p) => ({ ...p, rMultiple: "2.00", r_multiple: "2.00" }))}
+                          className="px-2.5 py-1 text-[11px] rounded bg-white/5 text-gray-300 border border-white/10 hover:bg-white/10 font-mono transition-colors"
+                        >
+                          +2.00R
+                        </button>
+                      </>
+                    ) : null}
+                  </div>
                   {fieldErrors.r_multiple && (
                     <p className="text-red-400 text-xs mt-1">
                       {fieldErrors.r_multiple}
@@ -1193,16 +1352,16 @@ export default function AddTrade() {
             ) : (
               <button
                 type="submit"
-                disabled={isSubmitting || !images[0] || !images[1]}
+                disabled={isSubmitting || (!isEditing && (!images[0] || !images[1]))}
                 className="px-8 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white font-bold text-sm transition-all shadow-lg shadow-emerald-500/30 flex items-center gap-2 disabled:opacity-50 disabled:hover:bg-emerald-500 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? (
                   <>
-                    <Loader2 className="w-4 h-4 animate-spin" /> Saving...
+                    <Loader2 className="w-4 h-4 animate-spin" /> {isEditing ? "Updating..." : "Saving..."}
                   </>
                 ) : (
                   <>
-                    <Save className="w-4 h-4" /> Save Trade
+                    <Save className="w-4 h-4" /> {isEditing ? "Update Trade" : "Save Trade"}
                   </>
                 )}
               </button>

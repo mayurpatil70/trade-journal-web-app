@@ -32,15 +32,40 @@ const calculateRMultiple = (entry, sl, tp, direction) => {
   const risk = Math.abs(entry - sl);
   if (risk === 0) return 0;
 
-  const gain = direction === "LONG" ? tp - entry : entry - tp;
-  const result = direction === "LONG" ? tp - entry : entry - tp;
-  const pnl = Math.abs(result) * (direction === "LONG" ? 1 : 1);
-
   if (direction === "LONG") {
     return (tp - entry) / (entry - sl);
   }
 
   return (entry - tp) / (sl - entry);
+};
+
+export const sanitizeRMultiple = (result, rMultipleValue, plannedRR) => {
+  const normResult = (result || "").toLowerCase().trim();
+
+  if (normResult === "loss") {
+    // A loss trade must have a negative R-multiple.
+    // If the user specified a custom negative R (e.g. -0.5, -1.2), keep it.
+    // If rMultipleValue was positive (e.g. from planned target R:R) or missing, default to -1.0.
+    if (rMultipleValue !== null && rMultipleValue !== undefined && rMultipleValue < 0) {
+      return rMultipleValue;
+    }
+    return -1.0;
+  }
+
+  if (normResult === "be") {
+    return 0.0;
+  }
+
+  // Win
+  if (rMultipleValue !== null && rMultipleValue !== undefined) {
+    return Math.abs(rMultipleValue);
+  }
+
+  if (plannedRR !== null && plannedRR !== undefined) {
+    return Math.abs(plannedRR);
+  }
+
+  return null;
 };
 
 export const createTrade = async (req, res) => {
@@ -77,10 +102,17 @@ export const createTrade = async (req, res) => {
     const tp = normaliseTradeNumber(tradeData.tp);
     const computedRisk = calculateRiskPercent(entry, sl);
 
-    const rMultipleValue =
+    const plannedRR = calculateRMultiple(entry, sl, tp, tradeData.direction);
+    const rawRMultiple =
       tradeData.rMultiple !== undefined && tradeData.rMultiple !== ""
         ? normaliseTradeNumber(tradeData.rMultiple)
-        : calculateRMultiple(entry, sl, tp, tradeData.direction);
+        : null;
+
+    const rMultipleValue = sanitizeRMultiple(
+      tradeData.result,
+      rawRMultiple,
+      plannedRR
+    );
 
     const insertData = {
       user_id: userId,
@@ -205,6 +237,99 @@ export const deleteTrade = async (req, res) => {
   } catch (error) {
     console.error("Delete Trade Error:", error);
     res.status(500).json({ success: false, error: "Failed to delete trade." });
+  }
+};
+
+export const updateTrade = async (req, res) => {
+  try {
+    const { userId } = req;
+    const { id } = req.params;
+    const tradeData = req.body;
+
+    if (!userId) {
+      return res
+        .status(401)
+        .json({ success: false, error: "Unauthorized: Missing User ID" });
+    }
+
+    const { data: existing, error: fetchErr } = await supabase
+      .from("trades")
+      .select("*")
+      .eq("id", id)
+      .eq("user_id", userId)
+      .single();
+
+    if (fetchErr || !existing) {
+      return res.status(404).json({ success: false, error: "Trade not found." });
+    }
+
+    const imageUrls = [...(existing.images || [])];
+    if (req.files && req.files.length > 0) {
+      for (const file of req.files) {
+        const url = await uploadToCloudinary(file.buffer);
+        imageUrls.push(url);
+      }
+    }
+
+    const entry = normaliseTradeNumber(tradeData.entry !== undefined ? tradeData.entry : existing.entry);
+    const sl = normaliseTradeNumber(tradeData.sl !== undefined ? tradeData.sl : existing.sl);
+    const tp = normaliseTradeNumber(tradeData.tp !== undefined ? tradeData.tp : existing.tp);
+    const direction = tradeData.direction || existing.direction;
+    const result = tradeData.result || existing.result;
+
+    const computedRisk = calculateRiskPercent(entry, sl);
+    const plannedRR = calculateRMultiple(entry, sl, tp, direction);
+    const rawRMultiple =
+      tradeData.rMultiple !== undefined && tradeData.rMultiple !== ""
+        ? normaliseTradeNumber(tradeData.rMultiple)
+        : tradeData.r_multiple !== undefined && tradeData.r_multiple !== ""
+        ? normaliseTradeNumber(tradeData.r_multiple)
+        : null;
+
+    const rMultipleValue = sanitizeRMultiple(result, rawRMultiple, plannedRR);
+
+    const updateFields = {
+      ...(tradeData.date !== undefined && { date: tradeData.date }),
+      ...(tradeData.time !== undefined && { time: tradeData.time }),
+      ...(tradeData.asset !== undefined && { asset: tradeData.asset }),
+      ...(tradeData.direction !== undefined && { direction }),
+      ...(tradeData.session !== undefined && { session: tradeData.session }),
+      ...(tradeData.setup !== undefined && { setup: tradeData.setup }),
+      entry,
+      sl,
+      tp,
+      risk:
+        computedRisk ??
+        (tradeData.risk !== undefined && tradeData.risk !== ""
+          ? normaliseTradeNumber(tradeData.risk)
+          : existing.risk),
+      result,
+      r_multiple: rMultipleValue,
+      ...(tradeData.ruleBreak !== undefined && { rule_break: tradeData.ruleBreak }),
+      ...(tradeData.reason !== undefined && { reason: tradeData.reason }),
+      ...(tradeData.lesson !== undefined && { lesson: tradeData.lesson }),
+      ...(tradeData.emotionBefore !== undefined && { emotion_before: tradeData.emotionBefore }),
+      ...(tradeData.emotionAfter !== undefined && { emotion_after: tradeData.emotionAfter }),
+      ...(tradeData.psychNote !== undefined && { psych_note: tradeData.psychNote }),
+      ...(tradeData.accountName !== undefined && { account_name: tradeData.accountName }),
+      images: imageUrls,
+      before_image: imageUrls[0] || null,
+      after_image: imageUrls[1] || null,
+    };
+
+    const { data, error } = await supabase
+      .from("trades")
+      .update(updateFields)
+      .eq("id", id)
+      .eq("user_id", userId)
+      .select();
+
+    if (error) throw error;
+
+    res.status(200).json({ success: true, data: data[0] });
+  } catch (error) {
+    console.error("Update Trade Error:", error);
+    res.status(500).json({ success: false, error: "Failed to update trade." });
   }
 };
 

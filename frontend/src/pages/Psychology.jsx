@@ -42,6 +42,25 @@ export default function Psychology() {
 
   const totalTrades = trades.length;
 
+  const normalizeTradeR = (t) => {
+    if (!t) return 0;
+    const res = (t.result || "").toLowerCase().trim();
+    let r = parseFloat(t.r_multiple);
+    if (Number.isNaN(r)) r = 0;
+    if (res === "loss" && r > 0) return -1;
+    if (res === "be") return 0;
+    if (res === "win" && r < 0) return Math.abs(r);
+    return r;
+  };
+
+  const isTradeWin = (t) => {
+    if (!t) return false;
+    const res = (t.result || "").toLowerCase().trim();
+    if (res === "win") return true;
+    if (res === "loss" || res === "be") return false;
+    return normalizeTradeR(t) > 0;
+  };
+
   // Group by Emotion Before
   const emotions = {};
   trades.forEach(t => {
@@ -49,8 +68,8 @@ export default function Psychology() {
     const e = t.emotion_before;
     if (!emotions[e]) emotions[e] = { total: 0, wins: 0, r: 0 };
     emotions[e].total++;
-    if (t.result === 'win') emotions[e].wins++;
-    emotions[e].r += parseFloat(t.r_multiple || 0);
+    if (isTradeWin(t)) emotions[e].wins++;
+    emotions[e].r += normalizeTradeR(t);
   });
 
   const emotionArray = Object.entries(emotions).map(([name, data]) => ({
@@ -61,11 +80,11 @@ export default function Psychology() {
   })).sort((a,b) => b.netR - a.netR);
 
   // Group by Rule Breaking
-  const rulesFollowed = trades.filter(t => t.rule_break === 'no' || !t.rule_break);
-  const rulesBroken = trades.filter(t => t.rule_break === 'yes');
+  const rulesFollowed = trades.filter(t => (t.rule_break || "").toLowerCase() === "no" || !t.rule_break);
+  const rulesBroken = trades.filter(t => (t.rule_break || "").toLowerCase() === "yes");
 
-  const rFollowed = rulesFollowed.reduce((acc, t) => acc + parseFloat(t.r_multiple || 0), 0);
-  const rBroken = rulesBroken.reduce((acc, t) => acc + parseFloat(t.r_multiple || 0), 0);
+  const rFollowed = rulesFollowed.reduce((acc, t) => acc + normalizeTradeR(t), 0);
+  const rBroken = rulesBroken.reduce((acc, t) => acc + normalizeTradeR(t), 0);
 
   return (
     <div className="w-full max-w-7xl mx-auto font-sans pb-24 px-4 md:px-8 mt-6">

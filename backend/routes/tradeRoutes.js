@@ -7,6 +7,7 @@ import {
   getTrades,
   deleteAllTrades,
   deleteTrade,
+  updateTrade,
   exportTrades,
 } from "../controllers/tradeController.js";
 
@@ -19,6 +20,9 @@ router.post("/", upload.array("images", 3), createTrade);
 
 // Dashboard & history trade listing
 router.get("/", getTrades);
+
+// Update single trade
+router.put("/:id", upload.array("images", 3), updateTrade);
 
 // Danger Zone: wipe all user trades
 router.delete("/all", deleteAllTrades);

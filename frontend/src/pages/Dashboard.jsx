@@ -111,15 +111,39 @@ const EquityCurve = ({ data, trades = [] }) => {
   );
 };
 
+export const normalizeTradeR = (t) => {
+  if (!t) return 0;
+  const res = (t.result || "").toLowerCase().trim();
+  let r = parseFloat(t.r_multiple);
+  if (Number.isNaN(r)) r = 0;
+  if (res === "loss" && r > 0) return -1;
+  if (res === "be") return 0;
+  if (res === "win" && r < 0) return Math.abs(r);
+  return r;
+};
+
+export const isTradeWin = (t) => {
+  if (!t) return false;
+  const res = (t.result || "").toLowerCase().trim();
+  if (res === "win") return true;
+  if (res === "loss" || res === "be") return false;
+  return normalizeTradeR(t) > 0;
+};
+
 // Pure stat calculator
 function calcStats(trades) {
   let wins = 0, totalR = 0, grossProfit = 0, grossLoss = 0, currentEquity = 0;
   const equityData = [0];
   trades.forEach((t) => {
-    const r = parseFloat(t.r_multiple) || 0;
+    const res = (t.result || "").toLowerCase().trim();
+    const r = normalizeTradeR(t);
     totalR += r;
-    if (t.result === "win" || r > 0) { wins++; grossProfit += r; }
-    else if (t.result === "loss" || r < 0) { grossLoss += Math.abs(r); }
+    if (res === "win" || (res !== "loss" && res !== "be" && r > 0)) {
+      wins++;
+      grossProfit += r;
+    } else if (res === "loss" || r < 0) {
+      grossLoss += Math.abs(r);
+    }
     currentEquity += r;
     equityData.push(currentEquity);
   });
@@ -175,8 +199,8 @@ export default function Dashboard() {
       if (!t.setup) return;
       if (!setups[t.setup]) setups[t.setup] = { total: 0, wins: 0, r: 0 };
       setups[t.setup].total++;
-      if (t.result === "win") setups[t.setup].wins++;
-      setups[t.setup].r += parseFloat(t.r_multiple || 0);
+      if (isTradeWin(t)) setups[t.setup].wins++;
+      setups[t.setup].r += normalizeTradeR(t);
     });
     return Object.entries(setups)
       .map(([name, d]) => ({ name, netR: d.r, total: d.total, winRate: (d.wins / d.total) * 100 }))
@@ -188,7 +212,7 @@ export default function Dashboard() {
     trades.forEach(t => {
       if (!t.emotion_before) return;
       if (!map[t.emotion_before]) map[t.emotion_before] = { r: 0, count: 0 };
-      map[t.emotion_before].r += parseFloat(t.r_multiple || 0);
+      map[t.emotion_before].r += normalizeTradeR(t);
       map[t.emotion_before].count++;
     });
     return Object.entries(map)
@@ -197,8 +221,8 @@ export default function Dashboard() {
   }, [trades]);
 
   const mistakesData = useMemo(() => {
-    const unforced = trades.filter(t => t.result === "loss" && t.rule_break === "yes");
-    const cost = unforced.reduce((acc, t) => acc + parseFloat(t.r_multiple || 0), 0);
+    const unforced = trades.filter(t => (t.result || "").toLowerCase() === "loss" && t.rule_break === "yes");
+    const cost = unforced.reduce((acc, t) => acc + normalizeTradeR(t), 0);
     return { count: unforced.length, cost };
   }, [trades]);
 
@@ -319,8 +343,8 @@ export default function Dashboard() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[...trades].sort((a, b) => new Date(b.created_at || b.date) - new Date(a.created_at || a.date)).slice(0, 3).map((t, i) => {
-              const r = parseFloat(t.r_multiple || 0);
-              const isWin = r >= 0;
+              const r = normalizeTradeR(t);
+              const isWin = isTradeWin(t);
               return (
                 <div key={i} onClick={() => navigate("/trades")} className="bg-[#101216] border border-white/5 rounded-2xl p-5 hover:bg-[#15181D] hover:border-white/10 transition-all cursor-pointer group">
                   <div className="flex items-start justify-between mb-4">
@@ -333,7 +357,7 @@ export default function Dashboard() {
                       <p className="text-[11px] text-gray-500 flex items-center gap-1.5"><Clock className="w-3 h-3" /> {t.date}</p>
                     </div>
                     <div className={`px-2 py-0.5 rounded-md border text-[11px] font-bold ${isWin ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : "bg-red-500/10 text-red-400 border-red-500/20"}`}>
-                      {isWin ? "+" : ""}{r.toFixed(2)}R
+                      {r >= 0 ? "+" : ""}{r.toFixed(2)}R
                     </div>
                   </div>
                   <div className="flex items-center justify-between text-[11px] text-gray-400 border-t border-white/5 pt-3">

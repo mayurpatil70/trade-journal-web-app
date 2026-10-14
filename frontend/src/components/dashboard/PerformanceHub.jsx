@@ -1,7 +1,25 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 
-const r = (t) => parseFloat(t.r_multiple) || 0;
+const r = (t) => {
+  if (!t) return 0;
+  const res = (t.result || '').toLowerCase().trim();
+  let val = parseFloat(t.r_multiple);
+  if (Number.isNaN(val)) val = 0;
+  if (res === 'loss' && val > 0) return -1;
+  if (res === 'be') return 0;
+  if (res === 'win' && val < 0) return Math.abs(val);
+  return val;
+};
+
+const isWin = (t) => {
+  if (!t) return false;
+  const res = (t.result || '').toLowerCase().trim();
+  if (res === 'win') return true;
+  if (res === 'loss' || res === 'be') return false;
+  return r(t) > 0;
+};
+
 const fmtR = (v) => `${v >= 0 ? '+' : ''}${v.toFixed(2)}R`;
 
 const group = (trades, key) => {
@@ -11,7 +29,7 @@ const group = (trades, key) => {
     const g = map.get(k) || { name: k, n: 0, wins: 0, total: 0 };
     g.n += 1;
     g.total += r(t);
-    if (r(t) > 0) g.wins += 1;
+    if (isWin(t)) g.wins += 1;
     map.set(k, g);
   });
   return [...map.values()].map((g) => ({ ...g, winRate: (g.wins / g.n) * 100, avg: g.total / g.n })).sort((a, b) => b.total - a.total);

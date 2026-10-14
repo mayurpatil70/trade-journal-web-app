@@ -40,9 +40,28 @@ export default function Analytics() {
     );
   }
 
+  const normalizeTradeR = (t) => {
+    if (!t) return 0;
+    const res = (t.result || "").toLowerCase().trim();
+    let r = parseFloat(t.r_multiple);
+    if (Number.isNaN(r)) r = 0;
+    if (res === "loss" && r > 0) return -1;
+    if (res === "be") return 0;
+    if (res === "win" && r < 0) return Math.abs(r);
+    return r;
+  };
+
+  const isTradeWin = (t) => {
+    if (!t) return false;
+    const res = (t.result || "").toLowerCase().trim();
+    if (res === "win") return true;
+    if (res === "loss" || res === "be") return false;
+    return normalizeTradeR(t) > 0;
+  };
+
   // Analytics Engine
   const totalTrades = trades.length;
-  const wins = trades.filter((t) => (t.result || "").toLowerCase() === "win");
+  const wins = trades.filter((t) => isTradeWin(t));
   const winRate = totalTrades ? (wins.length / totalTrades) * 100 : 0;
 
   // Setup Performance
@@ -51,8 +70,8 @@ export default function Analytics() {
     if (!t.setup) return;
     if (!setups[t.setup]) setups[t.setup] = { total: 0, wins: 0, r: 0 };
     setups[t.setup].total++;
-    if (t.result === 'win') setups[t.setup].wins++;
-    setups[t.setup].r += parseFloat(t.r_multiple || 0);
+    if (isTradeWin(t)) setups[t.setup].wins++;
+    setups[t.setup].r += normalizeTradeR(t);
   });
   const setupArray = Object.entries(setups).map(([name, data]) => ({
     name,
@@ -67,8 +86,8 @@ export default function Analytics() {
     if (!t.session) return;
     if (!sessions[t.session]) sessions[t.session] = { total: 0, wins: 0, r: 0 };
     sessions[t.session].total++;
-    if (t.result === 'win') sessions[t.session].wins++;
-    sessions[t.session].r += parseFloat(t.r_multiple || 0);
+    if (isTradeWin(t)) sessions[t.session].wins++;
+    sessions[t.session].r += normalizeTradeR(t);
   });
   const sessionArray = Object.entries(sessions).map(([name, data]) => ({
     name, winRate: (data.wins / data.total) * 100, netR: data.r, total: data.total

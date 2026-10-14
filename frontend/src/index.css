@@ -727,6 +727,33 @@ html.light
 
 html.light
   body:not(.terminal)
+  input[type="time"]:not([class*="bg-[#0A0B0D]"]):not(
+    [class*="[color-scheme:dark]"]
+  ) {
+  color-scheme: dark !important;
+  background-color: #0f172a !important;
+  color: #f8fafc !important;
+  border-color: rgba(71, 85, 105, 0.9) !important;
+  box-shadow: 0 0 0 1px rgba(148, 163, 184, 0.16);
+}
+
+html.light body:not(.terminal) input[type="time"]::-webkit-datetime-edit,
+html.light
+  body:not(.terminal)
+  input[type="time"]::-webkit-datetime-edit-fields-wrapper,
+html.light body:not(.terminal) input[type="time"]::-webkit-datetime-edit-text {
+  color: #f8fafc !important;
+}
+
+html.light
+  body:not(.terminal)
+  input[type="time"]::-webkit-calendar-picker-indicator {
+  filter: invert(1) brightness(1.2);
+  opacity: 1;
+}
+
+html.light
+  body:not(.terminal)
   input[type="date"]::-webkit-calendar-picker-indicator,
 html.light
   body:not(.terminal)
