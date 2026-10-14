@@ -18,11 +18,11 @@ createRoot(document.getElementById("root")).render(
 
 // Gracefully dissolve initial 3D circular loading screen once the app tree has mounted
 if (typeof window !== "undefined") {
-  // Give a pleasant 400ms duration for the circular 3D logo animation, then smoothly transition
-  setTimeout(() => {
+  // window.__dismissLoader() honors the target duration (5s for initial landing, 3s for refresh)
+  requestAnimationFrame(() => {
     if (typeof window.__dismissLoader === "function") {
       window.__dismissLoader();
     }
-  }, 400);
+  });
 }
 

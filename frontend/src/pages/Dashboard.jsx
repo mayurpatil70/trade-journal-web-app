@@ -3,6 +3,7 @@ import { EdgeBreakdown, TradingHealth, BacktestSummary } from "../components/das
 import AccountFilter from "../components/AccountFilter";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
+import Logo3DLoader from "../components/Logo3DLoader";
 import {
   Activity,
   PlusCircle,
@@ -166,10 +167,18 @@ function calcStats(trades) {
 export default function Dashboard() {
   const [allTrades, setAllTrades] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [minWaitDone, setMinWaitDone] = useState(false);
   const [selectedAccount, setSelectedAccount] = useState("");
   const navigate = useNavigate();
 
-  useEffect(() => { fetchTrades(); }, []);
+  useEffect(() => {
+    // 3-second 3D logo loading when entering /dashboard
+    const timer = setTimeout(() => {
+      setMinWaitDone(true);
+    }, 3000);
+    fetchTrades();
+    return () => clearTimeout(timer);
+  }, []);
 
   const fetchTrades = async () => {
     try {
@@ -234,14 +243,14 @@ export default function Dashboard() {
   }, [trades, stats]);
 
   // ── EARLY RETURN AFTER ALL HOOKS ──
-  if (isLoading) {
+  if (isLoading || !minWaitDone) {
     return (
-      <div className="p-8 h-full flex flex-col gap-6">
-        <div className="h-20 bg-white/5 rounded-2xl animate-pulse"></div>
-        <div className="grid grid-cols-5 gap-4">
-          {[1,2,3,4,5].map(i => <div key={i} className="h-24 bg-white/5 rounded-xl animate-pulse"></div>)}
-        </div>
-        <div className="h-64 bg-white/5 rounded-2xl animate-pulse"></div>
+      <div className="min-h-[75vh] flex items-center justify-center">
+        <Logo3DLoader
+          title="FOREX NOTES"
+          subtitle="Loading Performance Dashboard & Trade Journal..."
+          isFullScreen={false}
+        />
       </div>
     );
   }

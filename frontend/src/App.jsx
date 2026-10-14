@@ -14,6 +14,7 @@ import api, { isSessionValid, clearSession } from "./api/axios";
 // CRITICAL: ErrorBoundary MUST be eagerly imported — it cannot be lazy-loaded
 // because if it fails to load, there's nothing to catch the error (causes #310 crash loop)
 import ErrorBoundary from "./components/ErrorBoundary.jsx";
+import Logo3DLoader from "./components/Logo3DLoader.jsx";
 
 // Public Pages (eagerly loaded for SEO/LCP)
 import LandingPage from "./pages/LandingPage.jsx";
@@ -141,9 +142,10 @@ const PaywallGuard = () => {
 
   if (access === null) {
     return (
-      <div className="flex h-dvh bg-background items-center justify-center">
-        <Loader2 className="w-8 h-8 text-primary animate-spin" />
-      </div>
+      <Logo3DLoader
+        title="FOREX NOTES"
+        subtitle="Verifying authorization & account state..."
+      />
     );
   }
 
@@ -168,7 +170,7 @@ function App() {
   return (
     <BrowserRouter>
       <RouteSeo />
-      <Suspense fallback={<div className="flex h-dvh bg-background items-center justify-center"><Loader2 className="w-8 h-8 text-primary animate-spin" /></div>}>
+      <Suspense fallback={<Logo3DLoader />}>
         <ErrorBoundary>
           <Routes>
             {/* Public Landing Pages */}

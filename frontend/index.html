@@ -345,16 +345,42 @@
   </noscript>
 
   <script>
-    window.__dismissLoader = function () {
-      var loader = document.getElementById('fn-initial-loader');
-      if (!loader || loader.classList.contains('fn-loader-hidden')) return;
-      loader.classList.add('fn-loader-hidden');
+    (function () {
+      var nav = (performance.getEntriesByType && performance.getEntriesByType('navigation')[0]) || null;
+      var isReload = nav ? nav.type === 'reload' : (performance.navigation && performance.navigation.type === 1);
+      var path = window.location.pathname.replace(/\/$/, '');
+      var isLanding = path === '' || path === '/';
+
+      // 5 sec on initial landing entry, 3 sec on every page refresh / reload
+      var targetDuration = (isLanding && !isReload) ? 5000 : 3000;
+      var startTime = Date.now();
+
+      window.__targetLoaderDuration = targetDuration;
+      window.__loaderStartTime = startTime;
+
+      window.__dismissLoader = function (forceImmediate) {
+        var loader = document.getElementById('fn-initial-loader');
+        if (!loader || loader.classList.contains('fn-loader-hidden')) return;
+
+        var elapsed = Date.now() - startTime;
+        var remaining = forceImmediate ? 0 : Math.max(0, targetDuration - elapsed);
+
+        setTimeout(function () {
+          if (!loader || loader.classList.contains('fn-loader-hidden')) return;
+          loader.classList.add('fn-loader-hidden');
+          setTimeout(function () {
+            if (loader && loader.parentNode) loader.parentNode.removeChild(loader);
+          }, 550);
+        }, remaining);
+      };
+
+      // Safety fallback: dissolve after targetDuration + 2000ms in case script hangs
       setTimeout(function () {
-        if (loader && loader.parentNode) loader.parentNode.removeChild(loader);
-      }, 550);
-    };
-    // Safety fallback: dissolve after 3.8s in case network delay occurs
-    setTimeout(window.__dismissLoader, 3800);
+        if (typeof window.__dismissLoader === 'function') {
+          window.__dismissLoader(true);
+        }
+      }, targetDuration + 2000);
+    })();
   </script>
 
   <script type="module" src="/src/main.jsx"></script>
