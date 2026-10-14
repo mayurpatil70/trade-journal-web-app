@@ -167,17 +167,28 @@ function calcStats(trades) {
 export default function Dashboard() {
   const [allTrades, setAllTrades] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [minWaitDone, setMinWaitDone] = useState(false);
+  const [showDailyWelcome, setShowDailyWelcome] = useState(false);
   const [selectedAccount, setSelectedAccount] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
-    // 3-second 3D logo loading when entering /dashboard
-    const timer = setTimeout(() => {
-      setMinWaitDone(true);
-    }, 3000);
+    // Only show full-screen 3D loader ONE TIME when entering /dashboard every day (after sign up/login)
+    const today = new Date().toISOString().slice(0, 10);
+    const welcomeKey = `fn_daily_welcome_${today}`;
+    const alreadyShownToday = localStorage.getItem(welcomeKey);
+
+    if (!alreadyShownToday) {
+      setShowDailyWelcome(true);
+      localStorage.setItem(welcomeKey, "true");
+      const timer = setTimeout(() => {
+        setShowDailyWelcome(false);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
+  useEffect(() => {
     fetchTrades();
-    return () => clearTimeout(timer);
   }, []);
 
   const fetchTrades = async () => {
@@ -243,14 +254,25 @@ export default function Dashboard() {
   }, [trades, stats]);
 
   // ── EARLY RETURN AFTER ALL HOOKS ──
-  if (isLoading || !minWaitDone) {
+  if (showDailyWelcome) {
     return (
-      <div className="min-h-[75vh] flex items-center justify-center">
-        <Logo3DLoader
-          title="FOREX NOTES"
-          subtitle="Loading Performance Dashboard & Trade Journal..."
-          isFullScreen={false}
-        />
+      <Logo3DLoader
+        title="FOREX NOTES"
+        subtitle="Loading Performance Dashboard & Trade Journal..."
+      />
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="p-8 h-full flex flex-col gap-6">
+        <div className="h-20 bg-white/5 rounded-2xl animate-pulse"></div>
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+          {[1, 2, 3, 4, 5].map((i) => (
+            <div key={i} className="h-24 bg-white/5 rounded-xl animate-pulse"></div>
+          ))}
+        </div>
+        <div className="h-64 bg-white/5 rounded-2xl animate-pulse"></div>
       </div>
     );
   }

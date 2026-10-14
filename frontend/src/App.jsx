@@ -142,10 +142,9 @@ const PaywallGuard = () => {
 
   if (access === null) {
     return (
-      <Logo3DLoader
-        title="FOREX NOTES"
-        subtitle="Verifying authorization & account state..."
-      />
+      <div className="flex h-dvh bg-[#0a0a0a] items-center justify-center">
+        <Loader2 className="w-8 h-8 text-[#10b981] animate-spin" />
+      </div>
     );
   }
 
@@ -170,7 +169,7 @@ function App() {
   return (
     <BrowserRouter>
       <RouteSeo />
-      <Suspense fallback={<Logo3DLoader />}>
+      <Suspense fallback={<div className="flex h-dvh bg-[#0a0a0a] items-center justify-center"><Loader2 className="w-8 h-8 text-[#10b981] animate-spin" /></div>}>
         <ErrorBoundary>
           <Routes>
             {/* Public Landing Pages */}

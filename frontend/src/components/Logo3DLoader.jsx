@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 export default function Logo3DLoader({
   title = "FOREX NOTES",
   subtitle = "Preparing Your Trading Journal & Performance Analytics...",
-  isFullScreen = true,
   className = "",
 }) {
   const [fading, setFading] = useState(false);
@@ -13,13 +12,15 @@ export default function Logo3DLoader({
     <div
       className={`fn-loader-overlay ${fading ? "fn-loader-hidden" : ""} ${className}`}
       style={{
-        position: isFullScreen ? "fixed" : "absolute",
+        position: "fixed",
         top: 0,
         left: 0,
-        width: "100%",
-        height: "100%",
-        minHeight: isFullScreen ? "100vh" : "400px",
-        zIndex: 99999,
+        right: 0,
+        bottom: 0,
+        width: "100vw",
+        height: "100vh",
+        height: "100dvh",
+        zIndex: 99999999,
         backgroundColor: "#0a0a0a",
         display: "flex",
         alignItems: "center",
