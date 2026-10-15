@@ -2,6 +2,7 @@
 import NotificationBell from "../components/NotificationBell.jsx";
 import BrandLogo from "../components/BrandLogo";
 import ThemeToggle from "../components/ThemeToggle.jsx";
+import { useTheme } from "../components/theme-provider";
 import { useState, useEffect, Suspense } from "react";
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import PreTradeGate from "../components/PreTradeGate.jsx";
@@ -88,6 +89,8 @@ const NavItem = ({
 };
 
 export default function MainLayout() {
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isSubscriptionOpen, setIsSubscriptionOpen] = useState(false);
@@ -388,20 +391,36 @@ export default function MainLayout() {
               <div
                 onClick={() => setIsBannerExpanded(true)}
                 className={`relative overflow-hidden flex items-center justify-between gap-2.5 px-3.5 py-2 sm:px-5 sm:py-2.5 rounded-full ${
-                  announcement.type === "warning"
-                    ? "bg-gradient-to-r from-red-600 via-rose-600 to-red-600 shadow-[0_8px_30px_rgba(239,68,68,0.55)] border-red-300/40"
+                  isDark
+                    ? announcement.type === "warning"
+                      ? "bg-gradient-to-r from-red-600 via-rose-600 to-red-600 shadow-[0_8px_30px_rgba(239,68,68,0.55)] border-red-300/40 text-white"
+                      : announcement.type === "success"
+                      ? "bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-600 shadow-[0_8px_30px_rgba(16,185,129,0.55)] border-emerald-300/40 text-white"
+                      : "bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-600 shadow-[0_8px_30px_rgba(59,130,246,0.55)] border-blue-300/40 text-white"
+                    : announcement.type === "warning"
+                    ? "bg-white/95 text-rose-950 shadow-[0_8px_30px_rgba(239,68,68,0.18)] border-red-200/90 ring-1 ring-red-500/20"
                     : announcement.type === "success"
-                    ? "bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-600 shadow-[0_8px_30px_rgba(16,185,129,0.55)] border-emerald-300/40"
-                    : "bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-600 shadow-[0_8px_30px_rgba(59,130,246,0.55)] border-blue-300/40"
-                } text-white border ring-1 ring-white/25 backdrop-blur-md cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition-all before:absolute before:inset-x-0 before:top-0 before:h-1/2 before:bg-gradient-to-b before:from-white/25 before:to-transparent before:pointer-events-none select-none`}
+                    ? "bg-white/95 text-emerald-950 shadow-[0_8px_30px_rgba(16,185,129,0.18)] border-emerald-200/90 ring-1 ring-emerald-500/20"
+                    : "bg-white/95 text-blue-950 shadow-[0_8px_30px_rgba(59,130,246,0.18)] border-blue-200/90 ring-1 ring-blue-500/20"
+                } border ${isDark ? "ring-1 ring-white/25" : ""} backdrop-blur-md cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition-all before:absolute before:inset-x-0 before:top-0 before:h-1/2 before:bg-gradient-to-b ${
+                  isDark ? "before:from-white/25" : "before:from-white/50"
+                } before:to-transparent before:pointer-events-none select-none`}
                 title="Tap to expand and read full announcement"
               >
                 <div className="flex items-center gap-2 overflow-hidden flex-1 min-w-0">
                   <img src="/logo3d.png" alt="ForexNotes" className="w-5 h-5 object-contain shrink-0 drop-shadow-md" />
-                  <span className="text-white font-bold text-xs sm:text-[13px] tracking-wide drop-shadow-sm truncate">
+                  <span className={`font-bold text-xs sm:text-[13px] tracking-wide truncate ${isDark ? "text-white drop-shadow-sm" : "text-gray-900"}`}>
                     {announcement.message}
                   </span>
-                  <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded-md bg-white/20 text-white shrink-0 hidden sm:inline-block">
+                  <span className={`text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full shrink-0 hidden sm:inline-block ${
+                    isDark
+                      ? "bg-white/20 text-white"
+                      : announcement.type === "warning"
+                      ? "bg-red-500/10 text-red-700 border border-red-500/20"
+                      : announcement.type === "success"
+                      ? "bg-emerald-500/10 text-emerald-700 border border-emerald-500/20"
+                      : "bg-blue-500/10 text-blue-700 border border-blue-500/20"
+                  }`}>
                     Tap to view
                   </span>
                 </div>
@@ -410,7 +429,11 @@ export default function MainLayout() {
                     e.stopPropagation();
                     setDismissedAnn(true);
                   }}
-                  className="ml-1 p-1 rounded-full text-white/80 hover:text-white hover:bg-white/25 transition-all cursor-pointer shrink-0"
+                  className={`ml-1 p-1 rounded-full transition-all cursor-pointer shrink-0 ${
+                    isDark
+                      ? "text-white/80 hover:text-white hover:bg-white/25"
+                      : "text-gray-400 hover:text-gray-700 hover:bg-gray-100"
+                  }`}
                   title="Dismiss announcement"
                 >
                   <X className="w-3.5 h-3.5" />
@@ -420,22 +443,36 @@ export default function MainLayout() {
               /* Expanded Full Message Modal Card (User can read complete message including last line) */
               <div
                 className={`relative overflow-hidden w-full max-w-lg rounded-2xl ${
-                  announcement.type === "warning"
-                    ? "bg-gradient-to-br from-[#1c0808] via-[#2a0e0e] to-[#180606] border-red-500/40 shadow-[0_12px_40px_rgba(239,68,68,0.4)]"
+                  isDark
+                    ? announcement.type === "warning"
+                      ? "bg-gradient-to-br from-[#1c0808] via-[#2a0e0e] to-[#180606] border-red-500/40 shadow-[0_12px_40px_rgba(239,68,68,0.4)] text-white border ring-1 ring-white/10"
+                      : announcement.type === "success"
+                      ? "bg-gradient-to-br from-[#061c14] via-[#092a1e] to-[#051710] border-emerald-500/40 shadow-[0_12px_40px_rgba(16,185,129,0.4)] text-white border ring-1 ring-white/10"
+                      : "bg-gradient-to-br from-[#081226] via-[#0d1c3a] to-[#070e20] border-blue-500/40 shadow-[0_12px_40px_rgba(59,130,246,0.4)] text-white border ring-1 ring-white/10"
+                    : announcement.type === "warning"
+                    ? "bg-white/95 border-red-200/90 shadow-[0_16px_45px_rgba(239,68,68,0.18)] text-gray-900 border ring-1 ring-red-500/20"
                     : announcement.type === "success"
-                    ? "bg-gradient-to-br from-[#061c14] via-[#092a1e] to-[#051710] border-emerald-500/40 shadow-[0_12px_40px_rgba(16,185,129,0.4)]"
-                    : "bg-gradient-to-br from-[#081226] via-[#0d1c3a] to-[#070e20] border-blue-500/40 shadow-[0_12px_40px_rgba(59,130,246,0.4)]"
-                } text-white border ring-1 ring-white/10 backdrop-blur-2xl p-5 shadow-2xl animate-in zoom-in-95 duration-200`}
+                    ? "bg-white/95 border-emerald-200/90 shadow-[0_16px_45px_rgba(16,185,129,0.18)] text-gray-900 border ring-1 ring-emerald-500/20"
+                    : "bg-white/95 border-blue-200/90 shadow-[0_16px_45px_rgba(59,130,246,0.18)] text-gray-900 border ring-1 ring-blue-500/20"
+                } backdrop-blur-2xl p-5 shadow-2xl animate-in zoom-in-95 duration-200`}
               >
-                <div className="flex items-center justify-between gap-3 mb-3 border-b border-white/10 pb-2.5">
+                <div className={`flex items-center justify-between gap-3 mb-3 pb-2.5 border-b ${
+                  isDark ? "border-white/10" : "border-gray-200/80"
+                }`}>
                   <div className="flex items-center gap-2.5">
                     <img src="/logo3d.png" alt="ForexNotes" className="w-6 h-6 object-contain shrink-0 drop-shadow-md" />
-                    <span className={`text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full border ${
-                      announcement.type === "warning"
-                        ? "bg-red-500/20 text-red-300 border-red-500/30"
+                    <span className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full border ${
+                      isDark
+                        ? announcement.type === "warning"
+                          ? "bg-red-500/20 text-red-300 border-red-500/30"
+                          : announcement.type === "success"
+                          ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/30"
+                          : "bg-blue-500/20 text-blue-300 border-blue-500/30"
+                        : announcement.type === "warning"
+                        ? "bg-red-500/10 text-red-700 border-red-500/25"
                         : announcement.type === "success"
-                        ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/30"
-                        : "bg-blue-500/20 text-blue-300 border-blue-500/30"
+                        ? "bg-emerald-500/10 text-emerald-700 border-emerald-500/25"
+                        : "bg-blue-500/10 text-blue-700 border-blue-500/25"
                     }`}>
                       {announcement.type === "warning" ? "Maintenance & Alert" : announcement.type === "success" ? "Special Announcement" : "System Notification"}
                     </span>
@@ -445,21 +482,31 @@ export default function MainLayout() {
                       setDismissedAnn(true);
                       setIsBannerExpanded(false);
                     }}
-                    className="p-1.5 rounded-full text-white/70 hover:text-white hover:bg-white/10 transition-all cursor-pointer"
+                    className={`p-1.5 rounded-full transition-all cursor-pointer ${
+                      isDark
+                        ? "text-white/70 hover:text-white hover:bg-white/10"
+                        : "text-gray-400 hover:text-gray-700 hover:bg-gray-100"
+                    }`}
                     title="Dismiss and close"
                   >
                     <X className="w-4 h-4" />
                   </button>
                 </div>
 
-                <div className="max-h-[50vh] overflow-y-auto pr-1 text-xs sm:text-sm font-normal leading-relaxed whitespace-pre-line text-gray-200 select-text">
+                <div className={`max-h-[50vh] overflow-y-auto pr-1 text-xs sm:text-sm font-normal leading-relaxed whitespace-pre-line select-text ${
+                  isDark ? "text-gray-200" : "text-gray-800"
+                }`}>
                   {announcement.message}
                 </div>
 
-                <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-xs text-gray-400">
+                <div className={`mt-4 pt-3 flex items-center justify-between text-xs border-t ${
+                  isDark ? "border-white/10 text-gray-400" : "border-gray-200/80 text-gray-500"
+                }`}>
                   <button
                     onClick={() => setIsBannerExpanded(false)}
-                    className="hover:text-white text-[11px] font-medium cursor-pointer"
+                    className={`text-[11px] font-semibold cursor-pointer transition-colors ${
+                      isDark ? "hover:text-white" : "hover:text-gray-900"
+                    }`}
                   >
                     Collapse
                   </button>
@@ -468,7 +515,15 @@ export default function MainLayout() {
                       setDismissedAnn(true);
                       setIsBannerExpanded(false);
                     }}
-                    className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20 font-bold text-white transition-all cursor-pointer flex items-center gap-1.5 text-xs"
+                    className={`px-3.5 py-1.5 rounded-xl font-bold transition-all cursor-pointer flex items-center gap-1.5 text-xs shadow-sm ${
+                      isDark
+                        ? "bg-white/10 hover:bg-white/20 text-white border border-white/10"
+                        : announcement.type === "warning"
+                        ? "bg-red-600 hover:bg-red-700 text-white"
+                        : announcement.type === "success"
+                        ? "bg-emerald-600 hover:bg-emerald-700 text-white"
+                        : "bg-blue-600 hover:bg-blue-700 text-white"
+                    }`}
                   >
                     <X className="w-3.5 h-3.5" /> Dismiss & Close
                   </button>
