@@ -3,8 +3,8 @@ import { Link } from 'react-router-dom';
 const FOOTER_LINKS = [
   { title: 'Free tools', links: [['/tools/ftmo-drawdown-calculator', 'FTMO drawdown calculator'], ['/tools/fundednext-risk-manager', 'FundedNext risk manager'], ['/tools/lot-size-calculator', 'Lot size calculator']] },
   { title: 'Journal', links: [['/journal/xauusd', 'XAUUSD journal'], ['/journal/eurusd', 'EURUSD journal'], ['/journal/ict-strategy', 'ICT journal'], ['/journal/smc', 'SMC journal'], ['/journal/scalping', 'Scalping journal']] },
-  { title: 'Regions', links: [['/india/trading-journal', 'India trading journal'], ['/india/prop-firm-calculator', 'India prop firm calculator'], ['/india/forex-backtesting-software', 'Backtesting for India'], ['/dubai/trading-journal', 'Dubai trading journal'], ['/uae/prop-firm-trader-tools', 'UAE prop firm tools'], ['/uae/islamic-trading-journal', 'Islamic trading journal']] },
-  { title: 'Compare', links: [['/vs/fx-replay', 'vs FX Replay'], ['/vs/tradezella', 'vs TradeZella'], ['/vs/traders-casa', 'vs Traders Casa'], ['/vs/tradesviz', 'vs TradesViz'], ['/backtesting/btcusdt', 'BTCUSDT backtesting'], ['/privacy', 'Privacy policy']] },
+  { title: 'Regions', links: [['/india/forex-trading-journal', 'India forex journal'], ['/india/trading-journal', 'India trading journal'], ['/india/prop-firm-calculator', 'India prop firm calculator'], ['/india/forex-backtesting-software', 'Backtesting for India'], ['/dubai/forex-trading-journal', 'Dubai forex journal'], ['/dubai/trading-journal', 'Dubai trading journal'], ['/uae/prop-firm-trader-tools', 'UAE prop firm tools'], ['/uae/islamic-trading-journal', 'Islamic trading journal']] },
+  { title: 'Compare', links: [['/vs/tradezella', 'vs TradeZella'], ['/vs/tradersync', 'vs TraderSync'], ['/vs/fx-replay', 'vs FX Replay'], ['/vs/edgewonk', 'vs Edgewonk'], ['/vs/tradesviz', 'vs TradesViz'], ['/vs/traders-casa', 'vs Traders Casa'], ['/backtesting/btcusdt', 'BTCUSDT backtesting'], ['/privacy', 'Privacy policy']] },
 ];
 
 export default function SiteFooter({ copyright = true }) {

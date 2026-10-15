@@ -14,9 +14,27 @@ const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replac
 const ld = (data) => `<script type="application/ld+json" data-prerender>${JSON.stringify(data).replace(/</g, '\\u003c')}</script>`;
 
 const FOOTER = [
-  ['/tools/ftmo-drawdown-calculator', 'FTMO drawdown calculator'], ['/tools/lot-size-calculator', 'Lot size calculator'],
-  ['/india/trading-journal', 'India trading journal'], ['/dubai/trading-journal', 'Dubai trading journal'],
-  ['/uae/islamic-trading-journal', 'Islamic trading journal'], ['/vs/tradezella', 'vs TradeZella'], ['/vs/fx-replay', 'vs FX Replay'],
+  ['/tools/ftmo-drawdown-calculator', 'FTMO drawdown calculator'],
+  ['/tools/fundednext-risk-manager', 'FundedNext risk manager'],
+  ['/tools/lot-size-calculator', 'Lot size calculator'],
+  ['/india/forex-trading-journal', 'India forex journal'],
+  ['/india/trading-journal', 'India trading journal'],
+  ['/india/prop-firm-calculator', 'India prop firm calculator'],
+  ['/india/forex-backtesting-software', 'Forex backtesting software India'],
+  ['/dubai/forex-trading-journal', 'Dubai forex journal'],
+  ['/dubai/trading-journal', 'Dubai trading journal'],
+  ['/uae/prop-firm-trader-tools', 'UAE prop firm tools'],
+  ['/uae/islamic-trading-journal', 'Islamic trading journal'],
+  ['/vs/tradezella', 'vs TradeZella'],
+  ['/vs/tradersync', 'vs TraderSync'],
+  ['/vs/fx-replay', 'vs FX Replay'],
+  ['/vs/edgewonk', 'vs Edgewonk'],
+  ['/vs/tradesviz', 'vs TradesViz'],
+  ['/vs/traders-casa', 'vs Traders Casa'],
+  ['/journal/xauusd', 'XAUUSD gold journal'],
+  ['/journal/ict-strategy', 'ICT strategy journal'],
+  ['/journal/smc', 'SMC journal'],
+  ['/backtesting/btcusdt', 'BTCUSDT backtesting'],
 ];
 const footer = `<nav><ul>${FOOTER.map(([h, t]) => `<li><a href="${h}">${esc(t)}</a></li>`).join('')}</ul></nav>`;
 const faqHtml = (list) => `<section><h2>Frequently asked questions</h2>${list.map((f) => `<h3>${esc(f.q)}</h3><p>${esc(f.a)}</p>`).join('')}</section>`;
@@ -24,21 +42,21 @@ const faqHtml = (list) => `<section><h2>Frequently asked questions</h2>${list.ma
 function render({ path, title, description, jsonLd = [], alternates, body, robots }) {
   const url = `${SITE}${path === '/' ? '/' : path}`;
   let html = template
-    .replace(/<title>[^<]*<\/title>/, `<title>${esc(title)}</title>`)
-    .replace(/(<meta name="description" content=")[^"]*(")/, `$1${esc(description)}$2`)
-    .replace(/(<meta property="og:title" content=")[^"]*(")/, `$1${esc(title)}$2`)
-    .replace(/(<meta property="og:description" content=")[^"]*(")/, `$1${esc(description)}$2`)
-    .replace(/(<meta property="og:url" content=")[^"]*(")/, `$1${url}$2`)
-    .replace(/(<meta name="twitter:title" content=")[^"]*(")/, `$1${esc(title)}$2`)
-    .replace(/(<meta name="twitter:description" content=")[^"]*(")/, `$1${esc(description)}$2`)
-    .replace(/(<link rel="canonical" href=")[^"]*(")/, `$1${url}$2`);
-  if (robots) html = html.replace(/(<meta name="robots" content=")[^"]*(")/, `$1${robots}$2`);
+    .replace(/<title>[^<]*<\/title>/, () => `<title>${esc(title)}</title>`)
+    .replace(/(<meta name="description" content=")[^"]*(")/, (m, p1, p2) => `${p1}${esc(description)}${p2}`)
+    .replace(/(<meta property="og:title" content=")[^"]*(")/, (m, p1, p2) => `${p1}${esc(title)}${p2}`)
+    .replace(/(<meta property="og:description" content=")[^"]*(")/, (m, p1, p2) => `${p1}${esc(description)}${p2}`)
+    .replace(/(<meta property="og:url" content=")[^"]*(")/, (m, p1, p2) => `${p1}${url}${p2}`)
+    .replace(/(<meta name="twitter:title" content=")[^"]*(")/, (m, p1, p2) => `${p1}${esc(title)}${p2}`)
+    .replace(/(<meta name="twitter:description" content=")[^"]*(")/, (m, p1, p2) => `${p1}${esc(description)}${p2}`)
+    .replace(/(<link rel="canonical" href=")[^"]*(")/, (m, p1, p2) => `${p1}${url}${p2}`);
+  if (robots) html = html.replace(/(<meta name="robots" content=")[^"]*(")/, (m, p1, p2) => `${p1}${robots}${p2}`);
   const extra = [
     ...Object.entries(alternates || {}).map(([lang, p]) => `<link rel="alternate" hreflang="${lang}" href="${SITE}${p}" data-prerender />`),
     ...jsonLd.map(ld),
   ].join('\n  ');
-  html = html.replace('</head>', `  ${extra}\n</head>`);
-  return html.replace('<div id="root"></div>', `<div id="root"><main class="seo-prerender-shell" style="max-width:860px;margin:0 auto;padding:32px 20px;line-height:1.6;position:relative;z-index:1">${body}${footer}</main></div>`);
+  html = html.replace('</head>', () => `  ${extra}\n</head>`);
+  return html.replace('<div id="root"></div>', () => `<div id="root"><main class="seo-prerender-shell" style="max-width:860px;margin:0 auto;padding:32px 20px;line-height:1.6;position:relative;z-index:1">${body}${footer}</main></div>`);
 }
 
 const write = (path, html) => {
@@ -101,14 +119,22 @@ const urlXml = (path, { priority = '0.7', freq = 'monthly', group } = {}) => {
 const urlset = (urls) => `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n${urls.join('\n')}\n</urlset>\n`;
 const byRegion = (r) => SEO_PAGES.filter((p) => p.region === r).map((p) => urlXml(p.path, { priority: '0.8', group: p.hreflang }));
 
-writeFileSync(join(dist, 'sitemap-pages.xml'), urlset([
+const pub = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
+const writeXml = (name, content) => {
+  writeFileSync(join(dist, name), content);
+  try {
+    writeFileSync(join(pub, name), content);
+  } catch (e) {}
+};
+
+writeXml('sitemap-pages.xml', urlset([
   urlXml('/', { priority: '1.0', freq: 'weekly', group: 'journal' }),
   urlXml('/privacy', { priority: '0.3', freq: 'yearly' }),
   ...Object.keys(COMPETITORS).map((s) => urlXml(`/vs/${s}`, { priority: '0.8' })),
   ...SEO_PAGES.filter((p) => !p.region).map((p) => urlXml(p.path, { priority: '0.7', group: p.hreflang })),
 ]));
-writeFileSync(join(dist, 'sitemap-india.xml'), urlset(byRegion('IN')));
-writeFileSync(join(dist, 'sitemap-uae.xml'), urlset(byRegion('AE')));
-writeFileSync(join(dist, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${['sitemap-pages.xml', 'sitemap-india.xml', 'sitemap-uae.xml'].map((f) => `  <sitemap><loc>${SITE}/${f}</loc><lastmod>${today}</lastmod></sitemap>`).join('\n')}\n</sitemapindex>\n`);
+writeXml('sitemap-india.xml', urlset(byRegion('IN')));
+writeXml('sitemap-uae.xml', urlset(byRegion('AE')));
+writeXml('sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${['sitemap-pages.xml', 'sitemap-india.xml', 'sitemap-uae.xml'].map((f) => `  <sitemap><loc>${SITE}/${f}</loc><lastmod>${today}</lastmod></sitemap>`).join('\n')}\n</sitemapindex>\n`);
 
 console.log(`prerendered ${SEO_PAGES.length + Object.keys(COMPETITORS).length + 2} pages and 4 sitemaps`);

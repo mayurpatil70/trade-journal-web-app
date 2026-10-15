@@ -6,6 +6,7 @@ export const DISCLAIMER = 'Forex Notes is journaling, backtesting and analytics 
 // Pages sharing a group are alternates of each other for hreflang.
 export const HREFLANG_GROUPS = {
   journal: { 'en-IN': '/india/trading-journal', 'en-AE': '/dubai/trading-journal', 'x-default': '/' },
+  forexJournal: { 'en-IN': '/india/forex-trading-journal', 'en-AE': '/dubai/forex-trading-journal', 'x-default': '/india/forex-trading-journal' },
   prop: { 'en-IN': '/india/prop-firm-calculator', 'en-AE': '/uae/prop-firm-trader-tools', 'x-default': '/tools/ftmo-drawdown-calculator' },
 };
 
@@ -15,6 +16,72 @@ const PRICING_FAQ = {
 };
 
 export const SEO_PAGES = [
+  {
+    path: '/india/forex-trading-journal',
+    region: 'IN',
+    hreflang: 'forexJournal',
+    title: 'Best Forex Trading Journal in India (INR & USDT) | Forex Notes',
+    description: 'Top forex trading journal for traders in India. Track XAUUSD gold and forex in IST hours, calculate FTMO drawdown in INR, and pay via USDT BEP-20.',
+    eyebrow: 'India Forex & Prop Firm Journal',
+    h1: 'Best Forex Trading Journal in India for Prop Firm Traders',
+    intro: 'Designed for Indian traders who trade forex, gold (XAUUSD) and crypto through international prop firms like FTMO, FundedNext and FundingPips. Get automated session analytics in IST, calculate drawdowns in INR, and pay seamlessly via USDT BEP-20.',
+    hook: 'Zero card declines: Pay via USDT BEP-20 or Card',
+    sections: [
+      {
+        h2: 'Why Indian traders need a dedicated forex journal',
+        body: 'Most international trading journals ignore Indian realities: bank cards decline recurring USD subscriptions due to RBI 2-factor authentication, sessions default to US Eastern Time, and drawdown numbers are abstract dollars rather than rupees. Forex Notes solves all three.',
+        bullets: ['Instant USDT BEP-20 payments that bypass bank card declines', 'Indian Standard Time (IST) Asian, London and New York session analytics', 'Live INR conversion for daily and maximum drawdown limits'],
+      },
+      {
+        h2: 'All-in-one journal with 10-year bar replay backtester',
+        body: 'Instead of paying $35/mo for a backtester like FX Replay and another $30/mo for a journal like TradeZella, Forex Notes includes TradingView-style bar replay and a complete analytics journal for just $14/month (~₹1,180 INR).',
+      },
+      {
+        h2: 'Coach isLIVE: Catch emotional revenge trading before failing challenges',
+        body: 'The AI coach scans your recent trades, detects overleveraging after a loss, and prompts you to step away before breaching your daily loss limit.',
+      },
+    ],
+    faqs: [
+      { q: 'Why is Forex Notes considered the best forex trading journal in India?', a: 'Forex Notes combines 10-year candle bar replay, AI psychology tracking, INR drawdown calculations, and USDT BEP-20 payment options tailored specifically to Indian traders for just $14/mo compared to US journals costing $30-$50/mo.' },
+      { q: 'Can Indian traders pay using cryptocurrency or USDT?', a: 'Yes. You can pay securely with USDT on the BNB Smart Chain (BEP-20) network with zero bank card decline issues, as well as credit/debit cards.' },
+      { q: 'Does it support Indian Standard Time (IST) for session breakdowns?', a: 'Yes. Session analytics map directly to Asian, London, and New York opens in IST so you know exactly which trading windows are profitable for your strategy.' },
+      PRICING_FAQ,
+    ],
+    related: ['/india/trading-journal', '/india/prop-firm-calculator', '/india/forex-backtesting-software', '/journal/xauusd'],
+  },
+  {
+    path: '/dubai/forex-trading-journal',
+    region: 'AE',
+    hreflang: 'forexJournal',
+    title: 'Best Forex Trading Journal in Dubai & UAE | Forex Notes',
+    description: 'Top trading journal for Dubai & UAE prop firm traders. Track multi-funded accounts, calculate AED margin & leverage, and log swap-free trades from $14/mo.',
+    eyebrow: 'Dubai & UAE Professional Journal',
+    h1: 'The Forex Trading Journal for High-Capital Dubai Traders',
+    intro: 'Whether you trade out of Dubai Marina, Downtown or DIFC, Forex Notes helps UAE traders manage multi-firm allocations, calculate margin in AED, and track Islamic swap-free performance without interest distortions.',
+    hook: 'AED margin tools + Sharia swap-free R-multiple metrics',
+    sections: [
+      {
+        h2: 'Manage multi-prop firm allocations in one command center',
+        body: 'Dubai has become the global capital for prop firm and forex traders. If you are managing multiple $100k or $200k funded accounts across FTMO, FundedNext and other firms, Forex Notes consolidates your risk and drawdown floors in a single dashboard.',
+        bullets: ['AED margin and leverage calculator with exact 3.6725 dirham peg', 'Gulf Standard Time (GST) session tracking for London and NY overlaps', 'Multi-account risk rules preventing concurrent drawdown breaches'],
+      },
+      {
+        h2: '100% compatible with Islamic swap-free trading',
+        body: 'Performance is computed cleanly in R-multiples, profit factor, and expectancy without requiring overnight swap or interest inputs, making it ideal for Islamic accounts.',
+      },
+      {
+        h2: 'Full bar replay backtesting included',
+        body: 'Test your strategies candle-by-candle with 10 years of historical data for Gold (XAUUSD), forex majors, and crypto before deploying capital in live markets.',
+      },
+    ],
+    faqs: [
+      { q: 'What makes Forex Notes ideal for forex traders in Dubai and UAE?', a: 'Forex Notes provides multi-account tracking, AED conversion tools, GST session analytics, swap-free Islamic account support, and bar replay backtesting for $14/mo.' },
+      { q: 'Does it support AED dirhams for risk calculations?', a: 'Yes. The built-in margin and drawdown calculators support AED using the official 3.6725 peg to USD.' },
+      { q: 'Can Dubai traders pay with crypto USDT?', a: 'Yes, checkout supports USDT (BEP-20) as well as international cards.' },
+      PRICING_FAQ,
+    ],
+    related: ['/dubai/trading-journal', '/uae/prop-firm-trader-tools', '/uae/islamic-trading-journal', '/journal/xauusd'],
+  },
   {
     path: '/india/trading-journal',
     region: 'IN',

@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build && node scripts/prerender-seo.mjs",
+    "audit": "node scripts/seo-audit.mjs",
     "lint": "eslint .",
     "preview": "vite preview",
     "init-tailwind": "tailwindcss init -p"
