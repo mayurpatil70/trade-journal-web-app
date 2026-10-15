@@ -102,6 +102,7 @@ export default function MainLayout() {
   // System broadcast announcement
   const [announcement, setAnnouncement] = useState(null);
   const [dismissedAnn, setDismissedAnn] = useState(false);
+  const [isBannerExpanded, setIsBannerExpanded] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -109,8 +110,12 @@ export default function MainLayout() {
       api
         .get("/api/admin/public/announcement")
         .then((res) => {
-          if (!cancelled && res.data?.success && res.data.announcement?.active && res.data.announcement?.message) {
-            setAnnouncement(res.data.announcement);
+          if (!cancelled && res.data?.success) {
+            if (res.data.announcement?.active && res.data.announcement?.message) {
+              setAnnouncement(res.data.announcement);
+            } else {
+              setAnnouncement(null);
+            }
           }
         })
         .catch(() => {});
@@ -377,20 +382,99 @@ export default function MainLayout() {
       {/* Main Content Area */}
       <main className="flex-1 overflow-y-auto relative pt-14 pb-16 md:pt-0 md:pb-0 bg-[#0A0B0D]">
         {announcement && !dismissedAnn && (
-          <div className="fixed top-3 left-1/2 -translate-x-1/2 z-50 max-w-[92vw] sm:max-w-xl animate-in fade-in slide-in-from-top-4 duration-300 pointer-events-auto">
-            <div className="relative overflow-hidden flex items-center gap-2.5 px-4 py-2 sm:px-5 sm:py-2.5 rounded-full bg-gradient-to-r from-red-600 via-rose-600 to-red-600 text-white shadow-[0_8px_30px_rgba(239,68,68,0.55)] border border-red-300/40 ring-1 ring-white/25 backdrop-blur-md before:absolute before:inset-x-0 before:top-0 before:h-1/2 before:bg-gradient-to-b before:from-white/25 before:to-transparent before:pointer-events-none">
-              <img src="/logo3d.png" alt="ForexNotes" className="w-5 h-5 object-contain shrink-0 drop-shadow-md" />
-              <span className="text-white font-bold text-xs sm:text-[13px] tracking-wide drop-shadow-sm truncate">
-                {announcement.message}
-              </span>
-              <button
-                onClick={() => setDismissedAnn(true)}
-                className="ml-1.5 p-1 rounded-full text-white/80 hover:text-white hover:bg-white/20 transition-all cursor-pointer shrink-0"
-                title="Dismiss announcement"
+          <div className="fixed top-3 left-1/2 -translate-x-1/2 z-50 max-w-[94vw] sm:max-w-xl animate-in fade-in slide-in-from-top-4 duration-300 pointer-events-auto">
+            {!isBannerExpanded ? (
+              /* Collapsed Notch Pill */
+              <div
+                onClick={() => setIsBannerExpanded(true)}
+                className={`relative overflow-hidden flex items-center justify-between gap-2.5 px-3.5 py-2 sm:px-5 sm:py-2.5 rounded-full ${
+                  announcement.type === "warning"
+                    ? "bg-gradient-to-r from-red-600 via-rose-600 to-red-600 shadow-[0_8px_30px_rgba(239,68,68,0.55)] border-red-300/40"
+                    : announcement.type === "success"
+                    ? "bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-600 shadow-[0_8px_30px_rgba(16,185,129,0.55)] border-emerald-300/40"
+                    : "bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-600 shadow-[0_8px_30px_rgba(59,130,246,0.55)] border-blue-300/40"
+                } text-white border ring-1 ring-white/25 backdrop-blur-md cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition-all before:absolute before:inset-x-0 before:top-0 before:h-1/2 before:bg-gradient-to-b before:from-white/25 before:to-transparent before:pointer-events-none select-none`}
+                title="Tap to expand and read full announcement"
               >
-                <X className="w-3.5 h-3.5" />
-              </button>
-            </div>
+                <div className="flex items-center gap-2 overflow-hidden flex-1 min-w-0">
+                  <img src="/logo3d.png" alt="ForexNotes" className="w-5 h-5 object-contain shrink-0 drop-shadow-md" />
+                  <span className="text-white font-bold text-xs sm:text-[13px] tracking-wide drop-shadow-sm truncate">
+                    {announcement.message}
+                  </span>
+                  <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded-md bg-white/20 text-white shrink-0 hidden sm:inline-block">
+                    Tap to view
+                  </span>
+                </div>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setDismissedAnn(true);
+                  }}
+                  className="ml-1 p-1 rounded-full text-white/80 hover:text-white hover:bg-white/25 transition-all cursor-pointer shrink-0"
+                  title="Dismiss announcement"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            ) : (
+              /* Expanded Full Message Modal Card (User can read complete message including last line) */
+              <div
+                className={`relative overflow-hidden w-full max-w-lg rounded-2xl ${
+                  announcement.type === "warning"
+                    ? "bg-gradient-to-br from-[#1c0808] via-[#2a0e0e] to-[#180606] border-red-500/40 shadow-[0_12px_40px_rgba(239,68,68,0.4)]"
+                    : announcement.type === "success"
+                    ? "bg-gradient-to-br from-[#061c14] via-[#092a1e] to-[#051710] border-emerald-500/40 shadow-[0_12px_40px_rgba(16,185,129,0.4)]"
+                    : "bg-gradient-to-br from-[#081226] via-[#0d1c3a] to-[#070e20] border-blue-500/40 shadow-[0_12px_40px_rgba(59,130,246,0.4)]"
+                } text-white border ring-1 ring-white/10 backdrop-blur-2xl p-5 shadow-2xl animate-in zoom-in-95 duration-200`}
+              >
+                <div className="flex items-center justify-between gap-3 mb-3 border-b border-white/10 pb-2.5">
+                  <div className="flex items-center gap-2.5">
+                    <img src="/logo3d.png" alt="ForexNotes" className="w-6 h-6 object-contain shrink-0 drop-shadow-md" />
+                    <span className={`text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full border ${
+                      announcement.type === "warning"
+                        ? "bg-red-500/20 text-red-300 border-red-500/30"
+                        : announcement.type === "success"
+                        ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/30"
+                        : "bg-blue-500/20 text-blue-300 border-blue-500/30"
+                    }`}>
+                      {announcement.type === "warning" ? "Maintenance & Alert" : announcement.type === "success" ? "Special Announcement" : "System Notification"}
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setDismissedAnn(true);
+                      setIsBannerExpanded(false);
+                    }}
+                    className="p-1.5 rounded-full text-white/70 hover:text-white hover:bg-white/10 transition-all cursor-pointer"
+                    title="Dismiss and close"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+
+                <div className="max-h-[50vh] overflow-y-auto pr-1 text-xs sm:text-sm font-normal leading-relaxed whitespace-pre-line text-gray-200 select-text">
+                  {announcement.message}
+                </div>
+
+                <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-xs text-gray-400">
+                  <button
+                    onClick={() => setIsBannerExpanded(false)}
+                    className="hover:text-white text-[11px] font-medium cursor-pointer"
+                  >
+                    Collapse
+                  </button>
+                  <button
+                    onClick={() => {
+                      setDismissedAnn(true);
+                      setIsBannerExpanded(false);
+                    }}
+                    className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20 font-bold text-white transition-all cursor-pointer flex items-center gap-1.5 text-xs"
+                  >
+                    <X className="w-3.5 h-3.5" /> Dismiss & Close
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         )}
         <div className="max-md:hidden flex fixed top-3 right-5 z-40 items-center gap-2">

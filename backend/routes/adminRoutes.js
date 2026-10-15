@@ -461,6 +461,33 @@ router.post("/announcement", (req, res) => {
   }
 });
 
+// Admin: Delete / clear active broadcast announcement
+router.delete("/announcement", (req, res) => {
+  try {
+    globalAnnouncement = {
+      active: false,
+      message: "",
+      type: "info",
+      updatedAt: new Date().toISOString(),
+    };
+
+    try {
+      const dataDir = path.dirname(ANNOUNCEMENT_FILE);
+      if (!fs.existsSync(dataDir)) {
+        fs.mkdirSync(dataDir, { recursive: true });
+      }
+      fs.writeFileSync(ANNOUNCEMENT_FILE, JSON.stringify(globalAnnouncement, null, 2), "utf-8");
+    } catch (fsErr) {
+      console.warn("Failed to delete announcement file on disk:", fsErr.message);
+    }
+
+    res.json({ success: true, message: "Broadcast announcement deleted successfully.", announcement: globalAnnouncement });
+  } catch (error) {
+    console.error("Announcement delete error:", error);
+    res.status(500).json({ success: false, error: "Failed to delete announcement." });
+  }
+});
+
 // Admin: Toggle Discord verified status for user
 router.post("/user/:userId/toggle-discord", async (req, res) => {
   try {

@@ -293,6 +293,26 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleDeleteBroadcast = async () => {
+    if (!window.confirm("Are you sure you want to delete and clear the active broadcast banner platform-wide? This will immediately remove it from all users' screens.")) {
+      return;
+    }
+    try {
+      setBroadcastSaving(true);
+      const res = await api.delete("/api/admin/announcement");
+      if (res.data.success) {
+        setBroadcastActive(false);
+        setBroadcastMessage("");
+        setBroadcastSuccess(true);
+        setTimeout(() => setBroadcastSuccess(false), 3000);
+      }
+    } catch (error) {
+      alert(error.response?.data?.error || error.message || "Failed to delete broadcast announcement");
+    } finally {
+      setBroadcastSaving(false);
+    }
+  };
+
   const handleUpdateWithdrawal = async (id, status) => {
     try {
       setActionLoadingId(id);
@@ -968,6 +988,7 @@ export default function AdminDashboard() {
                 </div>
               </div>
             </div>
+            </div>
 
             {/* Quick Filter Status Pills */}
             <div className="flex items-center gap-1.5 mb-5 overflow-x-auto pb-1">
@@ -990,7 +1011,7 @@ export default function AdminDashboard() {
               ))}
             </div>
 
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto w-full">
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="border-b border-gray-200 dark:border-white/5 text-[10px] font-bold text-gray-500 uppercase tracking-widest">
@@ -1191,12 +1212,24 @@ export default function AdminDashboard() {
                           <p className="text-xs text-gray-500">
                             All {accounts.length} registered users currently require subscription or Discord verification and are placed in the Follow-up table below.
                           </p>
-                          <a
-                            href="#followup-table"
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/30 text-xs font-bold hover:bg-amber-500 hover:text-black transition-all mt-2 cursor-pointer"
-                          >
-                            Go to Follow-up Leads ({followUpLeads.length}) ↓
-                          </a>
+                          <div className="flex flex-wrap items-center justify-center gap-2 pt-2">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setShowAllInUpperTable(true);
+                                setUsersPage(1);
+                              }}
+                              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#10b981] hover:bg-[#0ea371] text-black text-xs font-bold transition-all cursor-pointer shadow-sm"
+                            >
+                              Show All {accounts.length} Users in Upper Table
+                            </button>
+                            <a
+                              href="#followup-table"
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/30 text-xs font-bold hover:bg-amber-500 hover:text-black transition-all cursor-pointer"
+                            >
+                              Go to Follow-up Leads ({followUpLeads.length}) ↓
+                            </a>
+                          </div>
                         </div>
                       </td>
                     </tr>
@@ -1502,7 +1535,6 @@ export default function AdminDashboard() {
                 </button>
               </div>
             </div>
-          </div>
           </div>
         </>
       )}
@@ -1862,7 +1894,19 @@ export default function AdminDashboard() {
             {/* Toggle Active */}
             <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-white/5 rounded-xl border border-gray-200 dark:border-white/10">
               <div>
-                <span className="text-xs font-bold text-gray-900 dark:text-white block">Banner Visibility</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold text-gray-900 dark:text-white block">Banner Visibility</span>
+                  {broadcastActive ? (
+                    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                      Live on Platform
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-gray-500/15 text-gray-500 border border-gray-500/20">
+                      Inactive / Off
+                    </span>
+                  )}
+                </div>
                 <span className="text-[11px] text-gray-500">When enabled, all logged-in and visiting users will see this banner.</span>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
@@ -1929,19 +1973,32 @@ export default function AdminDashboard() {
               </div>
             </div>
 
-            <div className="flex items-center justify-between pt-2">
-              <button
-                type="button"
-                onClick={handleSaveBroadcast}
-                disabled={broadcastSaving}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#10b981] hover:bg-[#0ea371] text-black font-bold text-xs shadow-md transition-all cursor-pointer disabled:opacity-50"
-              >
-                {broadcastSaving ? "Saving Announcement..." : "Save & Update Broadcast"}
-              </button>
+            <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
+              <div className="flex flex-wrap items-center gap-2.5">
+                <button
+                  type="button"
+                  onClick={handleSaveBroadcast}
+                  disabled={broadcastSaving}
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#10b981] hover:bg-[#0ea371] text-black font-bold text-xs shadow-md transition-all cursor-pointer disabled:opacity-50"
+                >
+                  {broadcastSaving ? "Saving Announcement..." : "Save & Update Broadcast"}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleDeleteBroadcast}
+                  disabled={broadcastSaving}
+                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-rose-500/10 hover:bg-rose-500 hover:text-white text-rose-600 dark:text-rose-400 border border-rose-500/30 font-bold text-xs transition-all cursor-pointer disabled:opacity-50"
+                  title="Clear and permanently remove active broadcast notification"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  Delete Active Broadcast
+                </button>
+              </div>
 
               {broadcastSuccess && (
                 <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
-                  <Check className="w-4 h-4" /> Broadcast published successfully!
+                  <Check className="w-4 h-4" /> Broadcast updated successfully!
                 </span>
               )}
             </div>
