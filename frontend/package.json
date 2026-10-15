@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "vite build && node scripts/prerender-seo.mjs",
     "audit": "node scripts/seo-audit.mjs",
+    "marketing": "node scripts/marketing-tracker.mjs",
     "lint": "eslint .",
     "preview": "vite preview",
     "init-tailwind": "tailwindcss init -p"
