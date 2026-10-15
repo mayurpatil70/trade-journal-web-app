@@ -9,15 +9,12 @@ import {
   ExternalLink,
   Copy,
   UserCheck,
-  UserX,
   Activity,
   Search,
   RefreshCw,
-  Calendar,
   AlertTriangle,
   CheckCircle,
   Clock,
-  Key,
   ChevronDown,
   Download,
   UserPlus,
@@ -25,11 +22,8 @@ import {
   Megaphone,
   TrendingUp,
   X,
-  Send,
-  Sliders,
   Check,
   XCircle,
-  Ban,
 } from "lucide-react";
 import api from "../api/axios";
 
@@ -405,7 +399,10 @@ export default function AdminDashboard() {
     });
   }, [upperAccounts, searchQuery, statusFilter]);
 
-  // Counts for status options (Upper Table)
+  // Counts for metrics & status options (Upper Table)
+  const totalRegistered = accounts.length || metrics.totalAccounts || 0;
+  const paidMembersCount = metrics.paidMembers ?? accounts.filter((a) => a.subscription_status === "paid").length;
+  const trialMembersCount = metrics.trialMembers ?? accounts.filter((a) => a.subscription_status === "trial").length;
   const activeUpperCount = upperAccounts.length;
   const upperPaidCount = upperAccounts.filter((a) => a.subscription_status === "paid").length;
   const upperTrialCount = upperAccounts.filter((a) => a.subscription_status === "trial").length;
@@ -1606,7 +1603,6 @@ export default function AdminDashboard() {
                       const trader = accounts.find((a) => a.id === t.user_id);
                       const isWin = (t.result || "").toLowerCase() === "win";
                       const isLoss = (t.result || "").toLowerCase() === "loss";
-                      const isBE = (t.result || "").toLowerCase() === "breakeven";
 
                       return (
                         <tr key={t.id} className="hover:bg-gray-50 dark:hover:bg-white/[0.02] transition-colors">
