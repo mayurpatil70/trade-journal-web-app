@@ -49,15 +49,22 @@ export default function AdminDashboard() {
     affiliates: [],
   });
 
-  // Filters & Pagination for Users
+  // Filters & Pagination for Users (Upper Table: Active Members)
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [isFilterDropdownOpen, setIsFilterDropdownOpen] = useState(false);
+  const [showAllInUpperTable, setShowAllInUpperTable] = useState(false);
   const filterDropdownRef = useRef(null);
   const [usersPage, setUsersPage] = useState(1);
   const [ordersPage, setOrdersPage] = useState(1);
   const [tradesPage, setTradesPage] = useState(1);
   const ROWS = 15;
+
+  // Filters & Pagination for Follow-up Leads Table (10 users per page)
+  const [followUpPage, setFollowUpPage] = useState(1);
+  const [followUpSearch, setFollowUpSearch] = useState("");
+  const [followUpStatusFilter, setFollowUpStatusFilter] = useState("all"); // "all" | "not_subscribed" | "expired" | "no_discord"
+  const FOLLOW_UP_ROWS = 10;
 
   // Modals state
   const [selectedUserForModal, setSelectedUserForModal] = useState(null);
@@ -366,9 +373,25 @@ export default function AdminDashboard() {
     document.body.removeChild(link);
   };
 
-  // Filter accounts
+  // Lead detector: Not Subscribed OR Not Linked to Discord
+  const isFollowUpLead = (acc) => {
+    const isNotSubscribed =
+      !acc.subscription_status ||
+      acc.subscription_status === "not_subscribed" ||
+      acc.subscription_status === "expired";
+    const isNotLinked = !acc.discord_verified;
+    return isNotSubscribed || isNotLinked;
+  };
+
+  // Upper Table shows ONLY active subscribed & linked members (excludes not subscribed / not linked leads)
+  const upperAccounts = useMemo(() => {
+    if (showAllInUpperTable) return accounts;
+    return accounts.filter((acc) => !isFollowUpLead(acc));
+  }, [accounts, showAllInUpperTable]);
+
+  // Filter upper table accounts
   const filteredUsers = useMemo(() => {
-    return accounts.filter((acc) => {
+    return upperAccounts.filter((acc) => {
       const q = searchQuery.toLowerCase().trim();
       const matchesSearch =
         !q ||
@@ -380,36 +403,34 @@ export default function AdminDashboard() {
       if (statusFilter === "all") return true;
       return acc.subscription_status === statusFilter;
     });
-  }, [accounts, searchQuery, statusFilter]);
+  }, [upperAccounts, searchQuery, statusFilter]);
 
-  // Counts for status options
-  const totalRegistered = accounts?.length || 0;
-  const paidMembersCount = accounts?.filter((a) => a.subscription_status === "paid").length || 0;
-  const trialMembersCount = accounts?.filter((a) => a.subscription_status === "trial").length || 0;
+  // Counts for status options (Upper Table)
+  const activeUpperCount = upperAccounts.length;
+  const upperPaidCount = upperAccounts.filter((a) => a.subscription_status === "paid").length;
+  const upperTrialCount = upperAccounts.filter((a) => a.subscription_status === "trial").length;
   const pendingOrdersCount = recentOrders?.filter((o) => o.status === "pending").length || 0;
-  const expiredMembersCount = accounts?.filter((a) => a.subscription_status === "expired").length || 0;
-  const unsubscribedMembersCount = accounts?.filter((a) => a.subscription_status === "not_subscribed").length || 0;
 
-  // Status Filter Options for Dropdown & Quick Pills
+  // Status Filter Options for Dropdown & Quick Pills (Upper Table)
   const STATUS_OPTIONS = [
     {
       key: "all",
-      label: "All Statuses",
-      count: totalRegistered,
+      label: "Active Members",
+      count: activeUpperCount,
       textColor: "text-gray-900 dark:text-white",
       badgeClass: "bg-gray-100 text-gray-800 dark:bg-white/10 dark:text-gray-200 border-gray-300 dark:border-white/20",
     },
     {
       key: "paid",
       label: "Paid Subscribers",
-      count: paidMembersCount,
+      count: upperPaidCount,
       textColor: "text-emerald-700 dark:text-emerald-400 font-bold",
       badgeClass: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-500/30",
     },
     {
       key: "trial",
       label: "Free Trials",
-      count: trialMembersCount,
+      count: upperTrialCount,
       textColor: "text-blue-700 dark:text-blue-400 font-bold",
       badgeClass: "bg-blue-500/15 text-blue-700 dark:text-blue-400 border-blue-500/30",
     },
@@ -420,30 +441,51 @@ export default function AdminDashboard() {
       textColor: "text-amber-700 dark:text-amber-400 font-bold",
       badgeClass: "bg-amber-500/15 text-amber-700 dark:text-amber-400 border-amber-500/30",
     },
-    {
-      key: "expired",
-      label: "Expired",
-      count: expiredMembersCount,
-      textColor: "text-rose-700 dark:text-rose-400 font-bold",
-      badgeClass: "bg-rose-500/15 text-rose-700 dark:text-rose-400 border-rose-500/30",
-    },
-    {
-      key: "not_subscribed",
-      label: "Not Subscribed",
-      count: unsubscribedMembersCount,
-      textColor: "text-slate-700 dark:text-slate-300 font-medium",
-      badgeClass: "bg-slate-500/15 text-slate-700 dark:text-slate-300 border-slate-500/30",
-    },
   ];
 
   const currentStatusObj = STATUS_OPTIONS.find((opt) => opt.key === statusFilter) || STATUS_OPTIONS[0];
 
-  // Pagination calculations
+  // Pagination calculations (Upper Table)
   const paginatedOrders = recentOrders.slice((ordersPage - 1) * ROWS, ordersPage * ROWS);
   const totalOrderPages = Math.max(1, Math.ceil(recentOrders.length / ROWS));
 
   const paginatedUsers = filteredUsers.slice((usersPage - 1) * ROWS, usersPage * ROWS);
   const totalUserPages = Math.max(1, Math.ceil(filteredUsers.length / ROWS));
+
+  // Follow-up / Unsubscribed Leads (Placed in lower table)
+  const followUpLeads = useMemo(() => {
+    return accounts.filter(isFollowUpLead);
+  }, [accounts]);
+
+  const filteredFollowUpLeads = useMemo(() => {
+    return followUpLeads.filter((acc) => {
+      const q = followUpSearch.toLowerCase().trim();
+      const matchesSearch =
+        !q ||
+        (acc.email && acc.email.toLowerCase().includes(q)) ||
+        (acc.id && acc.id.toLowerCase().includes(q));
+
+      if (!matchesSearch) return false;
+      if (followUpStatusFilter === "all") return true;
+      if (followUpStatusFilter === "not_subscribed") return acc.subscription_status === "not_subscribed";
+      if (followUpStatusFilter === "expired") return acc.subscription_status === "expired";
+      if (followUpStatusFilter === "no_discord") return !acc.discord_verified;
+      return true;
+    });
+  }, [followUpLeads, followUpSearch, followUpStatusFilter]);
+
+  const totalFollowUpPages = Math.max(1, Math.ceil(filteredFollowUpLeads.length / FOLLOW_UP_ROWS));
+  const paginatedFollowUps = useMemo(() => {
+    return filteredFollowUpLeads.slice(
+      (followUpPage - 1) * FOLLOW_UP_ROWS,
+      followUpPage * FOLLOW_UP_ROWS
+    );
+  }, [filteredFollowUpLeads, followUpPage]);
+
+  const copyAllIncompleteEmails = () => {
+    const emails = filteredFollowUpLeads.map((u) => u.email).filter(Boolean).join(", ");
+    copyToClipboard(emails, `Copied ${filteredFollowUpLeads.length} emails to clipboard!`);
+  };
 
   // Platform Trades feed filter & pagination
   const filteredTrades = useMemo(() => {
@@ -475,15 +517,6 @@ export default function AdminDashboard() {
     if (!selectedUserForModal) return [];
     return trades.filter((t) => t.user_id === selectedUserForModal.id);
   }, [selectedUserForModal, trades]);
-
-  const incompleteRegistrations = useMemo(() => {
-    return accounts.filter((acc) => acc.subscription_status === "not_subscribed" || acc.subscription_status === "expired");
-  }, [accounts]);
-
-  const copyAllIncompleteEmails = () => {
-    const emails = incompleteRegistrations.map((u) => u.email).filter(Boolean).join(", ");
-    copyToClipboard(emails, `Copied ${incompleteRegistrations.length} emails to clipboard!`);
-  };
 
   if (loading) {
     return (
@@ -821,20 +854,38 @@ export default function AdminDashboard() {
             </div>
           )}
 
-          {/* ALL REGISTERED USERS DATABASE */}
+          {/* ACTIVE SUBSCRIBED MEMBERS DATABASE (UPPER TABLE) */}
           <div className="bg-white dark:bg-[#0a0a0a]/80 backdrop-blur-xl border border-gray-200 dark:border-white/10 rounded-2xl p-6 shadow-sm dark:shadow-xl mb-8">
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-4">
               <div>
                 <h2 className="text-base md:text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                  All User Database ({filteredUsers.length} of {accounts.length})
-                  <span className="text-[10px] font-normal bg-[#10b981]/10 text-[#10b981] border border-[#10b981]/20 px-2 py-0.5 rounded-full uppercase tracking-wider">
-                    Full Supabase Sync
+                  Active Members Database ({filteredUsers.length} of {upperAccounts.length})
+                  <span className="text-[10px] font-semibold bg-[#10b981]/15 text-[#10b981] border border-[#10b981]/30 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                    {showAllInUpperTable ? "All Records" : "Subscribed & Linked"}
                   </span>
                 </h2>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                  Manage application access, grant subscriptions, inspect user trades, and provision licenses
+                  Showing active members with verified access. Unsubscribed and unlinked leads are managed in the Follow-up table below.
                 </p>
               </div>
+
+              {/* View Toggle & Search */}
+              <div className="flex flex-wrap items-center gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowAllInUpperTable((prev) => !prev);
+                    setUsersPage(1);
+                  }}
+                  className={`text-[11px] px-3 py-1.5 rounded-xl font-bold border transition-all cursor-pointer ${
+                    showAllInUpperTable
+                      ? "bg-amber-500/15 text-amber-700 dark:text-amber-400 border-amber-500/30"
+                      : "bg-gray-100 dark:bg-white/5 text-gray-600 dark:text-gray-400 border-gray-300 dark:border-white/10 hover:text-gray-900 dark:hover:text-white"
+                  }`}
+                  title="Toggle between showing only active subscribed & linked members or all database records"
+                >
+                  {showAllInUpperTable ? "Showing All Users" : "Leads Filtered Out"}
+                </button>
 
               {/* Search & Custom Theme-Safe Filter Dropdown */}
               <div className="flex flex-wrap items-center gap-3">
@@ -1135,7 +1186,21 @@ export default function AdminDashboard() {
                   ) : (
                     <tr>
                       <td colSpan={7} className="py-12 text-center text-gray-500 text-sm">
-                        No users matched the criteria. Try clearing search filters.
+                        <div className="max-w-md mx-auto space-y-2">
+                          <Users className="w-8 h-8 text-gray-400 mx-auto opacity-50" />
+                          <p className="font-semibold text-gray-800 dark:text-gray-200">
+                            No active subscribed members in upper table
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            All {accounts.length} registered users currently require subscription or Discord verification and are placed in the Follow-up table below.
+                          </p>
+                          <a
+                            href="#followup-table"
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/30 text-xs font-bold hover:bg-amber-500 hover:text-black transition-all mt-2 cursor-pointer"
+                          >
+                            Go to Follow-up Leads ({followUpLeads.length}) ↓
+                          </a>
+                        </div>
                       </td>
                     </tr>
                   )}
@@ -1143,7 +1208,7 @@ export default function AdminDashboard() {
               </table>
             </div>
 
-            {/* Pagination for Users */}
+            {/* Pagination for Users (Upper Table) */}
             {totalUserPages > 1 && (
               <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-white/5 mt-4 text-xs text-gray-500 dark:text-gray-400">
                 <span>
@@ -1169,75 +1234,278 @@ export default function AdminDashboard() {
             )}
           </div>
 
-          {/* Follow-up / Incomplete Registrations Card */}
-          <div className="bg-white dark:bg-[#0a0a0a]/80 backdrop-blur-xl border border-gray-200 dark:border-white/10 rounded-2xl p-6 shadow-sm dark:shadow-xl">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
+          {/* Follow-up / Incomplete Registrations Card (LOWER TABLE - 10 per page pagination) */}
+          <div id="followup-table" className="bg-white dark:bg-[#0a0a0a]/80 backdrop-blur-xl border border-gray-200 dark:border-white/10 rounded-2xl p-6 shadow-sm dark:shadow-xl scroll-mt-20">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-5">
               <div>
                 <h2 className="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                  Follow-up / Unsubscribed Leads ({incompleteRegistrations.length})
+                  Follow-up / Unsubscribed Leads ({filteredFollowUpLeads.length})
                   <span className="text-[10px] font-normal bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20 px-2 py-0.5 rounded-full uppercase tracking-wider">
-                    Outreach List
+                    Outreach List (10 per page)
                   </span>
                 </h2>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                  Users who registered but have not subscribed yet or whose trial has expired
+                  Users who registered but have not subscribed yet, have expired access, or have not verified Discord
                 </p>
               </div>
 
-              {incompleteRegistrations.length > 0 && (
+              <div className="flex flex-wrap items-center gap-2.5">
+                {/* Search in follow-up leads */}
+                <div className="relative">
+                  <Search className="w-3.5 h-3.5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    value={followUpSearch}
+                    onChange={(e) => {
+                      setFollowUpSearch(e.target.value);
+                      setFollowUpPage(1);
+                    }}
+                    placeholder="Search leads..."
+                    className="w-48 sm:w-56 bg-gray-50 dark:bg-white/5 border border-gray-300 dark:border-white/10 rounded-xl pl-9 pr-3 py-1.5 text-xs text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:border-amber-500"
+                  />
+                </div>
+
+                {filteredFollowUpLeads.length > 0 && (
+                  <button
+                    onClick={copyAllIncompleteEmails}
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500 hover:text-black border border-amber-500/20 text-amber-700 dark:text-amber-400 text-xs font-bold transition-all cursor-pointer shadow-sm"
+                  >
+                    <Copy className="w-3.5 h-3.5" />
+                    Copy All {filteredFollowUpLeads.length} Emails
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Quick Filter Pills for Follow-up Leads */}
+            <div className="flex items-center gap-2 overflow-x-auto pb-2 mb-4 scrollbar-none">
+              <span className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest shrink-0">
+                Filter Leads:
+              </span>
+              {[
+                { key: "all", label: "All Leads", count: followUpLeads.length },
+                {
+                  key: "not_subscribed",
+                  label: "Not Subscribed",
+                  count: followUpLeads.filter((u) => u.subscription_status === "not_subscribed").length,
+                },
+                {
+                  key: "expired",
+                  label: "Expired",
+                  count: followUpLeads.filter((u) => u.subscription_status === "expired").length,
+                },
+                {
+                  key: "no_discord",
+                  label: "No Discord",
+                  count: followUpLeads.filter((u) => !u.discord_verified).length,
+                },
+              ].map((opt) => (
                 <button
-                  onClick={copyAllIncompleteEmails}
-                  className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500 hover:text-black border border-amber-500/20 text-amber-700 dark:text-amber-400 text-xs font-bold transition-all cursor-pointer"
+                  key={`fu-opt-${opt.key}`}
+                  onClick={() => {
+                    setFollowUpStatusFilter(opt.key);
+                    setFollowUpPage(1);
+                  }}
+                  className={`text-[11px] px-2.5 py-1 rounded-lg font-bold border transition-all cursor-pointer whitespace-nowrap ${
+                    followUpStatusFilter === opt.key
+                      ? "bg-amber-500 text-black border-amber-500 shadow-sm"
+                      : "bg-gray-50 dark:bg-white/5 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-white/10 hover:border-amber-400"
+                  }`}
                 >
-                  <Copy className="w-3.5 h-3.5" />
-                  Copy All {incompleteRegistrations.length} Emails
+                  {opt.label} ({opt.count})
                 </button>
-              )}
+              ))}
             </div>
 
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="border-b border-gray-200 dark:border-white/5 text-[10px] font-bold text-gray-500 uppercase tracking-widest">
-                    <th className="pb-3 pr-4">Email</th>
-                    <th className="pb-3 pr-4">Status</th>
+                    <th className="pb-3 pr-4">Email / User</th>
+                    <th className="pb-3 pr-4">Access Status</th>
+                    <th className="pb-3 pr-4">Discord</th>
                     <th className="pb-3 pr-4">Registered Date</th>
                     <th className="pb-3 text-right">Quick Action</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100 dark:divide-white/5 text-xs">
-                  {incompleteRegistrations.slice(0, 10).map((acc) => (
-                    <tr key={`inc-${acc.id}`} className="hover:bg-gray-50 dark:hover:bg-white/[0.02] transition-colors">
-                      <td className="py-3 pr-4 font-medium text-gray-900 dark:text-white">{acc.email || "Unknown"}</td>
-                      <td className="py-3 pr-4">
-                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20 uppercase font-bold">
-                          {acc.subscription_status}
-                        </span>
-                      </td>
-                      <td className="py-3 pr-4 text-gray-500 font-mono">
-                        {acc.created_at ? new Date(acc.created_at).toLocaleDateString() : "N/A"}
-                      </td>
-                      <td className="py-3 text-right">
-                        <div className="flex items-center justify-end gap-2">
-                          <button
-                            onClick={() => copyToClipboard(acc.email, "Email copied!")}
-                            className="text-[#10b981] hover:underline text-[10px] font-bold uppercase tracking-wider cursor-pointer"
-                          >
-                            Copy Email
-                          </button>
-                          <button
-                            onClick={() => handleGrantAccess(acc.id, "trial", 7)}
-                            className="bg-blue-500/10 text-blue-700 dark:text-blue-400 hover:bg-blue-500 hover:text-white px-2 py-1 rounded text-[10px] font-bold cursor-pointer"
-                          >
-                            Give 7d Trial
-                          </button>
-                        </div>
+                  {paginatedFollowUps.length > 0 ? (
+                    paginatedFollowUps.map((acc) => {
+                      const isExpired = acc.subscription_status === "expired";
+                      const isNotSub = acc.subscription_status === "not_subscribed";
+
+                      return (
+                        <tr key={`inc-${acc.id}`} className="hover:bg-gray-50 dark:hover:bg-white/[0.02] transition-colors">
+                          <td className="py-3 pr-4 font-medium text-gray-900 dark:text-white">
+                            <div className="flex items-center gap-1.5">
+                              <span className="font-semibold text-gray-900 dark:text-white">{acc.email || "Unknown"}</span>
+                              {acc.email && (
+                                <button
+                                  onClick={() => copyToClipboard(acc.email, "Email copied!")}
+                                  className="text-gray-400 hover:text-gray-900 dark:hover:text-white cursor-pointer"
+                                  title="Copy Email"
+                                >
+                                  <Copy className="w-3 h-3" />
+                                </button>
+                              )}
+                            </div>
+                            <span className="text-[10px] text-gray-500 font-mono">ID: {acc.id?.substring(0, 16)}...</span>
+                          </td>
+
+                          <td className="py-3 pr-4">
+                            <span
+                              className={`text-[10px] px-2 py-0.5 rounded-full uppercase font-bold border ${
+                                isExpired
+                                  ? "bg-rose-500/10 text-rose-700 dark:text-rose-400 border-rose-500/20"
+                                  : isNotSub
+                                  ? "bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/20"
+                                  : "bg-gray-500/10 text-gray-600 dark:text-gray-400 border-gray-500/20"
+                              }`}
+                            >
+                              {acc.subscription_status || "not_subscribed"}
+                            </span>
+                          </td>
+
+                          <td className="py-3 pr-4">
+                            <div className="flex items-center gap-1.5">
+                              <span
+                                className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
+                                  acc.discord_verified
+                                    ? "bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 border border-indigo-500/20"
+                                    : "bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20"
+                                }`}
+                              >
+                                {acc.discord_verified ? "Linked" : "No Discord"}
+                              </span>
+                              <button
+                                onClick={() => handleToggleDiscord(acc.id, acc.discord_verified)}
+                                disabled={actionLoadingId === acc.id}
+                                className="text-[10px] text-blue-600 dark:text-blue-400 hover:underline font-bold cursor-pointer"
+                                title={acc.discord_verified ? "Unlink Discord" : "Manually verify Discord"}
+                              >
+                                {acc.discord_verified ? "Unlink" : "Verify"}
+                              </button>
+                            </div>
+                          </td>
+
+                          <td className="py-3 pr-4 text-gray-500 font-mono text-[11px]">
+                            {acc.created_at ? new Date(acc.created_at).toLocaleDateString() : "N/A"}
+                          </td>
+
+                          <td className="py-3 text-right">
+                            <div className="flex items-center justify-end gap-1.5 flex-wrap">
+                              <button
+                                onClick={() => setSelectedUserForModal(acc)}
+                                title="Inspect user details & trades"
+                                className="p-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-white/5 dark:hover:bg-white/10 border border-gray-200 dark:border-white/10 text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white transition-all cursor-pointer"
+                              >
+                                <Eye className="w-3.5 h-3.5" />
+                              </button>
+
+                              <button
+                                onClick={() => copyToClipboard(acc.email, "Email copied!")}
+                                className="px-2 py-1 rounded bg-gray-100 hover:bg-gray-200 dark:bg-white/5 dark:hover:bg-white/10 text-gray-700 dark:text-gray-300 text-[10px] font-bold uppercase tracking-wider cursor-pointer"
+                              >
+                                Copy Email
+                              </button>
+
+                              <button
+                                onClick={() => handleGrantAccess(acc.id, "trial", 7)}
+                                disabled={actionLoadingId === acc.id}
+                                className="bg-blue-500/10 text-blue-700 dark:text-blue-400 hover:bg-blue-500 hover:text-white border border-blue-500/20 px-2 py-1 rounded text-[10px] font-bold cursor-pointer transition-all disabled:opacity-50"
+                              >
+                                Give 7d Trial
+                              </button>
+
+                              <button
+                                onClick={() => handleGrantAccess(acc.id, "paid", 30)}
+                                disabled={actionLoadingId === acc.id}
+                                className="bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-500 hover:text-white border border-emerald-500/20 px-2 py-1 rounded text-[10px] font-bold cursor-pointer transition-all disabled:opacity-50"
+                              >
+                                +30d Pro
+                              </button>
+
+                              <button
+                                onClick={() => handleDeleteUser(acc.id)}
+                                disabled={actionLoadingId === acc.id}
+                                title="Delete user"
+                                className="p-1 rounded-lg bg-red-500/10 hover:bg-red-500 hover:text-white border border-red-500/20 text-red-600 dark:text-red-400 text-[10px] font-bold transition-all disabled:opacity-50 cursor-pointer"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  ) : (
+                    <tr>
+                      <td colSpan={5} className="py-8 text-center text-gray-500 text-xs">
+                        No leads found matching your criteria.
                       </td>
                     </tr>
-                  ))}
+                  )}
                 </tbody>
               </table>
             </div>
+
+            {/* Pagination Controls for Follow-up Table (10 users at a time) */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between pt-4 border-t border-gray-200 dark:border-white/5 mt-4 text-xs text-gray-500 dark:text-gray-400 gap-3">
+              <span>
+                Showing{" "}
+                <strong className="text-gray-900 dark:text-white">
+                  {filteredFollowUpLeads.length === 0 ? 0 : (followUpPage - 1) * FOLLOW_UP_ROWS + 1}
+                </strong>{" "}
+                to{" "}
+                <strong className="text-gray-900 dark:text-white">
+                  {Math.min(followUpPage * FOLLOW_UP_ROWS, filteredFollowUpLeads.length)}
+                </strong>{" "}
+                of <strong className="text-gray-900 dark:text-white">{filteredFollowUpLeads.length}</strong> leads (Page {followUpPage} of {totalFollowUpPages})
+              </span>
+
+              <div className="flex items-center gap-1.5">
+                <button
+                  onClick={() => setFollowUpPage((p) => Math.max(1, p - 1))}
+                  disabled={followUpPage <= 1}
+                  className="px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-white/5 dark:hover:bg-white/10 text-gray-800 dark:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all font-bold cursor-pointer"
+                >
+                  Previous
+                </button>
+
+                {/* Page number indicators */}
+                {Array.from({ length: totalFollowUpPages }, (_, i) => i + 1)
+                  .filter((page) => page === 1 || page === totalFollowUpPages || Math.abs(page - followUpPage) <= 1)
+                  .map((page, index, array) => {
+                    const prev = array[index - 1];
+                    const showEllipsis = prev && page - prev > 1;
+
+                    return (
+                      <span key={`fup-pg-${page}`} className="flex items-center gap-1">
+                        {showEllipsis && <span className="px-1 text-gray-500">...</span>}
+                        <button
+                          onClick={() => setFollowUpPage(page)}
+                          className={`w-7 h-7 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                            followUpPage === page
+                              ? "bg-amber-500 text-black shadow-sm"
+                              : "bg-gray-100 hover:bg-gray-200 dark:bg-white/5 dark:hover:bg-white/10 text-gray-700 dark:text-gray-300"
+                          }`}
+                        >
+                          {page}
+                        </button>
+                      </span>
+                    );
+                  })}
+
+                <button
+                  onClick={() => setFollowUpPage((p) => Math.min(totalFollowUpPages, p + 1))}
+                  disabled={followUpPage >= totalFollowUpPages}
+                  className="px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-white/5 dark:hover:bg-white/10 text-gray-800 dark:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all font-bold cursor-pointer"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          </div>
           </div>
         </>
       )}

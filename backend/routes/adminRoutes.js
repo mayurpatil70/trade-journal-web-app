@@ -39,6 +39,18 @@ router.get("/public/announcement", (req, res) => {
 
 router.use(requireAuth, requireAdmin);
 
+// High-Performance Supabase Aggregation Pipeline for Admin Metrics
+router.get("/metrics/aggregated", async (req, res) => {
+  try {
+    const { data, error } = await supabase.rpc("aggregate_admin_metrics");
+    if (error) throw error;
+    res.json({ success: true, source: "database_pipeline", data });
+  } catch (error) {
+    console.warn("[Admin] Aggregation pipeline RPC fallback:", error.message);
+    res.status(503).json({ success: false, error: "Database aggregation pipeline unavailable. Ensure migration 005 has been executed." });
+  }
+});
+
 // Fetch admin metrics for the dashboard
 router.get("/metrics", async (req, res) => {
   try {

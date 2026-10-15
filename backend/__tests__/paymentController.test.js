@@ -1,3 +1,4 @@
+import { jest } from '@jest/globals';
 import { verifyCryptoPayment } from '../controllers/paymentController.js';
 import { supabase } from '../config/supabase.js';
 import { ethers } from 'ethers';

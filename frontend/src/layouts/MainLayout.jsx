@@ -2,7 +2,7 @@
 import NotificationBell from "../components/NotificationBell.jsx";
 import BrandLogo from "../components/BrandLogo";
 import ThemeToggle from "../components/ThemeToggle.jsx";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import PreTradeGate from "../components/PreTradeGate.jsx";
 import PromoPopup from "../components/PromoPopup.jsx";
@@ -104,15 +104,24 @@ export default function MainLayout() {
   const [dismissedAnn, setDismissedAnn] = useState(false);
 
   useEffect(() => {
-    api
-      .get("/api/admin/public/announcement")
-      .then((res) => {
-        if (res.data?.success && res.data.announcement?.active && res.data.announcement?.message) {
-          setAnnouncement(res.data.announcement);
-        }
-      })
-      .catch(() => {});
-  }, [location.pathname]);
+    let cancelled = false;
+    const fetchAnn = () => {
+      api
+        .get("/api/admin/public/announcement")
+        .then((res) => {
+          if (!cancelled && res.data?.success && res.data.announcement?.active && res.data.announcement?.message) {
+            setAnnouncement(res.data.announcement);
+          }
+        })
+        .catch(() => {});
+    };
+    fetchAnn();
+    const interval = setInterval(fetchAnn, 5 * 60_000);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, []);
 
   // Command palette shortcut
   useEffect(() => {
@@ -125,7 +134,7 @@ export default function MainLayout() {
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [location.pathname]);
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("userId");
@@ -388,7 +397,16 @@ export default function MainLayout() {
           <NotificationBell />
           <ThemeToggle />
         </div>
-        <Outlet />
+        <Suspense
+          fallback={
+            <div className="min-h-[70vh] flex flex-col items-center justify-center p-8 bg-[#0A0B0D]">
+              <div className="w-8 h-8 rounded-full border-2 border-emerald-500/20 border-t-emerald-500 animate-spin mb-3" />
+              <p className="text-xs text-gray-400 font-medium tracking-wide">Loading workspace view...</p>
+            </div>
+          }
+        >
+          <Outlet />
+        </Suspense>
       </main>
 
       {/* Command Palette Overlay (Mock) */}

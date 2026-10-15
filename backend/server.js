@@ -3,6 +3,9 @@ import "dotenv/config";
 import express from "express";
 import cors from "cors";
 
+// Import Keep-Alive Cron
+import { startKeepAliveCron } from "./utils/keepAlive.js";
+
 // Import ALL Routes
 import aiRoutes from "./routes/aiRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
@@ -21,23 +24,53 @@ import marketRoutes from "./market/routes.js";
 
 const app = express();
 
+// Trust reverse proxies (Render, Cloudflare, Vercel) for accurate client IP in rate limiting
+app.set("trust proxy", 1);
+
+// Security Headers Middleware
+app.use((req, res, next) => {
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("X-Frame-Options", "SAMEORIGIN");
+  res.setHeader("X-XSS-Protection", "1; mode=block");
+  res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+  next();
+});
+
 // Middleware
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://forexnotes.vercel.app",
+  "https://www.forexnotes.in",
+  "https://forexnotes.in",
+  "capacitor://localhost",
+  "http://localhost",
+];
+
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173",
-      "https://forexnotes.vercel.app",
-      "https://www.forexnotes.in",
-      "https://forexnotes.in",
-      "capacitor://localhost",
-      "http://localhost",
-      "",
-    ],
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps or curl)
+      if (!origin || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      return callback(null, false);
+    },
     credentials: true,
   }),
 );
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Dedicated Health Check & Keep-Alive Endpoints
+app.get(["/", "/api/health"], (req, res) => {
+  res.status(200).json({
+    status: "ok",
+    service: "Forex Notes Backend API",
+    uptime: Math.round(process.uptime()),
+    timestamp: new Date().toISOString(),
+  });
+});
 
 // Mount ALL Routes
 app.use("/api/ai", aiRoutes);
@@ -55,13 +88,6 @@ app.use("/api/bot", botRoutes);
 app.use("/api/bot-hub", botHubRoutes);
 app.use("/api/market", marketRoutes);
 
-// Health Check Endpoint
-app.get("/", (req, res) => {
-  res
-    .status(200)
-    .json({ status: "Forex Notes Backend is running successfully!" });
-});
-
 app.use((err, req, res, next) => {
   if (res.headersSent) return next(err);
   if (err.type === "entity.too.large") return res.status(413).json({ error: "Request is too large." });
@@ -74,5 +100,8 @@ app.use((err, req, res, next) => {
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
+  // Launch keep-alive cron job to prevent inactivity spin-downs on Render/cloud hosting
+  startKeepAliveCron({ intervalMs: 10 * 60 * 1000, port: PORT });
 });
+
 

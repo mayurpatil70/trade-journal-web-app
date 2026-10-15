@@ -38,6 +38,10 @@ jest.unstable_mockModule('cloudinary', () => ({
 const app = express();
 app.use(express.json());
 
+process.env.AUTH_SECRET = 'test-secret-key-123';
+const { signAuthToken } = await import('../utils/authToken.js');
+const validAuthHeader = `Bearer ${signAuthToken('test-user-123', { secret: 'test-secret-key-123' })}`;
+
 let routes;
 
 beforeAll(async () => {
@@ -50,6 +54,7 @@ describe('Subscription Routes', () => {
   it('should process masterclass payment and return pending status', async () => {
     const res = await request(app)
       .post('/api/subscriptions/masterclass/verify')
+      .set('Authorization', validAuthHeader)
       .send({
         userId: 'test-user-123',
         txHash: '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef',
@@ -64,6 +69,7 @@ describe('Subscription Routes', () => {
   it('should reject invalid transaction hash', async () => {
     const res = await request(app)
       .post('/api/subscriptions/masterclass/verify')
+      .set('Authorization', validAuthHeader)
       .send({
         userId: 'test-user-123',
         txHash: 'invalid-hash',

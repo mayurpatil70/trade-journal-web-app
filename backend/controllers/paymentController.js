@@ -13,6 +13,10 @@ export const verifyCryptoPayment = async (req, res) => {
   
   if (!userId) return res.status(401).json({ error: 'Unauthorized' });
 
+  if (!txHash || typeof txHash !== 'string' || !/^0x([A-Fa-f0-9]{64})$/.test(txHash)) {
+    return res.status(400).json({ error: 'Invalid or failed transaction' });
+  }
+
   try {
     const tx = await provider.getTransaction(txHash);
     const receipt = await provider.getTransactionReceipt(txHash);
@@ -22,7 +26,10 @@ export const verifyCryptoPayment = async (req, res) => {
     }
 
     const expectedTokenAddress = '0x55d398326f99059fF775485246999027B3197955'.toLowerCase();
-    const yourMerchantWallet = process.env.BEP20_ADDRESS.toLowerCase();
+    const yourMerchantWallet = (process.env.BEP20_ADDRESS || "").toLowerCase();
+    if (!yourMerchantWallet) {
+      return res.status(503).json({ error: "Merchant wallet address is not configured." });
+    }
     
     if (tx.to.toLowerCase() !== expectedTokenAddress) {
        return res.status(400).json({ error: 'Transaction was not sent to the USDT contract' });
@@ -102,6 +109,9 @@ export const verifyCryptoPayment = async (req, res) => {
     res.status(200).json({ success: true, message: 'Payment verified and account activated!' });
 
   } catch (error) {
+    if (error?.code === 'INVALID_ARGUMENT' || error?.message?.includes('invalid argument')) {
+      return res.status(400).json({ error: 'Invalid or failed transaction' });
+    }
     console.error(error);
     res.status(500).json({ error: 'Payment verification failed' });
   }

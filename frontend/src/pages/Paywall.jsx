@@ -7,6 +7,7 @@ import { parseUnits } from 'viem';
 import { Loader2, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/axios'; // using their axios instance
+import { invalidateSubscriptionCache } from '../utils/subscriptionCache';
 
 // BSC USDT Contract Address
 const USDT_ADDRESS = '0x55d398326f99059fF775485246999027B3197955';
@@ -60,7 +61,8 @@ function Paywall() {
     try {
       const response = await api.post('/api/subscriptions/start-trial', { referredBy: localStorage.getItem('referred_by') });
       if (response.data.success) {
-        window.location.href = '/dashboard';
+        invalidateSubscriptionCache();
+        navigate('/dashboard');
       }
     } catch (error) {
       console.error(error);
@@ -114,7 +116,8 @@ function Paywall() {
         plan: selectedPlanType
       }).then(response => {
         if(response.data.success) {
-          window.location.href = '/dashboard';
+          invalidateSubscriptionCache();
+          navigate('/dashboard');
         }
       }).catch(err => {
          console.error(err);

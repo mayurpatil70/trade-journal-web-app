@@ -5,6 +5,7 @@ import { upload } from "../middlewares/upload.js";
 import {
   createTrade,
   getTrades,
+  getTradeAnalytics,
   deleteAllTrades,
   deleteTrade,
   updateTrade,
@@ -17,6 +18,9 @@ router.use(requireAuth);
 
 // Accepts up to 3 trade chart screenshots
 router.post("/", upload.array("images", 3), createTrade);
+
+// Aggregated Trade Analytics Pipeline
+router.get("/analytics", getTradeAnalytics);
 
 // Dashboard & history trade listing
 router.get("/", getTrades);

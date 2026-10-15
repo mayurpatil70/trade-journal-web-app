@@ -93,7 +93,8 @@ router.get("/status/:userId", async (req, res) => {
 // 3. Verify Payment & Unlock App
 router.post("/verify", requireAuth, upload.single("screenshot"), async (req, res) => {
   try {
-    const { userId, txHash, chain } = req.body;
+    const userId = req.userId;
+    const { txHash, chain } = req.body || {};
     let paymentScreenshot = null;
 
     if (req.file) {
@@ -173,7 +174,8 @@ router.post("/verify", requireAuth, upload.single("screenshot"), async (req, res
 // 4. Verify Masterclass Payment
 router.post("/masterclass/verify", requireAuth, upload.single("screenshot"), async (req, res) => {
   try {
-    const { userId, txHash, chain } = req.body;
+    const userId = req.userId;
+    const { txHash, chain } = req.body || {};
     let paymentScreenshot = null;
 
     if (req.file) {

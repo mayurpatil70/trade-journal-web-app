@@ -1,0 +1,18 @@
+name: Keep-Alive Server Heartbeat
+
+on:
+  schedule:
+    # Runs every 10 minutes (cron format: minute hour day-of-month month day-of-week)
+    - cron: '*/10 * * * *'
+  workflow_dispatch: # Allows manual trigger from GitHub Actions tab
+
+jobs:
+  ping-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping ForexNotes Backend API
+        run: |
+          echo "Pinging backend server to prevent inactivity sleep..."
+          curl -sSf -m 20 --retry 2 "https://forexnotes-web-app.onrender.com/api/health" || \
+          curl -sSf -m 20 "https://forexnotes-web-app.onrender.com/" || \
+          echo "Server wake-up request transmitted."

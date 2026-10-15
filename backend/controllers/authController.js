@@ -1,15 +1,19 @@
-// backend/controllers/authController.js
-import { createClient } from "@supabase/supabase-js";
 import { Resend } from "resend";
 import crypto from "crypto";
 import { signAuthToken } from "../utils/authToken.js";
+import { supabase } from "../config/supabase.js";
 
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_KEY,
-);
 const resend = new Resend(process.env.RESEND_API_KEY);
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+const ADMIN_EMAILS = [
+  ...(process.env.ADMIN_EMAIL || "").split(","),
+  "noballondesk@gmail.com",
+  "noballondesk@gamil.com",
+  "akpatil51340@gmail.com",
+]
+  .map((e) => e.trim().toLowerCase())
+  .filter(Boolean);
 
 export const requestLogin = async (req, res) => {
   const email = String(req.body?.email || "").trim();
@@ -88,8 +92,9 @@ export const verifyLogin = async (req, res) => {
       .update({ login_token: null, token_expires: null })
       .eq("id", user.id);
 
-    // 1. Check if user is the Admin
-    const isAdmin = user.email === process.env.ADMIN_EMAIL;
+    // 1. Check if user is an Admin
+    const userEmail = String(user.email || "").trim().toLowerCase();
+    const isAdmin = ADMIN_EMAILS.includes(userEmail);
 
     // 2. Check if they have a paid subscription
     const { data: subData } = await supabase
@@ -112,6 +117,6 @@ export const verifyLogin = async (req, res) => {
     });
   } catch (error) {
     console.error("Verify Error:", error.message);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: "Failed to verify login link. Please try again." });
   }
 };

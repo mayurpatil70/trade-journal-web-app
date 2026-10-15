@@ -1139,3 +1139,138 @@ export const exportTrades = async (req, res) => {
       .json({ success: false, error: "Failed to generate export file." });
   }
 };
+
+export const getTradeAnalytics = async (req, res) => {
+  try {
+    const { userId } = req;
+    const { accountName } = req.query;
+
+    if (!userId) {
+      return res.status(401).json({ success: false, error: "Unauthorized" });
+    }
+
+    // Tier 1: Fast PostgreSQL Aggregation Pipeline via RPC in Supabase
+    try {
+      const { data: rpcData, error: rpcError } = await supabase.rpc("aggregate_user_trades", {
+        p_user_id: userId,
+        p_account_name: accountName || null,
+      });
+
+      if (!rpcError && rpcData && Object.keys(rpcData).length > 0) {
+        return res.status(200).json({ success: true, source: "database_pipeline", data: rpcData });
+      }
+    } catch (rpcErr) {
+      // Continue to Tier 2 application fallback if RPC is not installed in database
+    }
+
+    // Tier 2: Resilient Application-Level Aggregation Pipeline Fallback
+    let query = supabase
+      .from("trades")
+      .select("result, r_multiple, pnl, setup, session, asset, rule_break, direction, date")
+      .eq("user_id", userId);
+
+    if (accountName) {
+      query = query.eq("account_name", accountName);
+    }
+
+    const { data: trades, error: fetchErr } = await query;
+    if (fetchErr) throw fetchErr;
+
+    const list = trades || [];
+    let wins = 0;
+    let losses = 0;
+    let be = 0;
+    let totalR = 0;
+    let totalPnl = 0;
+    let grossProfit = 0;
+    let grossLoss = 0;
+
+    const setups = {};
+    const sessions = {};
+    const assets = {};
+
+    list.forEach((t) => {
+      const resVal = (t.result || "").toLowerCase().trim();
+      let r = parseFloat(t.r_multiple) || 0;
+      let pnl = parseFloat(t.pnl) || 0;
+
+      if (resVal === "loss") {
+        losses++;
+        if (r > 0) r = -r;
+        if (pnl > 0) pnl = -pnl;
+        grossLoss += Math.abs(pnl);
+      } else if (resVal === "be") {
+        be++;
+        r = 0;
+      } else if (resVal === "win") {
+        wins++;
+        if (r < 0) r = Math.abs(r);
+        if (pnl < 0) pnl = Math.abs(pnl);
+        grossProfit += pnl;
+      }
+
+      totalR += r;
+      totalPnl += pnl;
+
+      if (t.setup) {
+        if (!setups[t.setup]) setups[t.setup] = { name: t.setup, total: 0, wins: 0, r: 0, pnl: 0 };
+        setups[t.setup].total++;
+        if (resVal === "win") setups[t.setup].wins++;
+        setups[t.setup].r += r;
+        setups[t.setup].pnl += pnl;
+      }
+
+      if (t.session) {
+        if (!sessions[t.session]) sessions[t.session] = { name: t.session, total: 0, wins: 0, r: 0, pnl: 0 };
+        sessions[t.session].total++;
+        if (resVal === "win") sessions[t.session].wins++;
+        sessions[t.session].r += r;
+        sessions[t.session].pnl += pnl;
+      }
+
+      if (t.asset) {
+        if (!assets[t.asset]) assets[t.asset] = { name: t.asset, total: 0, wins: 0, r: 0, pnl: 0 };
+        assets[t.asset].total++;
+        if (resVal === "win") assets[t.asset].wins++;
+        assets[t.asset].r += r;
+        assets[t.asset].pnl += pnl;
+      }
+    });
+
+    const totalTrades = list.length;
+    const validTrades = wins + losses;
+    const winRate = validTrades > 0 ? (wins / validTrades) * 100 : 0;
+    const profitFactor = grossLoss > 0 ? grossProfit / grossLoss : grossProfit > 0 ? 999 : 0;
+
+    const formatGroup = (dict) =>
+      Object.values(dict)
+        .map((g) => ({
+          ...g,
+          winRate: g.total > 0 ? Number(((g.wins / g.total) * 100).toFixed(1)) : 0,
+          netR: Number(g.r.toFixed(2)),
+          netPnl: Number(g.pnl.toFixed(2)),
+        }))
+        .sort((a, b) => b.netR - a.netR);
+
+    const fallbackResult = {
+      summary: {
+        total_trades: totalTrades,
+        wins,
+        losses,
+        breakevens: be,
+        win_rate: Number(winRate.toFixed(1)),
+        total_r: Number(totalR.toFixed(2)),
+        total_pnl: Number(totalPnl.toFixed(2)),
+        profit_factor: Number(profitFactor.toFixed(2)),
+      },
+      by_setup: formatGroup(setups),
+      by_session: formatGroup(sessions),
+      by_asset: formatGroup(assets),
+    };
+
+    res.status(200).json({ success: true, source: "application_fallback", data: fallbackResult });
+  } catch (error) {
+    console.error("Trade Analytics Error:", error);
+    res.status(500).json({ success: false, error: "Failed to generate trade analytics." });
+  }
+};

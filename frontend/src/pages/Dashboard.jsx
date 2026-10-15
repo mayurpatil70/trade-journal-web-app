@@ -4,6 +4,7 @@ import AccountFilter from "../components/AccountFilter";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
 import Logo3DLoader from "../components/Logo3DLoader";
+import { shouldShow3DLoaderForDashboard, mark3DLoaderShown } from "../utils/navigationState";
 import {
   Activity,
   PlusCircle,
@@ -164,9 +165,12 @@ function calcStats(trades) {
   };
 }
 
+// Module-scoped cache for trades
+let cachedDashboardTrades = null;
+
 export default function Dashboard() {
-  const [allTrades, setAllTrades] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [allTrades, setAllTrades] = useState(() => cachedDashboardTrades || []);
+  const [isLoading, setIsLoading] = useState(() => !cachedDashboardTrades);
   const [selectedAccount, setSelectedAccount] = useState("");
   const navigate = useNavigate();
 
@@ -180,11 +184,13 @@ export default function Dashboard() {
       if (!userId) return navigate("/login");
       const res = await api.get(`/api/trades?userId=${userId}`);
       const sorted = [...(res.data?.data || [])].sort((a, b) => new Date(a.date) - new Date(b.date));
+      cachedDashboardTrades = sorted;
       setAllTrades(sorted);
     } catch (err) {
       console.error(err);
     } finally {
       setIsLoading(false);
+      mark3DLoaderShown();
     }
   };
 
@@ -238,11 +244,23 @@ export default function Dashboard() {
 
   // ── EARLY RETURN AFTER ALL HOOKS ──
   if (isLoading) {
+    // Only show 3D Logo on physical page refresh (or initial direct URL landing on /dashboard)
+    // In-app navigation (clicking /dashboard from paywall after access, sidebar, etc.) will NEVER display the 3D logo
+    if (shouldShow3DLoaderForDashboard()) {
+      return (
+        <Logo3DLoader
+          title="FOREX NOTES"
+          subtitle="Loading Performance Dashboard & Trade Journal..."
+        />
+      );
+    }
+
+    // Ultra-lightweight fallback for in-app transitions and subsequent background refreshes
     return (
-      <Logo3DLoader
-        title="FOREX NOTES"
-        subtitle="Loading Performance Dashboard & Trade Journal..."
-      />
+      <div className="min-h-[70vh] flex flex-col items-center justify-center p-8 bg-[#0a0a0a]">
+        <div className="w-8 h-8 rounded-full border-2 border-emerald-500/20 border-t-emerald-500 animate-spin mb-3" />
+        <p className="text-xs text-gray-400 font-medium tracking-wide">Updating workspace...</p>
+      </div>
     );
   }
 

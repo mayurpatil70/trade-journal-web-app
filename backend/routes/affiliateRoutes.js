@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.get("/profile", requireAuth, async (req, res) => {
   try {
-    const userId = req.userId || req.body?.userId;
+    const userId = req.userId;
     const { data, error } = await supabase
       .from("profiles")
       .select("*")
@@ -28,8 +28,17 @@ router.get("/profile", requireAuth, async (req, res) => {
 });
 
 router.post("/withdraw", requireAuth, async (req, res) => {
-  const { withdrawAddress } = req.body;
-  const userId = req.userId || req.body?.userId;
+  const { withdrawAddress } = req.body || {};
+  const userId = req.userId;
+
+  if (!userId) return res.status(401).json({ error: "Unauthorized" });
+
+  if (!withdrawAddress || typeof withdrawAddress !== "string" || withdrawAddress.trim().length < 20) {
+    return res.status(400).json({ error: "A valid BEP20 USDT withdrawal wallet address is required." });
+  }
+
+  const cleanAddress = withdrawAddress.trim();
+
   try {
     const { data: profile } = await supabase
       .from("profiles")
@@ -37,24 +46,42 @@ router.post("/withdraw", requireAuth, async (req, res) => {
       .eq("id", userId)
       .single();
 
-    if (!profile || profile.wallet_balance < 25) {
-      return res.status(400).json({ error: "Minimum $25 required" });
+    const currentBalance = Number(profile?.wallet_balance || 0);
+    if (!profile || currentBalance < 25) {
+      return res.status(400).json({ error: "Minimum withdrawal amount is $25 USDT." });
     }
 
-    const { error: insertErr } = await supabase.from('withdrawals').insert([{
+    // Atomic deduction: only deducts if wallet_balance matches to prevent concurrent double-spend race conditions
+    const { data: updatedProfile, error: updateErr } = await supabase
+      .from("profiles")
+      .update({ wallet_balance: 0 })
+      .eq("id", userId)
+      .gte("wallet_balance", 25)
+      .select()
+      .maybeSingle();
+
+    if (updateErr || !updatedProfile) {
+      return res.status(409).json({ error: "Withdrawal conflict or balance already processed." });
+    }
+
+    const { error: insertErr } = await supabase.from("withdrawals").insert([{
       user_id: userId,
-      amount: profile.wallet_balance,
-      wallet_address: withdrawAddress
+      amount: currentBalance,
+      wallet_address: cleanAddress,
+      status: "pending",
+      created_at: new Date().toISOString(),
     }]);
 
-    if (insertErr) throw insertErr;
+    if (insertErr) {
+      // Revert balance if record insertion failed
+      await supabase.from("profiles").update({ wallet_balance: currentBalance }).eq("id", userId);
+      throw insertErr;
+    }
 
-    await supabase.from('profiles').update({ wallet_balance: 0 }).eq('id', userId);
-
-    res.json({ success: true });
+    res.json({ success: true, message: `Withdrawal request for $${currentBalance} USDT submitted.` });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Failed to process withdrawal" });
+    console.error("Withdrawal processing error:", error);
+    res.status(500).json({ error: "Failed to process withdrawal request." });
   }
 });
 

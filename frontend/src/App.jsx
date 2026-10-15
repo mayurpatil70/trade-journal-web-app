@@ -1,5 +1,5 @@
 // frontend/src/App.jsx
-import { useEffect, useState, lazy, Suspense } from "react";
+import { useEffect, useState, useRef, lazy, Suspense } from "react";
 import {
   BrowserRouter,
   useLocation,
@@ -10,6 +10,8 @@ import {
 } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import api, { isSessionValid, clearSession } from "./api/axios";
+import { getCachedAccessStatus, getImmediateCachedStatus } from "./utils/subscriptionCache";
+import { markInAppNavigation } from "./utils/navigationState";
 
 // CRITICAL: ErrorBoundary MUST be eagerly imported — it cannot be lazy-loaded
 // because if it fails to load, there's nothing to catch the error (causes #310 crash loop)
@@ -100,43 +102,54 @@ const AuthGuard = () => {
   return <Outlet />;
 };
 
+// Fast, non-blocking workspace loader (avoids heavy WebGL 3D loader flash on route transitions)
+const WorkspaceLoader = () => (
+  <div className="min-h-screen bg-[#0a0a0a] flex flex-col items-center justify-center p-6">
+    <div className="relative flex items-center justify-center mb-3">
+      <div className="w-10 h-10 rounded-full border-2 border-emerald-500/20 border-t-emerald-500 animate-spin" />
+      <img src="/logo3d.png" alt="Loading" className="w-4 h-4 object-contain absolute opacity-80" />
+    </div>
+    <p className="text-xs text-gray-400 font-medium tracking-wide">Connecting workspace...</p>
+  </div>
+);
+
 // GUARD 1.5: Strict Discord Enforcer (Must link Discord before accessing Paywall or Dashboard)
 const DiscordGateGuard = () => {
-  const [discordStatus, setDiscordStatus] = useState(null); // null = loading, 'allow', 'discord'
+  const [discordStatus, setDiscordStatus] = useState(() => {
+    const cached = getImmediateCachedStatus();
+    if (cached) {
+      return cached.isAdmin || cached.discordVerified ? "allow" : "discord";
+    }
+    return null;
+  });
 
   useEffect(() => {
-    const checkDiscord = async () => {
-      const userId = localStorage.getItem("userId") || "";
-      const userEmail = (localStorage.getItem("userEmail") || "").toLowerCase().trim();
-      const adminEmails = ["noballondesk@gmail.com", "noballondesk@gamil.com", "akpatil51340@gmail.com"];
-
-      // ADMIN BYPASS
-      if (adminEmails.includes(userEmail) || adminEmails.includes(userId.toLowerCase().trim())) {
-        setDiscordStatus('allow');
-        return;
-      }
-
-      try {
-        const response = await api.get(`/api/subscriptions/status/${userId || userEmail}`);
-        if (response.data?.isAdmin || response.data?.discordVerified) {
-          setDiscordStatus('allow');
+    let active = true;
+    getCachedAccessStatus()
+      .then((data) => {
+        if (!active) return;
+        if (data?.isAdmin || data?.discordVerified) {
+          setDiscordStatus("allow");
         } else {
-          setDiscordStatus('discord');
+          setDiscordStatus("discord");
         }
-      } catch (err) {
+      })
+      .catch((err) => {
+        if (!active) return;
         if (err.response?.status !== 401) {
-          setDiscordStatus('discord');
+          setDiscordStatus("discord");
         }
-      }
+      });
+    return () => {
+      active = false;
     };
-    checkDiscord();
   }, []);
 
   if (discordStatus === null) {
-    return <Logo3DLoader title="FOREX NOTES" subtitle="Loading your workspace..." />;
+    return <WorkspaceLoader />;
   }
 
-  if (discordStatus === 'discord') {
+  if (discordStatus === "discord") {
     return <Navigate to="/link-discord" replace />;
   }
 
@@ -145,50 +158,50 @@ const DiscordGateGuard = () => {
 
 // GUARD 2: The Paywall Enforcer
 const PaywallGuard = () => {
-  const [access, setAccess] = useState(null); // null = loading, 'allow', 'paywall', 'discord'
+  const [access, setAccess] = useState(() => {
+    const cached = getImmediateCachedStatus();
+    if (cached) {
+      if (cached.isAdmin) return "allow";
+      if (!cached.discordVerified) return "discord";
+      if (!cached.hasPaid) return "paywall";
+      return "allow";
+    }
+    return null;
+  });
 
   useEffect(() => {
-    const checkStatus = async () => {
-      const userId = localStorage.getItem("userId") || "";
-      const userEmail = (localStorage.getItem("userEmail") || "").toLowerCase().trim();
-      const adminEmails = ["noballondesk@gmail.com", "noballondesk@gamil.com", "akpatil51340@gmail.com"];
-
-      // ADMIN BYPASS
-      if (adminEmails.includes(userEmail) || adminEmails.includes(userId.toLowerCase().trim())) {
-        setAccess('allow');
-        return;
-      }
-
-      try {
-        const response = await api.get(`/api/subscriptions/status/${userId || userEmail}`);
-        const { hasPaid, discordVerified, isAdmin } = response.data;
+    let active = true;
+    getCachedAccessStatus()
+      .then((data) => {
+        if (!active) return;
+        const { hasPaid, discordVerified, isAdmin } = data || {};
         if (isAdmin) {
-          setAccess('allow');
-          return;
-        }
-        if (!discordVerified) {
-          setAccess('discord');
+          setAccess("allow");
+        } else if (!discordVerified) {
+          setAccess("discord");
         } else if (!hasPaid) {
-          setAccess('paywall');
+          setAccess("paywall");
         } else {
-          setAccess('allow');
+          setAccess("allow");
         }
-      } catch (error) {
-        // If 401, the axios interceptor will handle logout
+      })
+      .catch((error) => {
+        if (!active) return;
         if (error.response?.status !== 401) {
-          setAccess('paywall');
+          setAccess("paywall");
         }
-      }
+      });
+    return () => {
+      active = false;
     };
-    checkStatus();
   }, []);
 
   if (access === null) {
-    return <Logo3DLoader title="FOREX NOTES" subtitle="Loading your workspace..." />;
+    return <WorkspaceLoader />;
   }
 
-  if (access === 'discord') return <Navigate to="/link-discord" replace />;
-  if (access === 'paywall') return <Navigate to="/paywall" replace />;
+  if (access === "discord") return <Navigate to="/link-discord" replace />;
+  if (access === "paywall") return <Navigate to="/paywall" replace />;
 
   return <Outlet />;
 };
@@ -204,11 +217,44 @@ const AdminGuard = () => {
   return <Navigate to="/dashboard" replace />;
 };
 
+// Fast route transition loader that doesn't freeze browser or re-mount 3D canvas
+const RouteTransitionFallback = () => (
+  <div className="min-h-[70vh] flex flex-col items-center justify-center p-8 bg-[#0a0a0a]">
+    <div className="relative flex items-center justify-center mb-3">
+      <div className="w-9 h-9 rounded-full border-2 border-emerald-500/20 border-t-emerald-500 animate-spin" />
+      <img src="/logo3d.png" alt="ForexNotes" className="w-4 h-4 object-contain absolute opacity-80" />
+    </div>
+    <p className="text-xs text-gray-400 font-medium tracking-wide">Loading workspace view...</p>
+  </div>
+);
+
+// Route observer: marks in-app navigation when user transitions between routes
+const RouteWatcher = () => {
+  const { pathname } = useLocation();
+  const initialPath = useRef(pathname);
+
+  useEffect(() => {
+    if (pathname !== initialPath.current) {
+      markInAppNavigation();
+    }
+  }, [pathname]);
+
+  return null;
+};
+
 function App() {
+  // Wake up backend server on initial visit if it went to sleep from inactivity
+  useEffect(() => {
+    api.get("/api/health").catch(() => {
+      // Health check is non-blocking
+    });
+  }, []);
+
   return (
     <BrowserRouter>
+      <RouteWatcher />
       <RouteSeo />
-      <Suspense fallback={<Logo3DLoader title="FOREX NOTES" subtitle="Loading your workspace..." />}>
+      <Suspense fallback={<RouteTransitionFallback />}>
         <ErrorBoundary>
           <Routes>
             {/* Public Landing Pages */}

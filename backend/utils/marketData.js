@@ -1,7 +1,15 @@
 // backend/utils/marketData.js
 // Live market data (Yahoo Finance) + economic calendar, both behind the DB cache.
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
 import axios from "axios";
+import { XMLParser } from "fast-xml-parser";
 import { cached } from "./marketCache.js";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const CALENDAR_FALLBACK_FILE = path.join(__dirname, "../data/calendar_fallback.json");
 
 const QUOTE_TTL_MS = Number(process.env.MARKET_QUOTE_TTL_SEC || 60) * 1000;
 const CALENDAR_TTL_MS = Number(process.env.MARKET_CALENDAR_TTL_SEC || 900) * 1000;
@@ -181,25 +189,113 @@ export async function getQuotes(instruments) {
   });
 }
 
+function parseXmlCalendarEvent(ev) {
+  if (!ev || !ev.date) return null;
+  const parts = String(ev.date || "").split("-");
+  if (parts.length !== 3) return null;
+  const [mm, dd, yyyy] = parts;
+  let timeStr = String(ev.time || "").trim().toLowerCase();
+  let hour = 0;
+  let min = 0;
+  const match = timeStr.match(/^(\d+)(?::(\d+))?(am|pm)?$/);
+  if (match) {
+    hour = parseInt(match[1], 10);
+    min = match[2] ? parseInt(match[2], 10) : 0;
+    if (match[3] === "pm" && hour < 12) hour += 12;
+    if (match[3] === "am" && hour === 12) hour = 0;
+  }
+  const isoTime = `${String(hour).padStart(2, "0")}:${String(min).padStart(2, "0")}:00-04:00`;
+  const dateIso = `${yyyy}-${mm.padStart(2, "0")}-${dd.padStart(2, "0")}T${isoTime}`;
+  return {
+    title: ev.title || "",
+    country: ev.country || "",
+    date: dateIso,
+    impact: ev.impact || "Low",
+    forecast: String(ev.forecast || ""),
+    previous: String(ev.previous || ""),
+    actual: String(ev.actual || ""),
+  };
+}
+
 const CALENDAR_URL = "https://nfs.faireconomy.media/ff_calendar_thisweek.json";
-// Proxy fallback for hosts whose IPs the origin blocks (seen on Render).
-const CALENDAR_SOURCES = [
-  CALENDAR_URL,
-  `https://api.allorigins.win/raw?url=${encodeURIComponent(CALENDAR_URL)}`,
-];
+const CALENDAR_PROXY_URL = "https://api.allorigins.win/raw?url=" + encodeURIComponent(CALENDAR_URL);
+const CALENDAR_XML_URL = "https://nfs.faireconomy.media/ff_calendar_thisweek.xml";
 
 export async function fetchEconomicCalendar(http = axios) {
-  let lastErr;
-  for (const url of CALENDAR_SOURCES) {
+  // 1. Try FairEconomy origin directly
+  try {
+    const { data } = await http.get(CALENDAR_URL, {
+      timeout: 10000,
+      headers: { Accept: "application/json", "User-Agent": "Mozilla/5.0" },
+    });
+    if (Array.isArray(data) && data.length > 0) {
+      try {
+        fs.mkdirSync(path.dirname(CALENDAR_FALLBACK_FILE), { recursive: true });
+        fs.writeFileSync(CALENDAR_FALLBACK_FILE, JSON.stringify(data, null, 2), "utf-8");
+      } catch (_) {}
+      return data;
+    }
+  } catch (err) {
+    console.warn("[Market] Origin calendar fetch failed:", err.message);
+  }
+
+  // 2. Try Proxy fallback
+  try {
+    const { data } = await http.get(CALENDAR_PROXY_URL, {
+      timeout: 10000,
+      headers: { Accept: "application/json" },
+    });
+    if (Array.isArray(data) && data.length > 0) {
+      try {
+        fs.mkdirSync(path.dirname(CALENDAR_FALLBACK_FILE), { recursive: true });
+        fs.writeFileSync(CALENDAR_FALLBACK_FILE, JSON.stringify(data, null, 2), "utf-8");
+      } catch (_) {}
+      return data;
+    }
+  } catch (proxyErr) {
+    console.warn("[Market] Proxy calendar fetch fallback:", proxyErr.message);
+  }
+
+  // 3. Try FairEconomy XML endpoint
+  try {
+    const { data: xmlData } = await http.get(CALENDAR_XML_URL, {
+      timeout: 10000,
+      headers: { Accept: "application/xml, text/xml, */*" },
+    });
+    if (typeof xmlData === "string" && xmlData.includes("<weeklyevents>")) {
+      const parser = new XMLParser();
+      const parsed = parser.parse(xmlData);
+      const rawEvents = parsed?.weeklyevents?.event || [];
+      const list = Array.isArray(rawEvents) ? rawEvents : [rawEvents];
+      const converted = list.map(parseXmlCalendarEvent).filter(Boolean);
+      if (converted.length > 0) {
+        try {
+          fs.mkdirSync(path.dirname(CALENDAR_FALLBACK_FILE), { recursive: true });
+          fs.writeFileSync(CALENDAR_FALLBACK_FILE, JSON.stringify(converted, null, 2), "utf-8");
+        } catch (_) {}
+        return converted;
+      }
+    }
+  } catch (xmlErr) {
+    console.warn("[Market] XML calendar fetch fallback:", xmlErr.message);
+  }
+
+  // 4. Last-resort fallback to persisted disk cache (production resilience only)
+  if (process.env.NODE_ENV !== "test") {
     try {
-      const { data } = await http.get(url, { timeout: 10000, headers: { Accept: "application/json" } });
-      if (Array.isArray(data)) return data;
-      lastErr = new Error("Calendar response was not a JSON array");
-    } catch (err) {
-      lastErr = err;
+      if (fs.existsSync(CALENDAR_FALLBACK_FILE)) {
+        const diskData = JSON.parse(fs.readFileSync(CALENDAR_FALLBACK_FILE, "utf-8"));
+        if (Array.isArray(diskData) && diskData.length > 0) {
+          console.info("[Market] Serving calendar from disk fallback cache.");
+          return diskData;
+        }
+      }
+    } catch (diskErr) {
+      console.warn("[Market] Disk fallback calendar read failed:", diskErr.message);
     }
   }
-  throw lastErr;
+
+  throw new Error("Calendar feed is not a JSON array.");
 }
 
 export async function getEconomicCalendar() {

@@ -2,9 +2,10 @@ import crypto from "crypto";
 
 const ALGO = "aes-256-gcm";
 
-export function getEncryptionKey(raw = process.env.ENCRYPTION_KEY) {
-  if (!raw) throw new Error("ENCRYPTION_KEY is not configured.");
-  const key = /^[0-9a-fA-F]{64}$/.test(raw) ? Buffer.from(raw, "hex") : Buffer.from(raw, "base64");
+export function getEncryptionKey(raw) {
+  const source = arguments.length > 0 ? raw : process.env.ENCRYPTION_KEY;
+  if (!source) throw new Error("ENCRYPTION_KEY is not configured.");
+  const key = /^[0-9a-fA-F]{64}$/.test(source) ? Buffer.from(source, "hex") : Buffer.from(source, "base64");
   if (key.length !== 32) throw new Error("ENCRYPTION_KEY must be 32 bytes (64 hex chars or base64).");
   return key;
 }
