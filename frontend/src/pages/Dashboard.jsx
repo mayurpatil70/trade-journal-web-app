@@ -349,7 +349,7 @@ export default function Dashboard() {
       <div>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-[15px] font-semibold text-white">Recent Executions</h2>
-          <button onClick={() => navigate("/trades")} className="text-[12px] font-semibold text-gray-400 hover:text-white transition-colors">View All History</button>
+          <button onClick={() => navigate("/trades")} className="text-[12px] font-semibold text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">View All History</button>
         </div>
         {trades.length === 0 ? (
           <div className="bg-[#101216] border border-white/5 rounded-2xl p-10 text-center">
@@ -364,23 +364,23 @@ export default function Dashboard() {
               const r = normalizeTradeR(t);
               const isWin = isTradeWin(t);
               return (
-                <div key={i} onClick={() => navigate("/trades")} className="bg-[#101216] border border-white/5 rounded-2xl p-5 hover:bg-[#15181D] hover:border-white/10 transition-all cursor-pointer group">
+                <div key={i} onClick={() => navigate("/trades")} className="bg-[#101216] border border-white/5 rounded-2xl p-5 hover:bg-[#15181D] hover:border-white/10 transition-all cursor-pointer group flex flex-col justify-between h-full">
                   <div className="flex items-start justify-between mb-4">
                     <div>
                       <div className="flex items-center gap-2 mb-1">
-                        <span className={`w-2 h-2 rounded-full ${t.direction === "LONG" ? "bg-emerald-400" : "bg-purple-400"}`} />
+                        <span className={`w-2 h-2 rounded-full shrink-0 ${t.direction === "LONG" ? "bg-emerald-400" : "bg-purple-400"}`} />
                         <h4 className="font-semibold text-[14px] text-gray-100">{t.asset}</h4>
                         <span className="text-[9px] uppercase font-bold text-gray-400 px-1.5 py-0.5 bg-white/5 rounded">{t.direction}</span>
                       </div>
                       <p className="text-[11px] text-gray-500 flex items-center gap-1.5"><Clock className="w-3 h-3" /> {t.date}</p>
                     </div>
-                    <div className={`px-2 py-0.5 rounded-md border text-[11px] font-bold ${isWin ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : "bg-red-500/10 text-red-400 border-red-500/20"}`}>
+                    <div className={`px-2 py-0.5 rounded-md border text-[11px] font-bold shrink-0 ${isWin ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : "bg-red-500/10 text-red-400 border-red-500/20"}`}>
                       {r >= 0 ? "+" : ""}{r.toFixed(2)}R
                     </div>
                   </div>
-                  <div className="flex items-center justify-between text-[11px] text-gray-400 border-t border-white/5 pt-3">
+                  <div className="flex items-center justify-between text-[11px] text-gray-400 border-t border-white/5 pt-3 mt-auto">
                     <span className="truncate max-w-[120px]">{t.setup || "No setup logged"}</span>
-                    <span className="group-hover:text-white transition-colors">Details &rarr;</span>
+                    <span className="font-medium group-hover:text-gray-900 dark:group-hover:text-white transition-colors">Details &rarr;</span>
                   </div>
                 </div>
               );
@@ -398,84 +398,90 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
 
           {/* Strategy Analytics Mini */}
-          <div onClick={() => navigate("/analytics")} className="bg-[#101216] border border-white/5 hover:border-emerald-500/20 rounded-2xl p-5 cursor-pointer group transition-all hover:bg-[#101e18]">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <div className="p-2 bg-emerald-500/10 rounded-xl"><Activity className="w-4 h-4 text-emerald-400" /></div>
-                <span className="text-[13px] font-semibold text-white">Strategy Analytics</span>
+          <div onClick={() => navigate("/analytics")} className="bg-[#101216] border border-white/5 hover:border-emerald-500/20 rounded-2xl p-5 cursor-pointer group transition-all hover:bg-[#101e18] flex flex-col justify-between h-full">
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <div className="p-2 bg-emerald-500/10 rounded-xl"><Activity className="w-4 h-4 text-emerald-400" /></div>
+                  <span className="text-[13px] font-semibold text-white">Strategy Analytics</span>
+                </div>
+                <ChevronRight className="w-4 h-4 text-gray-600 group-hover:text-emerald-400 transition-colors" />
               </div>
-              <ChevronRight className="w-4 h-4 text-gray-600 group-hover:text-emerald-400 transition-colors" />
-            </div>
-            {analyticsSetups.length === 0 ? (
-              <p className="text-[12px] text-gray-600">No setup data yet.</p>
-            ) : (
-              <div className="space-y-2">
-                {analyticsSetups.map((s, i) => (
-                  <div key={i} className="flex items-center justify-between">
-                    <span className="text-[12px] text-gray-300 truncate max-w-[130px]">{s.name}</span>
-                    <span className={`text-[12px] font-bold ${s.netR >= 0 ? "text-emerald-400" : "text-red-400"}`}>{s.netR >= 0 ? "+" : ""}{s.netR.toFixed(2)}R</span>
-                  </div>
-                ))}
-              </div>
-            )}
-            <div className="mt-4 pt-3 border-t border-white/5 text-[11px] text-emerald-400 font-semibold flex items-center gap-1">Full Analysis <ArrowRight className="w-3 h-3" /></div>
-          </div>
-
-          {/* Psychology Lab Mini */}
-          <div onClick={() => navigate("/psychology")} className="bg-[#101216] border border-white/5 hover:border-purple-500/20 rounded-2xl p-5 cursor-pointer group transition-all hover:bg-[#130e1a]">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <div className="p-2 bg-purple-500/10 rounded-xl"><Brain className="w-4 h-4 text-purple-400" /></div>
-                <span className="text-[13px] font-semibold text-white">Psychology Lab</span>
-              </div>
-              <ChevronRight className="w-4 h-4 text-gray-600 group-hover:text-purple-400 transition-colors" />
-            </div>
-            {topEmotion.length === 0 ? (
-              <p className="text-[12px] text-gray-600">No psychology data yet.</p>
-            ) : (
-              <div className="space-y-2">
-                {topEmotion.map((e, i) => (
-                  <div key={i} className="flex items-center justify-between">
-                    <span className="text-[12px] text-gray-300 truncate max-w-[130px]">{e.name}</span>
-                    <span className={`text-[12px] font-bold ${e.netR >= 0 ? "text-emerald-400" : "text-red-400"}`}>{e.netR >= 0 ? "+" : ""}{e.netR.toFixed(2)}R</span>
-                  </div>
-                ))}
-              </div>
-            )}
-            <div className="mt-4 pt-3 border-t border-white/5 text-[11px] text-purple-400 font-semibold flex items-center gap-1">Full Analysis <ArrowRight className="w-3 h-3" /></div>
-          </div>
-
-          {/* Mistake Lab Mini */}
-          <div onClick={() => navigate("/mistakes")} className="bg-[#101216] border border-white/5 hover:border-amber-500/20 rounded-2xl p-5 cursor-pointer group transition-all hover:bg-[#1a1508]">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <div className="p-2 bg-amber-500/10 rounded-xl"><ShieldCheck className="w-4 h-4 text-amber-400" /></div>
-                <span className="text-[13px] font-semibold text-white">Mistake Lab</span>
-              </div>
-              <ChevronRight className="w-4 h-4 text-gray-600 group-hover:text-amber-400 transition-colors" />
-            </div>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-[12px] text-gray-400">Unforced Errors</span>
-                <span className="text-[13px] font-bold text-white">{mistakesData.count}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-[12px] text-gray-400">Cost of Mistakes</span>
-                <span className={`text-[13px] font-bold ${mistakesData.cost < 0 ? "text-red-400" : "text-gray-300"}`}>{mistakesData.cost.toFixed(2)}R</span>
-              </div>
-              {trades.length > 0 && (
-                <div>
-                  <div className="flex items-center justify-between text-[11px] text-gray-500 mb-1">
-                    <span>Rule Discipline</span>
-                    <span>{(((trades.length - mistakesData.count) / trades.length) * 100).toFixed(0)}%</span>
-                  </div>
-                  <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
-                    <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${((trades.length - mistakesData.count) / trades.length) * 100}%` }} />
-                  </div>
+              {analyticsSetups.length === 0 ? (
+                <p className="text-[12px] text-gray-500 dark:text-gray-400">No setup data yet.</p>
+              ) : (
+                <div className="space-y-2.5">
+                  {analyticsSetups.map((s, i) => (
+                    <div key={i} className="flex items-center justify-between">
+                      <span className="text-[12px] text-gray-300 truncate max-w-[130px]">{s.name}</span>
+                      <span className={`text-[12px] font-bold ${s.netR >= 0 ? "text-emerald-400" : "text-red-400"}`}>{s.netR >= 0 ? "+" : ""}{s.netR.toFixed(2)}R</span>
+                    </div>
+                  ))}
                 </div>
               )}
             </div>
-            <div className="mt-4 pt-3 border-t border-white/5 text-[11px] text-amber-400 font-semibold flex items-center gap-1">Full Analysis <ArrowRight className="w-3 h-3" /></div>
+            <div className="mt-4 pt-3 border-t border-white/5 text-[11px] text-emerald-400 font-semibold flex items-center gap-1">Full Analysis <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" /></div>
+          </div>
+
+          {/* Psychology Lab Mini */}
+          <div onClick={() => navigate("/psychology")} className="bg-[#101216] border border-white/5 hover:border-purple-500/20 rounded-2xl p-5 cursor-pointer group transition-all hover:bg-[#130e1a] flex flex-col justify-between h-full">
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <div className="p-2 bg-purple-500/10 rounded-xl"><Brain className="w-4 h-4 text-purple-400" /></div>
+                  <span className="text-[13px] font-semibold text-white">Psychology Lab</span>
+                </div>
+                <ChevronRight className="w-4 h-4 text-gray-600 group-hover:text-purple-400 transition-colors" />
+              </div>
+              {topEmotion.length === 0 ? (
+                <p className="text-[12px] text-gray-500 dark:text-gray-400">No psychology data yet.</p>
+              ) : (
+                <div className="space-y-2.5">
+                  {topEmotion.map((e, i) => (
+                    <div key={i} className="flex items-center justify-between">
+                      <span className="text-[12px] text-gray-300 truncate max-w-[130px]">{e.name}</span>
+                      <span className={`text-[12px] font-bold ${e.netR >= 0 ? "text-emerald-400" : "text-red-400"}`}>{e.netR >= 0 ? "+" : ""}{e.netR.toFixed(2)}R</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+            <div className="mt-4 pt-3 border-t border-white/5 text-[11px] text-purple-400 font-semibold flex items-center gap-1">Full Analysis <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" /></div>
+          </div>
+
+          {/* Mistake Lab Mini */}
+          <div onClick={() => navigate("/mistakes")} className="bg-[#101216] border border-white/5 hover:border-amber-500/20 rounded-2xl p-5 cursor-pointer group transition-all hover:bg-[#1a1508] flex flex-col justify-between h-full">
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <div className="p-2 bg-amber-500/10 rounded-xl"><ShieldCheck className="w-4 h-4 text-amber-400" /></div>
+                  <span className="text-[13px] font-semibold text-white">Mistake Lab</span>
+                </div>
+                <ChevronRight className="w-4 h-4 text-gray-600 group-hover:text-amber-400 transition-colors" />
+              </div>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-[12px] text-gray-400">Unforced Errors</span>
+                  <span className="text-[13px] font-bold text-white">{mistakesData.count}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-[12px] text-gray-400">Cost of Mistakes</span>
+                  <span className={`text-[13px] font-bold ${mistakesData.cost < 0 ? "text-red-400" : "text-gray-300"}`}>{mistakesData.cost.toFixed(2)}R</span>
+                </div>
+                {trades.length > 0 && (
+                  <div>
+                    <div className="flex items-center justify-between text-[11px] text-gray-500 mb-1">
+                      <span>Rule Discipline</span>
+                      <span>{(((trades.length - mistakesData.count) / trades.length) * 100).toFixed(0)}%</span>
+                    </div>
+                    <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
+                      <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${((trades.length - mistakesData.count) / trades.length) * 100}%` }} />
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+            <div className="mt-4 pt-3 border-t border-white/5 text-[11px] text-amber-400 font-semibold flex items-center gap-1">Full Analysis <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" /></div>
           </div>
 
         </div>

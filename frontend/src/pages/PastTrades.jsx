@@ -349,7 +349,7 @@ export default function PastTrades() {
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
-                    <ChevronRight className="w-5 h-5 text-gray-600 group-hover:text-white transition-colors hidden md:block" />
+                    <ChevronRight className="w-5 h-5 text-gray-600 group-hover:text-gray-900 dark:group-hover:text-white transition-colors hidden md:block" />
                   </div>
                 </div>
               );
