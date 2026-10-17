@@ -27,12 +27,29 @@ const app = express();
 // Trust reverse proxies (Render, Cloudflare, Vercel) for accurate client IP in rate limiting
 app.set("trust proxy", 1);
 
-// Security Headers Middleware
+// Enforce HTTPS redirection in production (behind Cloudflare, Render, Vercel reverse proxies)
+app.use((req, res, next) => {
+  const forwardedProto = req.headers["x-forwarded-proto"];
+  const isHttp = forwardedProto === "http";
+  const isLocalhost =
+    req.hostname === "localhost" ||
+    req.hostname === "127.0.0.1" ||
+    req.hostname.startsWith("192.168.");
+
+  if (isHttp && !isLocalhost && req.headers.host) {
+    return res.redirect(301, `https://${req.headers.host}${req.url}`);
+  }
+  next();
+});
+
+// Hardened Security Headers Middleware
 app.use((req, res, next) => {
   res.setHeader("X-Content-Type-Options", "nosniff");
   res.setHeader("X-Frame-Options", "SAMEORIGIN");
   res.setHeader("X-XSS-Protection", "1; mode=block");
   res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+  res.setHeader("Strict-Transport-Security", "max-age=63072000; includeSubDomains; preload");
+  res.setHeader("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
   next();
 });
 

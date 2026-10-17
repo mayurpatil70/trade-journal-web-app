@@ -64,25 +64,57 @@ export default function MakoSharkSection() {
     playVideo();
   }, []);
 
-  // IntersectionObserver to pause video when user scrolls far away
+  // Autoplay & continuous seamless loop enforcement for mobile browsers (iOS Safari, Brave)
   useEffect(() => {
     const section = sectionRef.current;
     const video = videoRef.current;
-    if (!section || !video) return;
+    if (!video) return;
 
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          video.play().catch(() => {});
-        } else {
-          video.pause();
-        }
-      },
-      { threshold: 0.05 }
-    );
+    // Enforce DOM properties required by iOS Safari / Brave WebKit
+    video.muted = true;
+    video.defaultMuted = true;
+    video.playsInline = true;
+    video.loop = true;
+    video.setAttribute('playsinline', '');
+    video.setAttribute('webkit-playsinline', 'true');
+    video.setAttribute('x5-playsinline', 'true');
 
-    observer.observe(section);
-    return () => observer.disconnect();
+    const tryPlay = () => {
+      video.muted = true;
+      const promise = video.play();
+      if (promise !== undefined) {
+        promise.catch(() => {
+          // Autoplay blocked by mobile battery saver / low power mode
+          const resumeOnGesture = () => {
+            video.muted = true;
+            video.play().catch(() => {});
+            ['touchstart', 'touchend', 'scroll', 'pointerdown', 'click'].forEach((evt) =>
+              window.removeEventListener(evt, resumeOnGesture)
+            );
+          };
+          ['touchstart', 'touchend', 'scroll', 'pointerdown', 'click'].forEach((evt) =>
+            window.addEventListener(evt, resumeOnGesture, { once: true, passive: true })
+          );
+        });
+      }
+    };
+
+    tryPlay();
+
+    if (section && 'IntersectionObserver' in window) {
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            tryPlay();
+          } else {
+            video.pause();
+          }
+        },
+        { threshold: 0.02 }
+      );
+      observer.observe(section);
+      return () => observer.disconnect();
+    }
   }, []);
 
   // Initialize theme tokens on mount without GPU pipeline readback stalls
@@ -110,6 +142,12 @@ export default function MakoSharkSection() {
       }, 700);
     };
 
+    const handleEnded = () => {
+      triggerBite();
+      video.currentTime = 0;
+      video.play().catch(() => {});
+    };
+
     const handleTimeUpdate = () => {
       const t = video.currentTime;
       const progress = Math.min(t / REVEAL_AT, 1);
@@ -128,11 +166,11 @@ export default function MakoSharkSection() {
     };
 
     video.addEventListener('timeupdate', handleTimeUpdate);
-    video.addEventListener('ended', triggerBite);
+    video.addEventListener('ended', handleEnded);
 
     return () => {
       video.removeEventListener('timeupdate', handleTimeUpdate);
-      video.removeEventListener('ended', triggerBite);
+      video.removeEventListener('ended', handleEnded);
       if (triggerBiteTimeout) clearTimeout(triggerBiteTimeout);
     };
   }, [lockedDepth]);
@@ -313,11 +351,18 @@ export default function MakoSharkSection() {
           src={SHARK_VIDEO_URL}
           autoPlay
           muted
+          defaultMuted
           loop
           playsInline
+          webkit-playsinline="true"
+          x5-playsinline="true"
           preload="auto"
           disablePictureInPicture
-          controlsList="nodownload noplaybackrate"
+          controlsList="nodownload noplaybackrate nofullscreen"
+          onEnded={(e) => {
+            e.currentTarget.currentTime = 0;
+            e.currentTarget.play().catch(() => {});
+          }}
           style={{
             position: 'absolute',
             inset: 0,

@@ -1223,4 +1223,38 @@ CINEMATIC HERO & INTERACTIVE MOTION SYSTEM
   font-family: 'JetBrains Mono', 'Space Mono', monospace;
 }
 
+/* =========================================================
+   ERADICATE NATIVE MOBILE BROWSER PLAY BUTTON OVERLAYS
+   (WebKit, iOS Safari, Brave mobile video overlay fix)
+   ========================================================= */
+video::-webkit-media-controls,
+video::-webkit-media-controls-start-playback-button,
+video::-webkit-media-controls-play-button,
+video::-webkit-media-controls-enclosure,
+video::-webkit-media-controls-panel,
+video::-webkit-media-controls-overlay-play-button,
+video::-webkit-media-controls-overlay-enclosure {
+  display: none !important;
+  -webkit-appearance: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+video::-moz-media-controls {
+  display: none !important;
+}
+
+.mako-hero-video,
+.kf-hero-video,
+#bgVideo {
+  pointer-events: none !important;
+  -webkit-touch-callout: none !important;
+  -webkit-user-select: none !important;
+  user-select: none !important;
+}
+
+
 

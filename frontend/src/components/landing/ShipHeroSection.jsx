@@ -158,9 +158,18 @@ export default function ShipHeroSection() {
           poster={POSTER_URL}
           autoPlay
           muted
+          defaultMuted
           loop
           playsInline
+          webkit-playsinline="true"
+          x5-playsinline="true"
           preload="auto"
+          disablePictureInPicture
+          controlsList="nodownload noplaybackrate nofullscreen"
+          onEnded={(e) => {
+            e.currentTarget.currentTime = 0;
+            e.currentTarget.play().catch(() => {});
+          }}
           style={{
             position: 'absolute',
             inset: 0,
@@ -168,6 +177,7 @@ export default function ShipHeroSection() {
             height: '100%',
             objectFit: 'cover',
             transform: 'translateZ(0)',
+            pointerEvents: 'none',
           }}
         />
         {/* Three Gradient Scrims preserving yacht in center */}

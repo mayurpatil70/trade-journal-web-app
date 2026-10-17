@@ -71,25 +71,57 @@ export default function KingfisherSection() {
     }
   };
 
-  // IntersectionObserver to pause video when offscreen
+  // Autoplay & continuous seamless loop enforcement for mobile browsers (iOS Safari, Brave)
   useEffect(() => {
     const section = sectionRef.current;
     const video = videoRef.current;
-    if (!section || !video) return;
+    if (!video) return;
 
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          video.play().catch(() => {});
-        } else {
-          video.pause();
-        }
-      },
-      { threshold: 0.08 }
-    );
+    // Enforce DOM properties required by iOS Safari / Brave WebKit
+    video.muted = true;
+    video.defaultMuted = true;
+    video.playsInline = true;
+    video.loop = true;
+    video.setAttribute('playsinline', '');
+    video.setAttribute('webkit-playsinline', 'true');
+    video.setAttribute('x5-playsinline', 'true');
 
-    observer.observe(section);
-    return () => observer.disconnect();
+    const tryPlay = () => {
+      video.muted = true;
+      const promise = video.play();
+      if (promise !== undefined) {
+        promise.catch(() => {
+          // Autoplay blocked by mobile battery saver / low power mode
+          const resumeOnGesture = () => {
+            video.muted = true;
+            video.play().catch(() => {});
+            ['touchstart', 'touchend', 'scroll', 'pointerdown', 'click'].forEach((evt) =>
+              window.removeEventListener(evt, resumeOnGesture)
+            );
+          };
+          ['touchstart', 'touchend', 'scroll', 'pointerdown', 'click'].forEach((evt) =>
+            window.addEventListener(evt, resumeOnGesture, { once: true, passive: true })
+          );
+        });
+      }
+    };
+
+    tryPlay();
+
+    if (section && 'IntersectionObserver' in window) {
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            tryPlay();
+          } else {
+            video.pause();
+          }
+        },
+        { threshold: 0.02 }
+      );
+      observer.observe(section);
+      return () => observer.disconnect();
+    }
   }, []);
 
   // Draw crops of video's final frame into canvases
@@ -148,13 +180,19 @@ export default function KingfisherSection() {
       triggerReveal();
     }, 7000);
 
+    const handleEnded = () => {
+      triggerReveal();
+      video.currentTime = 0;
+      video.play().catch(() => {});
+    };
+
     video.addEventListener('timeupdate', handleTimeUpdate);
-    video.addEventListener('ended', triggerReveal);
+    video.addEventListener('ended', handleEnded);
     video.addEventListener('error', triggerReveal);
 
     return () => {
       video.removeEventListener('timeupdate', handleTimeUpdate);
-      video.removeEventListener('ended', triggerReveal);
+      video.removeEventListener('ended', handleEnded);
       video.removeEventListener('error', triggerReveal);
       clearTimeout(hardTimeout);
     };
@@ -261,14 +299,22 @@ export default function KingfisherSection() {
         {/* Video of Kingfisher Landing — 100% UNTOUCHED NATIVE COLORS (No green scrim!) */}
         <video
           ref={videoRef}
+          className="kf-hero-video"
           src={BIRD_VIDEO_URL}
           autoPlay
           muted
+          defaultMuted
           loop
           playsInline
+          webkit-playsinline="true"
+          x5-playsinline="true"
           preload="auto"
           disablePictureInPicture
-          controlsList="nodownload noplaybackrate"
+          controlsList="nodownload noplaybackrate nofullscreen"
+          onEnded={(e) => {
+            e.currentTarget.currentTime = 0;
+            e.currentTarget.play().catch(() => {});
+          }}
           style={{
             position: 'absolute',
             inset: 0,
