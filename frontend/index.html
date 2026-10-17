@@ -27,7 +27,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
-    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Instrument+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=IBM+Plex+Mono:wght@400;500;600&family=Instrument+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;700&family=Manrope:wght@400;500;600;700;800&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Space+Grotesk:wght@500;600&family=Space+Mono:wght@400;700&display=swap"
     rel="stylesheet" />
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
   <link rel="icon" type="image/png" sizes="192x192" href="/logo-192.png" />
@@ -437,8 +437,8 @@
       var path = window.location.pathname.replace(/\/$/, '');
       var isLanding = path === '' || path === '/';
 
-      // 5 sec on initial landing entry, 3 sec on every page refresh / reload
-      var targetDuration = (isLanding && !isReload) ? 5000 : 3000;
+      // Fast, smooth fade on initial landing and page refresh (250ms)
+      var targetDuration = 250;
       var startTime = Date.now();
 
       window.__targetLoaderDuration = targetDuration;
@@ -456,16 +456,16 @@
           loader.classList.add('fn-loader-hidden');
           setTimeout(function () {
             if (loader && loader.parentNode) loader.parentNode.removeChild(loader);
-          }, 550);
+          }, 400);
         }, remaining);
       };
 
-      // Safety fallback: dissolve after targetDuration + 2000ms in case script hangs
+      // Safety fallback: dissolve after 800ms in case script hangs
       setTimeout(function () {
         if (typeof window.__dismissLoader === 'function') {
           window.__dismissLoader(true);
         }
-      }, targetDuration + 2000);
+      }, 800);
     })();
   </script>
 

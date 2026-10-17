@@ -35,6 +35,7 @@ const FOOTER = [
   ['/journal/ict-strategy', 'ICT strategy journal'],
   ['/journal/smc', 'SMC journal'],
   ['/backtesting/btcusdt', 'BTCUSDT backtesting'],
+  ['/markets/four-asset-classes', 'Four asset classes & predator speed'],
 ];
 const footer = `<nav><ul>${FOOTER.map(([h, t]) => `<li><a href="${h}">${esc(t)}</a></li>`).join('')}</ul></nav>`;
 const faqHtml = (list) => `<section><h2>Frequently asked questions</h2>${list.map((f) => `<h3>${esc(f.q)}</h3><p>${esc(f.a)}</p>`).join('')}</section>`;

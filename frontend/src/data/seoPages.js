@@ -467,6 +467,56 @@ export const SEO_PAGES = [
     ],
     related: ['/india/forex-backtesting-software', '/journal/scalping'],
   },
+  {
+    path: '/markets/four-asset-classes',
+    title: 'Four Asset Classes & Predator Speed Execution | Forex Notes',
+    description: 'Trade Forex Majors, Gold (XAUUSD), Global Indices, and Crypto with 10-year tick replay, AI psychology pre-check, and automated prop firm drawdown protection.',
+    eyebrow: 'Markets & Sessions · Predator Speed',
+    h1: 'Four Asset Classes, Infinite Edge: Built for Predator Speed',
+    intro: 'Forex Notes gives funded traders the predatory edge across all major sessions and market structures. Backtest 10 years of tick data, evaluate your psychological readiness before every trade, and protect your prop firm accounts with automated daily drawdown guards.',
+    hook: 'Forex Majors · Gold (XAUUSD) · Global Indices · Crypto Assets',
+    sections: [
+      {
+        h2: 'Four Asset Classes, Infinite Edge',
+        body: 'Trade the coastline nobody else can reach. Your AI coach plans your risk around market sessions, news events and your emotional state. High probability setups at dawn, disciplined risk at dusk, and zero revenge trading in between.',
+        bullets: [
+          'Forex Majors (24/5 FX): EURUSD, GBPUSD, USDJPY tick-by-tick replay & London/NY session analytics.',
+          'Gold / XAUUSD (High Volatility): Track Asian, London, and NY breakouts with automated pip-level risk sizing.',
+          'Global Indices (Cash Open): NAS100, US30, SPX500 high-momentum execution tracking and volume alerts.',
+          'Crypto Assets (24/7 Deep Liquidity): BTCUSDT, ETHUSDT 10-year bar replay and weekend volatility filters.',
+        ],
+      },
+      {
+        h2: 'Built for Speed, Tuned to Strike Once',
+        body: 'The shortfin mako is built end-to-end for one decisive move: hydrodynamic skin, endothermic muscle, and senses tuned to detect electrical pulses in open water. Forex Notes gives funded traders the exact same predatory edge.',
+        bullets: [
+          'LOG 01 · Dermal Protection Against Tilt: AI pre-trade checklist evaluates your emotional heartbeat before execution.',
+          'LOG 02 · A Sixth Sense for Liquidity: 10 full years of ultra-high resolution tick data to identify hidden algorithmic sweeps.',
+          'LOG 03 · Rules That Never Fail: Drawdown guardian tracks trailing daily limits in real-time so your challenge is never breached.',
+        ],
+      },
+      {
+        h2: 'Historical Depth & Challenge Pass Rates',
+        body: 'With 10 years of historical data depth, active AI risk guarding, and a 94% funded challenge pass rate for disciplined traders, Forex Notes delivers institutional-grade analytics starting at just $14/month.',
+      },
+    ],
+    faqs: [
+      {
+        q: 'Which asset classes are supported in Forex Notes?',
+        a: 'Forex Notes supports Forex Majors (EURUSD, GBPUSD, USDJPY, AUDUSD, USDCAD), Metals & Commodities including Gold (XAUUSD) and Silver (XAGUSD), Global Equity Indices (NAS100, US30, SPX500, GER40), and Crypto Assets (BTCUSDT, ETHUSDT) with full 10-year tick replay.',
+      },
+      {
+        q: 'How does the AI psychology pre-trade check prevent tilt?',
+        a: 'Before entering a trade, the AI Pre-Trade Guard checks your emotional state, recent loss streaks, session timing, and max daily drawdown to prevent revenge trading and impulsive sizing.',
+      },
+      {
+        q: 'How does the Prop Firm Guardian protect against account breaches?',
+        a: 'The Prop Firm Guardian calculates real-time trailing drawdown and daily loss thresholds based on your prop firm rules (FTMO, FundedNext, FundingPips, etc.), sounding alerts before you reach maximum risk levels.',
+      },
+      PRICING_FAQ,
+    ],
+    related: ['/journal/xauusd', '/journal/eurusd', '/backtesting/btcusdt', '/tools/ftmo-drawdown-calculator'],
+  },
 ];
 
 export const LANDING_FAQS = [

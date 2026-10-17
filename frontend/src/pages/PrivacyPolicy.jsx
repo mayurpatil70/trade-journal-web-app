@@ -1,43 +1,160 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import BrandLogo from '../components/BrandLogo';
+import SiteFooter from '../components/seo/SiteFooter';
+import LandingNavbar from '../components/landing/LandingNavbar';
 
 export default function PrivacyPolicy() {
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  }, []);
+
   return (
-    <div className="page-shell" style={{ padding: '80px 20px', fontFamily: 'Inter, sans-serif' }}>
-      <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-        <Link to="/" style={{ color: 'var(--gain)', textDecoration: 'none', marginBottom: '40px', display: 'inline-block' }}>
-          &larr; Back to Home
+    <div
+      style={{
+        minHeight: '100vh',
+        background: '#05090E',
+        color: '#EDEAE3',
+        fontFamily: "'Manrope', sans-serif",
+      }}
+    >
+      {/* ── UNIFIED SLEEK COMPACT TOP NAVIGATION ── */}
+      <LandingNavbar isFixed={false} />
+
+      <main style={{ maxWidth: '840px', margin: '0 auto', padding: '60px 24px 100px' }}>
+        <Link
+          to="/"
+          style={{
+            fontFamily: "'JetBrains Mono', monospace",
+            fontSize: '12px',
+            color: '#5FD4E8',
+            textDecoration: 'none',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
+            marginBottom: '32px',
+          }}
+        >
+          ← Return to Home
         </Link>
-        <h1 style={{ fontSize: '2.5rem', fontWeight: 800, marginBottom: '24px' }}>Privacy Policy</h1>
-        <p style={{ color: 'var(--ink-mute)', marginBottom: '32px' }}>Last updated: October 2026</p>
-        
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', color: 'var(--ink-soft)', lineHeight: 1.7 }}>
-          <section>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '16px', color: 'var(--ink)' }}>1. Information We Collect</h2>
-            <p>We collect information you provide directly to us, such as when you create an account, log a trade, or communicate with us. This includes your email address, Discord ID, trading data (e.g., pairs traded like XAUUSD, profit/loss), and prop firm rules you configure.</p>
+
+        <div
+          style={{
+            display: 'inline-block',
+            fontSize: '11px',
+            fontWeight: 700,
+            letterSpacing: '0.14em',
+            textTransform: 'uppercase',
+            color: '#E8732A',
+            padding: '5px 14px',
+            borderRadius: '999px',
+            background: 'rgba(232, 115, 42, 0.1)',
+            border: '1px solid rgba(232, 115, 42, 0.25)',
+            marginBottom: '16px',
+            fontFamily: "'JetBrains Mono', monospace",
+          }}
+        >
+          SECURITY & PRIVACY PROTOCOL
+        </div>
+
+        <h1
+          style={{
+            fontFamily: "'Instrument Serif', Georgia, serif",
+            fontSize: 'clamp(2.5rem, 5vw, 3.8rem)',
+            fontWeight: 400,
+            color: '#FFFFFF',
+            letterSpacing: '-0.02em',
+            marginBottom: '12px',
+          }}
+        >
+          Privacy <span style={{ fontStyle: 'italic', color: '#0E7C86' }}>Policy</span>
+        </h1>
+        <p
+          style={{
+            fontFamily: "'JetBrains Mono', monospace",
+            fontSize: '12px',
+            color: 'rgba(237, 234, 227, 0.5)',
+            marginBottom: '40px',
+          }}
+        >
+          Effective Date: October 2026 · Forex Notes Engine
+        </p>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          <section
+            style={{
+              background: 'rgba(15, 29, 28, 0.75)',
+              border: '1px solid rgba(255, 255, 255, 0.08)',
+              borderRadius: '20px',
+              padding: '28px',
+            }}
+          >
+            <h2 style={{ fontSize: '18px', fontWeight: 700, color: '#FFFFFF', marginBottom: '12px' }}>
+              1. Information We Collect
+            </h2>
+            <p style={{ fontSize: '14px', color: 'rgba(237, 234, 227, 0.75)', lineHeight: 1.7, margin: 0 }}>
+              We collect information you provide directly to us, such as when you create an account, log a trade, or communicate with our team. This includes your email address, Discord ID, trading journal parameters (e.g., pairs traded like XAUUSD, profit/loss, R-multiples), and prop firm rules you configure.
+            </p>
           </section>
 
-          <section>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '16px', color: 'var(--ink)' }}>2. How We Use Your Information</h2>
-            <p>We use the information we collect to:</p>
-            <ul style={{ listStyleType: 'disc', paddingLeft: '24px', marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <li>Provide, maintain, and improve our AI-powered trading journal.</li>
-              <li>Analyze your trading performance to offer personalized psychology insights and R-multiple tracking.</li>
-              <li>Monitor your prop firm drawdown limits to send alerts.</li>
+          <section
+            style={{
+              background: 'rgba(15, 29, 28, 0.75)',
+              border: '1px solid rgba(255, 255, 255, 0.08)',
+              borderRadius: '20px',
+              padding: '28px',
+            }}
+          >
+            <h2 style={{ fontSize: '18px', fontWeight: 700, color: '#FFFFFF', marginBottom: '12px' }}>
+              2. How We Use Your Information
+            </h2>
+            <p style={{ fontSize: '14px', color: 'rgba(237, 234, 227, 0.75)', lineHeight: 1.7, marginBottom: '12px' }}>
+              We use the collected information exclusively to:
+            </p>
+            <ul style={{ listStyle: 'disc', paddingLeft: '20px', color: 'rgba(237, 234, 227, 0.75)', fontSize: '14px', lineHeight: 1.7 }}>
+              <li>Provide, maintain, and continuously calibrate our AI-powered trading journal.</li>
+              <li>Analyze your trade executions to deliver real-time psychology insights and revenge trading tilt detection.</li>
+              <li>Monitor your prop firm trailing drawdown limits to sound automated breach warnings.</li>
             </ul>
           </section>
 
-          <section>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '16px', color: 'var(--ink)' }}>3. Data Security</h2>
-            <p>We implement industry-standard security measures to protect your personal information and trading logs. Your financial data is confidential and is only used to provide you with insights.</p>
+          <section
+            style={{
+              background: 'rgba(15, 29, 28, 0.75)',
+              border: '1px solid rgba(255, 255, 255, 0.08)',
+              borderRadius: '20px',
+              padding: '28px',
+            }}
+          >
+            <h2 style={{ fontSize: '18px', fontWeight: 700, color: '#FFFFFF', marginBottom: '12px' }}>
+              3. Data Security & Encryption
+            </h2>
+            <p style={{ fontSize: '14px', color: 'rgba(237, 234, 227, 0.75)', lineHeight: 1.7, margin: 0 }}>
+              We implement industry-standard encryption protocols to protect your personal information and trading logs. Your financial and journaling data remains strictly confidential and is never sold to brokers or third-party marketers.
+            </p>
           </section>
 
-          <section>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '16px', color: 'var(--ink)' }}>4. Contact Us</h2>
-            <p>If you have any questions about this Privacy Policy, please contact us via our Discord community.</p>
+          <section
+            style={{
+              background: 'rgba(15, 29, 28, 0.75)',
+              border: '1px solid rgba(255, 255, 255, 0.08)',
+              borderRadius: '20px',
+              padding: '28px',
+            }}
+          >
+            <h2 style={{ fontSize: '18px', fontWeight: 700, color: '#FFFFFF', marginBottom: '12px' }}>
+              4. Contact & Inquiries
+            </h2>
+            <p style={{ fontSize: '14px', color: 'rgba(237, 234, 227, 0.75)', lineHeight: 1.7, margin: 0 }}>
+              If you have any questions or data requests regarding this Privacy Policy, please contact our team via our official Discord community network.
+            </p>
           </section>
         </div>
-      </div>
+      </main>
+
+      <SiteFooter />
     </div>
   );
 }

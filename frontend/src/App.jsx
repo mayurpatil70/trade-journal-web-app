@@ -228,6 +228,26 @@ const RouteTransitionFallback = () => (
   </div>
 );
 
+// Global ScrollToTop: ensures route transitions and page visits always reset to the top
+const ScrollToTop = () => {
+  const { pathname, hash } = useLocation();
+
+  useEffect(() => {
+    if (hash) {
+      const el = document.querySelector(hash);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
+        return;
+      }
+    }
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  }, [pathname, hash]);
+
+  return null;
+};
+
 // Route observer: marks in-app navigation when user transitions between routes
 const RouteWatcher = () => {
   const { pathname } = useLocation();
@@ -252,6 +272,7 @@ function App() {
 
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <RouteWatcher />
       <RouteSeo />
       <Suspense fallback={<RouteTransitionFallback />}>
