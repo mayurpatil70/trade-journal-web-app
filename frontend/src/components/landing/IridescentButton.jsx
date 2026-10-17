@@ -9,25 +9,31 @@ export default function IridescentButton({
   onClick,
   children = 'CLAIM ACCESS',
   icon: Icon = ArrowRight,
+  size = 'md',
   style = {},
   className = '',
   target,
   rel,
+  ...rest
 }) {
+  const iconSize = size === 'sm' ? 12 : size === 'lg' ? 16 : 14;
+  const sizeClass = size === 'sm' ? 'iridescent-pill-sm' : size === 'lg' ? 'iridescent-pill-lg' : '';
+
   const content = (
     <>
       <span className="iridescent-disc" aria-hidden="true">
         <span className="iridescent-ring" />
-        <Icon size={14} className="iridescent-icon" strokeWidth={2.2} />
+        <Icon size={iconSize} className="iridescent-icon" strokeWidth={2.4} />
       </span>
       <span className="iridescent-label">{children}</span>
     </>
   );
 
   const sharedProps = {
-    className: `iridescent-pill ${className}`,
+    className: `iridescent-pill ${sizeClass} ${className}`.trim(),
     style,
     onClick,
+    ...rest,
   };
 
   if (href) {

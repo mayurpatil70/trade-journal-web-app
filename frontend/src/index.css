@@ -1095,6 +1095,34 @@ IRIDESCENT RING PILL BUTTON
   text-transform: uppercase;
   color: #f4efe6;
   line-height: 1;
+  white-space: nowrap;
+}
+
+/* Size Variants */
+.iridescent-pill-sm {
+  padding: 5px 14px 5px 5px !important;
+  gap: 8px !important;
+}
+.iridescent-pill-sm .iridescent-disc {
+  width: 26px !important;
+  height: 26px !important;
+}
+.iridescent-pill-sm .iridescent-label {
+  font-size: 10px !important;
+  letter-spacing: 0.12em !important;
+}
+
+.iridescent-pill-lg {
+  padding: 11px 26px 11px 11px !important;
+  gap: 14px !important;
+}
+.iridescent-pill-lg .iridescent-disc {
+  width: 38px !important;
+  height: 38px !important;
+}
+.iridescent-pill-lg .iridescent-label {
+  font-size: 12.5px !important;
+  letter-spacing: 0.18em !important;
 }
 
 @keyframes orbit {

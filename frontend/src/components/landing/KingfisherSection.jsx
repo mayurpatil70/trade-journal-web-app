@@ -5,6 +5,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowDown, ArrowRight } from 'lucide-react';
+import IridescentButton from './IridescentButton';
 
 const BIRD_VIDEO_URL = 'https://thinkingods.com/demos/kingfisher-hero/hero.mp4';
 
@@ -363,31 +364,9 @@ export default function KingfisherSection() {
 
             {/* CTA Row */}
             <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '14px' }}>
-              <Link
-                to="/login"
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '10px',
-                  padding: '12px 26px',
-                  borderRadius: '999px',
-                  background: 'linear-gradient(135deg, #E8732A, #F3A15E)',
-                  color: '#FFFFFF',
-                  fontFamily: "'Manrope', sans-serif",
-                  fontSize: '13px',
-                  fontWeight: 700,
-                  textDecoration: 'none',
-                  boxShadow: '0 8px 24px rgba(232,115,42,0.35)',
-                  transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.transform = 'translateY(-2px)')}
-                onMouseLeave={(e) => (e.currentTarget.style.transform = 'translateY(0)')}
-              >
-                <span>Start Free Trial</span>
-                <span style={{ width: 22, height: 22, borderRadius: '50%', background: 'rgba(255,255,255,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <ArrowRight size={13} color="#FFF" />
-                </span>
-              </Link>
+              <IridescentButton to="/login" size="md">
+                START FREE TRIAL
+              </IridescentButton>
 
               <button
                 type="button"

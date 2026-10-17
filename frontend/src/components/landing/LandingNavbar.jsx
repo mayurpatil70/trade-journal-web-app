@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, ArrowRight, BarChart2, Shield, BookOpen, Calculator, Layers, Zap } from 'lucide-react';
 import BrandLogo from '../BrandLogo';
+import IridescentButton from './IridescentButton';
 
 const NAV_LINKS = [
   { label: 'Markets', to: '/markets/four-asset-classes', icon: Layers },
@@ -156,37 +157,9 @@ export default function LandingNavbar({ isFixed = true }) {
 
         {/* Right: Start Free Trial Button + Three-Line Menu Button */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <Link
-            to="/login"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '8px 18px',
-              borderRadius: '999px',
-              background: 'linear-gradient(135deg, #E8732A 0%, #F3A15E 100%)',
-              color: '#0F1D1C',
-              fontFamily: "'Manrope', sans-serif",
-              fontSize: '12.5px',
-              fontWeight: 800,
-              letterSpacing: '0.02em',
-              textDecoration: 'none',
-              boxShadow: '0 4px 16px rgba(232, 115, 42, 0.35)',
-              transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-              whiteSpace: 'nowrap',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-1px)';
-              e.currentTarget.style.boxShadow = '0 6px 20px rgba(232, 115, 42, 0.5)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = '0 4px 16px rgba(232, 115, 42, 0.35)';
-            }}
-          >
-            <span>Start Free Trial</span>
-            <span style={{ fontSize: '11px', fontWeight: 800 }}>↗</span>
-          </Link>
+          <IridescentButton to="/login" size="sm">
+            START FREE TRIAL
+          </IridescentButton>
 
           {/* Three-Line Menu Toggle Button (Visible on all screens) */}
           <button
@@ -401,27 +374,14 @@ export default function LandingNavbar({ isFixed = true }) {
 
             {/* Bottom Actions */}
             <div style={{ paddingTop: '16px', borderTop: '1px solid rgba(255, 255, 255, 0.08)', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              <Link
+              <IridescentButton
                 to="/login"
+                size="md"
                 onClick={() => setMobileMenuOpen(false)}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px',
-                  padding: '12px',
-                  borderRadius: '999px',
-                  background: 'linear-gradient(135deg, #E8732A 0%, #F3A15E 100%)',
-                  color: '#0F1D1C',
-                  fontFamily: "'Manrope', sans-serif",
-                  fontSize: '13.5px',
-                  fontWeight: 800,
-                  textDecoration: 'none',
-                  boxShadow: '0 4px 16px rgba(232, 115, 42, 0.35)',
-                }}
+                style={{ width: '100%', justifyContent: 'center' }}
               >
-                Start Free Trial ↗
-              </Link>
+                START FREE TRIAL
+              </IridescentButton>
 
               <Link
                 to="/login"

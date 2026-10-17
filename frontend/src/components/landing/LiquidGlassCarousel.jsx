@@ -2,6 +2,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ArrowLeft, ArrowRight, Upload } from 'lucide-react';
+import IridescentButton from './IridescentButton';
 
 // Generates high-resolution vector/canvas mockups for the 5 app views
 const createMockupDataUri = (type, title, subtitle, badge, accent) => {
@@ -725,31 +726,9 @@ export default function LiquidGlassCarousel({ userImages = null }) {
             zIndex: 10,
           }}
         >
-          <a
-            href="/login"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '8px',
-              padding: '11px 24px',
-              borderRadius: '999px',
-              background: 'linear-gradient(135deg, #E8732A, #F3A15E)',
-              color: '#FFFFFF',
-              fontFamily: "'Manrope', sans-serif",
-              fontSize: '12px',
-              fontWeight: 800,
-              letterSpacing: '0.04em',
-              textTransform: 'uppercase',
-              textDecoration: 'none',
-              boxShadow: '0 8px 24px rgba(232, 115, 42, 0.35)',
-              transition: 'transform 0.2s, box-shadow 0.2s',
-            }}
-            onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = '0 10px 30px rgba(232, 115, 42, 0.5)'; }}
-            onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(232, 115, 42, 0.35)'; }}
-          >
-            <span>Explore All 5 Workspaces</span>
-            <ArrowRight size={13} />
-          </a>
+          <IridescentButton to="/login" size="md">
+            EXPLORE ALL 5 WORKSPACES
+          </IridescentButton>
         </div>
       </div>
 

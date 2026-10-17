@@ -7,6 +7,7 @@ import { WIDGETS } from '../components/seo/Calculators';
 import SiteFooter from '../components/seo/SiteFooter';
 import FourAssetClassesHero from '../components/seo/FourAssetClassesHero';
 import LandingNavbar from '../components/landing/LandingNavbar';
+import IridescentButton from '../components/landing/IridescentButton';
 
 export default function SeoLandingPage() {
   const { pathname } = useLocation();
@@ -127,26 +128,9 @@ export default function SeoLandingPage() {
 
             {/* CTA Buttons */}
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '14px' }}>
-              <Link
-                to="/login"
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '10px',
-                  padding: '12px 28px',
-                  borderRadius: '999px',
-                  background: 'linear-gradient(135deg, #E8732A 0%, #F3A15E 100%)',
-                  color: '#0F1D1C',
-                  fontSize: '14px',
-                  fontWeight: 700,
-                  textDecoration: 'none',
-                  boxShadow: '0 6px 20px rgba(232, 115, 42, 0.35)',
-                  transition: 'transform 0.2s ease',
-                }}
-              >
-                Try Forex Notes Free
-                <span style={{ fontSize: '13px', fontWeight: 800 }}>↗</span>
-              </Link>
+              <IridescentButton to="/login" size="md">
+                TRY FOREX NOTES FREE
+              </IridescentButton>
               <a
                 href="#faq"
                 style={{
@@ -385,26 +369,9 @@ export default function SeoLandingPage() {
           >
             ${PRICE.monthly}/month or ${PRICE.yearly}/year. Pay securely by Card or USDT (BEP-20). Free trial with instant access for all new accounts.
           </p>
-          <Link
-            to="/login"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '10px',
-              padding: '12px 30px',
-              borderRadius: '999px',
-              background: 'linear-gradient(135deg, #E8732A 0%, #F3A15E 100%)',
-              color: '#0F1D1C',
-              fontSize: '14px',
-              fontWeight: 700,
-              textDecoration: 'none',
-              boxShadow: '0 6px 20px rgba(232, 115, 42, 0.4)',
-              transition: 'transform 0.2s ease',
-            }}
-          >
-            Start Your Free Trial
-            <span style={{ fontSize: '13px', fontWeight: 800 }}>↗</span>
-          </Link>
+          <IridescentButton to="/login" size="md">
+            START YOUR FREE TRIAL
+          </IridescentButton>
         </section>
 
         {/* ── FREQUENTLY ASKED QUESTIONS (HIGH CONTRAST) ── */}

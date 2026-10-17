@@ -5,6 +5,7 @@ import { Check, X, ChevronRight, ShieldCheck } from "lucide-react";
 import { COMPETITORS, FOREX_NOTES, SECTIONS, comparisonRows, faqs } from "../data/competitorComparisons";
 import SiteFooter from "../components/seo/SiteFooter";
 import LandingNavbar from "../components/landing/LandingNavbar";
+import IridescentButton from "../components/landing/IridescentButton";
 
 const SITE = "https://forexnotes.in";
 
@@ -163,25 +164,9 @@ export default function CompetitorVsPage() {
             {c.hook}
           </p>
           <div style={{ display: "flex", justifyContent: "center", gap: "14px" }}>
-            <Link
-              to="/login"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "10px",
-                padding: "12px 28px",
-                borderRadius: "999px",
-                background: "linear-gradient(135deg, #E8732A 0%, #F3A15E 100%)",
-                color: "#0F1D1C",
-                fontSize: "14px",
-                fontWeight: 700,
-                textDecoration: "none",
-                boxShadow: "0 6px 20px rgba(232, 115, 42, 0.35)",
-              }}
-            >
-              Try Forex Notes Free for 24 Hours
-              <span style={{ fontSize: "13px", fontWeight: 800 }}>↗</span>
-            </Link>
+            <IridescentButton to="/login" size="md">
+              TRY FOREX NOTES FREE FOR 24 HOURS
+            </IridescentButton>
           </div>
         </section>
 
@@ -337,25 +322,9 @@ export default function CompetitorVsPage() {
             Forex Notes is ${FOREX_NOTES.monthly}/month or ${FOREX_NOTES.yearly}/year
             {c.monthlyApprox ? `, compared with roughly $${c.monthlyApprox}/month for ${c.name}.` : ", with journaling, backtesting and the AI coach included."}
           </p>
-          <Link
-            to="/login"
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "10px",
-              padding: "12px 28px",
-              borderRadius: "999px",
-              background: "linear-gradient(135deg, #E8732A 0%, #F3A15E 100%)",
-              color: "#0F1D1C",
-              fontSize: "14px",
-              fontWeight: 700,
-              textDecoration: "none",
-              boxShadow: "0 6px 20px rgba(232, 115, 42, 0.4)",
-            }}
-          >
-            Start Your Free Trial
-            <span style={{ fontSize: "13px", fontWeight: 800 }}>↗</span>
-          </Link>
+          <IridescentButton to="/login" size="md">
+            START YOUR FREE TRIAL
+          </IridescentButton>
         </section>
 
         {/* FAQs */}

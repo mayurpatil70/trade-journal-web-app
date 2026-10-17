@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, ShieldCheck, Zap, Database, TrendingUp, Layers, CheckCircle2 } from 'lucide-react';
+import IridescentButton from '../landing/IridescentButton';
 
 const ASSETS = [
   {
@@ -292,50 +293,9 @@ export default function FourAssetClassesHero() {
         </a>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-          <Link
-            to="/login"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '10px',
-              padding: '11px 24px',
-              borderRadius: '999px',
-              background: 'linear-gradient(135deg, #E8732A 0%, #F3A15E 100%)',
-              color: '#0F1D1C',
-              fontFamily: "'Manrope', sans-serif",
-              fontSize: '13px',
-              fontWeight: 700,
-              letterSpacing: '0.02em',
-              textDecoration: 'none',
-              boxShadow: '0 6px 20px rgba(232, 115, 42, 0.35)',
-              transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-1px)';
-              e.currentTarget.style.boxShadow = '0 10px 28px rgba(232, 115, 42, 0.45)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = '0 6px 20px rgba(232, 115, 42, 0.35)';
-            }}
-          >
-            Start Free Trial
-            <span
-              style={{
-                width: '18px',
-                height: '18px',
-                borderRadius: '50%',
-                background: 'rgba(15, 29, 28, 0.2)',
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '11px',
-                fontWeight: 800,
-              }}
-            >
-              ↗
-            </span>
-          </Link>
+          <IridescentButton to="/login" size="md">
+            START FREE TRIAL
+          </IridescentButton>
         </div>
       </div>
     </div>

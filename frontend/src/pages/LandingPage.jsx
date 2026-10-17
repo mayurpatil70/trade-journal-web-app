@@ -570,24 +570,13 @@ export default function LandingPage() {
                     ))}
                   </div>
 
-                  <Link
+                  <IridescentButton
                     to="/login"
-                    style={{
-                      display: "flex", alignItems: "center", justifyContent: "center", gap: "8px",
-                      width: "100%", padding: "13px", borderRadius: "999px", marginTop: "auto",
-                      background: "linear-gradient(135deg, #E8732A, #F3A15E)",
-                      color: "white", fontSize: "13px", fontWeight: 800,
-                      textDecoration: "none", letterSpacing: "0.02em",
-                      boxShadow: "0 8px 30px rgba(232, 115, 42, 0.4)",
-                      transition: "all 0.2s",
-                    }}
-                    onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = "0 10px 36px rgba(232, 115, 42, 0.55)"; }}
-                    onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 8px 30px rgba(232, 115, 42, 0.4)"; }}
+                    size="md"
+                    style={{ width: "100%", justifyContent: "center" }}
                   >
-                    <Zap size={14} />
-                    <span>Join Yearly</span>
-                    <ArrowRight size={13} />
-                  </Link>
+                    JOIN YEARLY
+                  </IridescentButton>
                 </div>
               </div>
             </div>
@@ -674,25 +663,14 @@ export default function LandingPage() {
               <p style={{ fontSize: "14px", color: "rgba(237, 234, 227, 0.7)", maxWidth: "500px", margin: "0 auto 28px", lineHeight: 1.7 }}>
                 Network with funded traders, share playbook setups, discuss daily market outlooks, and get direct technical support.
               </p>
-              <a
+              <IridescentButton
                 href="https://discord.gg/Ajaw3AjfWE"
-                target="_blank" rel="noopener noreferrer"
-                style={{
-                  display: "inline-flex", alignItems: "center", gap: "8px",
-                  padding: "13px 32px", borderRadius: "999px",
-                  background: "linear-gradient(135deg, #E8732A, #F3A15E)", color: "white",
-                  fontSize: "13px", fontWeight: 800,
-                  textDecoration: "none",
-                  boxShadow: "0 8px 30px rgba(232, 115, 42, 0.35)",
-                  transition: "all 0.2s",
-                }}
-                onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 12px 40px rgba(232, 115, 42, 0.55)"; e.currentTarget.style.transform = "translateY(-1px)"; }}
-                onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 8px 30px rgba(232, 115, 42, 0.35)"; e.currentTarget.style.transform = "translateY(0)"; }}
+                target="_blank"
+                rel="noopener noreferrer"
+                size="lg"
               >
-                <MessageSquare size={15} />
-                <span>Enter Discord Server</span>
-                <ChevronRight size={14} />
-              </a>
+                ENTER DISCORD SERVER
+              </IridescentButton>
             </div>
           </section>
 

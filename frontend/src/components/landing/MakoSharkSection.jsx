@@ -4,9 +4,9 @@
 // Fixed frosted chrome navigation, full-screen ocean hero, 4 market sessions, dive log & scrollytelling ascent bridge.
 
 import React, { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { ArrowDown, ArrowRight, Shield, Zap } from 'lucide-react';
 import LandingNavbar from './LandingNavbar';
+import IridescentButton from './IridescentButton';
 
 const SHARK_VIDEO_URL = 'https://thinkingods.com/demos/mako-hero/hero.mp4';
 const THUMB_EYE = 'https://thinkingods.com/demos/mako-hero/thumb-eye.jpg';
@@ -491,37 +491,9 @@ export default function MakoSharkSection() {
 
           {/* CTA Buttons */}
           <div className="mako-copy-cta-row" style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '16px', marginBottom: '22px' }}>
-            <Link
-              to="/login"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '10px',
-                padding: '13px 28px',
-                borderRadius: '999px',
-                background: 'linear-gradient(135deg, #E8732A, #F3A15E)',
-                color: '#FFFFFF',
-                fontFamily: "'Manrope', sans-serif",
-                fontSize: '13px',
-                fontWeight: 800,
-                textDecoration: 'none',
-                boxShadow: '0 8px 30px rgba(232,115,42,0.4)',
-                transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.boxShadow = '0 12px 36px rgba(232,115,42,0.55)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 8px 30px rgba(232,115,42,0.4)';
-              }}
-            >
-              <span>START 24H TRIAL</span>
-              <span style={{ width: 22, height: 22, borderRadius: '50%', background: 'rgba(255,255,255,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <ArrowRight size={13} color="#FFF" />
-              </span>
-            </Link>
+            <IridescentButton to="/login" size="md">
+              START 24H TRIAL
+            </IridescentButton>
 
             <button
               type="button"
@@ -785,29 +757,9 @@ export default function MakoSharkSection() {
             Your AI coach plans your risk around market sessions, news events and your emotional state. High probability setups at dawn, disciplined risk at dusk, and zero revenge trading in between.
           </p>
 
-          <Link
-            to="/login"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '10px',
-              padding: '11px 28px',
-              borderRadius: '999px',
-              background: 'linear-gradient(135deg, #E8732A, #F3A15E)',
-              color: '#FFF',
-              fontFamily: "'Manrope', sans-serif",
-              fontSize: '12px',
-              fontWeight: 800,
-              textDecoration: 'none',
-              boxShadow: '0 8px 30px rgba(232,115,42,0.4)',
-              transition: 'transform 0.2s ease',
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.transform = 'translateY(-2px)')}
-            onMouseLeave={(e) => (e.currentTarget.style.transform = 'translateY(0)')}
-          >
-            <span>START FREE TRIAL</span>
-            <ArrowRight size={14} />
-          </Link>
+          <IridescentButton to="/login" size="md">
+            START FREE TRIAL
+          </IridescentButton>
         </div>
 
         {/* Downward Scrollytelling Cue into Daylight */}
