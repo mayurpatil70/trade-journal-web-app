@@ -209,7 +209,7 @@ export default function AdminDashboard() {
     } else {
       if (targetUser && !targetUser.discord_verified) {
         const proceed = window.confirm(
-          `⚠️ DISCORD GATE REMINDER:\n\n${userEmail} has NOT joined or verified Discord yet!\n\nEven after granting ${days} days of ${type} access, they will be STOPPED at the Discord Gate and CANNOT enter /dashboard until they join Discord (or until you manually verify their Discord).\n\nDo you still want to proceed?`
+          `ℹ️ DISCORD NOTICE:\n\n${userEmail} has NOT joined or verified Discord yet.\n\nNote: Discord join is optional. Even without joining Discord, they can click "Skip for now" under the Discord card to enter /dashboard directly once granted ${days} days of ${type} access.\n\nDo you want to proceed with granting access?`
         );
         if (!proceed) return;
       } else {
