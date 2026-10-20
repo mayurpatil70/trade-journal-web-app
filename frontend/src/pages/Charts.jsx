@@ -23,6 +23,9 @@ export default function Charts() {
              height="100%"
              hide_side_toolbar={false}
              withdateranges={true}
+             hide_volume={true}
+             disabled_features={['create_volume_indicator_by_default']}
+             studies={[]}
           />
         </div>
       </div>

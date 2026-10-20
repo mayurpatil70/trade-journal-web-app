@@ -79,9 +79,18 @@ export default function DiscordCallback() {
             <p className="text-sm text-gray-400 mb-6">{errorMsg}</p>
             <button
               onClick={() => navigate("/link-discord")}
-              className="w-full py-3 bg-[#5865F2] hover:bg-[#4752C4] text-white font-bold rounded-xl transition-all"
+              className="w-full py-3 bg-[#5865F2] hover:bg-[#4752C4] text-white font-bold rounded-xl transition-all cursor-pointer"
             >
               Try Again <ArrowRight className="w-4 h-4 inline ml-1" />
+            </button>
+            <button
+              onClick={() => {
+                localStorage.setItem("discord_skipped", "true");
+                navigate("/dashboard");
+              }}
+              className="w-full mt-3 py-3 bg-white/[0.04] hover:bg-white/[0.08] text-gray-300 hover:text-white font-medium rounded-xl transition-all border border-white/10 cursor-pointer"
+            >
+              Skip Discord & Continue
             </button>
           </>
         )}

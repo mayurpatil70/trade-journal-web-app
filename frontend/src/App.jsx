@@ -113,56 +113,12 @@ const WorkspaceLoader = () => (
   </div>
 );
 
-// GUARD 1.5: Strict Discord Enforcer (Must link Discord before accessing Paywall or Dashboard)
-const DiscordGateGuard = () => {
-  const [discordStatus, setDiscordStatus] = useState(() => {
-    const cached = getImmediateCachedStatus();
-    if (cached) {
-      return cached.isAdmin || cached.discordVerified ? "allow" : "discord";
-    }
-    return null;
-  });
-
-  useEffect(() => {
-    let active = true;
-    getCachedAccessStatus()
-      .then((data) => {
-        if (!active) return;
-        if (data?.isAdmin || data?.discordVerified) {
-          setDiscordStatus("allow");
-        } else {
-          setDiscordStatus("discord");
-        }
-      })
-      .catch((err) => {
-        if (!active) return;
-        if (err.response?.status !== 401) {
-          setDiscordStatus("discord");
-        }
-      });
-    return () => {
-      active = false;
-    };
-  }, []);
-
-  if (discordStatus === null) {
-    return <WorkspaceLoader />;
-  }
-
-  if (discordStatus === "discord") {
-    return <Navigate to="/link-discord" replace />;
-  }
-
-  return <Outlet />;
-};
-
-// GUARD 2: The Paywall Enforcer
+// GUARD 2: The Paywall Enforcer (Requires active subscription / trial or admin)
 const PaywallGuard = () => {
   const [access, setAccess] = useState(() => {
     const cached = getImmediateCachedStatus();
     if (cached) {
       if (cached.isAdmin) return "allow";
-      if (!cached.discordVerified) return "discord";
       if (!cached.hasPaid) return "paywall";
       return "allow";
     }
@@ -174,11 +130,9 @@ const PaywallGuard = () => {
     getCachedAccessStatus()
       .then((data) => {
         if (!active) return;
-        const { hasPaid, discordVerified, isAdmin } = data || {};
+        const { hasPaid, isAdmin } = data || {};
         if (isAdmin) {
           setAccess("allow");
-        } else if (!discordVerified) {
-          setAccess("discord");
         } else if (!hasPaid) {
           setAccess("paywall");
         } else {
@@ -200,7 +154,6 @@ const PaywallGuard = () => {
     return <WorkspaceLoader />;
   }
 
-  if (access === "discord") return <Navigate to="/link-discord" replace />;
   if (access === "paywall") return <Navigate to="/paywall" replace />;
 
   return <Outlet />;
@@ -290,13 +243,10 @@ function App() {
             <Route element={<AuthGuard />}>
               <Route path="/link-discord" element={<DiscordGate />} />
               <Route path="/discord/callback" element={<DiscordCallback />} />
+              <Route path="/paywall" element={<Paywall />} />
 
-              {/* Guard 1.5: Strict Discord Gatekeeper — No one can access Paywall or App without joining Discord */}
-              <Route element={<DiscordGateGuard />}>
-                <Route path="/paywall" element={<Paywall />} />
-
-                {/* Guard 2: Must be logged in AND Paid (or Active Trial / Admin) */}
-                <Route element={<PaywallGuard />}>
+              {/* Guard 2: Must be logged in AND Paid (or Active Trial / Admin) */}
+              <Route element={<PaywallGuard />}>
                   <Route path="/backtest/:id" element={<Backtest />} />
                   <Route path="/backtest" element={<Navigate to="/sessions" replace />} />
                   <Route path="/" element={<MainLayout />}>
@@ -335,7 +285,6 @@ function App() {
                 </Route>
               </Route>
             </Route>
-          </Route>
 
           {/* 404 Catch All */}
           <Route path="*" element={<NotFound />} />

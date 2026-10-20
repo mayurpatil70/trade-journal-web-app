@@ -65,13 +65,8 @@ function Paywall() {
         navigate('/dashboard');
       }
     } catch (error) {
-      console.error(error);
-      if (error.response?.data?.needDiscord) {
-        alert("You must join and link our Discord server first before activating your free trial!");
-        navigate("/link-discord");
-      } else {
-        alert(error.response?.data?.error || 'Failed to start trial');
-      }
+      console.error("Start trial error:", error);
+      alert(error.response?.data?.error || 'Failed to start trial');
     } finally {
       setIsStartingTrial(false);
     }

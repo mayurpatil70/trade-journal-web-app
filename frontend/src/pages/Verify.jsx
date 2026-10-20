@@ -43,9 +43,10 @@ export default function Verify() {
 
         setStatus("success");
 
-        // 3. Smart Redirect: Discord -> Paywall -> Dashboard
+        // 3. Smart Redirect: Discord (optional) -> Paywall -> Dashboard
+        const discordSkipped = localStorage.getItem("discord_skipped") === "true";
         setTimeout(() => {
-          if (!discordVerified) {
+          if (!discordVerified && !discordSkipped) {
             navigate("/link-discord");
           } else if (!hasPaid) {
             navigate("/paywall");

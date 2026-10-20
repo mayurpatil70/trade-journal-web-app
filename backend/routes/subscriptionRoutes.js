@@ -262,19 +262,12 @@ router.post("/start-trial", requireAuth, async (req, res) => {
   if (!userId) return res.status(401).json({ error: "Unauthorized" });
 
   try {
-    // ── STRICT DISCORD GATE: Must link Discord first ──
+    // Fetch user info for profile creation if needed
     const { data: userRow } = await supabase
       .from("users")
       .select("email, discord_verified")
       .eq("id", userId)
       .maybeSingle();
-
-    if (!userRow?.discord_verified) {
-      return res.status(403).json({
-        error: "You must join and verify our Discord community before starting a free trial.",
-        needDiscord: true,
-      });
-    }
 
     let { data: profile, error } = await supabase
       .from("profiles")

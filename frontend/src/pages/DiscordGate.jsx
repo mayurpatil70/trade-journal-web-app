@@ -1,12 +1,14 @@
 // frontend/src/pages/DiscordGate.jsx
 import { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { MessageSquare, ArrowRight, Shield, AlertTriangle } from "lucide-react";
+import { MessageSquare, ArrowRight, Shield, AlertTriangle, Loader2 } from "lucide-react";
+import { getCachedAccessStatus } from "../utils/subscriptionCache";
 
 export default function DiscordGate() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [errorMessage, setErrorMessage] = useState("");
+  const [isSkipping, setIsSkipping] = useState(false);
 
   const DISCORD_INVITE_LINK = "https://discord.gg/Ajaw3AjfWE";
 
@@ -46,9 +48,26 @@ export default function DiscordGate() {
     window.location.href = discordOAuthUrl;
   };
 
+  const handleSkip = async () => {
+    setIsSkipping(true);
+    localStorage.setItem("discord_skipped", "true");
+    try {
+      const status = await getCachedAccessStatus();
+      if (status?.hasPaid || status?.isAdmin) {
+        navigate("/dashboard");
+      } else {
+        navigate("/paywall");
+      }
+    } catch {
+      navigate("/dashboard");
+    } finally {
+      setIsSkipping(false);
+    }
+  };
+
   return (
     <div
-      className="min-h-screen bg-[#020202] text-white flex items-center justify-center p-6"
+      className="min-h-screen bg-[#020202] text-white flex flex-col items-center justify-center p-6"
       style={{ fontFamily: "'Inter', sans-serif" }}
     >
       <div className="w-full max-w-lg bg-[#121418] border border-white/5 rounded-2xl p-8 md:p-10 shadow-2xl text-center">
@@ -72,7 +91,7 @@ export default function DiscordGate() {
           </div>
         )}
 
-        <div className="space-y-4 w-full flex flex-col items-center">
+        <div className="space-y-3.5 w-full flex flex-col items-center">
           <a
             href={DISCORD_INVITE_LINK}
             target="_blank"
@@ -84,10 +103,29 @@ export default function DiscordGate() {
 
           <button
             onClick={handleDiscordLogin}
-            className="w-full py-4 px-6 bg-[#1a1b20] hover:bg-[#23252b] text-white border border-white/10 font-bold rounded-2xl transition-all flex justify-center items-center gap-2 text-sm shadow-sm"
+            className="w-full py-4 px-6 bg-[#1a1b20] hover:bg-[#23252b] text-white border border-white/10 font-bold rounded-2xl transition-all flex justify-center items-center gap-2 text-sm shadow-sm cursor-pointer"
           >
             2. I've joined, Verify & Take me to Dashboard{" "}
             <ArrowRight className="w-4 h-4" />
+          </button>
+
+          <button
+            type="button"
+            onClick={handleSkip}
+            disabled={isSkipping}
+            className="w-full py-3.5 px-6 bg-white/[0.04] hover:bg-white/[0.09] text-gray-300 hover:text-white border border-white/10 font-semibold rounded-2xl transition-all flex justify-center items-center gap-2 text-sm shadow-sm cursor-pointer disabled:opacity-50"
+          >
+            {isSkipping ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin text-emerald-400" />
+                <span>Redirecting...</span>
+              </>
+            ) : (
+              <>
+                <span>Skip for now</span>
+                <ArrowRight className="w-4 h-4 text-gray-400" />
+              </>
+            )}
           </button>
         </div>
 
@@ -95,6 +133,17 @@ export default function DiscordGate() {
           <Shield className="w-4 h-4 text-[#21d4a3]" />
           <span>Your data is completely private and secure.</span>
         </div>
+      </div>
+
+      <div className="mt-4 text-center">
+        <button
+          type="button"
+          onClick={handleSkip}
+          disabled={isSkipping}
+          className="text-xs text-gray-500 hover:text-gray-300 transition-colors underline underline-offset-4 cursor-pointer"
+        >
+          Skip Discord and go directly to Dashboard / Plans &rarr;
+        </button>
       </div>
     </div>
   );
