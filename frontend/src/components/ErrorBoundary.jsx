@@ -5,17 +5,39 @@ import { AlertTriangle, RefreshCcw } from "lucide-react";
 class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { hasError: false, errorMessage: "" };
+    this.state = { hasError: false, errorMessage: "", isChunkError: false };
   }
 
   static getDerivedStateFromError(error) {
-    // Update state so the next render will show the fallback UI.
-    return { hasError: true, errorMessage: error.message };
+    const msg = error?.message || "";
+    const isChunkError =
+      msg.includes("Failed to fetch dynamically imported module") ||
+      msg.includes("error loading dynamically imported module") ||
+      msg.includes("Importing a module script failed") ||
+      error?.name === "ChunkLoadError";
+
+    return { hasError: true, errorMessage: msg, isChunkError };
   }
 
   componentDidCatch(error, errorInfo) {
-    // You can also log the error to an error reporting service here
     console.error("Uncaught error:", error, errorInfo);
+    const msg = error?.message || "";
+    const isChunkError =
+      msg.includes("Failed to fetch dynamically imported module") ||
+      msg.includes("error loading dynamically imported module") ||
+      msg.includes("Importing a module script failed") ||
+      error?.name === "ChunkLoadError";
+
+    // Auto-reload once if dynamic import failed because of a new production deployment
+    if (isChunkError) {
+      const retryKey = "chunk_reload_retry";
+      const lastRetry = sessionStorage.getItem(retryKey);
+      const now = Date.now();
+      if (!lastRetry || now - parseInt(lastRetry, 10) > 10000) {
+        sessionStorage.setItem(retryKey, now.toString());
+        window.location.reload();
+      }
+    }
   }
 
   render() {
@@ -27,15 +49,19 @@ class ErrorBoundary extends React.Component {
               <AlertTriangle className="w-8 h-8 text-red-500" />
             </div>
             <h1 className="text-2xl font-bold text-white mb-3">
-              Something went wrong
+              {this.state.isChunkError ? "Update Detected" : "Something went wrong"}
             </h1>
             <p className="text-sm text-gray-400 mb-6 bg-black/50 p-4 rounded-xl border border-white/5 font-mono overflow-x-auto text-left">
-              {this.state.errorMessage ||
-                "An unexpected rendering error occurred."}
+              {this.state.isChunkError
+                ? "A new update of Forex Notes was deployed. Please reload the application to continue."
+                : (this.state.errorMessage || "An unexpected rendering error occurred.")}
             </p>
             <button
-              onClick={() => window.location.replace("/")}
-              className="w-full py-4 px-6 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg shadow-emerald-500/25 transition-all flex justify-center items-center gap-2"
+              onClick={() => {
+                sessionStorage.removeItem("chunk_reload_retry");
+                window.location.reload();
+              }}
+              className="w-full py-4 px-6 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg shadow-emerald-500/25 transition-all flex justify-center items-center gap-2 cursor-pointer"
             >
               <RefreshCcw className="w-4 h-4" /> Reload Application
             </button>
