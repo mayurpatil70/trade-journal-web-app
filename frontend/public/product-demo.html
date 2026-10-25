@@ -1,0 +1,1253 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <!-- =====================================================================
+       PRESERVED SEO, GEO & AEO METADATA (Forex Notes Production Baseline)
+       ===================================================================== -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Interactive Product Demo | Forex Notes AI Trading Journal</title>
+  <meta name="description"
+    content="Watch how Forex Notes logs trades and deploys the AI Pre-Trade Guard in real-time. Interactive 60fps mock UI simulation with automated workflow demo." />
+  <meta name="keywords"
+    content="trading journal demo, ai trading coach demo, trade logging simulation, prop firm risk manager demo, interactive trading software demo" />
+  <meta name="robots" content="index, follow" />
+  <meta name="google-site-verification" content="JwpEiYJIP57LW0h5_8UChbTnvNAEWlu5BpWT-NiO86g" />
+  <link rel="canonical" href="https://forexnotes.in/#demo" />
+  <meta name="geo.region" content="IN;AE" />
+  <meta name="geo.placename" content="India; Dubai, United Arab Emirates" />
+  <meta name="theme-color" content="#060b11" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Forex Notes" />
+  <meta property="og:title" content="Interactive Product Demo | Forex Notes" />
+  <meta property="og:description"
+    content="Pure HTML/CSS/JS 60fps product simulation of our digital trade journal and real-time AI Pre-Trade Guard." />
+  <meta property="og:url" content="https://forexnotes.in/#demo" />
+  <meta property="og:image" content="https://forexnotes.in/og-image.png" />
+
+  <!-- Schema.org SoftwareApplication Demo -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Forex Notes",
+    "applicationCategory": "FinanceApplication",
+    "operatingSystem": "Web, iOS, Android, Windows, macOS",
+    "url": "https://forexnotes.in/",
+    "description": "Interactive product demonstration of automated trade logging, AI Pre-Trade Guard, and prop firm drawdown protection."
+  }
+  </script>
+
+  <!-- Google Fonts: Inter, Cormorant Garamond, JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,400&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- =====================================================================
+       INLINE STYLES: Mobile-first, 60fps GPU transforms & opacity only
+       ===================================================================== -->
+  <style>
+    /* -------------------------------------------------------------
+       BRAND DESIGN TOKENS ([BG], [PRIMARY], [ACCENT], [FONT])
+       ------------------------------------------------------------- */
+    :root {
+      /* [BG] Background */
+      --bg: #060b11;
+      --surface-outer: rgba(14, 23, 38, 0.95);
+      --surface-sidebar: #09101b;
+      --surface-main: #0c1524;
+      --surface-card: #111e33;
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-focus: rgba(16, 185, 129, 0.4);
+
+      /* [PRIMARY] Emerald Green */
+      --primary: #10b981;
+      --primary-hover: #059669;
+      --primary-glow: rgba(16, 185, 129, 0.35);
+
+      /* [ACCENT] Mint & Champagne Gold & Danger */
+      --accent: #34d399;
+      --accent-gold: #c9a96e;
+      --accent-danger: #f43f5e;
+
+      /* [FONT] Typography */
+      --font: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-serif: 'Cormorant Garamond', Georgia, serif;
+      --font-mono: 'JetBrains Mono', monospace;
+
+      /* Neutrals */
+      --text-white: #ffffff;
+      --text-body: #94a3b8;
+      --text-muted: #64748b;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      color-scheme: dark;
+      background-color: var(--bg);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      font-family: var(--font);
+      background-color: var(--bg);
+      color: var(--text-white);
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: clamp(32px, 5vw, 64px) clamp(16px, 3.5vw, 24px);
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Ambient Aurora Glow */
+    .demo-aurora {
+      position: absolute;
+      top: 25%;
+      left: 50%;
+      transform: translate(-50%, -30%) translateZ(0);
+      width: clamp(380px, 65vw, 850px);
+      height: clamp(380px, 65vw, 850px);
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.16) 0%, rgba(201, 169, 110, 0.06) 50%, transparent 72%);
+      filter: blur(85px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Container Header */
+    .demo-section {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      max-width: 1080px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .demo-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.22);
+      font-size: 0.76rem;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--primary);
+      margin-bottom: 14px;
+    }
+
+    .eyebrow-pulse {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--primary);
+      box-shadow: 0 0 8px var(--primary);
+    }
+
+    .demo-title {
+      font-family: var(--font-serif);
+      font-size: clamp(2.2rem, 5vw, 3.6rem);
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      line-height: 1.05;
+      color: #ffffff;
+      margin-bottom: 12px;
+    }
+
+    .demo-title span {
+      font-style: italic;
+      color: var(--accent-gold);
+    }
+
+    .demo-subtitle {
+      font-size: clamp(0.92rem, 1.8vw, 1.05rem);
+      color: var(--text-body);
+      max-width: 560px;
+      line-height: 1.6;
+      margin: 0 auto clamp(28px, 4vw, 42px);
+    }
+
+    /* -------------------------------------------------------------
+       THE MOCK UI WINDOW (Browser Frame with macOS Chrome)
+       ------------------------------------------------------------- */
+    .mock-window {
+      position: relative;
+      width: 100%;
+      max-width: 960px;
+      margin: 0 auto;
+      border-radius: 20px;
+      background: var(--surface-outer);
+      border: 1px solid var(--border-subtle);
+      box-shadow: 
+        0 24px 60px rgba(0, 0, 0, 0.65),
+        0 0 40px rgba(16, 185, 129, 0.12);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      height: clamp(480px, 60vh, 560px);
+      text-align: left;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    /* macOS Window Header Bar */
+    .window-header {
+      height: 42px;
+      background: rgba(8, 14, 24, 0.95);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      flex-shrink: 0;
+    }
+
+    .window-dots {
+      display: flex;
+      gap: 7px;
+    }
+
+    .win-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+    .win-dot.red { background: #ff5f56; }
+    .win-dot.yellow { background: #ffbd2e; }
+    .win-dot.green { background: #27c93f; }
+
+    .window-url-bar {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 4px 16px;
+      border-radius: 6px;
+      letter-spacing: 0.02em;
+    }
+
+    .window-status-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.7rem;
+      font-family: var(--font-mono);
+      color: var(--primary);
+    }
+
+    .live-sync-indicator {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--primary);
+      box-shadow: 0 0 6px var(--primary);
+    }
+
+    /* Window Body: Sidebar + Main Content Workspace */
+    .window-body {
+      flex: 1;
+      display: flex;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* -------------------------------------------------------------
+       MOCK SIDEBAR NAVIGATION
+       ------------------------------------------------------------- */
+    .mock-sidebar {
+      width: clamp(140px, 22vw, 200px);
+      background: var(--surface-sidebar);
+      border-right: 1px solid var(--border-subtle);
+      padding: 18px 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+
+    .sidebar-brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 24px;
+      padding-left: 6px;
+    }
+
+    .brand-icon-sq {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      background: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.75rem;
+      color: #060b11;
+    }
+
+    .brand-text-sm {
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      color: #ffffff;
+    }
+
+    .sidebar-menu {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      list-style: none;
+    }
+
+    .menu-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-body);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .menu-item.active {
+      background: rgba(16, 185, 129, 0.14);
+      color: var(--primary);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+    }
+
+    .menu-item svg {
+      width: 14px;
+      height: 14px;
+      stroke: currentColor;
+      stroke-width: 2;
+      fill: none;
+      flex-shrink: 0;
+    }
+
+    .sidebar-user {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 6px 0;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .user-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--accent-gold));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #060b11;
+    }
+
+    .user-meta {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .user-name {
+      font-size: 0.74rem;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .user-tag {
+      font-size: 0.64rem;
+      color: var(--primary);
+      font-family: var(--font-mono);
+    }
+
+    /* -------------------------------------------------------------
+       MAIN WORKSPACE & TRADE LIST
+       ------------------------------------------------------------- */
+    .mock-workspace {
+      flex: 1;
+      background: var(--surface-main);
+      padding: clamp(16px, 2.5vw, 24px);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .workspace-top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .workspace-heading {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .ws-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: -0.01em;
+    }
+
+    .ws-subtitle {
+      font-size: 0.74rem;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+
+    /* The Target Button that Cursor Clicks */
+    .btn-log-trade {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 9px 18px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--primary) 0%, #059669 100%);
+      color: #ffffff;
+      font-family: var(--font);
+      font-size: 0.8rem;
+      font-weight: 700;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 4px 16px var(--primary-glow);
+      cursor: pointer;
+      overflow: hidden;
+      transition: transform 0.15s ease;
+    }
+
+    .btn-log-trade svg {
+      width: 14px;
+      height: 14px;
+      stroke: currentColor;
+      stroke-width: 2.2;
+      fill: none;
+    }
+
+    /* Click Press State */
+    .btn-log-trade.is-clicked {
+      transform: scale(0.94);
+    }
+
+    /* Ripple Effect */
+    .ripple-ring {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.6);
+      transform: translate(-50%, -50%) scale(0);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .ripple-ring.animate-ripple {
+      animation: rippleWave 0.5s ease-out forwards;
+    }
+
+    @keyframes rippleWave {
+      0% { transform: translate(-50%, -50%) scale(0); opacity: 0.8; }
+      100% { transform: translate(-50%, -50%) scale(3.5); opacity: 0; }
+    }
+
+    /* Trade List Rows */
+    .trade-list-table {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex: 1;
+    }
+
+    .trade-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      border-radius: 10px;
+      background: var(--surface-card);
+      border: 1px solid var(--border-subtle);
+      font-size: 0.78rem;
+    }
+
+    .trade-col-main {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .symbol-pill {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 0.74rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.06);
+      color: #ffffff;
+    }
+
+    .strategy-name {
+      color: var(--text-body);
+      font-size: 0.74rem;
+    }
+
+    .trade-pnl {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 0.82rem;
+    }
+
+    .trade-pnl.win { color: var(--primary); }
+    .trade-pnl.loss { color: var(--accent-danger); }
+
+    /* -------------------------------------------------------------
+       SLIDE-OVER PANEL: AI PRE-TRADE GUARD MODAL
+       Smooth 60fps GPU Translate
+       ------------------------------------------------------------- */
+    .mock-panel-modal {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: clamp(260px, 50%, 340px);
+      height: 100%;
+      background: #0d1726;
+      border-left: 1px solid rgba(16, 185, 129, 0.3);
+      box-shadow: -14px 0 35px rgba(0, 0, 0, 0.6);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      z-index: 50;
+      
+      /* GPU Animation */
+      will-change: transform, opacity;
+      transform: translate3d(105%, 0, 0);
+      opacity: 0;
+      transition: transform 0.44s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+    }
+
+    .mock-panel-modal.is-open {
+      transform: translate3d(0, 0, 0);
+      opacity: 1;
+    }
+
+    .panel-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .panel-title-text {
+      font-size: 0.86rem;
+      font-weight: 700;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .panel-title-text svg {
+      width: 14px;
+      height: 14px;
+      stroke: var(--primary);
+    }
+
+    .panel-field-group {
+      margin-bottom: 14px;
+    }
+
+    .field-label {
+      font-size: 0.7rem;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    /* Fake Animated Typing Input Field */
+    .field-input-box {
+      width: 100%;
+      height: 38px;
+      border-radius: 8px;
+      background: rgba(8, 14, 24, 0.9);
+      border: 1px solid var(--border-subtle);
+      padding: 0 10px;
+      display: flex;
+      align-items: center;
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+      color: #ffffff;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .field-input-box.is-active {
+      border-color: var(--primary);
+      box-shadow: 0 0 12px rgba(16, 185, 129, 0.25);
+    }
+
+    .typewriter-text {
+      white-space: nowrap;
+    }
+
+    .input-caret {
+      display: inline-block;
+      width: 2px;
+      height: 14px;
+      background: var(--primary);
+      margin-left: 2px;
+      animation: caretBlink 0.9s infinite;
+    }
+
+    @keyframes caretBlink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    /* Risk Gauge Bar in Panel */
+    .risk-meter-box {
+      margin-bottom: 18px;
+      padding: 10px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .risk-meter-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.68rem;
+      font-family: var(--font-mono);
+      margin-bottom: 6px;
+    }
+
+    .risk-track {
+      height: 4px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      overflow: hidden;
+    }
+
+    .risk-fill {
+      height: 100%;
+      width: 30%;
+      background: var(--primary);
+    }
+
+    .btn-verify-trade {
+      position: relative;
+      margin-top: auto;
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--primary) 0%, #059669 100%);
+      color: #ffffff;
+      border: none;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 14px var(--primary-glow);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: transform 0.15s ease;
+    }
+
+    .btn-verify-trade.is-clicked {
+      transform: scale(0.95);
+    }
+
+    /* -------------------------------------------------------------
+       SUCCESS STATE NOTIFICATION
+       Pops in with soft bounce
+       ------------------------------------------------------------- */
+    .panel-success-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(11, 20, 34, 0.96);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 20px;
+      z-index: 60;
+      
+      will-change: transform, opacity;
+      transform: scale(0.85);
+      opacity: 0;
+      pointer-events: none;
+      transition: transform 0.38s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
+    }
+
+    .panel-success-overlay.is-shown {
+      transform: scale(1);
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .success-icon-circle {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: rgba(16, 185, 129, 0.18);
+      border: 2px solid var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--primary);
+      margin-bottom: 12px;
+      box-shadow: 0 0 24px var(--primary-glow);
+    }
+
+    .success-icon-circle svg {
+      width: 26px;
+      height: 26px;
+      stroke: currentColor;
+      stroke-width: 2.5;
+      fill: none;
+    }
+
+    .success-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 4px;
+    }
+
+    .success-desc {
+      font-size: 0.74rem;
+      color: var(--accent);
+      font-family: var(--font-mono);
+    }
+
+    /* -------------------------------------------------------------
+       THE ANIMATED CURSOR
+       Hardware-accelerated SVG Cursor moving smoothly over 8s loop
+       ------------------------------------------------------------- */
+    .demo-cursor {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 24px;
+      height: 24px;
+      z-index: 999;
+      pointer-events: none;
+      filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.6));
+      
+      /* Smooth GPU movement */
+      will-change: transform;
+      transform: translate3d(240px, 320px, 0);
+      transition: transform 0.65s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    .demo-cursor svg {
+      width: 100%;
+      height: 100%;
+      fill: #ffffff;
+      stroke: #060b11;
+      stroke-width: 1.5;
+    }
+
+    /* Click scale pulse */
+    .demo-cursor.cursor-click {
+      transform: scale(0.82) translateZ(0);
+    }
+
+    /* Timeline Progress Track below window */
+    .demo-timeline-bar {
+      margin-top: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      font-size: 0.74rem;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+    }
+
+    .timeline-meter {
+      width: 120px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 999px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .timeline-progress {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 0%;
+      background: var(--primary);
+      transition: width 0.1s linear;
+    }
+
+    .demo-action-btn {
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: var(--primary);
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .demo-action-btn:hover {
+      background: var(--primary);
+      color: #ffffff;
+    }
+
+    /* -------------------------------------------------------------
+       ACCESSIBILITY & PREFERS-REDUCED-MOTION
+       ------------------------------------------------------------- */
+    @media (prefers-reduced-motion: reduce) {
+      .demo-cursor {
+        display: none !important;
+      }
+      .mock-panel-modal {
+        transition: none !important;
+        transform: translate3d(0, 0, 0) !important;
+        opacity: 1 !important;
+      }
+      .panel-success-overlay {
+        transition: none !important;
+      }
+      .timeline-meter {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="demo-aurora" aria-hidden="true"></div>
+
+  <main class="demo-section" id="demo">
+    
+    <!-- Eyebrow Tag -->
+    <div class="demo-eyebrow">
+      <span class="eyebrow-pulse"></span>
+      <span>8-SECOND SIMULATED WORKFLOW DEMO</span>
+    </div>
+
+    <!-- Title -->
+    <h1 class="demo-title">
+      Zero Latency Journaling.<br />
+      <span>AI Risk Protection in Action.</span>
+    </h1>
+
+    <p class="demo-subtitle">
+      Watch how the AI Pre-Trade Guard intercepts emotional setups and validates prop firm drawdown limits in under 2 seconds.
+    </p>
+
+    <!-- =====================================================================
+         MOCK PRODUCT UI WINDOW
+         ===================================================================== -->
+    <div 
+      class="mock-window" 
+      id="mockWindow" 
+      role="region" 
+      aria-label="Interactive Product Demonstration of Trade Journal & AI Guard"
+    >
+      
+      <!-- Window Chrome Header -->
+      <div class="window-header">
+        <div class="window-dots">
+          <span class="win-dot red"></span>
+          <span class="win-dot yellow"></span>
+          <span class="win-dot green"></span>
+        </div>
+        <div class="window-url-bar">https://app.forexnotes.in/journal</div>
+        <div class="window-status-pill">
+          <span class="live-sync-indicator"></span>
+          <span>10Y TICK SYNC</span>
+        </div>
+      </div>
+
+      <!-- Window Workspace -->
+      <div class="window-body">
+        
+        <!-- Sidebar Navigation -->
+        <aside class="mock-sidebar">
+          <div>
+            <div class="sidebar-brand">
+              <div class="brand-icon-sq">FN</div>
+              <span class="brand-text-sm">FOREX NOTES</span>
+            </div>
+
+            <ul class="sidebar-menu">
+              <li class="menu-item active">
+                <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                <span>Journal</span>
+              </li>
+              <li class="menu-item">
+                <svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+                <span>10Y Backtest</span>
+              </li>
+              <li class="menu-item">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>
+                <span>AI Coach</span>
+              </li>
+              <li class="menu-item">
+                <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                <span>Prop Shield</span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Bottom User Tag -->
+          <div class="sidebar-user">
+            <div class="user-avatar">A</div>
+            <div class="user-meta">
+              <span class="user-name">Alex P.</span>
+              <span class="user-tag">FTMO $100k</span>
+            </div>
+          </div>
+        </aside>
+
+        <!-- Main Workspace Area -->
+        <section class="mock-workspace">
+          
+          <div class="workspace-top-bar">
+            <div class="workspace-heading">
+              <span class="ws-title">Trade Journal & Execution Log</span>
+              <span class="ws-subtitle">London Session Breakout Strategy</span>
+            </div>
+
+            <!-- Target Button Clicked by Cursor -->
+            <button class="btn-log-trade" id="btnLogTrade" type="button">
+              <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              <span>+ Log Trade</span>
+              <span class="ripple-ring" id="btnRipple"></span>
+            </button>
+          </div>
+
+          <!-- Trade List -->
+          <div class="trade-list-table">
+            <div class="trade-row">
+              <div class="trade-col-main">
+                <span class="symbol-pill">EURUSD</span>
+                <span class="strategy-name">London Breakout · M5</span>
+              </div>
+              <div class="trade-pnl win">+4.2R (+$1,280)</div>
+            </div>
+
+            <div class="trade-row">
+              <div class="trade-col-main">
+                <span class="symbol-pill">XAUUSD</span>
+                <span class="strategy-name">Daily S/R Sweep · M15</span>
+              </div>
+              <div class="trade-pnl win">+2.5R (+$750)</div>
+            </div>
+
+            <div class="trade-row">
+              <div class="trade-col-main">
+                <span class="symbol-pill">BTCUSD</span>
+                <span class="strategy-name">Asia Range Fade · M1</span>
+              </div>
+              <div class="trade-pnl loss">-1.0R (-$300)</div>
+            </div>
+          </div>
+
+          <!-- -------------------------------------------------------------
+               SLIDE-OVER PANEL: AI PRE-TRADE GUARD MODAL
+               ------------------------------------------------------------- -->
+          <div class="mock-panel-modal" id="modalPanel">
+            
+            <div class="panel-header-row">
+              <div class="panel-title-text">
+                <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                <span>AI Pre-Trade Guard</span>
+              </div>
+            </div>
+
+            <div class="panel-field-group">
+              <span class="field-label">TRADE SETUP & MINDSET</span>
+              <div class="field-input-box" id="inputFieldBox">
+                <span class="typewriter-text" id="typewriterTarget"></span>
+                <span class="input-caret"></span>
+              </div>
+            </div>
+
+            <div class="risk-meter-box">
+              <div class="risk-meter-header">
+                <span>FTMO DRAWDOWN BUFFER</span>
+                <span style="color: var(--primary);">2.1% / 5% SAFE</span>
+              </div>
+              <div class="risk-track">
+                <div class="risk-fill"></div>
+              </div>
+            </div>
+
+            <button class="btn-verify-trade" id="btnVerifySubmit" type="button">
+              <span>Execute & Guard</span>
+              <span class="ripple-ring" id="submitRipple"></span>
+            </button>
+
+            <!-- Success State Overlay -->
+            <div class="panel-success-overlay" id="successOverlay">
+              <div class="success-icon-circle">
+                <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <div class="success-title">Trade Approved & Logged!</div>
+              <div class="success-desc">AI Guard: Zero tilt detected · Risk safe</div>
+            </div>
+
+          </div>
+
+        </section>
+
+      </div>
+
+      <!-- -------------------------------------------------------------
+           THE ANIMATED CURSOR
+           ------------------------------------------------------------- -->
+      <div class="demo-cursor" id="animatedCursor">
+        <svg viewBox="0 0 24 24">
+          <path d="M3 3l7 18 3-7 7-3L3 3z" />
+        </svg>
+      </div>
+
+    </div>
+
+    <!-- Timeline Status & Replay Control -->
+    <div class="demo-timeline-bar">
+      <span>Auto-looping sequence (8s):</span>
+      <div class="timeline-meter">
+        <div class="timeline-progress" id="timelineProgress"></div>
+      </div>
+      <button class="demo-action-btn" id="restartDemoBtn" type="button">Restart Demo</button>
+    </div>
+
+  </main>
+
+  <!-- =====================================================================
+       VANILLA JS CONTROLLER: 8-Second Choreographed State Loop (60fps)
+       ===================================================================== -->
+  <script>
+    (function () {
+      'use strict';
+
+      const LOOP_DURATION = 8000; // Loops every 8 seconds per requirement
+
+      // DOM Elements
+      const mockWindow = document.getElementById('mockWindow');
+      const cursor = document.getElementById('animatedCursor');
+      const btnLogTrade = document.getElementById('btnLogTrade');
+      const btnRipple = document.getElementById('btnRipple');
+      const modalPanel = document.getElementById('modalPanel');
+      const inputFieldBox = document.getElementById('inputFieldBox');
+      const typewriterTarget = document.getElementById('typewriterTarget');
+      const btnVerifySubmit = document.getElementById('btnVerifySubmit');
+      const submitRipple = document.getElementById('submitRipple');
+      const successOverlay = document.getElementById('successOverlay');
+      const timelineProgress = document.getElementById('timelineProgress');
+      const restartBtn = document.getElementById('restartDemoBtn');
+
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+      // Typewriter string
+      const TYPEWRITER_PHRASE = "XAUUSD Buy · Risk 1.5% · No Tilt";
+
+      let loopStartTime = Date.now();
+      let loopAnimFrame = null;
+      let progressInterval = null;
+
+      /**
+       * Calculates cursor coordinates relative to the mockWindow element
+       */
+      function moveCursorTo(element, offsetX = 10, offsetY = 10) {
+        if (!element || prefersReducedMotion.matches) return;
+        const windowRect = mockWindow.getBoundingClientRect();
+        const elRect = element.getBoundingClientRect();
+
+        const x = elRect.left - windowRect.left + (elRect.width / 2) + offsetX;
+        const y = elRect.top - windowRect.top + (elRect.height / 2) + offsetY;
+
+        cursor.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+      }
+
+      /**
+       * Execute one full 8s choreographed timeline
+       */
+      function runChoreography() {
+        if (prefersReducedMotion.matches) return;
+
+        // Reset elements to base state
+        modalPanel.classList.remove('is-open');
+        successOverlay.classList.remove('is-shown');
+        inputFieldBox.classList.remove('is-active');
+        typewriterTarget.textContent = '';
+        btnRipple.classList.remove('animate-ripple');
+        submitRipple.classList.remove('animate-ripple');
+        btnLogTrade.classList.remove('is-clicked');
+        btnVerifySubmit.classList.remove('is-clicked');
+
+        // Start Cursor position (bottom right of window)
+        cursor.style.transition = 'transform 0.4s ease';
+        cursor.style.transform = 'translate3d(360px, 320px, 0)';
+
+        // -------------------------------------------------------------
+        // TIMELINE SEQUENCE (Total: 8s)
+        // -------------------------------------------------------------
+
+        // 1. Move cursor to "+ Log Trade" button (at 0.8s)
+        setTimeout(() => {
+          cursor.style.transition = 'transform 0.9s cubic-bezier(0.2, 0.8, 0.2, 1)';
+          moveCursorTo(btnLogTrade, -15, 0);
+        }, 800);
+
+        // 2. Click button & trigger ripple (at 1.9s)
+        setTimeout(() => {
+          btnLogTrade.classList.add('is-clicked');
+          btnRipple.classList.add('animate-ripple');
+          cursor.classList.add('cursor-click');
+          setTimeout(() => {
+            btnLogTrade.classList.remove('is-clicked');
+            cursor.classList.remove('cursor-click');
+          }, 180);
+        }, 1900);
+
+        // 3. Panel slides in smoothly (at 2.3s)
+        setTimeout(() => {
+          modalPanel.classList.add('is-open');
+        }, 2300);
+
+        // 4. Cursor moves to Input field (at 2.8s)
+        setTimeout(() => {
+          cursor.style.transition = 'transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1)';
+          moveCursorTo(inputFieldBox, -50, 0);
+        }, 2800);
+
+        // 5. Cursor types into input field (at 3.7s - 5.0s)
+        setTimeout(() => {
+          inputFieldBox.classList.add('is-active');
+          let charIndex = 0;
+          const typeInterval = setInterval(() => {
+            if (charIndex < TYPEWRITER_PHRASE.length) {
+              typewriterTarget.textContent += TYPEWRITER_PHRASE.charAt(charIndex);
+              charIndex++;
+            } else {
+              clearInterval(typeInterval);
+            }
+          }, 45);
+        }, 3700);
+
+        // 6. Cursor moves to "Execute & Guard" submit button (at 5.3s)
+        setTimeout(() => {
+          cursor.style.transition = 'transform 0.75s cubic-bezier(0.2, 0.8, 0.2, 1)';
+          moveCursorTo(btnVerifySubmit, -10, 0);
+        }, 5300);
+
+        // 7. Click submit button with ripple (at 6.2s)
+        setTimeout(() => {
+          btnVerifySubmit.classList.add('is-clicked');
+          submitRipple.classList.add('animate-ripple');
+          cursor.classList.add('cursor-click');
+          setTimeout(() => {
+            btnVerifySubmit.classList.remove('is-clicked');
+            cursor.classList.remove('cursor-click');
+          }, 180);
+        }, 6200);
+
+        // 8. Success State Overlay pops in with soft bounce (at 6.5s)
+        setTimeout(() => {
+          successOverlay.classList.add('is-shown');
+        }, 6500);
+
+        // 9. Cursor drifts back, prepares for loop restart (at 7.4s)
+        setTimeout(() => {
+          cursor.style.transition = 'transform 0.5s ease';
+          cursor.style.transform = 'translate3d(400px, 350px, 0)';
+        }, 7400);
+      }
+
+      /**
+       * Synchronized 8s Loop Master
+       */
+      function startMasterLoop() {
+        if (prefersReducedMotion.matches) return;
+
+        clearInterval(progressInterval);
+        loopStartTime = Date.now();
+
+        // Run first execution
+        runChoreography();
+
+        // 8s Progress Bar Meter
+        progressInterval = setInterval(() => {
+          const elapsed = (Date.now() - loopStartTime) % LOOP_DURATION;
+          const pct = (elapsed / LOOP_DURATION) * 100;
+          if (timelineProgress) timelineProgress.style.width = pct + '%';
+        }, 50);
+
+        // Recurring 8s Loop Trigger
+        setInterval(() => {
+          runChoreography();
+        }, LOOP_DURATION);
+      }
+
+      // Restart Demo Button Listener
+      if (restartBtn) {
+        restartBtn.addEventListener('click', () => {
+          loopStartTime = Date.now();
+          runChoreography();
+        });
+      }
+
+      // Initial Start
+      window.addEventListener('load', () => {
+        setTimeout(startMasterLoop, 400);
+      });
+
+      // Expose minimal API for console inspection
+      window.__DemoController = {
+        restart: () => {
+          loopStartTime = Date.now();
+          runChoreography();
+        }
+      };
+
+    })();
+  </script>
+</body>
+</html>

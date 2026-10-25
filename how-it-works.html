@@ -1,0 +1,1483 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <!-- =====================================================================
+       PRESERVED SEO, GEO & AEO METADATA (Forex Notes Production Baseline)
+       ===================================================================== -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>How It Works — 4-Step Institutional Trading Playbook | Forex Notes</title>
+  <meta name="description"
+    content="Discover how Forex Notes transforms trading performance in 4 vertical steps: auto-sync terminals, AI Pre-Trade Guard verification, R-multiple edge analytics, and prop firm scaling." />
+  <meta name="keywords"
+    content="how it works trading journal, 4 step trading playbook, mt5 auto-sync journal, ai pre trade guard, r-multiple analytics, pass ftmo challenge" />
+  <meta name="robots" content="index, follow" />
+  <meta name="google-site-verification" content="JwpEiYJIP57LW0h5_8UChbTnvNAEWlu5BpWT-NiO86g" />
+  <link rel="canonical" href="https://forexnotes.in/#how-it-works" />
+  <meta name="geo.region" content="IN;AE" />
+  <meta name="geo.placename" content="India; Dubai, United Arab Emirates" />
+  <meta name="theme-color" content="#060b11" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Forex Notes" />
+  <meta property="og:title" content="How It Works — 4-Step Institutional Trading Playbook | Forex Notes" />
+  <meta property="og:description"
+    content="Follow the 4-step workflow: Connect accounts, verify setups with AI Pre-Trade Guard, discover your quantifiable R-multiple edge, and pass prop evaluations." />
+  <meta property="og:url" content="https://forexnotes.in/#how-it-works" />
+  <meta property="og:image" content="https://forexnotes.in/og-image.png" />
+
+  <!-- Schema.org HowTo Structured Data (AEO / Voice Search Optimized) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    "name": "How Forex Notes Works: 4-Step Playbook to Trading Mastery",
+    "description": "A structured 4-step workflow for algorithmic, prop firm, and discretionary traders to connect accounts, enforce risk rules, quantify execution edge, and pass prop firm evaluations.",
+    "totalTime": "PT5M",
+    "estimatedCost": {
+      "@type": "MonetaryAmount",
+      "currency": "USD",
+      "value": "0"
+    },
+    "step": [
+      {
+        "@type": "HowToStep",
+        "position": 1,
+        "name": "Connect Your Broker or Terminal in 30 Seconds",
+        "itemListElement": [{
+          "@type": "HowToDirection",
+          "text": "Link MetaTrader 4/5, cTrader, TradingView webhooks, or crypto exchange read-only API keys for sub-second trade synchronization."
+        }]
+      },
+      {
+        "@type": "HowToStep",
+        "position": 2,
+        "name": "Verify Execution with AI Pre-Trade Guard",
+        "itemListElement": [{
+          "@type": "HowToDirection",
+          "text": "Check daily drawdown limits, session killzone alignment, and psychological tilt before submitting trades to prevent revenge trading."
+        }]
+      },
+      {
+        "@type": "HowToStep",
+        "position": 3,
+        "name": "Analyze R-Multiples and Behavioral Edge",
+        "itemListElement": [{
+          "@type": "HowToDirection",
+          "text": "Inspect automated MAE/MFE graphs, expectancy calculations, and mistake leak detectors to quantify institutional edge."
+        }]
+      },
+      {
+        "@type": "HowToStep",
+        "position": 4,
+        "name": "Pass Prop Evaluations & Scale Capital",
+        "itemListElement": [{
+          "@type": "HowToDirection",
+          "text": "Track FTMO and Topstep drawdown boundaries in real time and generate cryptographically audited performance statements for payouts."
+        }]
+      }
+    ]
+  }
+  </script>
+
+  <!-- Google Fonts: Inter, Cormorant Garamond, JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,400;1,600&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- =====================================================================
+       INLINE STYLES: Mobile-First, Smooth 60fps GPU (Transform/Opacity), Accessible
+       ===================================================================== -->
+  <style>
+    /* -------------------------------------------------------------
+       BRAND DESIGN TOKENS ([BG], [PRIMARY], [ACCENT], [FONT])
+       ------------------------------------------------------------- */
+    :root {
+      /* [BG] Background */
+      --bg: #060b11;
+      --bg-elevated: rgba(14, 23, 38, 0.78);
+      --bg-card: rgba(11, 19, 32, 0.82);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --card-border-active: rgba(16, 185, 129, 0.42);
+
+      /* [PRIMARY] Emerald Green */
+      --primary: #10b981;
+      --primary-hover: #059669;
+      --primary-glow: rgba(16, 185, 129, 0.35);
+      --primary-glow-subtle: rgba(16, 185, 129, 0.12);
+
+      /* [ACCENT] Electric Mint & Champagne Gold */
+      --accent: #34d399;
+      --accent-gold: #c9a96e;
+      --accent-gold-glow: rgba(201, 169, 110, 0.28);
+
+      /* [FONT] Typography */
+      --font: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-serif: 'Cormorant Garamond', Georgia, serif;
+      --font-mono: 'JetBrains Mono', monospace;
+
+      /* Neutrals & Text */
+      --text-white: #ffffff;
+      --text-body: #94a3b8;
+      --text-muted: #64748b;
+      --danger: #ef4444;
+      --danger-subtle: rgba(239, 68, 68, 0.15);
+    }
+
+    /* -------------------------------------------------------------
+       RESET & BASE STYLING
+       ------------------------------------------------------------- */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      color-scheme: dark;
+      background-color: var(--bg);
+      font-family: var(--font);
+      color: var(--text-white);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-height: 100vh;
+      background-color: var(--bg);
+      background-image:
+        radial-gradient(circle at 50% 0%, rgba(16, 185, 129, 0.08) 0%, transparent 60%),
+        radial-gradient(circle at 10% 40%, rgba(201, 169, 110, 0.04) 0%, transparent 50%),
+        radial-gradient(circle at 90% 80%, rgba(16, 185, 129, 0.05) 0%, transparent 50%);
+      background-attachment: fixed;
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+
+    /* Skip link for keyboard users */
+    .skip-to-content {
+      position: absolute;
+      top: -60px;
+      left: 16px;
+      background: var(--primary);
+      color: #060b11;
+      font-weight: 700;
+      padding: 10px 16px;
+      border-radius: 6px;
+      z-index: 9999;
+      text-decoration: none;
+      transition: top 0.2s ease;
+    }
+    .skip-to-content:focus {
+      top: 16px;
+      outline: 2px solid #ffffff;
+    }
+
+    /* Screen reader only utility */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border-width: 0;
+    }
+
+    /* -------------------------------------------------------------
+       CONTAINER & HEADER
+       ------------------------------------------------------------- */
+    .page-wrapper {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 60px 20px 100px;
+    }
+
+    @media (min-width: 768px) {
+      .page-wrapper {
+        padding: 90px 32px 140px;
+      }
+    }
+
+    .section-header {
+      text-align: center;
+      max-width: 780px;
+      margin: 0 auto 50px;
+      position: relative;
+    }
+
+    @media (min-width: 768px) {
+      .section-header {
+        margin-bottom: 72px;
+      }
+    }
+
+    /* Pill badge */
+    .pill-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      background: rgba(16, 185, 129, 0.09);
+      border: 1px solid rgba(16, 185, 129, 0.28);
+      border-radius: 9999px;
+      font-family: var(--font-mono);
+      font-size: 0.76rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 18px;
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.12);
+    }
+
+    .pill-badge::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      background: var(--primary);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--primary);
+      animation: pulseGlow 2s infinite ease-in-out;
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+
+    .section-title {
+      font-size: clamp(2rem, 5vw, 3.25rem);
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -0.025em;
+      color: var(--text-white);
+      margin-bottom: 16px;
+    }
+
+    .section-title span.serif {
+      font-family: var(--font-serif);
+      font-weight: 600;
+      font-style: italic;
+      background: linear-gradient(135deg, #ffffff 30%, var(--accent-gold) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .section-subtitle {
+      font-size: clamp(0.95rem, 2vw, 1.125rem);
+      color: var(--text-body);
+      max-width: 620px;
+      margin: 0 auto 28px;
+      font-weight: 400;
+    }
+
+    /* Interactive Jump Pills & Live Progress HUD */
+    .controls-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin: 0 auto;
+      padding: 10px 14px;
+      background: rgba(14, 23, 38, 0.6);
+      border: 1px solid var(--card-border);
+      border-radius: 9999px;
+      backdrop-filter: blur(12px);
+      max-width: fit-content;
+    }
+
+    .step-nav-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 9999px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: color 0.25s ease, background-color 0.25s ease, border-color 0.25s ease, transform 0.2s ease;
+    }
+
+    .step-nav-btn:hover {
+      color: var(--text-white);
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.1);
+      transform: translateY(-1px);
+    }
+
+    .step-nav-btn.active {
+      color: #060b11;
+      background: var(--primary);
+      border-color: var(--primary);
+      box-shadow: 0 0 12px rgba(16, 185, 129, 0.4);
+    }
+
+    .demo-auto-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: var(--accent);
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.2s;
+    }
+    .demo-auto-btn:hover {
+      background: rgba(16, 185, 129, 0.22);
+      transform: translateY(-1px);
+    }
+
+    /* -------------------------------------------------------------
+       HOW IT WORKS TIMELINE LAYOUT
+       ------------------------------------------------------------- */
+    .timeline-container {
+      position: relative;
+      margin-top: 40px;
+    }
+
+    /* SVG Track Spine Container */
+    .timeline-svg-wrapper {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+      overflow: visible;
+    }
+
+    .timeline-svg {
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+    }
+
+    /* The background faint rail line */
+    .spine-rail-bg {
+      stroke: rgba(255, 255, 255, 0.08);
+      stroke-width: 3;
+      stroke-linecap: round;
+      fill: none;
+    }
+
+    /* The dynamic glowing active line (stroke-dashoffset driven) */
+    .spine-rail-active {
+      stroke: url(#emeraldGoldGradient);
+      stroke-width: 4;
+      stroke-linecap: round;
+      fill: none;
+      filter: url(#glowFilter);
+      will-change: stroke-dashoffset;
+      /* Smooth 60fps transitions for micro-updates */
+      transition: stroke-dashoffset 0.08s linear;
+    }
+
+    /* The list of 4 steps */
+    .steps-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 64px;
+      position: relative;
+      z-index: 2;
+    }
+
+    @media (min-width: 768px) {
+      .steps-list {
+        gap: 96px;
+      }
+    }
+
+    /* Individual step row */
+    .step-item {
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      padding-left: 64px; /* Space for the left dot on mobile */
+    }
+
+    @media (min-width: 768px) {
+      .step-item {
+        padding-left: 0;
+        display: grid;
+        grid-template-columns: 1fr 64px 1fr;
+        align-items: center;
+        gap: 32px;
+      }
+
+      /* Alternating order for even/odd on desktop */
+      .step-item:nth-child(odd) .step-content {
+        grid-column: 1;
+        text-align: right;
+      }
+      .step-item:nth-child(odd) .step-dot-anchor {
+        grid-column: 2;
+      }
+      .step-item:nth-child(odd) .step-card-preview {
+        grid-column: 3;
+      }
+
+      .step-item:nth-child(even) .step-card-preview {
+        grid-column: 1;
+        order: 1;
+      }
+      .step-item:nth-child(even) .step-dot-anchor {
+        grid-column: 2;
+        order: 2;
+      }
+      .step-item:nth-child(even) .step-content {
+        grid-column: 3;
+        order: 3;
+        text-align: left;
+      }
+    }
+
+    /* -------------------------------------------------------------
+       STEP DOT & HALO (Anchored to timeline spine)
+       ------------------------------------------------------------- */
+    .step-dot-anchor {
+      position: absolute;
+      left: 12px;
+      top: 24px;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 5;
+    }
+
+    @media (min-width: 768px) {
+      .step-dot-anchor {
+        position: static;
+        width: 100%;
+        height: 100%;
+        margin: 0 auto;
+      }
+    }
+
+    .step-dot {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #060b11;
+      border: 2px solid rgba(255, 255, 255, 0.16);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      cursor: pointer;
+      /* GPU transform / opacity */
+      will-change: transform, box-shadow;
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                  border-color 0.4s ease,
+                  box-shadow 0.4s ease;
+    }
+
+    /* Center core inside the dot */
+    .step-dot-core {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.25);
+      will-change: transform, background-color;
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+                  background-color 0.4s ease,
+                  box-shadow 0.4s ease;
+    }
+
+    /* Step number badge attached to dot */
+    .step-dot-num {
+      position: absolute;
+      top: -10px;
+      right: -10px;
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 1px 5px;
+      border-radius: 4px;
+      background: rgba(14, 23, 38, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: var(--text-muted);
+      transition: color 0.3s ease, border-color 0.3s ease, background 0.3s ease;
+    }
+
+    /* Pulsing halo ring (active state only) */
+    .step-dot-halo {
+      position: absolute;
+      inset: -8px;
+      border-radius: 50%;
+      border: 1.5px solid var(--primary);
+      opacity: 0;
+      transform: scale(0.7);
+      pointer-events: none;
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+
+    /* ACTIVE STATE FOR DOT */
+    .step-item.is-active .step-dot {
+      border-color: var(--primary);
+      box-shadow: 0 0 24px rgba(16, 185, 129, 0.55),
+                  inset 0 0 10px rgba(16, 185, 129, 0.25);
+      transform: scale(1.12);
+    }
+
+    .step-item.is-active .step-dot-core {
+      background: var(--accent);
+      box-shadow: 0 0 10px var(--primary);
+      transform: scale(1.25);
+    }
+
+    .step-item.is-active .step-dot-num {
+      background: rgba(16, 185, 129, 0.18);
+      border-color: rgba(16, 185, 129, 0.45);
+      color: var(--accent);
+    }
+
+    .step-item.is-active .step-dot-halo {
+      opacity: 0.8;
+      transform: scale(1.35);
+      animation: ripplePulse 2.4s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
+    }
+
+    @keyframes ripplePulse {
+      0% {
+        transform: scale(0.9);
+        opacity: 0.9;
+      }
+      70% {
+        transform: scale(1.7);
+        opacity: 0;
+      }
+      100% {
+        transform: scale(1.7);
+        opacity: 0;
+      }
+    }
+
+    /* -------------------------------------------------------------
+       STEP TEXT CONTENT & TYPOGRAPHY
+       ------------------------------------------------------------- */
+    .step-content {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      /* 60fps GPU transitions */
+      opacity: 0.38;
+      transform: translateY(14px);
+      will-change: opacity, transform;
+      transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+                  transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .step-item.is-active .step-content {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Category Pill */
+    .step-cat-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      width: fit-content;
+      transition: color 0.4s ease;
+    }
+
+    @media (min-width: 768px) {
+      .step-item:nth-child(odd) .step-cat-pill {
+        margin-left: auto;
+      }
+    }
+
+    .step-item.is-active .step-cat-pill {
+      color: var(--accent);
+    }
+
+    .step-title {
+      font-size: clamp(1.25rem, 3vw, 1.65rem);
+      font-weight: 700;
+      line-height: 1.25;
+      color: var(--text-white);
+      letter-spacing: -0.015em;
+    }
+
+    .step-desc {
+      font-size: 0.925rem;
+      color: var(--text-body);
+      line-height: 1.65;
+    }
+
+    /* -------------------------------------------------------------
+       STEP CARD PREVIEWS (Rich Micro-UI Widgets)
+       ------------------------------------------------------------- */
+    .step-card-preview {
+      margin-top: 14px;
+      background: var(--bg-card);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 18px 20px;
+      backdrop-filter: blur(14px);
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+      /* 60fps GPU transitions */
+      opacity: 0.35;
+      transform: translateY(16px);
+      will-change: opacity, transform, border-color, box-shadow;
+      transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+                  transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+                  border-color 0.4s ease,
+                  box-shadow 0.4s ease;
+    }
+
+    @media (min-width: 768px) {
+      .step-card-preview {
+        margin-top: 0;
+      }
+    }
+
+    .step-item.is-active .step-card-preview {
+      opacity: 1;
+      transform: translateY(0);
+      border-color: var(--card-border-active);
+      box-shadow: 0 14px 40px -10px rgba(0, 0, 0, 0.7),
+                  0 0 35px -5px rgba(16, 185, 129, 0.16);
+    }
+
+    /* Micro-UI: Header bar of cards */
+    .widget-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      padding-bottom: 12px;
+      margin-bottom: 14px;
+      font-size: 0.78rem;
+      font-family: var(--font-mono);
+    }
+
+    .widget-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 600;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--primary);
+      box-shadow: 0 0 8px var(--primary);
+    }
+
+    /* Micro-UI 1: Broker badges */
+    .terminal-badges-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .terminal-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.72rem;
+      font-family: var(--font-mono);
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 6px;
+      padding: 4px 9px;
+      color: #cbd5e1;
+    }
+
+    .terminal-badge svg {
+      width: 13px;
+      height: 13px;
+      color: var(--accent);
+    }
+
+    .sync-log-sample {
+      background: rgba(6, 11, 17, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: #e2e8f0;
+    }
+
+    .sync-time {
+      color: var(--text-muted);
+      font-size: 0.7rem;
+    }
+
+    /* Micro-UI 2: Pre-Trade Checklist */
+    .checklist-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .checklist-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.78rem;
+      color: #cbd5e1;
+      padding: 6px 10px;
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 6px;
+      border-left: 2px solid transparent;
+      transition: border-color 0.3s, background 0.3s;
+    }
+
+    .step-item.is-active .checklist-item {
+      border-left-color: var(--primary);
+      background: rgba(16, 185, 129, 0.05);
+    }
+
+    .check-icon {
+      color: var(--primary);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    /* Micro-UI 3: R-Multiple Metrics */
+    .metrics-grid-widget {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .metric-cell {
+      background: rgba(6, 11, 17, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 8px;
+      padding: 10px 12px;
+    }
+
+    .metric-cell-lbl {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-bottom: 2px;
+    }
+
+    .metric-cell-val {
+      font-family: var(--font-mono);
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .metric-cell-val.gold {
+      color: var(--accent-gold);
+    }
+
+    /* Micro-UI 4: Prop Challenge Progress */
+    .prop-bar-track {
+      width: 100%;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 9999px;
+      overflow: hidden;
+      margin: 8px 0 12px;
+      position: relative;
+    }
+
+    .prop-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--primary), var(--accent-gold));
+      border-radius: 9999px;
+      transition: width 1s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .step-item.is-active .prop-bar-fill {
+      width: 82.5%;
+    }
+
+    .prop-meta-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      font-family: var(--font-mono);
+      color: var(--text-body);
+    }
+
+    .safe-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    /* -------------------------------------------------------------
+       BOTTOM CTA ROW
+       ------------------------------------------------------------- */
+    .section-footer {
+      text-align: center;
+      margin-top: 70px;
+      padding-top: 40px;
+      border-top: 1px solid var(--card-border);
+    }
+
+    .cta-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background: var(--primary);
+      color: #060b11;
+      font-family: var(--font);
+      font-weight: 700;
+      font-size: 1rem;
+      padding: 14px 28px;
+      border-radius: 10px;
+      text-decoration: none;
+      box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.4);
+      transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .cta-btn:hover {
+      background: var(--accent);
+      transform: translateY(-2px);
+      box-shadow: 0 14px 30px -5px rgba(16, 185, 129, 0.6);
+    }
+
+    .cta-btn:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+    }
+
+    .guarantee-note {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 12px;
+    }
+
+    /* -------------------------------------------------------------
+       ACCESSIBILITY: PREFERS-REDUCED-MOTION
+       ------------------------------------------------------------- */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+
+      .spine-rail-active {
+        stroke-dashoffset: 0 !important;
+      }
+
+      .step-content,
+      .step-card-preview {
+        opacity: 1 !important;
+        transform: none !important;
+      }
+
+      .step-dot {
+        border-color: var(--primary) !important;
+        transform: none !important;
+      }
+
+      .step-dot-halo {
+        display: none !important;
+      }
+
+      .prop-bar-fill {
+        width: 82.5% !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Skip link for accessibility -->
+  <a href="#how-it-works-timeline" class="skip-to-content">Skip to timeline steps</a>
+
+  <main class="page-wrapper">
+    <!-- SECTION HEADER -->
+    <header class="section-header" id="how-it-works">
+      <div class="pill-badge" role="text">
+        <span class="sr-only">Process Guide: </span>
+        4-Step Execution Framework
+      </div>
+      <h1 class="section-title">
+        From Random Bets to <span class="serif">Institutional Edge</span>
+      </h1>
+      <p class="section-subtitle">
+        Eliminate emotional tilt, automate your R-multiples, and guard your prop firm capital with an institutional workflow engineered for serious traders.
+      </p>
+
+      <!-- Navigation & Demo Playback Controls -->
+      <nav class="controls-bar" aria-label="Step quick navigation">
+        <button type="button" class="step-nav-btn active" data-step-target="0" aria-label="Jump to step 1">
+          <span>01</span> Connect
+        </button>
+        <button type="button" class="step-nav-btn" data-step-target="1" aria-label="Jump to step 2">
+          <span>02</span> AI Guard
+        </button>
+        <button type="button" class="step-nav-btn" data-step-target="2" aria-label="Jump to step 3">
+          <span>03</span> Quant Edge
+        </button>
+        <button type="button" class="step-nav-btn" data-step-target="3" aria-label="Jump to step 4">
+          <span>04</span> Scale & Fund
+        </button>
+        <button type="button" class="demo-auto-btn" id="autoPlayBtn" aria-label="Simulate smooth auto scroll through timeline">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+          </svg>
+          <span id="autoPlayText">Auto-Scroll</span>
+        </button>
+      </nav>
+    </header>
+
+    <!-- TIMELINE WRAPPER WITH DYNAMIC SVG DRAWING SPINE -->
+    <section class="timeline-container" id="how-it-works-timeline" aria-label="How Forex Notes Works in 4 Steps">
+      
+      <!-- SVG Track Spine: Draws as user scrolls -->
+      <div class="timeline-svg-wrapper" aria-hidden="true" id="timelineSvgWrapper">
+        <svg class="timeline-svg" id="timelineSvg" preserveAspectRatio="none">
+          <defs>
+            <!-- Glowing Emerald to Gold Gradient -->
+            <linearGradient id="emeraldGoldGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#10b981" />
+              <stop offset="45%" stop-color="#34d399" />
+              <stop offset="85%" stop-color="#c9a96e" />
+              <stop offset="100%" stop-color="#e2ba7d" />
+            </linearGradient>
+
+            <!-- Neon Glow Filter -->
+            <filter id="glowFilter" x="-40%" y="-20%" width="180%" height="140%">
+              <feGaussianBlur stdDeviation="3.5" result="coloredBlur" />
+              <feMerge>
+                <feMergeNode in="coloredBlur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+          </defs>
+
+          <!-- Background Faint Rail -->
+          <path id="spineRailBg" class="spine-rail-bg" d="M 0 0 L 0 1000" />
+
+          <!-- Dynamic Active Glowing Path -->
+          <path id="spineRailActive" class="spine-rail-active" d="M 0 0 L 0 1000" />
+        </svg>
+      </div>
+
+      <!-- 4 VERTICAL STEPS -->
+      <ol class="steps-list" role="list">
+
+        <!-- STEP 1 -->
+        <li class="step-item is-active" id="step-1" data-step-index="0" aria-current="step">
+          <div class="step-dot-anchor">
+            <button type="button" class="step-dot" aria-label="Step 1: Connect Your Broker or Terminal">
+              <span class="step-dot-halo" aria-hidden="true"></span>
+              <span class="step-dot-core" aria-hidden="true"></span>
+              <span class="step-dot-num" aria-hidden="true">01</span>
+            </button>
+          </div>
+
+          <div class="step-content">
+            <span class="step-cat-pill">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              Step 01 • Zero-Latency Auto-Sync
+            </span>
+            <h2 class="step-title">Connect Your Broker or Terminal in 30 Seconds</h2>
+            <p class="step-desc">
+              Link MetaTrader 4/5, cTrader, TradingView webhooks, or crypto exchanges via our lightweight EA or read-only API keys. Every fill, slippage tick, commission, and swap logs instantly without tedious manual spreadsheet entries.
+            </p>
+          </div>
+
+          <!-- Micro-UI Card 1 -->
+          <div class="step-card-preview" role="region" aria-label="Terminal Connection Preview">
+            <div class="widget-head">
+              <span class="widget-status">
+                <span class="status-dot"></span> MT5 LIVE SYNC
+              </span>
+              <span style="color: var(--accent); font-weight: 600;">9ms Latency</span>
+            </div>
+            <div class="terminal-badges-row">
+              <div class="terminal-badge">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                MetaTrader 5 EA
+              </div>
+              <div class="terminal-badge">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                cTrader FIX
+              </div>
+              <div class="terminal-badge">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m4.93 4.93 4.24 4.24"/><path d="m14.83 9.17 4.24-4.24"/><path d="m14.83 14.83 4.24 4.24"/><path d="m9.17 14.83-4.24 4.24"/></svg>
+                Binance Read-Only
+              </div>
+            </div>
+            <div class="sync-log-sample">
+              <div>
+                <strong style="color: var(--accent);">EURUSD</strong> BUY 2.00 Lots @ 1.08420
+              </div>
+              <span class="sync-time">Just now • Auto-Synced</span>
+            </div>
+          </div>
+        </li>
+
+        <!-- STEP 2 -->
+        <li class="step-item" id="step-2" data-step-index="1" aria-current="false">
+          <div class="step-dot-anchor">
+            <button type="button" class="step-dot" aria-label="Step 2: AI Pre-Trade Guard Verification">
+              <span class="step-dot-halo" aria-hidden="true"></span>
+              <span class="step-dot-core" aria-hidden="true"></span>
+              <span class="step-dot-num" aria-hidden="true">02</span>
+            </button>
+          </div>
+
+          <div class="step-content">
+            <span class="step-cat-pill">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+              </svg>
+              Step 02 • Tilt & Drawdown Prevention
+            </span>
+            <h2 class="step-title">Verify Execution with the AI Pre-Trade Guard</h2>
+            <p class="step-desc">
+              Before clicking execute, the Pre-Trade Guard validates your setup checklist against strict risk parameters. If you are revenge trading, exceeding daily drawdown limits, or entering during high-impact news, the system locks order entry until composure returns.
+            </p>
+          </div>
+
+          <!-- Micro-UI Card 2 -->
+          <div class="step-card-preview" role="region" aria-label="Pre-Trade Guard Checklist Preview">
+            <div class="widget-head">
+              <span class="widget-status">
+                <span class="status-dot"></span> AI PRE-TRADE CHECKLIST
+              </span>
+              <span style="color: var(--primary); font-weight: 700;">PASSED (4/4)</span>
+            </div>
+            <ul class="checklist-list">
+              <li class="checklist-item">
+                <span class="check-icon">✓</span>
+                <span><strong>Risk per Trade:</strong> 0.75% ($750) — within 1.0% limit</span>
+              </li>
+              <li class="checklist-item">
+                <span class="check-icon">✓</span>
+                <span><strong>Economic News:</strong> Zero USD red-folder releases in 45m</span>
+              </li>
+              <li class="checklist-item">
+                <span class="check-icon">✓</span>
+                <span><strong>Killzone Alignment:</strong> London / NY Overlap Session</span>
+              </li>
+              <li class="checklist-item">
+                <span class="check-icon">✓</span>
+                <span><strong>Psychology Radar:</strong> Resting state calm • Zero tilt</span>
+              </li>
+            </ul>
+          </div>
+        </li>
+
+        <!-- STEP 3 -->
+        <li class="step-item" id="step-3" data-step-index="2" aria-current="false">
+          <div class="step-dot-anchor">
+            <button type="button" class="step-dot" aria-label="Step 3: Quant Edge & R-Multiple Analytics">
+              <span class="step-dot-halo" aria-hidden="true"></span>
+              <span class="step-dot-core" aria-hidden="true"></span>
+              <span class="step-dot-num" aria-hidden="true">03</span>
+            </button>
+          </div>
+
+          <div class="step-content">
+            <span class="step-cat-pill">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <line x1="18" y1="20" x2="18" y2="10"></line>
+                <line x1="12" y1="20" x2="12" y2="4"></line>
+                <line x1="6" y1="20" x2="6" y2="14"></line>
+              </svg>
+              Step 03 • Statistical Edge Quantification
+            </span>
+            <h2 class="step-title">Uncover Quant Edge with Automated R-Multiples</h2>
+            <p class="step-desc">
+              P&amp;L dollars lie; mathematical R-multiples tell the truth. Automatically track your Maximum Adverse Excursion (MAE), Maximum Favorable Excursion (MFE), and mistake leak cost. Know with certainty whether your edge comes from entries or trade management.
+            </p>
+          </div>
+
+          <!-- Micro-UI Card 3 -->
+          <div class="step-card-preview" role="region" aria-label="Edge Analytics Preview">
+            <div class="widget-head">
+              <span class="widget-status">
+                <span class="status-dot"></span> EDGE SCORECARD (LAST 50 TRADES)
+              </span>
+              <span style="color: var(--accent-gold); font-weight: 700;">A+ RATING</span>
+            </div>
+            <div class="metrics-grid-widget">
+              <div class="metric-cell">
+                <div class="metric-cell-lbl">Avg Win Multiplier</div>
+                <div class="metric-cell-val">+2.84R</div>
+              </div>
+              <div class="metric-cell">
+                <div class="metric-cell-lbl">Expectancy / Trade</div>
+                <div class="metric-cell-val gold">+0.72R</div>
+              </div>
+              <div class="metric-cell">
+                <div class="metric-cell-lbl">Win Rate (London)</div>
+                <div class="metric-cell-val">68.4%</div>
+              </div>
+              <div class="metric-cell">
+                <div class="metric-cell-lbl">Tilt Capital Saved</div>
+                <div class="metric-cell-val gold">$4,180</div>
+              </div>
+            </div>
+          </div>
+        </li>
+
+        <!-- STEP 4 -->
+        <li class="step-item" id="step-4" data-step-index="3" aria-current="false">
+          <div class="step-dot-anchor">
+            <button type="button" class="step-dot" aria-label="Step 4: Scale Prop Accounts & Payouts">
+              <span class="step-dot-halo" aria-hidden="true"></span>
+              <span class="step-dot-core" aria-hidden="true"></span>
+              <span class="step-dot-num" aria-hidden="true">04</span>
+            </button>
+          </div>
+
+          <div class="step-content">
+            <span class="step-cat-pill">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="8" r="7"></circle>
+                <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
+              </svg>
+              Step 04 • Prop Funding & Audited Proof
+            </span>
+            <h2 class="step-title">Pass Prop Evaluations and Scale Capital</h2>
+            <p class="step-desc">
+              Protect challenge accounts on FTMO, FundedNext, and Topstep with automated daily drawdown alarms. Export cryptographically verified track records to present to prop risk desks and private allocation syndicates.
+            </p>
+          </div>
+
+          <!-- Micro-UI Card 4 -->
+          <div class="step-card-preview" role="region" aria-label="Prop Challenge Status Preview">
+            <div class="widget-head">
+              <span class="widget-status">
+                <span class="status-dot"></span> FTMO $100K EVALUATION (PHASE 2)
+              </span>
+              <span class="safe-badge">● TARGET 82.5%</span>
+            </div>
+            <div class="prop-bar-track" aria-hidden="true">
+              <div class="prop-bar-fill"></div>
+            </div>
+            <div class="prop-meta-row">
+              <span>Profit: <strong style="color: var(--accent);">+$4,125 / $5,000</strong></span>
+              <span>Drawdown Used: <strong style="color: #38bdf8;">$480 / $5,000 (Safe)</strong></span>
+            </div>
+          </div>
+        </li>
+
+      </ol>
+    </section>
+
+    <!-- BOTTOM CALL TO ACTION -->
+    <footer class="section-footer">
+      <a href="/login" class="cta-btn">
+        Start Your 4-Step Journey Free
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+          <polyline points="12 5 19 12 12 19"></polyline>
+        </svg>
+      </a>
+      <p class="guarantee-note">No credit card required • Instant MT4/MT5 setup • Free 14-day Pro access</p>
+    </footer>
+  </main>
+
+  <!-- =====================================================================
+       VANILLA JS: Scroll-Tied SVG Draw, Dynamic Layout Calc, 60fps Animation
+       ===================================================================== -->
+  <script>
+    (function initHowItWorks() {
+      // DOM Elements
+      const container = document.getElementById('how-it-works-timeline');
+      const svg = document.getElementById('timelineSvg');
+      const bgRail = document.getElementById('spineRailBg');
+      const activeRail = document.getElementById('spineRailActive');
+      const stepItems = Array.from(document.querySelectorAll('.step-item'));
+      const stepDots = Array.from(document.querySelectorAll('.step-dot'));
+      const navButtons = Array.from(document.querySelectorAll('.step-nav-btn'));
+      const autoPlayBtn = document.getElementById('autoPlayBtn');
+      const autoPlayText = document.getElementById('autoPlayText');
+
+      // State
+      let pathTotalLength = 0;
+      let currentProgress = 0;
+      let isTicking = false;
+      let isAutoPlaying = false;
+      let autoPlayRaf = null;
+
+      // Check if user prefers reduced motion
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      /**
+       * 1. Dynamically calculate exact dot centers and redraw SVG path
+       *    Handles responsive layout shifts, mobile left spine, and desktop center spine.
+       */
+      function recalculateSpinePath() {
+        if (!container || !bgRail || !activeRail || stepDots.length === 0) return;
+
+        const containerRect = container.getBoundingClientRect();
+        const firstDotRect = stepDots[0].getBoundingClientRect();
+        const lastDotRect = stepDots[stepDots.length - 1].getBoundingClientRect();
+
+        // Coordinates relative to the timeline container
+        const x1 = firstDotRect.left + firstDotRect.width / 2 - containerRect.left;
+        const y1 = firstDotRect.top + firstDotRect.height / 2 - containerRect.top;
+        const x2 = lastDotRect.left + lastDotRect.width / 2 - containerRect.left;
+        const y2 = lastDotRect.top + lastDotRect.height / 2 - containerRect.top;
+
+        // Path d string: Straight line through all dots
+        const pathData = `M ${x1} ${y1} L ${x2} ${y2}`;
+
+        bgRail.setAttribute('d', pathData);
+        activeRail.setAttribute('d', pathData);
+
+        // Update stroke dasharray to exact path length
+        pathTotalLength = activeRail.getTotalLength() || (y2 - y1);
+        activeRail.style.strokeDasharray = `${pathTotalLength} ${pathTotalLength}`;
+
+        if (prefersReducedMotion) {
+          activeRail.style.strokeDashoffset = '0';
+          stepItems.forEach(item => item.classList.add('is-active'));
+          return;
+        }
+
+        // Reapply current progress offset
+        activeRail.style.strokeDashoffset = (pathTotalLength * (1 - currentProgress)).toString();
+      }
+
+      /**
+       * 2. Compute scroll progress tied to user scroll position
+       *    Sweet spot trigger: 50% of viewport height (vertical center)
+       */
+      function updateScrollProgress() {
+        if (prefersReducedMotion) return;
+
+        const viewportHeight = window.innerHeight;
+        const triggerY = viewportHeight * 0.52; // Trigger threshold in viewport
+
+        const firstDotRect = stepDots[0].getBoundingClientRect();
+        const lastDotRect = stepDots[stepDots.length - 1].getBoundingClientRect();
+
+        const firstY = firstDotRect.top + firstDotRect.height / 2;
+        const lastY = lastDotRect.top + lastDotRect.height / 2;
+        const totalDistance = lastY - firstY;
+
+        let progress = 0;
+        if (totalDistance > 0) {
+          progress = (triggerY - firstY) / totalDistance;
+          progress = Math.max(0, Math.min(1, progress));
+        } else {
+          progress = 0;
+        }
+
+        currentProgress = progress;
+
+        // Update SVG line stroke-dashoffset
+        if (pathTotalLength > 0) {
+          const targetOffset = pathTotalLength * (1 - progress);
+          activeRail.style.strokeDashoffset = targetOffset.toString();
+        }
+
+        // Update active steps & dots lighting
+        stepItems.forEach((step, index) => {
+          const dot = stepDots[index];
+          const dotRect = dot.getBoundingClientRect();
+          const dotCenter = dotRect.top + dotRect.height / 2;
+
+          // Light up when the trigger line passes the dot center (with small lead threshold)
+          const isReached = dotCenter <= (triggerY + 24);
+
+          if (isReached || index === 0 && progress > 0.02) {
+            if (!step.classList.contains('is-active')) {
+              step.classList.add('is-active');
+              step.setAttribute('aria-current', 'step');
+            }
+          } else {
+            // Revert when scrolling back above
+            if (index > 0) {
+              step.classList.remove('is-active');
+              step.setAttribute('aria-current', 'false');
+            }
+          }
+        });
+
+        // Update active quick-navigation button
+        let activeIdx = 0;
+        stepItems.forEach((step, idx) => {
+          if (step.classList.contains('is-active')) activeIdx = idx;
+        });
+
+        navButtons.forEach((btn, idx) => {
+          const isCurrent = idx === activeIdx;
+          btn.classList.toggle('active', isCurrent);
+          btn.setAttribute('aria-pressed', isCurrent ? 'true' : 'false');
+        });
+
+        isTicking = false;
+      }
+
+      function onScroll() {
+        if (!isTicking) {
+          requestAnimationFrame(updateScrollProgress);
+          isTicking = true;
+        }
+      }
+
+      // Initialize path calculations
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', () => {
+        recalculateSpinePath();
+        updateScrollProgress();
+      }, { passive: true });
+
+      // Run on DOM ready & after web fonts load to ensure layout precision
+      recalculateSpinePath();
+      updateScrollProgress();
+      if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(() => {
+          recalculateSpinePath();
+          updateScrollProgress();
+        });
+      }
+
+      /**
+       * 3. Interactive Nav Buttons & Dot Clicks
+       */
+      function scrollToStep(index) {
+        if (index < 0 || index >= stepItems.length) return;
+        const targetStep = stepItems[index];
+        const targetDot = stepDots[index];
+        const dotRect = targetDot.getBoundingClientRect();
+        const currentScrollY = window.pageYOffset || document.documentElement.scrollTop;
+        const targetY = currentScrollY + dotRect.top - (window.innerHeight * 0.45);
+
+        window.scrollTo({
+          top: targetY,
+          behavior: 'smooth'
+        });
+      }
+
+      navButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const stepIdx = parseInt(btn.getAttribute('data-step-target'), 10);
+          scrollToStep(stepIdx);
+        });
+      });
+
+      stepDots.forEach((dot, idx) => {
+        dot.addEventListener('click', () => {
+          scrollToStep(idx);
+        });
+      });
+
+      /**
+       * 4. Auto-Scroll Demonstration
+       */
+      function stopAutoPlay() {
+        if (!isAutoPlaying) return;
+        isAutoPlaying = false;
+        if (autoPlayRaf) cancelAnimationFrame(autoPlayRaf);
+        autoPlayText.textContent = 'Auto-Scroll';
+        autoPlayBtn.style.background = 'rgba(16, 185, 129, 0.12)';
+      }
+
+      function startAutoPlay() {
+        if (isAutoPlaying) {
+          stopAutoPlay();
+          return;
+        }
+
+        isAutoPlaying = true;
+        autoPlayText.textContent = 'Pause';
+        autoPlayBtn.style.background = 'rgba(16, 185, 129, 0.35)';
+
+        // Scroll to start of timeline first if past it
+        const firstDotRect = stepDots[0].getBoundingClientRect();
+        const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+        const startTarget = currentScroll + firstDotRect.top - (window.innerHeight * 0.5);
+
+        window.scrollTo({ top: startTarget, behavior: 'smooth' });
+
+        setTimeout(() => {
+          if (!isAutoPlaying) return;
+
+          const lastDotRect = stepDots[stepDots.length - 1].getBoundingClientRect();
+          const curScroll = window.pageYOffset || document.documentElement.scrollTop;
+          const endTarget = curScroll + lastDotRect.top - (window.innerHeight * 0.5);
+          const scrollDistance = endTarget - curScroll;
+          const duration = 5200; // 5.2s gentle glide through all 4 steps
+          const startTime = performance.now();
+          const initialScroll = curScroll;
+
+          function stepGlide(now) {
+            if (!isAutoPlaying) return;
+            const elapsed = now - startTime;
+            const t = Math.min(1, elapsed / duration);
+            // Ease-in-out curve
+            const ease = t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+
+            window.scrollTo(0, initialScroll + scrollDistance * ease);
+
+            if (t < 1) {
+              autoPlayRaf = requestAnimationFrame(stepGlide);
+            } else {
+              stopAutoPlay();
+            }
+          }
+
+          autoPlayRaf = requestAnimationFrame(stepGlide);
+        }, 600);
+      }
+
+      autoPlayBtn.addEventListener('click', startAutoPlay);
+
+      // Cancel autoplay on manual user interaction
+      ['wheel', 'touchstart', 'keydown'].forEach(evt => {
+        window.addEventListener(evt, () => {
+          if (isAutoPlaying) stopAutoPlay();
+        }, { passive: true });
+      });
+
+    })();
+  </script>
+</body>
+</html>
+

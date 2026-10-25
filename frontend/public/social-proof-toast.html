@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <!-- =====================================================================
+       PRESERVED SEO, GEO & AEO METADATA (Forex Notes Production Baseline)
+       ===================================================================== -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Live Trader Activity & Social Proof | Forex Notes</title>
+  <meta name="description"
+    content="Real-time verified purchases from global funded traders in UK, UAE, India, and USA using Forex Notes 10-year bar replay and AI psychology coach." />
+  <meta name="keywords"
+    content="live trader purchases, forex trading journal social proof, verified funded traders, ftmo prop firm journal, ai trading coach reviews" />
+  <meta name="robots" content="index, follow" />
+  <meta name="google-site-verification" content="JwpEiYJIP57LW0h5_8UChbTnvNAEWlu5BpWT-NiO86g" />
+  <link rel="canonical" href="https://forexnotes.in/" />
+  <meta name="geo.region" content="IN;AE" />
+  <meta name="geo.placename" content="India; Dubai, United Arab Emirates" />
+  <meta name="theme-color" content="#060b11" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Forex Notes" />
+  <meta property="og:title" content="Live Trader Purchases & Activity | Forex Notes" />
+  <meta property="og:description"
+    content="Join 4,200+ traders actively improving risk and backtesting strategies with Forex Notes." />
+  <meta property="og:url" content="https://forexnotes.in/" />
+  <meta property="og:image" content="https://forexnotes.in/og-image.png" />
+
+  <!-- Schema.org SoftwareApplication -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Forex Notes",
+    "applicationCategory": "FinanceApplication",
+    "operatingSystem": "Web, iOS, Android, Windows, macOS",
+    "url": "https://forexnotes.in/",
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.9",
+      "reviewCount": "128"
+    }
+  }
+  </script>
+
+  <!-- Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,400&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- =====================================================================
+       INLINE CSS: Mobile-first, 60fps GPU transforms & opacity only
+       ===================================================================== -->
+  <style>
+    /* -------------------------------------------------------------
+       BRAND DESIGN TOKENS ([BG], [PRIMARY], [ACCENT], [FONT])
+       ------------------------------------------------------------- */
+    :root {
+      /* [BG] Background */
+      --bg: #060b11;
+      --card-bg: rgba(14, 23, 38, 0.92);
+      --border-glass: rgba(255, 255, 255, 0.09);
+
+      /* [PRIMARY] Emerald Green */
+      --primary: #10b981;
+      --primary-hover: #059669;
+      --primary-glow: rgba(16, 185, 129, 0.4);
+
+      /* [ACCENT] Mint & Champagne Gold */
+      --accent: #34d399;
+      --accent-gold: #c9a96e;
+
+      /* [FONT] Typography */
+      --font: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-serif: 'Cormorant Garamond', Georgia, serif;
+      --font-mono: 'JetBrains Mono', monospace;
+
+      /* Neutrals */
+      --text-white: #ffffff;
+      --text-body: #94a3b8;
+      --text-muted: #64748b;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      color-scheme: dark;
+      background-color: var(--bg);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      font-family: var(--font);
+      background-color: var(--bg);
+      color: var(--text-white);
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 16px;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Ambient Atmosphere */
+    .ambient-aurora {
+      position: absolute;
+      top: 25%;
+      left: 50%;
+      transform: translate(-50%, -30%) translateZ(0);
+      width: clamp(350px, 60vw, 750px);
+      height: clamp(350px, 60vw, 750px);
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.16) 0%, rgba(201, 169, 110, 0.06) 50%, transparent 72%);
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Center Demo Showcase Layout */
+    .demo-showcase {
+      position: relative;
+      z-index: 10;
+      text-align: center;
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    .demo-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.22);
+      font-size: 0.76rem;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--primary);
+      margin-bottom: 16px;
+    }
+
+    .demo-title {
+      font-family: var(--font-serif);
+      font-size: clamp(2.3rem, 5.2vw, 3.8rem);
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      line-height: 1.08;
+      color: #ffffff;
+      margin-bottom: 12px;
+    }
+
+    .demo-title span {
+      font-style: italic;
+      color: var(--accent-gold);
+    }
+
+    .demo-desc {
+      font-size: clamp(0.95rem, 1.8vw, 1.05rem);
+      color: var(--text-body);
+      line-height: 1.6;
+      margin-bottom: 28px;
+    }
+
+    .demo-controls-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .demo-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-size: 0.86rem;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      cursor: pointer;
+      border: 1px solid var(--border-glass);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .demo-btn-primary {
+      background: linear-gradient(135deg, var(--primary) 0%, #059669 100%);
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.2);
+      box-shadow: 0 4px 18px var(--primary-glow);
+    }
+
+    .demo-btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(16, 185, 129, 0.45);
+    }
+
+    .demo-btn-secondary {
+      background: rgba(255, 255, 255, 0.04);
+      color: #cbd5e1;
+    }
+
+    .demo-btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: #ffffff;
+    }
+
+    /* -------------------------------------------------------------
+       BOTTOM-LEFT SOCIAL-PROOF TOAST (60fps GPU transform & opacity)
+       ------------------------------------------------------------- */
+    .toast-container {
+      position: fixed;
+      bottom: clamp(16px, 3.5vw, 24px);
+      left: clamp(16px, 3.5vw, 24px);
+      z-index: 999999;
+      pointer-events: none;
+      /* Safe area inset for modern mobile docks */
+      margin-bottom: env(safe-area-inset-bottom, 0px);
+      margin-left: env(safe-area-inset-left, 0px);
+      max-width: calc(100vw - 32px);
+    }
+
+    .toast-card {
+      width: clamp(290px, 86vw, 360px);
+      background: var(--card-bg);
+      border: 1px solid var(--border-glass);
+      border-left: 3.5px solid var(--primary);
+      border-radius: 16px;
+      padding: 14px 16px 14px 14px;
+      box-shadow: 
+        0 18px 40px rgba(0, 0, 0, 0.55),
+        0 2px 6px rgba(0, 0, 0, 0.3),
+        0 0 20px rgba(16, 185, 129, 0.12);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      position: relative;
+      overflow: hidden;
+      pointer-events: auto;
+      
+      /* GPU Acceleration */
+      will-change: transform, opacity;
+      transform: translate3d(-120%, 15px, 0) scale(0.95);
+      opacity: 0;
+      transition: transform 0.44s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.36s ease;
+    }
+
+    /* Active visible state: slides in smoothly */
+    .toast-card.is-visible {
+      transform: translate3d(0, 0, 0) scale(1);
+      opacity: 1;
+    }
+
+    /* Exiting state: slides out smoothly to the left */
+    .toast-card.is-exiting {
+      transform: translate3d(-115%, 0, 0) scale(0.96);
+      opacity: 0;
+      transition: transform 0.34s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.28s ease;
+    }
+
+    /* Avatar Pill with Pulse Dot */
+    .toast-avatar-box {
+      position: relative;
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(201, 169, 110, 0.2));
+      border: 1.5px solid rgba(16, 185, 129, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 1.05rem;
+      flex-shrink: 0;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+    }
+
+    .toast-live-dot {
+      position: absolute;
+      bottom: -2px;
+      right: -2px;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--primary);
+      border: 2px solid #0b131f;
+      box-shadow: 0 0 6px var(--primary);
+    }
+
+    /* Content Group */
+    .toast-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      padding-right: 18px; /* space for close button */
+    }
+
+    .toast-buyer-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.84rem;
+      font-weight: 700;
+      color: #ffffff;
+      line-height: 1.3;
+    }
+
+    .toast-city {
+      font-weight: 500;
+      color: var(--text-body);
+      font-size: 0.76rem;
+    }
+
+    .toast-product-row {
+      font-size: 0.8rem;
+      color: rgba(255, 255, 255, 0.9);
+      line-height: 1.35;
+      margin-top: 1px;
+    }
+
+    .toast-product-highlight {
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .toast-meta-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 4px;
+      font-size: 0.7rem;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+    }
+
+    .toast-time {
+      color: var(--accent-gold);
+      font-weight: 600;
+    }
+
+    .verified-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    /* Close Button (X) */
+    .toast-close-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: transparent;
+      border: none;
+      color: rgba(255, 255, 255, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: color 0.2s, background 0.2s;
+    }
+
+    .toast-close-btn:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .toast-close-btn svg {
+      width: 14px;
+      height: 14px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2.2;
+    }
+
+    /* 4-Second Dwell Progress Bar across bottom */
+    .toast-progress-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 2.5px;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.08);
+      overflow: hidden;
+    }
+
+    .toast-progress-fill {
+      height: 100%;
+      width: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      transform-origin: left;
+      transform: scaleX(1);
+      will-change: transform;
+    }
+
+    /* -------------------------------------------------------------
+       ACCESSIBILITY & PREFERS-REDUCED-MOTION
+       ------------------------------------------------------------- */
+    @media (prefers-reduced-motion: reduce) {
+      .toast-card {
+        transition: opacity 0.2s ease !important;
+        transform: none !important;
+      }
+      .toast-card.is-visible {
+        opacity: 1 !important;
+      }
+      .toast-card.is-exiting {
+        opacity: 0 !important;
+      }
+      .toast-progress-bar {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="ambient-aurora" aria-hidden="true"></div>
+
+  <!-- Showcase Demo Hero -->
+  <main class="demo-showcase">
+    <div class="demo-badge">
+      <span>● LIVE SOCIAL PROOF ENGINE</span>
+    </div>
+
+    <h1 class="demo-title">
+      Verified Trader Purchases.<br />
+      <span>Real-Time Confidence.</span>
+    </h1>
+
+    <p class="demo-desc">
+      Watch the live social proof toast in the bottom-left corner. It cycles through 10 verified global purchases every 6–9 seconds, stays visible for 4s, and respects user dismissal for the session.
+    </p>
+
+    <div class="demo-controls-row">
+      <button class="demo-btn demo-btn-primary" id="triggerNowBtn" type="button">
+        Trigger Toast Now
+      </button>
+
+      <button class="demo-btn demo-btn-secondary" id="resetSessionBtn" type="button">
+        Reset Session Dismissal
+      </button>
+    </div>
+  </main>
+
+  <!-- =====================================================================
+       BOTTOM-LEFT SOCIAL PROOF TOAST
+       role="status" and aria-live="polite" ensure full assistive accessibility
+       ===================================================================== -->
+  <div class="toast-container" id="toastContainer" aria-live="polite" role="status">
+    <div class="toast-card" id="toastCard">
+      
+      <!-- Avatar with Initial -->
+      <div class="toast-avatar-box">
+        <span id="toastInitial">A</span>
+        <span class="toast-live-dot" aria-hidden="true"></span>
+      </div>
+
+      <!-- Main Content -->
+      <div class="toast-content">
+        <div class="toast-buyer-row">
+          <span id="toastName">Alex P.</span>
+          <span class="toast-city" id="toastCity">from London, UK</span>
+        </div>
+
+        <div class="toast-product-row">
+          <span>just bought </span>
+          <span class="toast-product-highlight" id="toastProduct">Pro Yearly (50% Off)</span>
+        </div>
+
+        <div class="toast-meta-row">
+          <span class="toast-time" id="toastTime">2m ago</span>
+          <span>•</span>
+          <span class="verified-badge">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+            <span>Verified Purchase</span>
+          </span>
+        </div>
+      </div>
+
+      <!-- Close Button: Dismisses for this session -->
+      <button class="toast-close-btn" id="toastCloseBtn" type="button" aria-label="Dismiss live notifications for this session">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+
+      <!-- 4-Second Dwell Indicator Bar -->
+      <div class="toast-progress-bar" aria-hidden="true">
+        <div class="toast-progress-fill" id="toastProgressFill"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       VANILLA JAVASCRIPT: 10-Entry JSON, 6-9s Random Interval, 4s Dwell, 60fps
+       ===================================================================== -->
+  <script>
+    (function () {
+      'use strict';
+
+      /* =====================================================================
+         EDITABLE JSON ARRAY OF 10 SAMPLE ENTRIES
+         (Customize names, cities, products, and timestamps here)
+         ===================================================================== */
+      const SOCIAL_PROOF_ENTRIES = [
+        {
+          name: "Alex P.",
+          city: "London, UK",
+          product: "Pro Yearly (50% Off)",
+          timeAgo: "2m ago"
+        },
+        {
+          name: "Ravi K.",
+          city: "Dubai, UAE",
+          product: "Pro Yearly ($114)",
+          timeAgo: "5m ago"
+        },
+        {
+          name: "Sarah J.",
+          city: "Mumbai, India",
+          product: "Pro Monthly ($14)",
+          timeAgo: "9m ago"
+        },
+        {
+          name: "Mike T.",
+          city: "Chicago, USA",
+          product: "Elite VIP Pass",
+          timeAgo: "14m ago"
+        },
+        {
+          name: "Liam W.",
+          city: "Sydney, Australia",
+          product: "Pro Yearly ($114)",
+          timeAgo: "18m ago"
+        },
+        {
+          name: "Kenji S.",
+          city: "Singapore",
+          product: "10-Yr Tick Replay Pro",
+          timeAgo: "23m ago"
+        },
+        {
+          name: "Elena M.",
+          city: "Frankfurt, Germany",
+          product: "Pro Yearly (50% Off)",
+          timeAgo: "27m ago"
+        },
+        {
+          name: "David C.",
+          city: "Toronto, Canada",
+          product: "Elite VIP Pass",
+          timeAgo: "34m ago"
+        },
+        {
+          name: "Zubair H.",
+          city: "Abu Dhabi, UAE",
+          product: "Pro Yearly ($114)",
+          timeAgo: "41m ago"
+        },
+        {
+          name: "Thabo N.",
+          city: "Johannesburg, SA",
+          product: "Pro Monthly ($14)",
+          timeAgo: "49m ago"
+        }
+      ];
+
+      // Configuration Constants
+      const DWELL_DURATION = 4000; // Stays for 4s per requirement
+      const MIN_INTERVAL = 6000;   // 6s
+      const MAX_INTERVAL = 9000;   // 9s (random between 6-9s)
+      const SESSION_KEY = 'fn_social_proof_dismissed';
+
+      // DOM Elements
+      const toastCard = document.getElementById('toastCard');
+      const toastInitial = document.getElementById('toastInitial');
+      const toastName = document.getElementById('toastName');
+      const toastCity = document.getElementById('toastCity');
+      const toastProduct = document.getElementById('toastProduct');
+      const toastTime = document.getElementById('toastTime');
+      const toastCloseBtn = document.getElementById('toastCloseBtn');
+      const progressFill = document.getElementById('toastProgressFill');
+      const triggerNowBtn = document.getElementById('triggerNowBtn');
+      const resetSessionBtn = document.getElementById('resetSessionBtn');
+
+      let currentEntryIdx = 0;
+      let nextToastTimer = null;
+      let hideToastTimer = null;
+      let progressAnimTimer = null;
+      let isVisible = false;
+
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+      /**
+       * Check if user dismissed toasts for this session
+       */
+      function isDismissedForSession() {
+        try {
+          return sessionStorage.getItem(SESSION_KEY) === 'true';
+        } catch (e) {
+          return false;
+        }
+      }
+
+      /**
+       * Populate toast card with entry details
+       */
+      function populateEntry(entry) {
+        toastName.textContent = entry.name;
+        toastCity.textContent = `from ${entry.city}`;
+        toastProduct.textContent = entry.product;
+        toastTime.textContent = entry.timeAgo;
+        toastInitial.textContent = entry.name.charAt(0).toUpperCase();
+      }
+
+      /**
+       * Display toast with 60fps GPU slide-in, hold for 4s, then slide out
+       */
+      function showToast() {
+        if (isDismissedForSession() || isVisible) return;
+
+        // Select entry
+        const entry = SOCIAL_PROOF_ENTRIES[currentEntryIdx];
+        populateEntry(entry);
+        currentEntryIdx = (currentEntryIdx + 1) % SOCIAL_PROOF_ENTRIES.length;
+
+        isVisible = true;
+
+        // Reset progress bar
+        progressFill.style.transition = 'none';
+        progressFill.style.transform = 'scaleX(1)';
+        void progressFill.offsetHeight; // force reflow
+
+        // Slide in
+        toastCard.classList.remove('is-exiting');
+        toastCard.classList.add('is-visible');
+
+        // Animate 4s dwell progress bar smoothly
+        if (!prefersReducedMotion.matches) {
+          progressFill.style.transition = `transform ${DWELL_DURATION}ms linear`;
+          progressFill.style.transform = 'scaleX(0)';
+        }
+
+        // Schedule slide-out after exactly 4 seconds
+        hideToastTimer = setTimeout(() => {
+          hideToast();
+        }, DWELL_DURATION);
+      }
+
+      /**
+       * Hide toast with slide-out transition
+       */
+      function hideToast(forceImmediate = false) {
+        clearTimeout(hideToastTimer);
+        if (!isVisible) return;
+
+        toastCard.classList.remove('is-visible');
+        toastCard.classList.add('is-exiting');
+
+        const exitDuration = forceImmediate || prefersReducedMotion.matches ? 0 : 350;
+
+        setTimeout(() => {
+          toastCard.classList.remove('is-exiting');
+          isVisible = false;
+
+          // If not dismissed, schedule next toast after random 6-9s
+          if (!isDismissedForSession() && !forceImmediate) {
+            scheduleNextToast();
+          }
+        }, exitDuration);
+      }
+
+      /**
+       * Schedule next toast randomly between 6s and 9s
+       */
+      function scheduleNextToast() {
+        if (isDismissedForSession()) return;
+        clearTimeout(nextToastTimer);
+
+        // Random delay between 6000ms and 9000ms
+        const randomDelay = Math.floor(MIN_INTERVAL + Math.random() * (MAX_INTERVAL - MIN_INTERVAL));
+
+        nextToastTimer = setTimeout(() => {
+          showToast();
+        }, randomDelay);
+      }
+
+      /**
+       * Close button handler: hides immediately & stores dismissal in sessionStorage
+       */
+      function dismissForSession() {
+        try {
+          sessionStorage.setItem(SESSION_KEY, 'true');
+        } catch (e) {}
+
+        clearTimeout(nextToastTimer);
+        clearTimeout(hideToastTimer);
+        hideToast(true);
+      }
+
+      // Attach Close Button Listener
+      if (toastCloseBtn) {
+        toastCloseBtn.addEventListener('click', dismissForSession);
+      }
+
+      // Demo Controls: Trigger Now
+      if (triggerNowBtn) {
+        triggerNowBtn.addEventListener('click', () => {
+          try {
+            sessionStorage.removeItem(SESSION_KEY);
+          } catch (e) {}
+          clearTimeout(nextToastTimer);
+          hideToast(true);
+          setTimeout(showToast, 100);
+        });
+      }
+
+      // Demo Controls: Reset Session
+      if (resetSessionBtn) {
+        resetSessionBtn.addEventListener('click', () => {
+          try {
+            sessionStorage.removeItem(SESSION_KEY);
+            alert('Session dismissal reset! Toasts will now resume.');
+          } catch (e) {}
+          scheduleNextToast();
+        });
+      }
+
+      // Initial Start: Show first toast after 2.5s initial load delay
+      if (!isDismissedForSession()) {
+        setTimeout(showToast, 2500);
+      }
+
+      // Expose minimal API for customization inspection
+      window.__SocialProof = {
+        show: showToast,
+        hide: hideToast,
+        reset: () => {
+          sessionStorage.removeItem(SESSION_KEY);
+          scheduleNextToast();
+        },
+        entries: SOCIAL_PROOF_ENTRIES
+      };
+
+    })();
+  </script>
+</body>
+</html>

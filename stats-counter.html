@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <!-- =====================================================================
+       PRESERVED SEO, GEO & AEO METADATA (Forex Notes Production Baseline)
+       ===================================================================== -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Platform Metrics & Performance Stats | Forex Notes</title>
+  <meta name="description"
+    content="Explore Forex Notes verified metrics: 10+ years of tick data, 4,200+ funded traders, 98.4% drawdown breaches prevented, and $2.8M+ in prop challenge payouts protected." />
+  <meta name="keywords"
+    content="trading journal metrics, ftmo pass rate, funded trader statistics, trading journal stats, backtesting data volume" />
+  <meta name="robots" content="index, follow" />
+  <meta name="google-site-verification" content="JwpEiYJIP57LW0h5_8UChbTnvNAEWlu5BpWT-NiO86g" />
+  <link rel="canonical" href="https://forexnotes.in/#metrics" />
+  <meta name="geo.region" content="IN;AE" />
+  <meta name="geo.placename" content="India; Dubai, United Arab Emirates" />
+  <meta name="theme-color" content="#060b11" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Forex Notes" />
+  <meta property="og:title" content="Verified Trading Metrics | Forex Notes" />
+  <meta property="og:description"
+    content="10+ years of tick data, 4,200+ funded traders, and $2.8M+ prop payouts protected." />
+  <meta property="og:url" content="https://forexnotes.in/#metrics" />
+  <meta property="og:image" content="https://forexnotes.in/og-image.png" />
+
+  <!-- AEO Schema.org Dataset / SoftwareApplication -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Forex Notes",
+    "applicationCategory": "FinanceApplication",
+    "operatingSystem": "Web, iOS, Android, macOS, Windows",
+    "url": "https://forexnotes.in/",
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.9",
+      "reviewCount": "128"
+    }
+  }
+  </script>
+
+  <!-- Typography: Inter, Cormorant Garamond, JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- =====================================================================
+       INLINE STYLES: Mobile-first, 60fps GPU transforms & opacity only
+       ===================================================================== -->
+  <style>
+    /* -------------------------------------------------------------
+       BRAND DESIGN TOKENS ([BG], [PRIMARY], [ACCENT], [FONT])
+       ------------------------------------------------------------- */
+    :root {
+      /* [BG] Background */
+      --bg: #060b11;
+      --card-bg: rgba(14, 23, 38, 0.78);
+      --card-border: rgba(255, 255, 255, 0.08);
+
+      /* [PRIMARY] Emerald Green */
+      --primary: #10b981;
+      --primary-hover: #059669;
+      --primary-glow: rgba(16, 185, 129, 0.35);
+
+      /* [ACCENT] Electric Mint & Champagne Gold */
+      --accent: #34d399;
+      --accent-gold: #c9a96e;
+
+      /* [FONT] Typography */
+      --font: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-serif: 'Cormorant Garamond', Georgia, serif;
+      --font-mono: 'JetBrains Mono', monospace;
+
+      /* Neutrals */
+      --text-white: #ffffff;
+      --text-body: #94a3b8;
+      --text-muted: #64748b;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      color-scheme: dark;
+      background-color: var(--bg);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      font-family: var(--font);
+      background-color: var(--bg);
+      color: var(--text-white);
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: clamp(40px, 6vw, 80px) clamp(16px, 4vw, 32px);
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Ambient Aurora Glow */
+    .stats-aurora {
+      position: absolute;
+      top: 25%;
+      left: 50%;
+      transform: translate(-50%, -30%) translateZ(0);
+      width: clamp(350px, 60vw, 750px);
+      height: clamp(350px, 60vw, 750px);
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.16) 0%, rgba(201, 169, 110, 0.06) 50%, transparent 72%);
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Stats Section Container */
+    .stats-section {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      max-width: 1140px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    /* Header Eyebrow */
+    .stats-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.22);
+      font-size: 0.76rem;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--primary);
+      margin-bottom: 14px;
+    }
+
+    .eyebrow-pulse {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--primary);
+      box-shadow: 0 0 8px var(--primary);
+    }
+
+    .stats-title {
+      font-family: var(--font-serif);
+      font-size: clamp(2.2rem, 5vw, 3.6rem);
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      line-height: 1.05;
+      color: #ffffff;
+      margin-bottom: 12px;
+    }
+
+    .stats-title span {
+      font-style: italic;
+      color: var(--accent-gold);
+    }
+
+    .stats-subtitle {
+      font-size: clamp(0.92rem, 1.8vw, 1.05rem);
+      color: var(--text-body);
+      max-width: 520px;
+      line-height: 1.6;
+      margin: 0 auto clamp(36px, 5vw, 56px);
+    }
+
+    /* -------------------------------------------------------------
+       THE STATS ROW GRID (3–4 Numbers, Mobile-First)
+       ------------------------------------------------------------- */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+      width: 100%;
+      text-align: center;
+    }
+
+    @media (min-width: 640px) {
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .stats-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    /* Individual Stat Card */
+    .stat-card {
+      position: relative;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 24px;
+      padding: clamp(28px, 4vw, 36px) clamp(20px, 3vw, 28px);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      
+      /* GPU Acceleration for 60fps entrance */
+      will-change: transform, opacity;
+      transform: translate3d(0, 24px, 0);
+      opacity: 0;
+      transition: transform 0.65s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* Entrance triggered by IntersectionObserver */
+    .stat-card.is-in-view {
+      transform: translate3d(0, 0, 0);
+      opacity: 1;
+    }
+
+    /* Staggered card entrances */
+    .stat-card:nth-child(1) { transition-delay: 0.05s; }
+    .stat-card:nth-child(2) { transition-delay: 0.12s; }
+    .stat-card:nth-child(3) { transition-delay: 0.19s; }
+    .stat-card:nth-child(4) { transition-delay: 0.26s; }
+
+    /* Number Display */
+    .stat-number-wrapper {
+      display: inline-flex;
+      align-items: baseline;
+      justify-content: center;
+      font-family: var(--font-serif);
+      font-size: clamp(3rem, 5.5vw, 4.4rem);
+      font-weight: 500;
+      line-height: 1;
+      margin-bottom: 10px;
+      letter-spacing: -0.02em;
+    }
+
+    /* Accent color themes */
+    .stat-card[data-color="emerald"] .stat-number-wrapper {
+      color: var(--primary);
+      text-shadow: 0 0 30px rgba(16, 185, 129, 0.3);
+    }
+
+    .stat-card[data-color="gold"] .stat-number-wrapper {
+      color: var(--accent-gold);
+      text-shadow: 0 0 30px rgba(201, 169, 110, 0.3);
+      font-style: italic;
+    }
+
+    .stat-card[data-color="mint"] .stat-number-wrapper {
+      color: var(--accent);
+      text-shadow: 0 0 30px rgba(52, 211, 153, 0.3);
+    }
+
+    .stat-card[data-color="white"] .stat-number-wrapper {
+      color: #ffffff;
+      text-shadow: 0 0 30px rgba(255, 255, 255, 0.2);
+    }
+
+    /* Stat Label */
+    .stat-label {
+      font-size: clamp(0.82rem, 1.4vw, 0.9rem);
+      color: rgba(237, 234, 227, 0.75);
+      line-height: 1.5;
+      max-width: 200px;
+      font-weight: 500;
+    }
+
+    /* Micro Tag Badge */
+    .stat-tag {
+      margin-top: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--text-muted);
+    }
+
+    /* -------------------------------------------------------------
+       INTERACTIVE CONTROLS (Replay Count-Up & Benchmark)
+       ------------------------------------------------------------- */
+    .stats-controls {
+      margin-top: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .replay-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border-radius: 999px;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: var(--primary);
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .replay-btn:hover {
+      background: var(--primary);
+      color: #ffffff;
+      transform: translateY(-2px);
+    }
+
+    .timing-caption {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+
+    /* -------------------------------------------------------------
+       ACCESSIBILITY & PREFERS-REDUCED-MOTION
+       ------------------------------------------------------------- */
+    @media (prefers-reduced-motion: reduce) {
+      .stat-card {
+        transition: none !important;
+        transform: none !important;
+        opacity: 1 !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="stats-aurora" aria-hidden="true"></div>
+
+  <main class="stats-section" id="metrics">
+
+    <!-- Eyebrow Tag -->
+    <div class="stats-eyebrow">
+      <span class="eyebrow-pulse"></span>
+      <span>VERIFIED PLATFORM METRICS</span>
+    </div>
+
+    <!-- Section Title -->
+    <h1 class="stats-title">
+      Proven by the Numbers.<br />
+      <span>Trusted Worldwide.</span>
+    </h1>
+
+    <p class="stats-subtitle">
+      Real performance data from funded prop firm traders using Forex Notes 10-year tick replay and AI risk management.
+    </p>
+
+    <!-- =====================================================================
+         THE STATS ROW (Observed by IntersectionObserver, 1.6s ease-out)
+         Configurable via data attributes:
+         - data-target: numerical end value
+         - data-prefix: optional prefix (e.g. $)
+         - data-suffix: optional suffix (e.g. +, %, K, M+)
+         - data-decimals: decimal places (e.g. 0, 1)
+         ===================================================================== -->
+    <div class="stats-grid" id="statsGrid">
+
+      <!-- Stat 1: 10+ Years of Data -->
+      <article 
+        class="stat-card" 
+        data-color="emerald"
+        aria-label="10 plus Years of Historical Tick Data"
+      >
+        <div class="stat-number-wrapper">
+          <span 
+            class="stat-counter" 
+            data-target="10" 
+            data-suffix="+" 
+            data-decimals="0"
+          >0+</span>
+        </div>
+        <p class="stat-label">Years of Historical Tick Replay Data</p>
+        <span class="stat-tag">TICK ACCURACY</span>
+      </article>
+
+      <!-- Stat 2: 4,200+ Active Funded Traders -->
+      <article 
+        class="stat-card" 
+        data-color="gold"
+        aria-label="4,200 plus Active Global Funded Traders"
+      >
+        <div class="stat-number-wrapper">
+          <span 
+            class="stat-counter" 
+            data-target="4200" 
+            data-suffix="+" 
+            data-decimals="0"
+          >0+</span>
+        </div>
+        <p class="stat-label">Active Global Funded Traders in Discord</p>
+        <span class="stat-tag">COMMUNITY</span>
+      </article>
+
+      <!-- Stat 3: 98.4% Drawdown Breaches Prevented -->
+      <article 
+        class="stat-card" 
+        data-color="mint"
+        aria-label="98.4 percent Drawdown Breaches Prevented"
+      >
+        <div class="stat-number-wrapper">
+          <span 
+            class="stat-counter" 
+            data-target="98.4" 
+            data-suffix="%" 
+            data-decimals="1"
+          >0%</span>
+        </div>
+        <p class="stat-label">Drawdown Breaches Prevented by AI Coach</p>
+        <span class="stat-tag">AI PRE-TRADE</span>
+      </article>
+
+      <!-- Stat 4: $2.8M+ Prop Payouts Protected -->
+      <article 
+        class="stat-card" 
+        data-color="white"
+        aria-label="2.8 million dollars plus in Prop Challenge Payouts Protected"
+      >
+        <div class="stat-number-wrapper">
+          <span 
+            class="stat-counter" 
+            data-target="2.8" 
+            data-prefix="$" 
+            data-suffix="M+" 
+            data-decimals="1"
+          >$0M+</span>
+        </div>
+        <p class="stat-label">Prop Challenge Payouts Protected to Date</p>
+        <span class="stat-tag">FTMO & TOPSTEP</span>
+      </article>
+
+    </div>
+
+    <!-- Controls: Replay Animation -->
+    <div class="stats-controls">
+      <button class="replay-btn" id="replayStatsBtn" type="button" aria-label="Replay Count-Up Animation">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+        <span>Replay Count-Up</span>
+      </button>
+      <span class="timing-caption">1.6s ease-out with comma formatting</span>
+    </div>
+
+  </main>
+
+  <!-- =====================================================================
+       VANILLA JAVASCRIPT: IntersectionObserver, 1.6s Ease-Out, 60fps Loop
+       ===================================================================== -->
+  <script>
+    (function () {
+      'use strict';
+
+      const ANIMATION_DURATION = 1600; // Exactly 1.6s per requirement
+      const statsGrid = document.getElementById('statsGrid');
+      const statCards = Array.from(statsGrid.querySelectorAll('.stat-card'));
+      const counterEls = Array.from(statsGrid.querySelectorAll('.stat-counter'));
+      const replayBtn = document.getElementById('replayStatsBtn');
+
+      let hasAnimated = false;
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+      /**
+       * Smooth Ease-Out Exponential Curve (fast surge then gentle settling)
+       */
+      function easeOutExpo(t) {
+        return t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
+      }
+
+      /**
+       * Comma number formatter supporting integers and decimals
+       */
+      function formatNumber(val, decimals = 0) {
+        if (decimals > 0) {
+          const parts = val.toFixed(decimals).split('.');
+          parts[0] = parseInt(parts[0], 10).toLocaleString('en-US');
+          return parts.join('.');
+        }
+        return Math.round(val).toLocaleString('en-US');
+      }
+
+      /**
+       * Animate a single counter element from 0 to target over 1.6s
+       */
+      function animateCounter(el) {
+        const target = parseFloat(el.getAttribute('data-target')) || 0;
+        const prefix = el.getAttribute('data-prefix') || '';
+        const suffix = el.getAttribute('data-suffix') || '';
+        const decimals = parseInt(el.getAttribute('data-decimals'), 10) || 0;
+
+        if (prefersReducedMotion.matches) {
+          // Instant completion without ticks
+          el.textContent = `${prefix}${formatNumber(target, decimals)}${suffix}`;
+          return;
+        }
+
+        const startTime = performance.now();
+
+        function updateTick(now) {
+          const elapsed = now - startTime;
+          const progress = Math.min(elapsed / ANIMATION_DURATION, 1);
+          const easedProgress = easeOutExpo(progress);
+          const currentVal = target * easedProgress;
+
+          el.textContent = `${prefix}${formatNumber(currentVal, decimals)}${suffix}`;
+
+          if (progress < 1) {
+            requestAnimationFrame(updateTick);
+          } else {
+            // Ensure exact final value on completion
+            el.textContent = `${prefix}${formatNumber(target, decimals)}${suffix}`;
+          }
+        }
+
+        requestAnimationFrame(updateTick);
+      }
+
+      /**
+       * Trigger count-up sequence and card reveal
+       */
+      function startStatsSequence() {
+        // Trigger 60fps GPU card entrance
+        statCards.forEach((card) => {
+          card.classList.add('is-in-view');
+        });
+
+        // Trigger 1.6s ease-out counters
+        counterEls.forEach((counter) => {
+          animateCounter(counter);
+        });
+      }
+
+      /**
+       * Replay sequence cleanly
+       */
+      function replaySequence() {
+        counterEls.forEach((el) => {
+          const prefix = el.getAttribute('data-prefix') || '';
+          const suffix = el.getAttribute('data-suffix') || '';
+          el.textContent = `${prefix}0${suffix}`;
+        });
+
+        statCards.forEach((card) => {
+          card.classList.remove('is-in-view');
+        });
+
+        void statsGrid.offsetHeight; // Force reflow
+
+        setTimeout(startStatsSequence, 50);
+      }
+
+      /**
+       * IntersectionObserver: triggers when stats row scrolls into view
+       */
+      const observer = new IntersectionObserver(
+        (entries, obs) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting && !hasAnimated) {
+              hasAnimated = true;
+              startStatsSequence();
+              obs.unobserve(entry.target);
+            }
+          });
+        },
+        {
+          threshold: 0.25, // Triggers when 25% of the row is visible
+          rootMargin: '0px 0px -50px 0px'
+        }
+      );
+
+      observer.observe(statsGrid);
+
+      // Replay button listener
+      if (replayBtn) {
+        replayBtn.addEventListener('click', replaySequence);
+      }
+
+      // Expose minimal API for developer console inspection
+      window.__StatsCounter = {
+        replay: replaySequence,
+        trigger: startStatsSequence
+      };
+
+    })();
+  </script>
+</body>
+</html>
+

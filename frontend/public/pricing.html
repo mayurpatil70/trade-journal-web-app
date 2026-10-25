@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <!-- =====================================================================
+       PRESERVED SEO, GEO & AEO METADATA (Forex Notes Production Baseline)
+       ===================================================================== -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pricing Plans & Memberships | Forex Notes</title>
+  <meta name="description"
+    content="Flexible monthly and yearly pricing plans for Forex Notes. 10-year bar replay backtesting, AI psychology coach, and prop firm risk tools from $14/mo. Pay with card or USDT." />
+  <meta name="keywords"
+    content="forex trading journal pricing, ftmo trading journal cost, trading journal monthly yearly discount, tradezella pricing alternative, backtesting software cost" />
+  <meta name="robots" content="index, follow" />
+  <meta name="google-site-verification" content="JwpEiYJIP57LW0h5_8UChbTnvNAEWlu5BpWT-NiO86g" />
+  <link rel="canonical" href="https://forexnotes.in/#pricing" />
+  <meta name="geo.region" content="IN;AE" />
+  <meta name="geo.placename" content="India; Dubai, United Arab Emirates" />
+  <meta name="theme-color" content="#060b11" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Forex Notes" />
+  <meta property="og:title" content="Transparent Pricing Plans | Forex Notes" />
+  <meta property="og:description"
+    content="Backtest 10 years of market data and protect your capital with our AI coach. Choose Monthly or Yearly with 50% discount." />
+  <meta property="og:url" content="https://forexnotes.in/#pricing" />
+  <meta property="og:image" content="https://forexnotes.in/og-image.png" />
+
+  <!-- AEO Schema.org Pricing Offers -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Forex Notes",
+    "applicationCategory": "FinanceApplication",
+    "operatingSystem": "Web, iOS, Android, Windows, macOS",
+    "url": "https://forexnotes.in/",
+    "offers": [
+      {
+        "@type": "Offer",
+        "name": "Starter Trial",
+        "price": "0",
+        "priceCurrency": "USD",
+        "description": "24-hour unlimited free access to the trading journal."
+      },
+      {
+        "@type": "Offer",
+        "name": "Pro Monthly",
+        "price": "14",
+        "priceCurrency": "USD",
+        "description": "Full access to 10-year bar replay and AI psychology coach, billed monthly."
+      },
+      {
+        "@type": "Offer",
+        "name": "Pro Yearly",
+        "price": "114",
+        "priceCurrency": "USD",
+        "description": "Full access with 50% yearly discount. Card and USDT BEP-20 accepted."
+      }
+    ]
+  }
+  </script>
+
+  <!-- Google Fonts: Inter & Instrument Serif & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,400&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- =====================================================================
+       INLINE CSS: 60fps GPU Odometer Rolling & Soft Bounce Badges
+       ===================================================================== -->
+  <style>
+    /* -------------------------------------------------------------
+       BRAND DESIGN TOKENS ([BG], [PRIMARY], [ACCENT], [FONT])
+       ------------------------------------------------------------- */
+    :root {
+      /* [BG] Background */
+      --bg: #060b11;
+      --surface-card: rgba(14, 23, 38, 0.88);
+      --surface-elevated: rgba(20, 33, 54, 0.95);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-accent: rgba(16, 185, 129, 0.35);
+
+      /* [PRIMARY] Emerald Green */
+      --primary: #10b981;
+      --primary-hover: #059669;
+      --primary-glow: rgba(16, 185, 129, 0.35);
+      --primary-light: #34d399;
+
+      /* [ACCENT] Mint & Champagne Gold */
+      --accent: #34d399;
+      --accent-gold: #c9a96e;
+      --accent-badge: #f59e0b;
+
+      /* [FONT] Typography */
+      --font: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-serif: 'Cormorant Garamond', Georgia, serif;
+      --font-mono: 'JetBrains Mono', monospace;
+
+      /* Neutrals */
+      --text-white: #ffffff;
+      --text-gray: #94a3b8;
+      --text-muted: #64748b;
+
+      /* Odometer sizing */
+      --odometer-height: 48px;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      color-scheme: dark;
+      background-color: var(--bg);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      font-family: var(--font);
+      background-color: var(--bg);
+      color: var(--text-white);
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: clamp(32px, 5vw, 64px) clamp(16px, 4vw, 32px);
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Ambient Aurora Glow */
+    .pricing-aurora {
+      position: absolute;
+      top: 15%;
+      left: 50%;
+      transform: translate(-50%, -20%) translateZ(0);
+      width: clamp(320px, 60vw, 750px);
+      height: clamp(320px, 60vw, 750px);
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.16) 0%, rgba(201, 169, 110, 0.06) 50%, transparent 72%);
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .pricing-section {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      max-width: 1140px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    /* Header Eyebrow */
+    .pricing-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.22);
+      font-size: 0.76rem;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--primary);
+      margin-bottom: 14px;
+    }
+
+    .eyebrow-pulse {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--primary);
+      box-shadow: 0 0 8px var(--primary);
+    }
+
+    .pricing-title {
+      font-family: var(--font-serif);
+      font-size: clamp(2.3rem, 5vw, 3.8rem);
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      line-height: 1.05;
+      color: #ffffff;
+      margin-bottom: 12px;
+    }
+
+    .pricing-title span {
+      font-style: italic;
+      color: var(--accent-gold);
+    }
+
+    .pricing-subtitle {
+      font-size: clamp(0.92rem, 1.8vw, 1.05rem);
+      color: var(--text-gray);
+      max-width: 520px;
+      line-height: 1.6;
+      margin-bottom: clamp(28px, 4vw, 38px);
+    }
+
+    /* -------------------------------------------------------------
+       MONTHLY / YEARLY TOGGLE SWITCH (Smooth 60fps pill slide)
+       ------------------------------------------------------------- */
+    .toggle-wrapper {
+      display: inline-flex;
+      align-items: center;
+      position: relative;
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid var(--border-subtle);
+      border-radius: 999px;
+      padding: 5px;
+      margin-bottom: clamp(36px, 6vw, 56px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    /* Sliding pill background (GPU transform only) */
+    .toggle-pill-glider {
+      position: absolute;
+      top: 5px;
+      left: 5px;
+      height: calc(100% - 10px);
+      width: 154px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--primary) 0%, #059669 100%);
+      box-shadow: 0 4px 18px var(--primary-glow);
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      transform: translate3d(0, 0, 0);
+      will-change: transform;
+      z-index: 1;
+    }
+
+    /* Toggle State Yearly: Slide pill right */
+    .toggle-wrapper[data-billing="yearly"] .toggle-pill-glider {
+      transform: translate3d(154px, 0, 0);
+    }
+
+    .toggle-opt-btn {
+      position: relative;
+      z-index: 2;
+      width: 154px;
+      padding: 10px 0;
+      border: none;
+      background: none;
+      cursor: pointer;
+      font-family: var(--font);
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      color: var(--text-gray);
+      transition: color 0.25s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .toggle-opt-btn .toggle-badge {
+      font-size: 0.65rem;
+      font-family: var(--font-mono);
+      font-weight: 800;
+      padding: 1px 6px;
+      border-radius: 999px;
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--accent);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      transition: all 0.25s ease;
+    }
+
+    .toggle-wrapper[data-billing="monthly"] .toggle-opt-btn[data-value="monthly"] .toggle-badge,
+    .toggle-wrapper[data-billing="yearly"] .toggle-opt-btn[data-value="yearly"] .toggle-badge {
+      background: rgba(255, 255, 255, 0.25);
+      color: #ffffff;
+      border-color: transparent;
+    }
+
+    .toggle-wrapper[data-billing="monthly"] .toggle-opt-btn[data-value="monthly"],
+    .toggle-wrapper[data-billing="yearly"] .toggle-opt-btn[data-value="yearly"] {
+      color: #ffffff;
+    }
+
+    /* -------------------------------------------------------------
+       PRICING CARDS GRID (2 Plans, Centered, Mobile-First)
+       ------------------------------------------------------------- */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 28px;
+      max-width: 860px;
+      margin: 0 auto;
+      width: 100%;
+      text-align: left;
+    }
+
+    @media (min-width: 768px) {
+      .cards-grid {
+        grid-template-columns: repeat(2, 1fr);
+        align-items: stretch;
+      }
+    }
+
+    .price-card {
+      position: relative;
+      border-radius: 24px;
+      background: var(--surface-card);
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+      padding: clamp(24px, 3.5vw, 32px);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.28s ease;
+      will-change: transform;
+    }
+
+    .price-card:hover {
+      transform: translateY(-4px) translateZ(0);
+    }
+
+    /* Featured Center Plan (Pro Trader) */
+    .price-card.featured-plan {
+      background: var(--surface-elevated);
+      border: 2px solid var(--primary);
+      box-shadow: 
+        0 24px 60px rgba(0, 0, 0, 0.6),
+        0 0 40px rgba(16, 185, 129, 0.18);
+    }
+
+    .plan-top-badge {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+      color: #060b11;
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 4px 14px;
+      border-radius: 999px;
+      box-shadow: 0 4px 14px var(--primary-glow);
+    }
+
+    .plan-header {
+      margin-bottom: 20px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .plan-name {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 6px;
+    }
+
+    .plan-desc {
+      font-size: 0.8rem;
+      color: var(--text-gray);
+      line-height: 1.45;
+      min-height: 2.9em;
+    }
+
+    /* -------------------------------------------------------------
+       VERTICAL ODOMETER ROLLING REEL (60fps GPU Transform)
+       ------------------------------------------------------------- */
+    .price-row {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+      margin-bottom: 6px;
+      position: relative;
+    }
+
+    .currency-symbol {
+      font-family: var(--font-serif);
+      font-size: 2.2rem;
+      font-weight: 400;
+      color: #ffffff;
+      line-height: 1;
+    }
+
+    /* Odometer Window: Masks overflow while digits roll vertically */
+    .odometer-viewport {
+      display: inline-flex;
+      height: var(--odometer-height);
+      overflow: hidden;
+      line-height: var(--odometer-height);
+      font-family: var(--font-serif);
+      font-size: 3rem;
+      font-weight: 500;
+      color: #ffffff;
+      vertical-align: baseline;
+    }
+
+    /* Individual Column reel containing digits 0 through 9 */
+    .digit-column {
+      display: flex;
+      flex-direction: column;
+      height: var(--odometer-height);
+      transform: translate3d(0, 0, 0);
+      will-change: transform;
+      transition: transform 0.48s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .digit-column span {
+      display: block;
+      height: var(--odometer-height);
+      line-height: var(--odometer-height);
+      text-align: center;
+      width: 0.58em;
+    }
+
+    /* Frequency label */
+    .billing-period {
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    /* Crossed-out original price */
+    .strikethrough-price {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      text-decoration: line-through;
+      margin-bottom: 12px;
+      font-family: var(--font-mono);
+      min-height: 1.2em;
+    }
+
+    /* -------------------------------------------------------------
+       "SAVE [X]%" YEARLY SOFT-BOUNCE POP-IN BADGE
+       (Strictly transforms & opacity only)
+       ------------------------------------------------------------- */
+    .savings-badge-wrap {
+      min-height: 28px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+    }
+
+    .savings-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 8px;
+      background: rgba(16, 185, 129, 0.16);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      color: var(--primary-light);
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      opacity: 0;
+      transform: scale(0.6) translateY(6px) translateZ(0);
+      will-change: transform, opacity;
+      transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.25s ease;
+      pointer-events: none;
+    }
+
+    /* Popped in state when yearly is active */
+    .toggle-wrapper[data-billing="yearly"] ~ .cards-grid .savings-badge.active-yearly {
+      opacity: 1;
+      transform: scale(1) translateY(0) translateZ(0);
+      pointer-events: auto;
+    }
+
+    /* -------------------------------------------------------------
+       PLAN FEATURE LIST & CTA BUTTON
+       ------------------------------------------------------------- */
+    .features-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 28px;
+      flex: 1;
+    }
+
+    .feature-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 0.84rem;
+      color: rgba(255, 255, 255, 0.85);
+      line-height: 1.4;
+    }
+
+    .check-icon {
+      width: 16px;
+      height: 16px;
+      stroke: var(--primary);
+      stroke-width: 2.2;
+      fill: none;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .btn-plan-action {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 14px 20px;
+      border-radius: 14px;
+      font-family: var(--font);
+      font-size: 0.92rem;
+      font-weight: 700;
+      text-decoration: none;
+      letter-spacing: 0.02em;
+      cursor: pointer;
+      border: 1px solid var(--border-subtle);
+      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s, background 0.2s;
+    }
+
+    /* Standard Button */
+    .btn-plan-action.btn-outline {
+      background: rgba(255, 255, 255, 0.04);
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+
+    .btn-plan-action.btn-outline:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: var(--primary);
+      transform: translateY(-2px);
+    }
+
+    /* Primary Accent Button */
+    .btn-plan-action.btn-primary {
+      background: linear-gradient(135deg, var(--primary) 0%, #059669 100%);
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.2);
+      box-shadow: 0 8px 24px var(--primary-glow);
+    }
+
+    .btn-plan-action.btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 34px rgba(16, 185, 129, 0.5);
+    }
+
+    /* Guarantee Tag */
+    .pricing-footer-notes {
+      margin-top: 36px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .footer-note-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* -------------------------------------------------------------
+       ACCESSIBILITY & PREFERS-REDUCED-MOTION
+       ------------------------------------------------------------- */
+    @media (prefers-reduced-motion: reduce) {
+      .toggle-pill-glider,
+      .digit-column,
+      .savings-badge,
+      .price-card {
+        transition: none !important;
+        animation: none !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="pricing-aurora" aria-hidden="true"></div>
+
+  <main class="pricing-section" id="pricing">
+    
+    <!-- Eyebrow -->
+    <div class="pricing-eyebrow">
+      <span class="eyebrow-pulse"></span>
+      <span>04 MEMBERSHIP · TRANSPARENT PRICING</span>
+    </div>
+
+    <!-- Title -->
+    <h1 class="pricing-title">
+      Choose Your Edge.<br />
+      <span>Cancel Anytime.</span>
+    </h1>
+
+    <p class="pricing-subtitle">
+      Gain immediate access to 10-year historical bar replay, AI psychology protection, and prop firm risk tools.
+    </p>
+
+    <!-- =====================================================================
+         MONTHLY / YEARLY TOGGLE SWITCH
+         ===================================================================== -->
+    <div 
+      class="toggle-wrapper" 
+      id="billingToggle" 
+      data-billing="monthly"
+      role="switch"
+      aria-checked="false"
+      aria-label="Billing frequency toggle: Currently Monthly"
+      tabindex="0"
+    >
+      <div class="toggle-pill-glider" aria-hidden="true"></div>
+      
+      <button 
+        type="button" 
+        class="toggle-opt-btn" 
+        data-value="monthly"
+        tabindex="-1"
+      >
+        <span>Monthly</span>
+        <span class="toggle-badge">25% OFF</span>
+      </button>
+
+      <button 
+        type="button" 
+        class="toggle-opt-btn" 
+        data-value="yearly"
+        tabindex="-1"
+      >
+        <span>Yearly</span>
+        <span class="toggle-badge">50% OFF</span>
+      </button>
+    </div>
+
+    <!-- =====================================================================
+         2 PRICING PLANS WITH VERTICAL ODOMETER DIGIT REELS
+         ===================================================================== -->
+    <div class="cards-grid">
+
+      <!-- Plan 1: Starter / Beginner -->
+      <article class="price-card" aria-label="Starter Plan">
+        <div class="plan-header">
+          <h2 class="plan-name">Starter</h2>
+          <p class="plan-desc">Test drive the complete trading journal ecosystem free for 24 hours.</p>
+        </div>
+
+        <div class="price-box">
+          <div class="price-row" aria-label="Price: Free">
+            <span class="currency-symbol">$</span>
+            <div class="odometer-viewport" aria-hidden="true">
+              <div class="digit-column" data-target="0">
+                <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span>
+              </div>
+            </div>
+            <span class="billing-period">/forever</span>
+          </div>
+
+          <div class="strikethrough-price">No card needed</div>
+
+          <!-- Empty spacer keeps heights perfectly aligned across cards -->
+          <div class="savings-badge-wrap">
+            <span class="savings-badge" aria-hidden="true">FREE TRIAL</span>
+          </div>
+        </div>
+
+        <ul class="features-list">
+          <li class="feature-item">
+            <svg class="check-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>Full Digital Trading Journal access</span>
+          </li>
+          <li class="feature-item">
+            <svg class="check-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>Basic Performance Analytics & Insights</span>
+          </li>
+          <li class="feature-item">
+            <svg class="check-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>24 Hours Unlimited Backtesting Replay</span>
+          </li>
+          <li class="feature-item">
+            <svg class="check-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>Prop Firm Drawdown Calculator</span>
+          </li>
+        </ul>
+
+        <a href="https://forexnotes.in/login" class="btn-plan-action btn-outline">
+          Start For Free
+        </a>
+      </article>
+
+      <!-- Plan 2: Pro Trader (Featured, 50% Odometer Roll) -->
+      <article class="price-card featured-plan" aria-label="Pro Trader Plan">
+        <div class="plan-top-badge">MOST POPULAR</div>
+
+        <div class="plan-header">
+          <h2 class="plan-name">Pro Trader</h2>
+          <p class="plan-desc">Our flagship institutional suite with active AI coaching & 10-year tick replay.</p>
+        </div>
+
+        <div class="price-box">
+          <div class="price-row" id="proPriceRow" aria-label="Price: $14 per month">
+            <span class="currency-symbol">$</span>
+            
+            <!-- Odometer digits reel: Monthly = 14, Yearly = 9 (or 114) -->
+            <div class="odometer-viewport" id="proOdometer" aria-hidden="true">
+              <!-- Digit 1 Reel (Tens) -->
+              <div class="digit-column" id="proDigit1" data-val="1">
+                <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span>
+              </div>
+              <!-- Digit 2 Reel (Units) -->
+              <div class="digit-column" id="proDigit2" data-val="4">
+                <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span>
+              </div>
+            </div>
+
+            <span class="billing-period" id="proPeriod">/month</span>
+          </div>
+
+          <div class="strikethrough-price" id="proStrike">$19/month</div>
+
+          <!-- Discount Pop Badge: 25% on Monthly, 50% on Yearly -->
+          <div class="savings-badge-wrap">
+            <div class="savings-badge active-yearly" id="proSavingsBadge" style="transform: scale(1); opacity: 1;">
+              ⚡ SAVE 25% ($14/mo)
+            </div>
+          </div>
+        </div>
+
+        <ul class="features-list">
+          <li class="feature-item">
+            <svg class="check-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            <span><strong>10 Years</strong> of historical tick replay data</span>
+          </li>
+          <li class="feature-item">
+            <svg class="check-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            <span><strong>AI Psychology Coach</strong> (Pre-Trade Guard)</span>
+          </li>
+          <li class="feature-item">
+            <svg class="check-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>FTMO & Prop firm daily drawdown shield</span>
+          </li>
+          <li class="feature-item">
+            <svg class="check-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>Automated R-Multiple & session analytics</span>
+          </li>
+          <li class="feature-item">
+            <svg class="check-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>Private Discord Alpha community access</span>
+          </li>
+        </ul>
+
+        <a href="https://forexnotes.in/login" class="btn-plan-action btn-primary" id="proCta">
+          Join Pro Trader
+        </a>
+      </article>
+
+    </div>
+
+    <!-- Trust Footer -->
+    <div class="pricing-footer-notes">
+      <div class="footer-note-item">
+        <span>🛡️ 24h Money-Back Guarantee</span>
+      </div>
+      <div>•</div>
+      <div class="footer-note-item">
+        <span>💳 Card & USDT (BEP-20) Supported</span>
+      </div>
+      <div>•</div>
+      <div class="footer-note-item">
+        <span>⚡ Instant Automated Activation</span>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- =====================================================================
+       VANILLA JAVASCRIPT: Odometer Digit Rolling Physics & Toggle Listener
+       ===================================================================== -->
+  <script>
+    (function () {
+      'use strict';
+
+      const toggleWrap = document.getElementById('billingToggle');
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+      // Pro Plan Elements
+      const proDigit1 = document.getElementById('proDigit1');
+      const proDigit2 = document.getElementById('proDigit2');
+      const proPeriod = document.getElementById('proPeriod');
+      const proStrike = document.getElementById('proStrike');
+      const proPriceRow = document.getElementById('proPriceRow');
+      const proSavingsBadge = document.getElementById('proSavingsBadge');
+
+      // Digit height for vertical transform translation (48px)
+      const DIGIT_HEIGHT = 48;
+
+      /**
+       * Rolls an odometer digit column to a specific digit (0-9)
+       * Uses pure GPU translateY for 60fps performance
+       */
+      function rollDigit(columnEl, digit, staggerMs = 0) {
+        if (!columnEl) return;
+        const targetY = -1 * digit * DIGIT_HEIGHT;
+
+        if (prefersReducedMotion.matches) {
+          columnEl.style.transition = 'none';
+          columnEl.style.transform = `translate3d(0, ${targetY}px, 0)`;
+          return;
+        }
+
+        setTimeout(() => {
+          columnEl.style.transition = 'transform 0.48s cubic-bezier(0.16, 1, 0.3, 1)';
+          columnEl.style.transform = `translate3d(0, ${targetY}px, 0)`;
+        }, staggerMs);
+      }
+
+      /**
+       * Switch Billing Frequency: Monthly <-> Yearly
+       */
+      function setBilling(frequency) {
+        toggleWrap.setAttribute('data-billing', frequency);
+        const isYearly = frequency === 'yearly';
+
+        // Update accessibility attributes
+        toggleWrap.setAttribute('aria-checked', isYearly ? 'true' : 'false');
+        toggleWrap.setAttribute('aria-label', `Billing frequency toggle: Currently ${isYearly ? 'Yearly with 50% discount' : 'Monthly with 25% discount'}`);
+
+        if (isYearly) {
+          // PRO: Rolls from 14 -> 09 (or $9.50/mo billed annually $114/yr)
+          rollDigit(proDigit1, 0, 0);
+          rollDigit(proDigit2, 9, 60);
+          proPeriod.textContent = '/mo (billed $114/yr)';
+          proStrike.textContent = '$19/month ($228/yr)';
+          proPriceRow.setAttribute('aria-label', 'Price: $9.50 per month, billed annually at $114 per year');
+          if (proSavingsBadge) proSavingsBadge.textContent = '⚡ SAVE 50% ($114/yr)';
+        } else {
+          // PRO: Rolls from 09 -> 14
+          rollDigit(proDigit1, 1, 0);
+          rollDigit(proDigit2, 4, 60);
+          proPeriod.textContent = '/month';
+          proStrike.textContent = '$19/month';
+          proPriceRow.setAttribute('aria-label', 'Price: $14 per month');
+          if (proSavingsBadge) proSavingsBadge.textContent = '⚡ SAVE 25% ($14/mo)';
+        }
+      }
+
+      // Toggle Click Handlers
+      toggleWrap.addEventListener('click', (e) => {
+        const btn = e.target.closest('.toggle-opt-btn');
+        if (btn) {
+          setBilling(btn.getAttribute('data-value'));
+        } else {
+          // Click on toggle wrapper switches current state
+          const current = toggleWrap.getAttribute('data-billing');
+          setBilling(current === 'monthly' ? 'yearly' : 'monthly');
+        }
+      });
+
+      // Keyboard Accessibility: Spacebar or Enter toggles switch
+      toggleWrap.addEventListener('keydown', (e) => {
+        if (e.key === ' ' || e.key === 'Enter') {
+          e.preventDefault();
+          const current = toggleWrap.getAttribute('data-billing');
+          setBilling(current === 'monthly' ? 'yearly' : 'monthly');
+        }
+      });
+
+      // Initial roll to set starting values correctly
+      setBilling('monthly');
+
+    })();
+  </script>
+</body>
+</html>
+

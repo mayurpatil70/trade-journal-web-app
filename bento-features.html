@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <!-- =====================================================================
+       PRESERVED SEO, GEO & AEO METADATA (Forex Notes Production Baseline)
+       ===================================================================== -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Platform Features Bento Grid | Forex Notes</title>
+  <meta name="description"
+    content="Explore the Forex Notes features bento: 10-year bar replay engine, AI psychology coach, prop firm drawdown guardian, automated R-multiples, and session edge analytics." />
+  <meta name="keywords"
+    content="features bento grid, trading journal features, ftmo drawdown guardian, ai trading psychology coach, 10-year bar replay, automated r-multiple journal" />
+  <meta name="robots" content="index, follow" />
+  <meta name="google-site-verification" content="JwpEiYJIP57LW0h5_8UChbTnvNAEWlu5BpWT-NiO86g" />
+  <link rel="canonical" href="https://forexnotes.in/#features" />
+  <meta name="geo.region" content="IN;AE" />
+  <meta name="geo.placename" content="India; Dubai, United Arab Emirates" />
+  <meta name="theme-color" content="#060b11" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Forex Notes" />
+  <meta property="og:title" content="Platform Features Bento Grid | Forex Notes" />
+  <meta property="og:description"
+    content="Discover our 6 institutional trading pillars designed to pass prop firm challenges and master execution." />
+  <meta property="og:url" content="https://forexnotes.in/#features" />
+  <meta property="og:image" content="https://forexnotes.in/og-image.png" />
+
+  <!-- Schema.org SoftwareApplication Features -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Forex Notes",
+    "applicationCategory": "FinanceApplication",
+    "operatingSystem": "Web, iOS, Android, Windows, macOS",
+    "url": "https://forexnotes.in/",
+    "featureList": [
+      "10-Year Bar Replay Engine with Institutional Tick Data",
+      "AI Psychology Coach (Pre-Trade Guard)",
+      "Prop Firm Drawdown Guardian for FTMO & Topstep",
+      "Automated R-Multiple & Expectancy Calculator",
+      "Session Edge & Breakout Liquidity Radar",
+      "Encrypted Cloud Vault with Offline Export"
+    ]
+  }
+  </script>
+
+  <!-- Google Fonts: Inter, Cormorant Garamond, JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,400&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- =====================================================================
+       INLINE STYLES: Mobile-first, 60fps GPU transforms & spring physics
+       ===================================================================== -->
+  <style>
+    /* -------------------------------------------------------------
+       BRAND DESIGN TOKENS ([BG], [PRIMARY], [ACCENT], [FONT])
+       ------------------------------------------------------------- */
+    :root {
+      /* [BG] Background */
+      --bg: #060b11;
+      --card-bg: rgba(14, 23, 38, 0.85);
+      --card-border: rgba(255, 255, 255, 0.08);
+
+      /* [PRIMARY] Emerald Green */
+      --primary: #10b981;
+      --primary-hover: #059669;
+      --primary-glow: rgba(16, 185, 129, 0.35);
+
+      /* [ACCENT] Electric Mint & Champagne Gold */
+      --accent: #34d399;
+      --accent-gold: #c9a96e;
+
+      /* [FONT] Typography */
+      --font: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-serif: 'Cormorant Garamond', Georgia, serif;
+      --font-mono: 'JetBrains Mono', monospace;
+
+      /* Neutrals */
+      --text-white: #ffffff;
+      --text-body: #94a3b8;
+      --text-muted: #64748b;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      color-scheme: dark;
+      background-color: var(--bg);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      font-family: var(--font);
+      background-color: var(--bg);
+      color: var(--text-white);
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: clamp(40px, 6vw, 88px) clamp(16px, 4vw, 32px);
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Ambient Aurora Glow */
+    .bento-aurora {
+      position: absolute;
+      top: 20%;
+      left: 50%;
+      transform: translate(-50%, -30%) translateZ(0);
+      width: clamp(380px, 65vw, 850px);
+      height: clamp(380px, 65vw, 850px);
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.16) 0%, rgba(201, 169, 110, 0.06) 50%, transparent 72%);
+      filter: blur(85px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Section Container */
+    .bento-section {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      max-width: 1140px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    /* Header Eyebrow */
+    .bento-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.22);
+      font-size: 0.76rem;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--primary);
+      margin-bottom: 14px;
+    }
+
+    .eyebrow-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--primary);
+      box-shadow: 0 0 8px var(--primary);
+    }
+
+    .bento-title {
+      font-family: var(--font-serif);
+      font-size: clamp(2.3rem, 5vw, 3.8rem);
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      line-height: 1.05;
+      color: #ffffff;
+      margin-bottom: 12px;
+    }
+
+    .bento-title span {
+      font-style: italic;
+      color: var(--accent-gold);
+    }
+
+    .bento-subtitle {
+      font-size: clamp(0.92rem, 1.8vw, 1.05rem);
+      color: var(--text-body);
+      max-width: 540px;
+      line-height: 1.6;
+      margin: 0 auto clamp(36px, 5vw, 56px);
+    }
+
+    /* -------------------------------------------------------------
+       THE BENTO GRID (6 Tiles, Mixed Sizes, Mobile-First)
+       ------------------------------------------------------------- */
+    .bento-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+      width: 100%;
+      text-align: left;
+    }
+
+    @media (min-width: 768px) {
+      .bento-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .bento-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      /* Mixed Bento Spans on Desktop */
+      .tile-span-2 {
+        grid-column: span 2;
+      }
+    }
+
+    /* -------------------------------------------------------------
+       INDIVIDUAL TILE (Scattered Start -> Spring Snap into Place)
+       - Strictly transform & opacity animated for 60fps
+       - Overshoot Spring Curve: cubic-bezier(0.34, 1.56, 0.64, 1)
+       - Desktop hover lifts the tile
+       ------------------------------------------------------------- */
+    .bento-tile {
+      position: relative;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 24px;
+      padding: clamp(24px, 3.5vw, 32px);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+      
+      /* GPU Acceleration */
+      will-change: transform, opacity;
+      transform: translate3d(var(--offset-x, 0px), var(--offset-y, 40px), 0) rotate(var(--offset-r, 0deg));
+      opacity: 0;
+      transition: 
+        transform 0.65s cubic-bezier(0.34, 1.56, 0.64, 1),
+        opacity 0.5s ease,
+        border-color 0.25s ease,
+        box-shadow 0.25s ease;
+      transition-delay: calc(var(--tile-idx, 0) * 90ms);
+    }
+
+    /* Scattered Initial Offsets (Different directions for each tile) */
+    .bento-tile:nth-child(1) { --offset-x: -50px; --offset-y: 40px; --offset-r: -4deg; }
+    .bento-tile:nth-child(2) { --offset-x: 45px; --offset-y: -30px; --offset-r: 3.5deg; }
+    .bento-tile:nth-child(3) { --offset-x: -35px; --offset-y: 50px; --offset-r: -2.5deg; }
+    .bento-tile:nth-child(4) { --offset-x: 50px; --offset-y: 35px; --offset-r: 3deg; }
+    .bento-tile:nth-child(5) { --offset-x: -45px; --offset-y: -35px; --offset-r: -3deg; }
+    .bento-tile:nth-child(6) { --offset-x: 40px; --offset-y: 45px; --offset-r: 2.5deg; }
+
+    /* Assembled In-View State: Snaps to 0,0,0 with spring bounce */
+    .bento-tile.is-assembled {
+      transform: translate3d(0, 0, 0) rotate(0deg);
+      opacity: 1;
+    }
+
+    /* Desktop Hover: Lifts the tile smoothly */
+    @media (hover: hover) and (pointer: fine) {
+      .bento-tile.is-assembled:hover {
+        transform: translateY(-8px) scale(1.015) translateZ(0);
+        border-color: rgba(16, 185, 129, 0.4);
+        box-shadow: 
+          0 24px 50px rgba(0, 0, 0, 0.6),
+          0 0 30px rgba(16, 185, 129, 0.18);
+        transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s, border-color 0.25s;
+        transition-delay: 0s; /* Instant hover response */
+      }
+    }
+
+    /* Top Row: Icon + Badge Tag */
+    .tile-top-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .tile-icon-box {
+      width: 46px;
+      height: 46px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.18), rgba(201, 169, 110, 0.12));
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--primary);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+      flex-shrink: 0;
+    }
+
+    .tile-icon-box svg {
+      width: 22px;
+      height: 22px;
+      stroke: currentColor;
+      stroke-width: 2.2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+
+    .tile-badge {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      color: var(--accent-gold);
+    }
+
+    /* Title & One-Line Description */
+    .tile-content {
+      margin-bottom: 20px;
+    }
+
+    .tile-title {
+      font-size: clamp(1.15rem, 2vw, 1.35rem);
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 8px;
+      letter-spacing: -0.01em;
+    }
+
+    .tile-oneline {
+      font-size: 0.88rem;
+      color: var(--text-body);
+      line-height: 1.55;
+    }
+
+    /* Visual Micro-Preview in Wide Tiles */
+    .tile-visual-footer {
+      margin-top: auto;
+      padding-top: 16px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.74rem;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+    }
+
+    .micro-pill-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .micro-pill {
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: rgba(16, 185, 129, 0.12);
+      color: var(--primary);
+      font-weight: 600;
+      font-size: 0.68rem;
+    }
+
+    /* Replay Animation Toolbar */
+    .bento-controls {
+      margin-top: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .replay-bento-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 22px;
+      border-radius: 999px;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: var(--primary);
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .replay-bento-btn:hover {
+      background: var(--primary);
+      color: #ffffff;
+      transform: translateY(-2px);
+    }
+
+    .bento-timing-caption {
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+      color: var(--text-muted);
+    }
+
+    /* -------------------------------------------------------------
+       ACCESSIBILITY & PREFERS-REDUCED-MOTION
+       ------------------------------------------------------------- */
+    @media (prefers-reduced-motion: reduce) {
+      .bento-tile {
+        transition: none !important;
+        transform: none !important;
+        opacity: 1 !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="bento-aurora" aria-hidden="true"></div>
+
+  <main class="bento-section" id="features">
+
+    <!-- Eyebrow -->
+    <div class="bento-eyebrow">
+      <span class="eyebrow-dot"></span>
+      <span>03 FIELD CAPABILITIES · UNMATCHED EDGE</span>
+    </div>
+
+    <!-- Title -->
+    <h1 class="bento-title">
+      Engineered for Performance.<br />
+      <span>Built for Funded Traders.</span>
+    </h1>
+
+    <p class="bento-subtitle">
+      Scroll down to watch the 6 institutional capability tiles snap into place with staggered spring physics.
+    </p>
+
+    <!-- =====================================================================
+         THE 6 BENTO TILES (Mixed Sizes, Scattered Start -> Spring Snap)
+         ===================================================================== -->
+    <div 
+      class="bento-grid" 
+      id="bentoGrid" 
+      role="region" 
+      aria-label="Platform Features Bento Grid"
+    >
+
+      <!-- Tile 1 (Large / Spans 2 cols): 10-Year Bar Replay -->
+      <article class="bento-tile tile-span-2" style="--tile-idx: 0;">
+        <div class="tile-top-row">
+          <div class="tile-icon-box">
+            <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          </div>
+          <span class="tile-badge">BACKTESTING MASTERY</span>
+        </div>
+
+        <div class="tile-content">
+          <h2 class="tile-title">10-Year Bar Replay Engine</h2>
+          <p class="tile-oneline">
+            Replay institutional tick data across forex, gold, and crypto with multi-timeframe precision before risking real capital.
+          </p>
+        </div>
+
+        <div class="tile-visual-footer">
+          <div class="micro-pill-group">
+            <span class="micro-pill">M1 TICK DATA</span>
+            <span class="micro-pill">MULTI-CHART SYNC</span>
+            <span class="micro-pill">SPEED CONTROL</span>
+          </div>
+          <span>Decade-Long Historical Depth</span>
+        </div>
+      </article>
+
+      <!-- Tile 2 (Standard): AI Psychology Coach -->
+      <article class="bento-tile" style="--tile-idx: 1;">
+        <div class="tile-top-row">
+          <div class="tile-icon-box">
+            <svg viewBox="0 0 24 24"><path d="M12 2a4 4 0 0 0-4 4c0 1.5.8 2.8 2 3.5V11a2 2 0 0 0 2 2 2 2 0 0 0 2-2V9.5c1.2-.7 2-2 2-3.5a4 4 0 0 0-4-4z"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
+          </div>
+          <span class="tile-badge">AI GUARD</span>
+        </div>
+
+        <div class="tile-content">
+          <h2 class="tile-title">AI Psychology Coach</h2>
+          <p class="tile-oneline">
+            Real-time Pre-Trade Guard halts revenge trading and emotional tilt before drawdown breaches occur.
+          </p>
+        </div>
+
+        <div class="tile-visual-footer">
+          <span class="micro-pill">TILT LOCKOUT ACTIVE</span>
+          <span>Zero Rule Breaches</span>
+        </div>
+      </article>
+
+      <!-- Tile 3 (Standard): Prop Firm Guardian -->
+      <article class="bento-tile" style="--tile-idx: 2;">
+        <div class="tile-top-row">
+          <div class="tile-icon-box">
+            <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <span class="tile-badge">RISK SHIELD</span>
+        </div>
+
+        <div class="tile-content">
+          <h2 class="tile-title">Prop Firm Guardian</h2>
+          <p class="tile-oneline">
+            Automated daily and trailing drawdown threshold alerts for FTMO, Topstep, FundedNext, and Apex.
+          </p>
+        </div>
+
+        <div class="tile-visual-footer">
+          <span class="micro-pill">70% MAX LOSS ALERT</span>
+          <span>FTMO & Topstep Safe</span>
+        </div>
+      </article>
+
+      <!-- Tile 4 (Standard): Automated R-Multiples -->
+      <article class="bento-tile" style="--tile-idx: 3;">
+        <div class="tile-top-row">
+          <div class="tile-icon-box">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>
+          </div>
+          <span class="tile-badge">METRICS ENGINE</span>
+        </div>
+
+        <div class="tile-content">
+          <h2 class="tile-title">Automated R-Multiples</h2>
+          <p class="tile-oneline">
+            Logs precise risk-to-reward ratios and MAE/MFE trade management stats without manual spreadsheets.
+          </p>
+        </div>
+
+        <div class="tile-visual-footer">
+          <span class="micro-pill">EXPECTANCY CURVE</span>
+          <span>Instant Calculation</span>
+        </div>
+      </article>
+
+      <!-- Tile 5 (Wide / Spans 2 cols): Session Edge Analytics -->
+      <article class="bento-tile tile-span-2" style="--tile-idx: 4;">
+        <div class="tile-top-row">
+          <div class="tile-icon-box">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <span class="tile-badge">LIQUIDITY RADAR</span>
+        </div>
+
+        <div class="tile-content">
+          <h2 class="tile-title">Session Edge Analytics</h2>
+          <p class="tile-oneline">
+            Isolate your highest-expectancy trading hours across London, New York, and Asian breakout liquidity sessions.
+          </p>
+        </div>
+
+        <div class="tile-visual-footer">
+          <div class="micro-pill-group">
+            <span class="micro-pill">LONDON OPEN</span>
+            <span class="micro-pill">NY OVERLAP</span>
+            <span class="micro-pill">ASIA RANGE</span>
+          </div>
+          <span>Session Heatmap Sync</span>
+        </div>
+      </article>
+
+      <!-- Tile 6 (Standard): Encrypted Cloud Vault -->
+      <article class="bento-tile" style="--tile-idx: 5;">
+        <div class="tile-top-row">
+          <div class="tile-icon-box">
+            <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </div>
+          <span class="tile-badge">DATA PRIVACY</span>
+        </div>
+
+        <div class="tile-content">
+          <h2 class="tile-title">Encrypted Cloud Vault</h2>
+          <p class="tile-oneline">
+            Zero data sharing with brokers; export trade journals to PDF, CSV, or Excel with full screenshot history.
+          </p>
+        </div>
+
+        <div class="tile-visual-footer">
+          <span class="micro-pill">AES-256 ENCRYPTION</span>
+          <span>User-Owned Data</span>
+        </div>
+      </article>
+
+    </div>
+
+    <!-- Replay Spring Assembly Toolbar -->
+    <div class="bento-controls">
+      <button class="replay-bento-btn" id="replayBentoBtn" type="button" aria-label="Replay Spring Bento Assembly">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+        <span>Replay Spring Assembly</span>
+      </button>
+      <span class="bento-timing-caption">Staggered spring snap with desktop hover lift</span>
+    </div>
+
+  </main>
+
+  <!-- =====================================================================
+       VANILLA JAVASCRIPT: IntersectionObserver Spring Assembly Controller
+       ===================================================================== -->
+  <script>
+    (function () {
+      'use strict';
+
+      const bentoGrid = document.getElementById('bentoGrid');
+      const tiles = Array.from(bentoGrid.querySelectorAll('.bento-tile'));
+      const replayBtn = document.getElementById('replayBentoBtn');
+
+      let hasAssembled = false;
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+      /**
+       * Trigger spring assembly: tiles snap into place with staggered spring easing
+       */
+      function assembleTiles() {
+        if (prefersReducedMotion.matches) {
+          tiles.forEach((tile) => tile.classList.add('is-assembled'));
+          return;
+        }
+
+        tiles.forEach((tile) => {
+          tile.classList.add('is-assembled');
+        });
+      }
+
+      /**
+       * Replay assembly animation cleanly
+       */
+      function replayAssembly() {
+        tiles.forEach((tile) => {
+          tile.classList.remove('is-assembled');
+        });
+
+        // Force browser reflow to re-arm transition
+        void bentoGrid.offsetHeight;
+
+        setTimeout(assembleTiles, 60);
+      }
+
+      /**
+       * IntersectionObserver: triggers when bento grid enters viewport
+       */
+      const observer = new IntersectionObserver(
+        (entries, obs) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting && !hasAssembled) {
+              hasAssembled = true;
+              assembleTiles();
+              obs.unobserve(entry.target);
+            }
+          });
+        },
+        {
+          threshold: 0.18, // Triggers when 18% of the bento grid is visible
+          rootMargin: '0px 0px -40px 0px'
+        }
+      );
+
+      observer.observe(bentoGrid);
+
+      // Replay button listener
+      if (replayBtn) {
+        replayBtn.addEventListener('click', replayAssembly);
+      }
+
+      // Expose minimal API for developer console inspection
+      window.__BentoFeatures = {
+        assemble: assembleTiles,
+        replay: replayAssembly
+      };
+
+    })();
+  </script>
+</body>
+</html>
+
