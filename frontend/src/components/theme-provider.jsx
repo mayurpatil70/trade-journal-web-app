@@ -30,9 +30,6 @@ export function ThemeProvider({ children }) {
   useEffect(() => {
     const root = document.documentElement;
 
-    // Enable temporary smooth transition class for buttery cross-fade
-    root.classList.add("theme-transitioning");
-
     root.classList.remove("light", "dark");
     root.classList.add(theme);
     root.style.colorScheme = theme;
@@ -41,12 +38,6 @@ export function ThemeProvider({ children }) {
     if (metaThemeColor) {
       metaThemeColor.setAttribute("content", theme === "dark" ? "#0A0C10" : "#F5F6F9");
     }
-
-    const timer = setTimeout(() => {
-      root.classList.remove("theme-transitioning");
-    }, 350);
-
-    return () => clearTimeout(timer);
   }, [theme]);
 
   const value = useMemo(() => {

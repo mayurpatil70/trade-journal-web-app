@@ -1,12 +1,113 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { WagmiProvider, useWriteContract, useWaitForTransactionReceipt, useAccount, useConnect } from 'wagmi';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { wagmiConfig } from '../lib/wagmi';
 import { parseUnits } from 'viem';
 import { Loader2, ArrowLeft, CheckCircle2, Zap, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import api from '../api/axios'; // using their axios instance
+import api from '../api/axios';
 import { invalidateSubscriptionCache } from '../utils/subscriptionCache';
+
+class PaywallErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+  componentDidCatch(err) {
+    console.warn('[Paywall] Handled Web3 provider error:', err?.message);
+  }
+  render() {
+    if (this.state.hasError) {
+      return <PaywallFallbackView />;
+    }
+    return this.props.children;
+  }
+}
+
+// Fallback view if Web3 / crypto library fails to load
+function PaywallFallbackView() {
+  const navigate = useNavigate();
+  const [isStartingTrial, setIsStartingTrial] = useState(false);
+  const [billingCycle, setBillingCycle] = useState('monthly');
+  const isYearly = billingCycle === 'yearly';
+
+  const handleStartFree = async () => {
+    setIsStartingTrial(true);
+    try {
+      const response = await api.post('/api/subscriptions/start-trial', {
+        referredBy: localStorage.getItem('referred_by'),
+      });
+      if (response.data.success) {
+        invalidateSubscriptionCache();
+        navigate('/dashboard');
+      }
+    } catch (error) {
+      alert(error.response?.data?.error || 'Failed to start trial');
+    } finally {
+      setIsStartingTrial(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-[#060b11] text-white flex flex-col items-center pt-16 pb-24 px-4 relative overflow-x-hidden">
+      <button
+        onClick={() => navigate('/dashboard')}
+        className="absolute top-6 left-6 text-gray-400 hover:text-white flex items-center gap-2 text-sm font-medium transition-colors z-20"
+      >
+        <ArrowLeft className="w-4 h-4" /> Back to Dashboard
+      </button>
+      <div className="text-center relative z-10 max-w-2xl mb-8">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-mono font-bold tracking-wider uppercase mb-3">
+          <Zap className="w-3 h-3" />
+          <span>Membership Access</span>
+        </div>
+        <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white mb-3">
+          Select Your Trading Plan
+        </h1>
+        <p className="text-gray-400 text-sm sm:text-base">
+          10-Year Backtesting · Real-Time AI Psychology Coach · Instant Activation
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl w-full justify-center items-stretch relative z-10">
+        <div className="bg-[#0b131f]/90 border border-white/10 p-8 rounded-2xl flex flex-col backdrop-blur-xl">
+          <h2 className="text-lg font-bold text-white mb-2">Beginner Trial</h2>
+          <p className="text-gray-400 text-xs mb-6">Test the trading journal completely free</p>
+          <div className="mb-4">
+            <span className="text-4xl font-extrabold text-white">$0</span>
+            <span className="text-gray-400 text-xs font-mono ml-1">/24 hours</span>
+            <p className="text-gray-500 text-xs font-mono mt-1">No credit card required</p>
+          </div>
+          <button
+            onClick={handleStartFree}
+            disabled={isStartingTrial}
+            className="w-full mt-auto py-3.5 rounded-xl font-bold text-xs tracking-wider uppercase border border-white/20 text-white hover:bg-white/5 transition-all"
+          >
+            {isStartingTrial ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : 'Start For Free'}
+          </button>
+        </div>
+
+        <div className="bg-[#0f1d2e] border-2 border-emerald-500 p-8 rounded-2xl flex flex-col backdrop-blur-xl">
+          <h2 className="text-lg font-bold text-white mb-2">Pro Trader</h2>
+          <p className="text-gray-400 text-xs mb-6">Full institutional backtesting & AI psychology suite</p>
+          <div className="mb-4">
+            <span className="text-4xl font-extrabold text-white">{isYearly ? '$114' : '$14'}</span>
+            <span className="text-gray-400 text-xs font-mono ml-1">{isYearly ? '/year' : '/month'}</span>
+          </div>
+          <button
+            onClick={() => alert('Please connect using a Web3-enabled browser (e.g. MetaMask) or contact support.')}
+            className="w-full mt-auto py-3.5 rounded-xl font-bold text-xs tracking-wider uppercase bg-emerald-600 hover:bg-emerald-500 text-white transition-all"
+          >
+            Subscribe With USDT
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 // BSC USDT Contract Address
 const USDT_ADDRESS = '0x55d398326f99059fF775485246999027B3197955';
@@ -32,11 +133,13 @@ const queryClient = new QueryClient();
 
 export default function PaywallPage() {
   return (
-    <WagmiProvider config={wagmiConfig}>
-      <QueryClientProvider client={queryClient}>
-        <Paywall />
-      </QueryClientProvider>
-    </WagmiProvider>
+    <PaywallErrorBoundary>
+      <WagmiProvider config={wagmiConfig}>
+        <QueryClientProvider client={queryClient}>
+          <Paywall />
+        </QueryClientProvider>
+      </WagmiProvider>
+    </PaywallErrorBoundary>
   );
 }
 
@@ -112,6 +215,9 @@ function Paywall() {
 
   const { isSuccess: isConfirmed } = useWaitForTransactionReceipt({
     hash,
+    query: {
+      enabled: Boolean(hash),
+    },
   });
 
   const subType = localStorage.getItem('subscriptionType') || 'free';

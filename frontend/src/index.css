@@ -502,16 +502,14 @@ LANDING PAGE ANIMATIONS
    macOS / iOS SPATIAL GLASS DESIGN SYSTEM & THEME CROSS-DISSOLVE
    ========================================================= */
 
-/* Buttery-smooth cross-dissolve during theme switching */
-html.theme-transitioning,
-html.theme-transitioning *,
-html.theme-transitioning *::before,
-html.theme-transitioning *::after {
-  transition: background-color 300ms cubic-bezier(0.4, 0, 0.2, 1),
-              border-color 300ms cubic-bezier(0.4, 0, 0.2, 1),
-              color 300ms cubic-bezier(0.4, 0, 0.2, 1),
-              box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1) !important;
-  transition-delay: 0s !important;
+/* Buttery-smooth surface cross-dissolve during theme switching (No wildcard lag) */
+body,
+aside,
+main,
+.mac-bento-card,
+.mac-glass-panel,
+.mac-glass-card {
+  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
 }
 
 /* Trading theme ambient mesh background */

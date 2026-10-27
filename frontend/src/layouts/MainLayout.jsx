@@ -256,15 +256,8 @@ export default function MainLayout() {
       className="flex h-screen w-full bg-[#f8f9fc] dark:bg-[#0a0c10] text-neutral-900 dark:text-neutral-100 transition-colors duration-300 overflow-hidden font-sans relative"
       style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif" }}
     >
-      {/* ── macOS Spatial Ambient Canvas Mesh (Strict Emerald & Monochrome Neutrals) ── */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden z-0 select-none">
-        {/* Top-left emerald mesh */}
-        <div className="absolute -top-[20%] -left-[10%] w-[55vw] h-[55vw] max-w-[800px] max-h-[800px] rounded-full bg-emerald-400/[0.08] dark:bg-emerald-500/[0.06] blur-[140px] transition-colors duration-500" />
-        {/* Top-right subtle neutral glow */}
-        <div className="absolute -top-[15%] right-[5%] w-[45vw] h-[45vw] max-w-[700px] max-h-[700px] rounded-full bg-white/[0.06] dark:bg-white/[0.02] blur-[140px] transition-colors duration-500" />
-        {/* Bottom-center emerald glow */}
-        <div className="absolute -bottom-[20%] left-[25%] w-[50vw] h-[50vw] max-w-[750px] max-h-[750px] rounded-full bg-emerald-400/[0.05] dark:bg-emerald-500/[0.04] blur-[150px] transition-colors duration-500" />
-      </div>
+      {/* ── Ambient Background Canvas ── */}
+      <div className="pointer-events-none absolute inset-0 z-0 select-none bg-gradient-to-br from-transparent via-transparent to-emerald-500/[0.02]" />
 
       {/* ── REACT PORTAL: Feature Lock / Pro Popup ── */}
       {showLockPopup &&
@@ -496,38 +489,11 @@ export default function MainLayout() {
         {/* System Broadcast Announcement */}
         <SystemAnnouncementBanner announcement={announcement} isDark={isDark} />
 
-        {/* ── Desktop Floating macOS Top Navigation Bar ── */}
-        <header className="hidden md:flex sticky top-0 z-30 h-16 px-6 items-center justify-between border-b border-black/[0.05] dark:border-white/[0.06] bg-white/60 dark:bg-[#0c0e15]/60 backdrop-blur-xl">
-          {/* Left: Dynamic Breadcrumb / Workspace Badge */}
-          <div className="flex items-center gap-3">
-            <span className="text-xs font-semibold text-neutral-400 dark:text-neutral-500">Forex Notes</span>
-            <span className="text-neutral-300 dark:text-neutral-700">/</span>
-            <h2 className="text-sm font-bold text-neutral-900 dark:text-white tracking-tight">{pathTitle}</h2>
-            <div className="ml-2 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 dark:bg-emerald-500/15 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[11px] font-semibold">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              Markets Active
-            </div>
-          </div>
-
-          {/* Center: Apple Spotlight Search Trigger Pill */}
-          <button
-            type="button"
-            onClick={() => setIsSearchOpen(true)}
-            className="flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-black/[0.035] dark:bg-white/[0.05] hover:bg-black/[0.06] dark:hover:bg-white/[0.08] border border-black/[0.05] dark:border-white/[0.08] text-xs text-neutral-500 dark:text-neutral-400 transition-all duration-200 cursor-pointer shadow-sm hover:shadow"
-          >
-            <Search className="w-3.5 h-3.5 text-neutral-400" />
-            <span className="text-neutral-500 dark:text-neutral-400">Search trades, news, tools...</span>
-            <span className="font-mono text-[10px] px-1.5 py-0.5 rounded-md bg-black/5 dark:bg-white/10 text-neutral-600 dark:text-neutral-300">
-              ⌘K
-            </span>
-          </button>
-
-          {/* Right: Apple Control Center (Notification & Theme Toggle) */}
-          <div className="flex items-center gap-2">
-            <NotificationBell />
-            <ThemeToggle />
-          </div>
-        </header>
+        {/* ── Fixed Top-Right Action Cluster (Visible & Accessible on ALL pages) ── */}
+        <div className="hidden md:flex fixed top-4 right-6 z-40 items-center gap-2.5">
+          <NotificationBell />
+          <ThemeToggle />
+        </div>
 
         {/* Workspace Route Container */}
         <Suspense
