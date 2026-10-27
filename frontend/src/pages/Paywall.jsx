@@ -52,7 +52,7 @@ function PaywallFallbackView() {
   };
 
   return (
-    <div className="min-h-screen bg-[#060b11] text-white flex flex-col items-center pt-16 pb-24 px-4 relative overflow-x-hidden">
+    <div className="paywall-container min-h-screen bg-[#060b11] text-white flex flex-col items-center pt-16 pb-24 px-4 relative overflow-x-hidden">
       <button
         onClick={() => navigate('/dashboard')}
         className="absolute top-6 left-6 text-gray-400 hover:text-white flex items-center gap-2 text-sm font-medium transition-colors z-20"
@@ -73,7 +73,7 @@ function PaywallFallbackView() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl w-full justify-center items-stretch relative z-10">
-        <div className="bg-[#0b131f]/90 border border-white/10 p-8 rounded-2xl flex flex-col backdrop-blur-xl">
+        <div className="bg-[#0b131f] border border-white/10 p-8 rounded-2xl flex flex-col backdrop-blur-xl">
           <h2 className="text-lg font-bold text-white mb-2">Beginner Trial</h2>
           <p className="text-gray-400 text-xs mb-6">Test the trading journal completely free</p>
           <div className="mb-4">
@@ -132,6 +132,13 @@ const ERC20_ABI = [
 const queryClient = new QueryClient();
 
 export default function PaywallPage() {
+  useEffect(() => {
+    document.body.classList.add('terminal');
+    return () => {
+      document.body.classList.remove('terminal');
+    };
+  }, []);
+
   return (
     <PaywallErrorBoundary>
       <WagmiProvider config={wagmiConfig}>
@@ -210,6 +217,13 @@ function Paywall() {
   const { isConnected } = useAccount();
   const { connectors, connect } = useConnect();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    document.body.classList.add('terminal');
+    return () => {
+      document.body.classList.remove('terminal');
+    };
+  }, []);
 
   const { data: hash, writeContract } = useWriteContract();
 
@@ -296,7 +310,7 @@ function Paywall() {
   const isYearly = billingCycle === 'yearly';
 
   return (
-    <div className="min-h-screen bg-[#060b11] text-white flex flex-col items-center pt-16 pb-24 px-4 relative overflow-x-hidden">
+    <div className="paywall-container min-h-screen bg-[#060b11] text-white flex flex-col items-center pt-16 pb-24 px-4 relative overflow-x-hidden">
       {/* Background Ambient Glow */}
       <div
         className="absolute top-10 left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full pointer-events-none"
@@ -376,7 +390,7 @@ function Paywall() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl w-full justify-center items-stretch relative z-10">
         
         {/* Card 1: Beginner (Free Trial) */}
-        <div className="bg-[#0b131f]/90 border border-white/10 p-8 rounded-2xl flex flex-col backdrop-blur-xl relative hover:border-white/20 transition-all">
+        <div className="bg-[#0b131f] border border-white/10 p-8 rounded-2xl flex flex-col backdrop-blur-xl relative hover:border-white/20 transition-all">
           <h2 className="text-lg font-bold text-white mb-2">Beginner Trial</h2>
           <p className="text-gray-400 text-xs mb-6">Test the trading journal completely free</p>
 
@@ -413,7 +427,7 @@ function Paywall() {
           <button
             onClick={handleStartFree}
             disabled={isStartingTrial}
-            className="w-full mt-auto py-3.5 rounded-xl font-bold text-xs tracking-wider uppercase border border-white/20 text-white hover:bg-white/5 transition-all disabled:opacity-50"
+            className="w-full mt-auto py-3.5 rounded-xl font-bold text-xs tracking-wider uppercase border border-white/20 text-white bg-white/5 hover:bg-white/10 transition-all disabled:opacity-50"
           >
             {isStartingTrial ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : 'Start For Free'}
           </button>

@@ -997,6 +997,87 @@ html.light body:not(.terminal) .dark-luxury-card input[type="file"],
 }
 
 /* =========================================================
+   PAYWALL PAGE ISOLATION
+   Guarantees that Paywall remains perfectly dark & legible
+   regardless of whether global theme is light or dark.
+   ========================================================= */
+.paywall-container {
+  color-scheme: dark !important;
+  background-color: #060b11 !important;
+  color: #ffffff !important;
+}
+
+html.light body .paywall-container,
+html.light body:not(.terminal) .paywall-container {
+  background-color: #060b11 !important;
+  color: #ffffff !important;
+}
+
+html.light body .paywall-container h1,
+html.light body:not(.terminal) .paywall-container h1,
+html.light body .paywall-container h2,
+html.light body:not(.terminal) .paywall-container h2,
+html.light body .paywall-container .text-white,
+html.light body:not(.terminal) .paywall-container .text-white,
+html.light body .paywall-container [class*="text-white"],
+html.light body:not(.terminal) .paywall-container [class*="text-white"],
+.paywall-container .text-white,
+.paywall-container [class*="text-white"] {
+  color: #ffffff !important;
+}
+
+html.light body .paywall-container .text-gray-400,
+html.light body:not(.terminal) .paywall-container .text-gray-400,
+html.light body .paywall-container [class*="text-gray-400"],
+html.light body:not(.terminal) .paywall-container [class*="text-gray-400"],
+.paywall-container .text-gray-400,
+.paywall-container [class*="text-gray-400"] {
+  color: #9ca3af !important;
+}
+
+html.light body .paywall-container .text-gray-300,
+html.light body:not(.terminal) .paywall-container .text-gray-300,
+html.light body .paywall-container [class*="text-gray-300"],
+html.light body:not(.terminal) .paywall-container [class*="text-gray-300"],
+.paywall-container .text-gray-300,
+.paywall-container [class*="text-gray-300"] {
+  color: #d1d5db !important;
+}
+
+html.light body .paywall-container .text-gray-500,
+html.light body:not(.terminal) .paywall-container .text-gray-500,
+html.light body .paywall-container [class*="text-gray-500"],
+html.light body:not(.terminal) .paywall-container [class*="text-gray-500"],
+.paywall-container .text-gray-500,
+.paywall-container [class*="text-gray-500"] {
+  color: #6b7280 !important;
+}
+
+html.light body .paywall-container [class*="border-white"],
+html.light body:not(.terminal) .paywall-container [class*="border-white"],
+.paywall-container [class*="border-white"] {
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+html.light body .paywall-container [class*="bg-[#0b131f]"],
+html.light body:not(.terminal) .paywall-container [class*="bg-[#0b131f]"],
+.paywall-container [class*="bg-[#0b131f]"] {
+  background-color: #0b131f !important;
+}
+
+html.light body .paywall-container [class*="bg-[#0f1d2e]"],
+html.light body:not(.terminal) .paywall-container [class*="bg-[#0f1d2e]"],
+.paywall-container [class*="bg-[#0f1d2e]"] {
+  background-color: #0f1d2e !important;
+}
+
+html.light body .paywall-container [class*="bg-slate-900"],
+html.light body:not(.terminal) .paywall-container [class*="bg-slate-900"],
+.paywall-container [class*="bg-slate-900"] {
+  background-color: rgba(15, 23, 42, 0.8) !important;
+}
+
+/* =========================================================
 LEDGER UTILITIES
 ========================================================= */
 
