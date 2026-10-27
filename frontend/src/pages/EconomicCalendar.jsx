@@ -1,4 +1,4 @@
-// frontend/src/pages/EconomicCalendar.jsx
+﻿// frontend/src/pages/EconomicCalendar.jsx
 import { useEffect, useRef } from "react";
 import { Globe, ExternalLink, CalendarDays } from "lucide-react";
 

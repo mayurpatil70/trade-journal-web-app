@@ -1,4 +1,4 @@
-export default function BrandLogo({ className = "", ...rest }) {
+﻿export default function BrandLogo({ className = "", ...rest }) {
   return (
     <img
       src="/logo-brand-384.webp"

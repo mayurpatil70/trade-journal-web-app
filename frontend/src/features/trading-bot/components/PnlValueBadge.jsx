@@ -1,4 +1,4 @@
-import { memo } from "react";
+﻿import { memo } from "react";
 
 function PnlValueBadge({ value, suffix = "", digits = 2 }) {
   if (value == null || Number.isNaN(Number(value))) return <span className="text-gray-500">-</span>;

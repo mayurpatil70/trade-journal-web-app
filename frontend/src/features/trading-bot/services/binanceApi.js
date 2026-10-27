@@ -1,4 +1,4 @@
-import api from "../../../api/axios";
+﻿import api from "../../../api/axios";
 
 export const botApi = {
   status: () => api.get("/api/bot/status").then((r) => r.data),

@@ -1,4 +1,4 @@
-export default function NotFound() {
+﻿export default function NotFound() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', backgroundColor: 'var(--paper)', color: 'var(--ink)' }}>
       <h1 style={{ fontSize: '4rem', fontWeight: 800, color: '#ec4899', marginBottom: '16px' }}>404</h1>

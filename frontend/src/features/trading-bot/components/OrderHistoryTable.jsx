@@ -1,4 +1,4 @@
-import { memo } from "react";
+﻿import { memo } from "react";
 import PnlValueBadge from "./PnlValueBadge";
 
 const STATUS_TONE = {

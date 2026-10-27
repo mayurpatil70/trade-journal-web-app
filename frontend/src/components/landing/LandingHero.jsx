@@ -1,4 +1,4 @@
-// src/components/landing/LandingHero.jsx
+﻿// src/components/landing/LandingHero.jsx
 // The main hero text and 3D candlestick section
 
 import { lazy, Suspense } from 'react';

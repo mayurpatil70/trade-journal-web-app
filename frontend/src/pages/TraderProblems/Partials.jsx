@@ -1,4 +1,4 @@
-// frontend/src/pages/TraderProblems/Partials.jsx
+﻿// frontend/src/pages/TraderProblems/Partials.jsx
 import { useState } from "react";
 import { Calculator, Plus, Trash2, PieChart } from "lucide-react";
 

@@ -1,4 +1,4 @@
-export const SITE = 'https://forexnotes.in';
+﻿export const SITE = 'https://forexnotes.in';
 export const PRICE = { monthly: 14, yearly: 114 };
 
 export const DISCLAIMER = 'Forex Notes is journaling, backtesting and analytics software. It is not a broker, does not hold funds or execute trades for you, and does not give investment advice. Trading carries risk; check the rules that apply to you in your country and with your prop firm.';

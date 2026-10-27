@@ -270,45 +270,67 @@ export default function Dashboard() {
       {/* 1. HERO HEADER */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <h1 className="font-serif text-3xl font-medium text-gray-200">
-            {getGreeting()}, <span className="text-white font-semibold">{localStorage.getItem("userEmail")?.split("@")[0] || "Trader"}</span>
+          <h1 className="font-serif text-3xl font-medium text-neutral-800 dark:text-neutral-100">
+            {getGreeting()},{" "}
+            <span className="text-neutral-900 dark:text-white font-semibold">
+              {localStorage.getItem("userEmail")?.split("@")[0] || "Trader"}
+            </span>
           </h1>
-          <p className="text-gray-500 mt-1 text-[13px]">Your trading performance at a glance.</p>
+          <p className="text-neutral-500 dark:text-neutral-400 mt-1 text-[13px]">
+            Your trading performance at a glance.
+          </p>
         </div>
         <div className="flex items-center gap-3 flex-wrap">
           <AccountFilter trades={allTrades} selectedAccount={selectedAccount} onChange={setSelectedAccount} />
-          <button onClick={() => navigate("/add-trade")} className="flex items-center gap-2 px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-medium rounded-lg transition-colors text-[13px] shadow-lg shadow-emerald-500/20">
+          <button
+            onClick={() => navigate("/add-trade")}
+            className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white font-semibold rounded-2xl transition-all text-[13px] shadow-lg shadow-emerald-500/25 active:scale-95 cursor-pointer"
+          >
             <PlusCircle className="w-4 h-4" /> Log Trade
           </button>
         </div>
       </div>
 
-      {/* 2. KPI ROW */}
+      {/* 2. KPI ROW (Apple macOS Bento Box Row) */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
         {[
-          { label: "Net R-Multiple", value: `${stats.totalR >= 0 ? "+" : ""}${stats.totalR}R`, color: parseFloat(stats.totalR) >= 0 ? "text-emerald-400" : "text-red-400" },
-          { label: "Win Rate", value: `${stats.winRate}%`, color: "text-white" },
-          { label: "Profit Factor", value: stats.profitFactor, color: "text-white" },
-          { label: "Average R", value: `${parseFloat(stats.avgR) >= 0 ? "+" : ""}${stats.avgR}R`, color: "text-gray-300" },
-          { label: "Max Drawdown", value: `-${stats.maxDrawdown}R`, color: "text-red-400" },
+          {
+            label: "Net R-Multiple",
+            value: `${stats.totalR >= 0 ? "+" : ""}${stats.totalR}R`,
+            color: parseFloat(stats.totalR) >= 0 ? "text-emerald-500 dark:text-emerald-400" : "text-rose-500 dark:text-rose-400",
+          },
+          { label: "Win Rate", value: `${stats.winRate}%`, color: "text-neutral-900 dark:text-white" },
+          { label: "Profit Factor", value: stats.profitFactor, color: "text-neutral-900 dark:text-white" },
+          {
+            label: "Average R",
+            value: `${parseFloat(stats.avgR) >= 0 ? "+" : ""}${stats.avgR}R`,
+            color: "text-neutral-700 dark:text-neutral-300",
+          },
+          { label: "Max Drawdown", value: `-${stats.maxDrawdown}R`, color: "text-rose-500 dark:text-rose-400" },
         ].map((kpi, i) => (
-          <div key={i} className="glossy rounded-2xl p-5">
-            <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-widest mb-2">{kpi.label}</p>
-            <p className={`ledger-figure text-3xl ${kpi.color}`}>{kpi.value}</p>
+          <div key={i} className="mac-bento-card rounded-3xl p-5">
+            <p className="text-[11px] font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-widest mb-2">
+              {kpi.label}
+            </p>
+            <p className={`ledger-figure text-3xl font-bold ${kpi.color}`}>{kpi.value}</p>
           </div>
         ))}
       </div>
 
       {/* 3. MAIN PERFORMANCE AREA */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 glossy rounded-2xl p-6 flex flex-col">
+        <div className="lg:col-span-2 mac-bento-card rounded-3xl p-6 flex flex-col">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h2 className="text-[15px] font-semibold text-white">Equity Progression (R)</h2>
-              <p className="text-[12px] text-gray-500 mt-1">Cumulative R-Multiple across {selectedAccount ? `"${selectedAccount}"` : "all trades"}</p>
+              <h2 className="text-[15px] font-bold text-neutral-900 dark:text-white">Equity Progression (R)</h2>
+              <p className="text-[12px] text-neutral-500 dark:text-neutral-400 mt-1">
+                Cumulative R-Multiple across {selectedAccount ? `"${selectedAccount}"` : "all trades"}
+              </p>
             </div>
-            <div className="flex items-center gap-2 text-xs font-medium text-gray-400">
-              <span className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-emerald-400" /> New Highs</span>
+            <div className="flex items-center gap-2 text-xs font-medium text-neutral-500 dark:text-neutral-400">
+              <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 dark:bg-emerald-500/15 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[11px] font-semibold">
+                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> New Highs
+              </span>
             </div>
           </div>
           <div className="flex-1 min-h-[250px] relative">
@@ -317,21 +339,26 @@ export default function Dashboard() {
         </div>
 
         <div className="flex flex-col gap-6">
-          <div className="bg-gradient-to-br from-emerald-50 to-white dark:from-[#102a3a] dark:to-[#0A0B0D] border border-emerald-500/20 rounded-2xl p-6 relative overflow-hidden group flex flex-col justify-between">
+          <div className="bg-gradient-to-br from-emerald-500/[0.08] via-white/80 to-teal-500/[0.05] dark:from-[#102a3a]/80 dark:to-[#0A0B0D]/80 border border-emerald-500/20 dark:border-emerald-500/25 rounded-3xl p-6 relative overflow-hidden group flex flex-col justify-between backdrop-blur-2xl shadow-sm hover:shadow transition-all">
             <div>
-              <h3 className="text-[11px] font-semibold text-emerald-500 uppercase tracking-widest mb-3">Economic Calendar</h3>
-              <p className="text-gray-200 text-[13px] leading-relaxed mb-4 relative z-10">
+              <h3 className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest mb-3">
+                Economic Calendar
+              </h3>
+              <p className="text-neutral-700 dark:text-neutral-200 text-[13px] leading-relaxed mb-4 relative z-10 font-medium">
                 Stay ahead of the markets. Track upcoming high-impact economic events before you execute your trades.
               </p>
             </div>
-            <div className="mt-4 pt-4 border-t border-white/10 flex justify-between items-center relative z-10">
+            <div className="mt-4 pt-4 border-t border-black/[0.06] dark:border-white/10 flex justify-between items-center relative z-10">
               <button
                 onClick={() => navigate("/affiliate")}
-                className="relative flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold text-black bg-gradient-to-r from-amber-400 to-yellow-300 hover:from-amber-300 hover:to-yellow-200 transition-all shadow-md shadow-amber-500/30 hover:shadow-amber-400/50 hover:scale-105 active:scale-95"
+                className="relative flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-bold text-black bg-gradient-to-r from-amber-400 to-yellow-300 hover:from-amber-300 hover:to-yellow-200 transition-all shadow-md shadow-amber-500/20 hover:scale-105 active:scale-95"
               >
                 <img src="/logo3d.png" alt="ForexNotes" className="w-3.5 h-3.5 object-contain inline-block shrink-0" /> Get 10% Off with Affiliate
               </button>
-              <button onClick={() => navigate("/news")} className="text-[12px] font-semibold text-emerald-400 hover:text-cyan-300 flex items-center gap-1 transition-colors">
+              <button
+                onClick={() => navigate("/news")}
+                className="text-[12px] font-semibold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1 transition-colors"
+              >
                 View Calendar <ArrowRight className="w-3 h-3" />
               </button>
             </div>
@@ -348,15 +375,27 @@ export default function Dashboard() {
       {/* 4. RECENT TRADES */}
       <div>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-[15px] font-semibold text-white">Recent Executions</h2>
-          <button onClick={() => navigate("/trades")} className="text-[12px] font-semibold text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">View All History</button>
+          <h2 className="text-[15px] font-bold text-neutral-900 dark:text-white">Recent Executions</h2>
+          <button
+            onClick={() => navigate("/trades")}
+            className="text-[12px] font-semibold text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-colors"
+          >
+            View All History
+          </button>
         </div>
         {trades.length === 0 ? (
-          <div className="bg-[#101216] border border-white/5 rounded-2xl p-10 text-center">
-            <List className="w-8 h-8 text-gray-600 mx-auto mb-3" />
-            <h3 className="text-gray-300 font-medium mb-1">Your trading history starts here.</h3>
-            <p className="text-xs text-gray-500 mb-5">Log your first trade to begin discovering your performance patterns.</p>
-            <button onClick={() => navigate("/add-trade")} className="px-5 py-2 bg-white/10 hover:bg-white/15 text-white text-[13px] font-medium rounded-lg transition-colors">Add First Trade</button>
+          <div className="mac-bento-card rounded-3xl p-10 text-center border border-dashed border-black/[0.08] dark:border-white/10">
+            <List className="w-8 h-8 text-neutral-400 dark:text-neutral-600 mx-auto mb-3" />
+            <h3 className="text-neutral-800 dark:text-neutral-200 font-semibold mb-1">Your trading history starts here.</h3>
+            <p className="text-xs text-neutral-500 dark:text-neutral-400 mb-5">
+              Log your first trade to begin discovering your performance patterns.
+            </p>
+            <button
+              onClick={() => navigate("/add-trade")}
+              className="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white text-[13px] font-semibold rounded-xl transition-all shadow-md shadow-emerald-500/25 active:scale-95"
+            >
+              Add First Trade
+            </button>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

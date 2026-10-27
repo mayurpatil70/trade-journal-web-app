@@ -1,4 +1,4 @@
-const TTL = 5000;
+﻿const TTL = 5000;
 const cache = new Map();
 
 export async function getPrices(symbols) {

@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+﻿import { useEffect, useRef } from 'react';
 import { useTheme } from '../theme-provider';
 
 // Vibrant trading palette: high saturation, never muddy or washed out

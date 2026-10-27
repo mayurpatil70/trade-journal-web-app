@@ -1,4 +1,4 @@
-export const FOREX_NOTES = {
+﻿export const FOREX_NOTES = {
   name: "Forex Notes",
   monthly: 14,
   yearly: 114,

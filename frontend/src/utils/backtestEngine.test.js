@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+﻿import { describe, it, expect } from 'vitest';
 import {
   createReplay, positionSize, validateOrder, pendingFillPrice, exitCheck, stepReplay,
   placeOrder, closePosition, computeAnalytics, paginate, partialClose, modifyPosition,

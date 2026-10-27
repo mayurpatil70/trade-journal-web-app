@@ -1,4 +1,4 @@
-// frontend/src/pages/DiscordGate.jsx
+﻿// frontend/src/pages/DiscordGate.jsx
 import { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { MessageSquare, ArrowRight, Shield, AlertTriangle, Loader2 } from "lucide-react";

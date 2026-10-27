@@ -1,4 +1,4 @@
-import { memo } from "react";
+﻿import { memo } from "react";
 import { useBinanceStream } from "../hooks/useBinanceStream";
 import PnlValueBadge from "./PnlValueBadge";
 

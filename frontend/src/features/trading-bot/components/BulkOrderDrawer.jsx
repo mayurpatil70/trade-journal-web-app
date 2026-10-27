@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { getSymbolInfo } from "../services/symbolInfoCache";
 
 const EMPTY = { symbols: "", allocatedCapital: 100, takeProfitPercentage: 2, stopLossPercentage: 5, maxActiveOrders: 3, gridSpacingPercentage: 1 };

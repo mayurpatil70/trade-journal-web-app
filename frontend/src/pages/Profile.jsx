@@ -1,4 +1,4 @@
-// frontend/src/pages/Profile.jsx
+﻿// frontend/src/pages/Profile.jsx
 import { useState } from "react";
 import { User, Loader2, Mail, Phone, AtSign, Shield } from "lucide-react";
 

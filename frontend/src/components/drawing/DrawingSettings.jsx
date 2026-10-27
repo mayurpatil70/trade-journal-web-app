@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+﻿import { useEffect, useRef, useState } from 'react';
 import { Lock, Unlock, EyeOff, Copy, Trash2, BookmarkPlus, X, Check } from 'lucide-react';
 import { TOOLS, MARKERS, saveTemplate } from './tools';
 

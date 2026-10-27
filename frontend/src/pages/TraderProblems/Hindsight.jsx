@@ -1,4 +1,4 @@
-// frontend/src/pages/TraderProblems/Hindsight.jsx
+﻿// frontend/src/pages/TraderProblems/Hindsight.jsx
 import { useState, useEffect } from "react";
 import {
   SlidersHorizontal,

@@ -1,4 +1,4 @@
-// frontend/src/pages/AdminDashboard.jsx
+﻿// frontend/src/pages/AdminDashboard.jsx
 import { useState, useEffect, useMemo, useRef } from "react";
 import {
   ShieldCheck,

@@ -1,4 +1,4 @@
-// frontend/src/pages/TraderProblems/LotSizeCalculator.jsx
+﻿// frontend/src/pages/TraderProblems/LotSizeCalculator.jsx
 import { useState, useMemo } from "react";
 import {
   Calculator,

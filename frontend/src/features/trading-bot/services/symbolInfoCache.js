@@ -1,4 +1,4 @@
-const TTL = 60 * 60 * 1000;
+﻿const TTL = 60 * 60 * 1000;
 const BASE = "https://api.binance.com";
 const cache = new Map();
 const inflight = new Map();

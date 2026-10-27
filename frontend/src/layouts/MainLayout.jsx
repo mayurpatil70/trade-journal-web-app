@@ -3,7 +3,8 @@ import NotificationBell from "../components/NotificationBell.jsx";
 import BrandLogo from "../components/BrandLogo";
 import ThemeToggle from "../components/ThemeToggle.jsx";
 import { useTheme } from "../components/theme-provider";
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, useRef, useCallback, Suspense } from "react";
+import { createPortal } from "react-dom";
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import PreTradeGate from "../components/PreTradeGate.jsx";
 import PromoPopup from "../components/PromoPopup.jsx";
@@ -16,7 +17,6 @@ import {
   Calendar as CalendarIcon,
   Globe,
   Users,
-  Upload,
   Settings,
   Headphones,
   Wallet,
@@ -27,14 +27,15 @@ import {
   ChevronDown,
   User,
   CreditCard,
-  CheckCircle2,
   ShieldCheck,
   Zap,
   Lock,
   Calculator as CalculatorIcon,
+  Search,
+  Sparkles,
 } from "lucide-react";
 
-// FIX: Extracted outside to prevent React Hook Error 310 (Black Screen Crash)
+// Nav Item with Apple Squircle Geometry & Glossy Interaction
 const NavItem = ({
   to,
   icon: Icon,
@@ -46,11 +47,11 @@ const NavItem = ({
   isLocked = false,
   onLockedClick,
 }) => {
-  const isActive = currentPath === to || currentPath.startsWith(to + "/");
+  const isActive = currentPath === to || (to !== "/" && currentPath.startsWith(to + "/"));
 
   return (
     <Link
-      to={(isDisabled || isLocked) ? "#" : to}
+      to={isDisabled || isLocked ? "#" : to}
       onClick={(e) => {
         if (isDisabled) e.preventDefault();
         else if (isLocked) {
@@ -58,49 +59,56 @@ const NavItem = ({
           if (onLockedClick) onLockedClick();
         } else if (onClick) onClick();
       }}
-      className={`group flex items-center justify-between px-3 py-2.5 rounded-xl transition-all font-medium text-[13px] ${
+      className={`group relative flex items-center justify-between px-3.5 py-2.5 rounded-2xl transition-all duration-300 font-medium text-[13px] ${
         isDisabled
-          ? "opacity-50 cursor-not-allowed text-gray-500"
+          ? "opacity-40 cursor-not-allowed text-neutral-400 dark:text-neutral-600"
           : isActive
-            ? "bg-[#1B2027] text-white border border-white/5 shadow-[0_0_15px_rgba(16,185,129,0.15)]"
-            : "text-gray-400 hover:bg-[#15181D] hover:text-gray-200 border border-transparent"
+          ? "bg-white dark:bg-white/[0.09] text-emerald-800 dark:text-white font-semibold border border-black/[0.06] dark:border-white/[0.12] shadow-[0_4px_16px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.4)]"
+          : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white hover:bg-black/[0.035] dark:hover:bg-white/[0.06] border border-transparent"
       }`}
     >
-      <div className="flex items-center gap-3">
+      {/* Active Left Indicator Bar */}
+      {isActive && (
+        <span className="absolute left-1.5 top-2.5 bottom-2.5 w-1 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.8)]" />
+      )}
+
+      <div className="flex items-center gap-3 pl-1">
         <Icon
-          className={`w-[18px] h-[18px] transition-colors ${
+          className={`w-[18px] h-[18px] transition-all duration-300 ${
             isActive
-              ? "text-emerald-400"
-              : "text-gray-500 group-hover:text-gray-300"
+              ? "text-emerald-600 dark:text-emerald-400 drop-shadow-[0_0_8px_rgba(16,185,129,0.5)]"
+              : "text-neutral-400 dark:text-neutral-500 group-hover:text-neutral-800 dark:group-hover:text-neutral-200"
           }`}
-          strokeWidth={isActive ? 2.5 : 2}
+          strokeWidth={isActive ? 2.4 : 2}
         />
         <span className="tracking-tight">{label}</span>
       </div>
+
       <div className="flex items-center gap-2">
         {isBeta && (
-          <span className="text-[9px] uppercase tracking-wider font-bold bg-emerald-500/10 text-emerald-400 px-1.5 py-0.5 rounded-md">
+          <span className="text-[9px] uppercase tracking-wider font-extrabold bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-full">
             Beta
           </span>
         )}
-        {isLocked && <Lock className="w-3.5 h-3.5 text-gray-500" />}
+        {isLocked && <Lock className="w-3.5 h-3.5 text-neutral-400 dark:text-neutral-500" />}
       </div>
     </Link>
   );
 };
 
 export default function MainLayout() {
-  const { theme } = useTheme();
-  const isDark = theme === "dark";
+  const { theme, isDark } = useTheme();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [isSubscriptionOpen, setIsSubscriptionOpen] = useState(false);
+  const [profileCoords, setProfileCoords] = useState({ bottom: 0, left: 0, width: 236 });
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [showLockPopup, setShowLockPopup] = useState(false);
+  const userCardRef = useRef(null);
   const location = useLocation();
   const navigate = useNavigate();
 
   const userId = localStorage.getItem("userId") || localStorage.getItem("userEmail");
+  const userEmail = localStorage.getItem("userEmail") || "Trader";
   const isAdmin = userId === "noballondesk@gmail.com" || userId === "akpatil51340@gmail.com";
 
   // System broadcast announcement
@@ -130,18 +138,38 @@ export default function MainLayout() {
     };
   }, []);
 
-  // Command palette shortcut
+  // Command palette shortcut (⌘K or Ctrl+K)
   useEffect(() => {
-    // Command Palette listener
     const handleKeyDown = (e) => {
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
         e.preventDefault();
         setIsSearchOpen(true);
       }
+      if (e.key === "Escape") {
+        setIsSearchOpen(false);
+        setIsProfileOpen(false);
+        setShowLockPopup(false);
+      }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
+
+  // Update position of user profile dropdown popover
+  const updateProfileCoords = useCallback(() => {
+    if (!userCardRef.current) return;
+    const rect = userCardRef.current.getBoundingClientRect();
+    setProfileCoords({
+      bottom: window.innerHeight - rect.top + 8,
+      left: rect.left,
+      width: rect.width,
+    });
+  }, []);
+
+  const toggleProfile = () => {
+    if (!isProfileOpen) updateProfileCoords();
+    setIsProfileOpen((p) => !p);
+  };
 
   const handleLogout = () => {
     localStorage.removeItem("userId");
@@ -179,8 +207,6 @@ export default function MainLayout() {
         { to: "/charts", icon: Activity, label: "Live Charts" },
         { to: "/sessions", icon: Zap, label: "Setup Backtesting" },
         { to: "/news", icon: Globe, label: "Economic Calendar" },
-        
-        
         { to: "/bot-hub", icon: Activity, label: "Bot Hub", isBeta: true, requiresAdmin: true },
         { to: "/bot-hub/connections", icon: ShieldCheck, label: "Exchange Keys", requiresAdmin: true },
         { to: "/bot-hub/mt5", icon: Zap, label: "MT5 AI Bot", isBeta: true, requiresAdmin: true },
@@ -189,7 +215,6 @@ export default function MainLayout() {
           icon: CalculatorIcon,
           label: "Calculators",
         },
-        // { to: "/calculator/prop-firm", icon: CalculatorIcon, label: "Funded Guardian" },
       ],
     },
     {
@@ -203,75 +228,129 @@ export default function MainLayout() {
     },
   ];
 
+  // Route title formatting for dynamic Apple topbar
+  const pathTitle = (() => {
+    const p = location.pathname;
+    if (p.includes("dashboard")) return "Dashboard";
+    if (p.includes("add-trade")) return "Add Trade";
+    if (p.includes("trades")) return "Past Trades";
+    if (p.includes("calendar")) return "Calendar";
+    if (p.includes("analytics")) return "Strategy Analytics";
+    if (p.includes("psychology")) return "Psychology Lab";
+    if (p.includes("mistakes")) return "Mistake Lab";
+    if (p.includes("charts")) return "Live Charts";
+    if (p.includes("sessions")) return "Setup Backtesting";
+    if (p.includes("news")) return "Economic Calendar";
+    if (p.includes("calculator")) return "Lot Size Calculator";
+    if (p.includes("accounts")) return "Prop Firm Accounts";
+    if (p.includes("settings")) return "Settings";
+    if (p.includes("profile")) return "Profile";
+    if (p.includes("support")) return "Support";
+    if (p.includes("affiliate")) return "Affiliate";
+    if (p.includes("admin")) return "Command Center";
+    return "Forex Notes";
+  })();
+
   return (
     <div
-      className="flex h-screen bg-[#0A0B0D] text-white transition-colors duration-200 overflow-hidden"
-      style={{ fontFamily: "'Inter', sans-serif" }}
+      className="flex h-screen w-full bg-[#f8f9fc] dark:bg-[#0a0c10] text-neutral-900 dark:text-neutral-100 transition-colors duration-300 overflow-hidden font-sans relative"
+      style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif" }}
     >
-      {showLockPopup && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
-          <div className="bg-[#101216] border border-white/10 p-6 rounded-2xl shadow-2xl max-w-sm w-full relative text-center">
-            <button onClick={() => setShowLockPopup(false)} className="absolute top-4 right-4 text-gray-500 hover:text-white transition-colors">
-              <X className="w-5 h-5" />
-            </button>
-            <div className="w-12 h-12 bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Lock className="w-6 h-6 text-emerald-400" />
+      {/* ── macOS Spatial Ambient Canvas Mesh ── */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden z-0 select-none">
+        {/* Top-left emerald mesh */}
+        <div className="absolute -top-[20%] -left-[10%] w-[55vw] h-[55vw] max-w-[800px] max-h-[800px] rounded-full bg-emerald-400/10 dark:bg-emerald-500/[0.07] blur-[120px] transition-colors duration-500" />
+        {/* Top-right indigo/violet mesh */}
+        <div className="absolute -top-[15%] right-[5%] w-[45vw] h-[45vw] max-w-[700px] max-h-[700px] rounded-full bg-indigo-400/[0.08] dark:bg-indigo-500/[0.06] blur-[130px] transition-colors duration-500" />
+        {/* Bottom-center subtle sapphire mesh */}
+        <div className="absolute -bottom-[20%] left-[25%] w-[50vw] h-[50vw] max-w-[750px] max-h-[750px] rounded-full bg-cyan-400/[0.06] dark:bg-cyan-500/[0.04] blur-[140px] transition-colors duration-500" />
+      </div>
+
+      {/* ── REACT PORTAL: Feature Lock / Pro Popup ── */}
+      {showLockPopup &&
+        createPortal(
+          <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/40 dark:bg-black/70 backdrop-blur-md px-4 animate-in fade-in duration-200">
+            <div
+              className="bg-white/90 dark:bg-[#121622]/90 border border-black/[0.08] dark:border-white/[0.12] p-7 rounded-3xl shadow-[0_25px_60px_rgba(0,0,0,0.15)] dark:shadow-[0_25px_70px_rgba(0,0,0,0.7)] max-w-sm w-full relative text-center backdrop-blur-2xl animate-in zoom-in-95 duration-200"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                onClick={() => setShowLockPopup(false)}
+                className="absolute top-4 right-4 text-neutral-400 hover:text-neutral-700 dark:hover:text-white p-1 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+              <div className="w-14 h-14 bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/30 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm shadow-emerald-500/20">
+                <Lock className="w-7 h-7 text-emerald-600 dark:text-emerald-400" />
+              </div>
+              <h3 className="text-lg font-bold text-neutral-900 dark:text-white mb-2">Coming Soon</h3>
+              <p className="text-neutral-600 dark:text-neutral-400 text-xs leading-relaxed mb-6">
+                This feature is currently in active development for the upcoming Pro Plan release.
+              </p>
+              <button
+                onClick={() => setShowLockPopup(false)}
+                className="w-full py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-xl transition-all shadow-lg shadow-emerald-500/25 active:scale-95"
+              >
+                Got it
+              </button>
             </div>
-            <h3 className="text-lg font-bold text-white mb-2">Coming Soon</h3>
-            <p className="text-gray-400 text-sm mb-6">
-              This feature is currently in development and will be available in the upcoming Pro Plan. Stay tuned!
-            </p>
-            <button onClick={() => setShowLockPopup(false)} className="w-full py-2.5 bg-emerald-500 hover:bg-emerald-400 text-black font-semibold rounded-xl transition-colors">
-              Got it
-            </button>
-          </div>
+          </div>,
+          document.body
+        )}
+
+      {/* ── Mobile iOS Header ── */}
+      <div className="md:hidden fixed top-0 left-0 right-0 h-14 bg-white/75 dark:bg-[#0c0e15]/75 backdrop-blur-2xl border-b border-black/[0.06] dark:border-white/[0.08] flex items-center justify-between px-4 z-40 shadow-sm">
+        <div className="flex items-center gap-2">
+          <BrandLogo className="h-10 w-auto object-contain" />
         </div>
-      )}
-      {/* Mobile Header */}
-      <div className="md:hidden fixed top-0 left-0 right-0 h-14 glossy-bar flex items-center justify-between px-4 z-40">
-        <div className="flex items-center gap-2"><BrandLogo className="h-11 w-auto object-contain" /></div>
-        <div className="flex items-center gap-1">
-        <ThemeToggle />
-        <NotificationBell />
-        <button
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-colors"
-        >
-          {isMobileMenuOpen ? (
-            <X className="w-5 h-5" />
-          ) : (
-            <Menu className="w-5 h-5" />
-          )}
-        </button>
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          <NotificationBell />
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="p-2 rounded-xl text-neutral-600 dark:text-neutral-300 hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
+            aria-label="Toggle navigation menu"
+          >
+            {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
         </div>
       </div>
 
-      {/* Sidebar - Premium Trading Cockpit Style */}
+      {/* ── macOS Frosted Glass Sidebar ── */}
       <aside
-        className={`fixed inset-y-0 left-0 z-30 w-[260px] glossy-side border-r border-white/5 transform transition-transform duration-300 ease-in-out flex flex-col ${
+        className={`fixed inset-y-0 left-0 z-30 w-[260px] bg-white/70 dark:bg-[#10131b]/70 backdrop-blur-2xl border-r border-black/[0.06] dark:border-white/[0.08] shadow-[2px_0_24px_rgba(0,0,0,0.02)] dark:shadow-[4px_0_40px_rgba(0,0,0,0.5)] transform transition-transform duration-300 ease-in-out flex flex-col ${
           isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
         } md:relative md:translate-x-0`}
       >
-        {/* Logo */}
-        <div className="h-16 flex items-center justify-between px-5 shrink-0 hidden md:flex border-b border-white/5">
-          <div className="flex items-center gap-2"><BrandLogo className="h-12 w-auto object-contain" /></div>
+        {/* macOS Window Top Chrome */}
+        <div className="h-16 flex items-center justify-between px-5 shrink-0 hidden md:flex border-b border-black/[0.05] dark:border-white/[0.06]">
+          <div className="flex items-center gap-3">
+            {/* Apple Window Traffic Light Dots */}
+            <div className="flex items-center gap-1.5 mr-1 group/traffic cursor-default">
+              <span className="w-3 h-3 rounded-full bg-[#FF5F56] border border-[#E0443E] shadow-sm inline-block group-hover/traffic:brightness-95 transition-all" />
+              <span className="w-3 h-3 rounded-full bg-[#FFBD2E] border border-[#DEA123] shadow-sm inline-block group-hover/traffic:brightness-95 transition-all" />
+              <span className="w-3 h-3 rounded-full bg-[#27C93F] border border-[#1AAB29] shadow-sm inline-block group-hover/traffic:brightness-95 transition-all" />
+            </div>
+            <BrandLogo className="h-8 w-auto object-contain" />
+          </div>
+
           <button
             onClick={() => setIsSearchOpen(true)}
-            className="p-1.5 text-gray-500 hover:text-gray-300 rounded-md hover:bg-white/5 transition-colors"
+            className="flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-medium bg-black/[0.04] dark:bg-white/[0.06] hover:bg-black/[0.08] dark:hover:bg-white/[0.1] text-neutral-500 dark:text-neutral-400 transition-colors border border-black/[0.04] dark:border-white/[0.06]"
+            title="Spotlight Search (⌘K)"
           >
-            <span className="text-[10px] font-mono border border-gray-700 px-1 rounded">
-              ⌘K
-            </span>
+            <span className="font-mono text-[10px]">⌘K</span>
           </button>
         </div>
 
-        <nav className="flex-1 overflow-y-auto py-5 px-3 space-y-7 scrollbar-hide mt-14 md:mt-0">
+        {/* Navigation Item Tree */}
+        <nav className="flex-1 overflow-y-auto py-5 px-3 space-y-6 scrollbar-hide mt-14 md:mt-0">
           {navSections.map((section) => (
             <div key={section.label}>
-              <p className="px-3 text-[10px] font-semibold text-gray-600 uppercase tracking-widest mb-2.5">
+              <p className="px-3.5 text-[10px] font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-widest mb-2">
                 {section.label}
               </p>
-              <div className="space-y-0.5">
+              <div className="space-y-1">
                 {section.items.map((item) => (
                   <NavItem
                     key={item.to}
@@ -279,7 +358,9 @@ export default function MainLayout() {
                     icon={item.icon}
                     label={item.label}
                     isBeta={item.isBeta}
-                    isDisabled={item.isDisabled} isLocked={!isAdmin && item.requiresAdmin} onLockedClick={() => setShowLockPopup(true)}
+                    isDisabled={item.isDisabled}
+                    isLocked={!isAdmin && item.requiresAdmin}
+                    onLockedClick={() => setShowLockPopup(true)}
                     currentPath={location.pathname}
                     onClick={closeMenu}
                   />
@@ -288,15 +369,15 @@ export default function MainLayout() {
             </div>
           ))}
 
-          {/* ADMIN BYPASS MENU */}
+          {/* ADMIN MENU (Conditionally Rendered) */}
           {["noballondesk@gmail.com", "akpatil51340@gmail.com"].includes(
-            localStorage.getItem("userEmail"),
+            localStorage.getItem("userEmail")
           ) && (
-            <div className="pt-5 mt-5 border-t border-white/5">
-              <p className="px-3 text-[10px] font-semibold text-emerald-500/70 uppercase tracking-widest mb-2.5">
+            <div className="pt-4 mt-4 border-t border-black/[0.05] dark:border-white/[0.06]">
+              <p className="px-3.5 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest mb-2">
                 Admin
               </p>
-              <div className="space-y-0.5">
+              <div className="space-y-1">
                 <NavItem
                   to="/admin"
                   icon={ShieldCheck}
@@ -304,161 +385,260 @@ export default function MainLayout() {
                   currentPath={location.pathname}
                   onClick={closeMenu}
                 />
-                  <NavItem
-                    to="/admin/setup"
-                    icon={Settings}
-                    label="Bot Setup"
-                    currentPath={location.pathname}
-                    onClick={closeMenu}
-                  />
-                  <NavItem
-                    to="/admin/trading-bot"
-                    icon={Activity}
-                    label="Trading Bot"
-                    currentPath={location.pathname}
-                    onClick={closeMenu}
-                  />
+                <NavItem
+                  to="/admin/setup"
+                  icon={Settings}
+                  label="Bot Setup"
+                  currentPath={location.pathname}
+                  onClick={closeMenu}
+                />
+                <NavItem
+                  to="/admin/trading-bot"
+                  icon={Activity}
+                  label="Trading Bot"
+                  currentPath={location.pathname}
+                  onClick={closeMenu}
+                />
               </div>
             </div>
           )}
         </nav>
 
-        {/* User Card */}
+        {/* User Card with Squircle Avatar */}
         <div className="p-3 relative">
-          {isProfileOpen && (
-            <div className="absolute bottom-full left-3 right-3 mb-2 bg-[#1B2027] border border-white/10 rounded-xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-2 z-50">
-              <Link
-                to="/profile"
-                onClick={closeMenu}
-                className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-300 hover:bg-[#232931] hover:text-white transition-colors"
-              >
-                <User className="w-4 h-4 text-emerald-400" />
-                Profile
-              </Link>
-              <button
-                onClick={() => {
-                  setIsProfileOpen(false);
-                  navigate('/paywall');
-                }}
-                className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-emerald-400 hover:bg-emerald-400/10 transition-colors text-left border-t border-white/5"
-              >
-                <CreditCard className="w-4 h-4 text-emerald-400" />
-                Subscription Plan
-              </button>
-              <button
-                onClick={handleLogout}
-                className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-red-400 hover:bg-red-400/10 transition-colors text-left border-t border-white/5"
-              >
-                <LogOut className="w-4 h-4 text-red-400" />
-                Log out
-              </button>
-            </div>
-          )}
-
           <div
-            onClick={() => setIsProfileOpen(!isProfileOpen)}
-            className="flex items-center justify-between p-3 rounded-xl bg-[#101216] border border-white/5 hover:border-white/10 transition-colors cursor-pointer group"
+            ref={userCardRef}
+            onClick={toggleProfile}
+            className="flex items-center justify-between p-2.5 rounded-2xl bg-white/70 dark:bg-white/[0.04] hover:bg-white/95 dark:hover:bg-white/[0.08] border border-black/[0.06] dark:border-white/[0.08] shadow-[0_2px_10px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_16px_rgba(0,0,0,0.25)] transition-all cursor-pointer group"
           >
             <div className="flex items-center gap-3 overflow-hidden">
-              <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center font-bold text-sm shrink-0 border border-emerald-500/20">
-                {localStorage.getItem("userEmail")
-                  ? localStorage.getItem("userEmail").charAt(0).toUpperCase()
-                  : "U"}
+              <div className="relative">
+                <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 text-emerald-700 dark:text-emerald-400 flex items-center justify-center font-bold text-xs shrink-0 border border-emerald-500/30 shadow-inner">
+                  {userEmail.charAt(0).toUpperCase()}
+                </div>
+                <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-500 border-2 border-white dark:border-[#10131b] rounded-full" />
               </div>
               <div className="overflow-hidden flex flex-col items-start">
-                <p className="text-[13px] font-medium text-gray-200 leading-tight truncate max-w-[110px]">
-                  {localStorage.getItem("userEmail") || "Trader"}
+                <p className="text-[13px] font-semibold text-neutral-800 dark:text-neutral-200 leading-tight truncate max-w-[110px]">
+                  {userEmail}
                 </p>
-                <span className="text-[10px] text-gray-500 mt-0.5 group-hover:text-gray-400 transition-colors">
+                <span className="text-[10px] font-medium text-emerald-600 dark:text-emerald-400 mt-0.5">
                   Pro Workspace
                 </span>
               </div>
             </div>
             <ChevronDown
-              className={`w-4 h-4 text-gray-500 transition-transform ${isProfileOpen ? "rotate-180 text-white" : "group-hover:text-gray-300"}`}
+              className={`w-4 h-4 text-neutral-400 transition-transform duration-300 ${
+                isProfileOpen ? "rotate-180 text-emerald-500" : "group-hover:text-neutral-700 dark:group-hover:text-neutral-200"
+              }`}
             />
           </div>
         </div>
       </aside>
 
-      {/* Main Content Area */}
-      <main className="flex-1 overflow-y-auto relative pt-14 pb-16 md:pt-0 md:pb-0 bg-[#0A0B0D]">
-        {/* Isolated, zero-lag System Announcement Banner */}
+      {/* ── REACT PORTAL: User Profile Popover ── */}
+      {isProfileOpen &&
+        createPortal(
+          <>
+            {/* Click dismissal backdrop */}
+            <div
+              className="fixed inset-0 z-[9980] bg-transparent"
+              onClick={() => setIsProfileOpen(false)}
+            />
+            <div
+              style={{
+                position: "fixed",
+                bottom: profileCoords.bottom,
+                left: profileCoords.left,
+                width: profileCoords.width,
+              }}
+              className="z-[9985] bg-white/90 dark:bg-[#131622]/90 border border-black/[0.08] dark:border-white/[0.12] rounded-2xl shadow-[0_16px_40px_rgba(0,0,0,0.12)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.6)] backdrop-blur-2xl p-1.5 overflow-hidden animate-in fade-in slide-in-from-bottom-2 duration-150 space-y-0.5"
+            >
+              <Link
+                to="/profile"
+                onClick={closeMenu}
+                className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-neutral-700 dark:text-neutral-200 hover:bg-black/[0.04] dark:hover:bg-white/[0.08] transition-colors"
+              >
+                <div className="w-6 h-6 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+                  <User className="w-3.5 h-3.5" />
+                </div>
+                Profile Settings
+              </Link>
+              <button
+                onClick={() => {
+                  setIsProfileOpen(false);
+                  navigate("/paywall");
+                }}
+                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-amber-600 dark:text-amber-400 hover:bg-amber-500/10 transition-colors text-left"
+              >
+                <div className="w-6 h-6 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center">
+                  <CreditCard className="w-3.5 h-3.5" />
+                </div>
+                Subscription Plan
+              </button>
+              <div className="my-1 border-t border-black/[0.05] dark:border-white/[0.06]" />
+              <button
+                onClick={handleLogout}
+                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-rose-600 dark:text-rose-400 hover:bg-rose-500/10 transition-colors text-left"
+              >
+                <div className="w-6 h-6 rounded-lg bg-rose-500/10 text-rose-600 dark:text-rose-400 flex items-center justify-center">
+                  <LogOut className="w-3.5 h-3.5" />
+                </div>
+                Log out
+              </button>
+            </div>
+          </>,
+          document.body
+        )}
+
+      {/* ── Main Viewport Area ── */}
+      <main className="flex-1 overflow-y-auto relative pt-14 pb-16 md:pt-0 md:pb-0 z-10">
+        {/* System Broadcast Announcement */}
         <SystemAnnouncementBanner announcement={announcement} isDark={isDark} />
-        <div className="max-md:hidden flex fixed top-3 right-5 z-40 items-center gap-2">
-          <NotificationBell />
-          <ThemeToggle />
-        </div>
+
+        {/* ── Desktop Floating macOS Top Navigation Bar ── */}
+        <header className="hidden md:flex sticky top-0 z-30 h-16 px-6 items-center justify-between border-b border-black/[0.05] dark:border-white/[0.06] bg-white/60 dark:bg-[#0c0e15]/60 backdrop-blur-xl">
+          {/* Left: Dynamic Breadcrumb / Workspace Badge */}
+          <div className="flex items-center gap-3">
+            <span className="text-xs font-semibold text-neutral-400 dark:text-neutral-500">Forex Notes</span>
+            <span className="text-neutral-300 dark:text-neutral-700">/</span>
+            <h2 className="text-sm font-bold text-neutral-900 dark:text-white tracking-tight">{pathTitle}</h2>
+            <div className="ml-2 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 dark:bg-emerald-500/15 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[11px] font-semibold">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              Markets Active
+            </div>
+          </div>
+
+          {/* Center: Apple Spotlight Search Trigger Pill */}
+          <button
+            type="button"
+            onClick={() => setIsSearchOpen(true)}
+            className="flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-black/[0.035] dark:bg-white/[0.05] hover:bg-black/[0.06] dark:hover:bg-white/[0.08] border border-black/[0.05] dark:border-white/[0.08] text-xs text-neutral-500 dark:text-neutral-400 transition-all duration-200 cursor-pointer shadow-sm hover:shadow"
+          >
+            <Search className="w-3.5 h-3.5 text-neutral-400" />
+            <span className="text-neutral-500 dark:text-neutral-400">Search trades, news, tools...</span>
+            <span className="font-mono text-[10px] px-1.5 py-0.5 rounded-md bg-black/5 dark:bg-white/10 text-neutral-600 dark:text-neutral-300">
+              ⌘K
+            </span>
+          </button>
+
+          {/* Right: Apple Control Center (Notification & Theme Toggle) */}
+          <div className="flex items-center gap-2">
+            <NotificationBell />
+            <ThemeToggle />
+          </div>
+        </header>
+
+        {/* Workspace Route Container */}
         <Suspense
           fallback={
-            <div className="min-h-[70vh] flex flex-col items-center justify-center p-8 bg-[#0A0B0D]">
+            <div className="min-h-[70vh] flex flex-col items-center justify-center p-8">
               <div className="w-8 h-8 rounded-full border-2 border-emerald-500/20 border-t-emerald-500 animate-spin mb-3" />
-              <p className="text-xs text-gray-400 font-medium tracking-wide">Loading workspace view...</p>
+              <p className="text-xs text-neutral-500 dark:text-neutral-400 font-medium tracking-wide">
+                Loading workspace view...
+              </p>
             </div>
           }
         >
-          <Outlet />
+          <div className="relative">
+            <Outlet />
+          </div>
         </Suspense>
       </main>
 
-      {/* Command Palette Overlay (Mock) */}
-      {isSearchOpen && (
-        <div
-          className="fixed inset-0 z-50 flex items-start justify-center pt-[15vh] p-4 bg-black/50 backdrop-blur-sm animate-in fade-in"
-          onClick={() => setIsSearchOpen(false)}
-        >
+      {/* ── REACT PORTAL: macOS Spotlight Command Palette ── */}
+      {isSearchOpen &&
+        createPortal(
           <div
-            className="w-full max-w-xl bg-[#101216] border border-white/10 rounded-2xl shadow-2xl overflow-hidden"
-            onClick={(e) => e.stopPropagation()}
+            className="fixed inset-0 z-[10000] flex items-start justify-center pt-[14vh] p-4 bg-black/35 dark:bg-black/65 backdrop-blur-md animate-in fade-in duration-150"
+            onClick={() => setIsSearchOpen(false)}
           >
-            <div className="flex items-center px-4 py-3 border-b border-white/5">
-              <img src="/logo3d.png" alt="ForexNotes" className="w-5 h-5 object-contain mr-3 shrink-0" />
-              <input
-                type="text"
-                placeholder="Search trades, analytics, or actions..."
-                autoFocus
-                className="flex-1 bg-transparent border-none outline-none text-white placeholder-gray-500 text-[15px]"
-              />
-              <button
-                onClick={() => setIsSearchOpen(false)}
-                className="px-2 py-1 bg-white/5 text-gray-400 text-[10px] rounded hover:bg-white/10"
-              >
-                ESC
-              </button>
+            <div
+              className="w-full max-w-xl bg-white/90 dark:bg-[#121622]/90 border border-black/[0.08] dark:border-white/[0.12] rounded-3xl shadow-[0_30px_70px_rgba(0,0,0,0.2)] dark:shadow-[0_35px_80px_rgba(0,0,0,0.7)] backdrop-blur-2xl overflow-hidden animate-in zoom-in-95 duration-150"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center px-4 py-3.5 border-b border-black/[0.06] dark:border-white/[0.08]">
+                <Search className="w-5 h-5 text-emerald-500 mr-3 shrink-0" />
+                <input
+                  type="text"
+                  placeholder="Search trades, analytics, calculators, or actions..."
+                  autoFocus
+                  className="flex-1 bg-transparent border-none outline-none text-neutral-900 dark:text-white placeholder-neutral-400 text-sm font-medium"
+                />
+                <button
+                  onClick={() => setIsSearchOpen(false)}
+                  className="px-2 py-0.5 bg-black/[0.05] dark:bg-white/10 text-neutral-500 dark:text-neutral-400 text-[11px] font-mono rounded-md hover:bg-black/10 dark:hover:bg-white/15"
+                >
+                  ESC
+                </button>
+              </div>
+
+              <div className="p-2 space-y-1">
+                <p className="px-3 py-1.5 text-[10px] font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-widest">
+                  Quick Actions
+                </p>
+                <button
+                  onClick={() => {
+                    navigate("/add-trade");
+                    setIsSearchOpen(false);
+                  }}
+                  className="w-full flex items-center gap-3 px-3 py-2.5 text-xs font-medium text-neutral-700 dark:text-neutral-200 hover:bg-black/[0.04] dark:hover:bg-white/[0.06] rounded-xl transition-colors text-left group"
+                >
+                  <div className="w-6 h-6 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center group-hover:scale-105 transition-transform">
+                    <PlusCircle className="w-4 h-4" />
+                  </div>
+                  Log a new trade
+                </button>
+                <button
+                  onClick={() => {
+                    navigate("/dashboard");
+                    setIsSearchOpen(false);
+                  }}
+                  className="w-full flex items-center gap-3 px-3 py-2.5 text-xs font-medium text-neutral-700 dark:text-neutral-200 hover:bg-black/[0.04] dark:hover:bg-white/[0.06] rounded-xl transition-colors text-left group"
+                >
+                  <div className="w-6 h-6 rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center group-hover:scale-105 transition-transform">
+                    <LayoutDashboard className="w-4 h-4" />
+                  </div>
+                  Go to Dashboard
+                </button>
+                <button
+                  onClick={() => {
+                    navigate("/analytics");
+                    setIsSearchOpen(false);
+                  }}
+                  className="w-full flex items-center gap-3 px-3 py-2.5 text-xs font-medium text-neutral-700 dark:text-neutral-200 hover:bg-black/[0.04] dark:hover:bg-white/[0.06] rounded-xl transition-colors text-left group"
+                >
+                  <div className="w-6 h-6 rounded-lg bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 flex items-center justify-center group-hover:scale-105 transition-transform">
+                    <Activity className="w-4 h-4" />
+                  </div>
+                  Strategy Analytics
+                </button>
+                <button
+                  onClick={() => {
+                    navigate("/news");
+                    setIsSearchOpen(false);
+                  }}
+                  className="w-full flex items-center gap-3 px-3 py-2.5 text-xs font-medium text-neutral-700 dark:text-neutral-200 hover:bg-black/[0.04] dark:hover:bg-white/[0.06] rounded-xl transition-colors text-left group"
+                >
+                  <div className="w-6 h-6 rounded-lg bg-rose-500/10 text-rose-600 dark:text-rose-400 flex items-center justify-center group-hover:scale-105 transition-transform">
+                    <Globe className="w-4 h-4" />
+                  </div>
+                  Economic Calendar
+                </button>
+              </div>
             </div>
-            <div className="p-2">
-              <p className="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                Quick Actions
-              </p>
-              <button
-                onClick={() => {
-                  navigate("/add-trade");
-                  setIsSearchOpen(false);
-                }}
-                className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-gray-300 hover:bg-white/5 rounded-lg transition-colors text-left"
-              >
-                <PlusCircle className="w-4 h-4 text-emerald-400" /> Log a new trade
-              </button>
-              <button
-                onClick={() => {
-                  navigate("/dashboard");
-                  setIsSearchOpen(false);
-                }}
-                className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-gray-300 hover:bg-white/5 rounded-lg transition-colors text-left"
-              >
-                <LayoutDashboard className="w-4 h-4 text-emerald-400" /> Go to
-                Command Center
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+          </div>,
+          document.body
+        )}
+
+      {/* Mobile Drawer Overlay */}
       {isMobileMenuOpen && (
         <div
-          className="fixed inset-0 bg-black/60 z-20 md:hidden backdrop-blur-sm"
+          className="fixed inset-0 bg-black/40 z-20 md:hidden backdrop-blur-sm"
           onClick={closeMenu}
         />
       )}
+
       <PromoPopup />
       <PreTradeGate />
     </div>

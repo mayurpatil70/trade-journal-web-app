@@ -1,4 +1,4 @@
-// src/components/landing/AmbientBackground.jsx
+﻿// src/components/landing/AmbientBackground.jsx
 import { useEffect, useRef } from 'react';
 
 export default function AmbientBackground() {

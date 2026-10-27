@@ -1,4 +1,4 @@
-// frontend/src/pages/DiscordCallback.jsx
+﻿// frontend/src/pages/DiscordCallback.jsx
 import { useEffect, useState, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import api from "../api/axios";

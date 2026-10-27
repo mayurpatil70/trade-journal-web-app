@@ -1,4 +1,4 @@
-const isBuy = (side) => side === 'Buy';
+﻿const isBuy = (side) => side === 'Buy';
 const dir = (side) => (isBuy(side) ? 1 : -1);
 
 export function createReplay(balance) {

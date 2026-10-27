@@ -1,4 +1,4 @@
-// frontend/src/components/PreTradeGate.jsx
+﻿// frontend/src/components/PreTradeGate.jsx
 import { useState, useRef, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { X, Send, ChevronRight, Loader2, ImagePlus, XCircle, Maximize2, Minimize2 } from "lucide-react";

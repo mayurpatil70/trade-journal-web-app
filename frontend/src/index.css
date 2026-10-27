@@ -2,6 +2,8 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
+@config "../tailwind.config.js";
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
@@ -191,7 +193,7 @@ GLOBAL RESET
   }
 
   html {
-    /* scroll-behavior: smooth; — Lenis smooth scroll handles this */
+    /* scroll-behavior: smooth; â€” Lenis smooth scroll handles this */
     font-family: var(--font-sans);
     background: var(--background);
   }
@@ -486,7 +488,23 @@ LANDING PAGE ANIMATIONS
   cursor: pointer !important;
 }
 
-/* Trading theme: black, gray, green, red with a glossy finish */
+/* =========================================================
+   macOS / iOS SPATIAL GLASS DESIGN SYSTEM & THEME CROSS-DISSOLVE
+   ========================================================= */
+
+/* Buttery-smooth cross-dissolve during theme switching */
+html.theme-transitioning,
+html.theme-transitioning *,
+html.theme-transitioning *::before,
+html.theme-transitioning *::after {
+  transition: background-color 300ms cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 300ms cubic-bezier(0.4, 0, 0.2, 1),
+              color 300ms cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1) !important;
+  transition-delay: 0s !important;
+}
+
+/* Trading theme ambient mesh background */
 .trading-bg {
   background:
     radial-gradient(
@@ -499,43 +517,171 @@ LANDING PAGE ANIMATIONS
       rgba(239, 68, 68, 0.07),
       transparent 60%
     ),
-    #000;
+    #0a0c10;
 }
+
+/* 1. macOS Glass Panel (Main containers, floating bars) */
+.mac-glass-panel {
+  position: relative;
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(0, 0, 0, 0.07);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04), inset 0 1px 0 0 rgba(255, 255, 255, 0.9);
+  border-radius: 1.25rem;
+  transition: background-color 300ms ease, border-color 300ms ease, box-shadow 300ms ease;
+}
+
+.dark .mac-glass-panel,
+html.dark .mac-glass-panel {
+  background: rgba(18, 22, 31, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45), inset 0 1px 0 0 rgba(255, 255, 255, 0.12);
+}
+
+/* 2. macOS Bento Card (Cards, widgets, metrics with squircle geometry) */
+.mac-glass-card,
+.mac-bento-card {
+  position: relative;
+  background: rgba(255, 255, 255, 0.76);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.035), inset 0 1px 0 0 rgba(255, 255, 255, 0.95);
+  border-radius: 1.25rem;
+  transition: transform 250ms cubic-bezier(0.2, 0.8, 0.2, 1),
+              box-shadow 250ms cubic-bezier(0.2, 0.8, 0.2, 1),
+              border-color 250ms ease,
+              background-color 300ms ease;
+}
+
+.mac-glass-card:hover,
+.mac-bento-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.06), inset 0 1px 0 0 rgba(255, 255, 255, 1);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+.dark .mac-glass-card,
+.dark .mac-bento-card,
+html.dark .mac-glass-card,
+html.dark .mac-bento-card {
+  background: rgba(22, 26, 36, 0.68);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.4), inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+}
+
+.dark .mac-glass-card:hover,
+.dark .mac-bento-card:hover,
+html.dark .mac-glass-card:hover,
+html.dark .mac-bento-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.55), inset 0 1px 0 0 rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+/* 3. Upgraded Glossy & Glassy components (Bento Box floating card effect) */
 .glossy {
   position: relative;
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(0, 0, 0, 0.07);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04), inset 0 1px 0 0 rgba(255, 255, 255, 0.95);
+  border-radius: 1.25rem;
+  transition: background-color 300ms ease, border-color 300ms ease, box-shadow 300ms ease;
+}
+
+.dark .glossy,
+html.dark .glossy {
   background:
     linear-gradient(
       180deg,
-      rgba(255, 255, 255, 0.07),
+      rgba(255, 255, 255, 0.06),
       rgba(255, 255, 255, 0.015) 38%,
-      rgba(0, 0, 0, 0.25)
+      rgba(0, 0, 0, 0.22)
     ),
-    rgba(14, 16, 20, 0.88);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+    rgba(18, 22, 31, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.09);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.09),
-    0 24px 60px rgba(0, 0, 0, 0.45);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 16px 45px rgba(0, 0, 0, 0.45);
 }
+
 .glossy-bar {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0)),
-    rgba(6, 7, 9, 0.82);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  box-shadow: inset 0 -1px 0 rgba(16, 185, 129, 0.06);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+  transition: background-color 300ms ease, border-color 300ms ease;
 }
+
+.dark .glossy-bar,
+html.dark .glossy-bar {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0)),
+    rgba(14, 17, 24, 0.75);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 -1px 0 rgba(16, 185, 129, 0.06), 0 4px 25px rgba(0, 0, 0, 0.35);
+}
+
 .glossy-side {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  box-shadow: inset -1px 0 0 rgba(0, 0, 0, 0.06);
+  transition: background-color 300ms ease, border-color 300ms ease;
+}
+
+.dark .glossy-side,
+html.dark .glossy-side {
   background:
     linear-gradient(
       180deg,
-      rgba(255, 255, 255, 0.04),
+      rgba(255, 255, 255, 0.03),
       rgba(255, 255, 255, 0) 30%
     ),
-    linear-gradient(180deg, #0b0c0f, #070809);
-  box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.05);
+    rgba(16, 19, 27, 0.75);
+  box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.08);
+}
+
+/* 4. Apple iOS / macOS Pill button */
+.mac-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  padding: 0.375rem 0.875rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: #1f2937;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: all 200ms ease;
+}
+
+.mac-pill:hover {
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px);
+}
+
+.dark .mac-pill,
+html.dark .mac-pill {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.06);
+  color: #f3f4f6;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.dark .mac-pill:hover,
+html.dark .mac-pill:hover {
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
 }
 .btn-glossy-green,
 .btn-glossy-red {
@@ -684,11 +830,14 @@ html.light body:not(.terminal) [class~="text-purple-400"] {
 
 html.light body:not(.terminal) .glossy,
 html.light body:not(.terminal) .glossy-bar,
-html.light body:not(.terminal) .glossy-side {
-  background: var(--surface) !important;
-  backdrop-filter: blur(16px);
-  border-color: var(--hairline) !important;
-  box-shadow: var(--glass-shadow);
+html.light body:not(.terminal) .glossy-side,
+html.light body:not(.terminal) .mac-glass-card,
+html.light body:not(.terminal) .mac-glass-panel {
+  background: rgba(255, 255, 255, 0.78) !important;
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-color: rgba(0, 0, 0, 0.07) !important;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04), inset 0 1px 0 0 rgba(255, 255, 255, 0.95) !important;
 }
 
 html.light body:not(.terminal) input,

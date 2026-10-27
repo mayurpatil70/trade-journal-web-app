@@ -1,4 +1,4 @@
-// src/components/landing/DashboardMockup.jsx
+﻿// src/components/landing/DashboardMockup.jsx
 // A pixel-perfect code-drawn replica of the Forex Notes dashboard
 // Used as the hero mockup element animated by GSAP ScrollTrigger
 

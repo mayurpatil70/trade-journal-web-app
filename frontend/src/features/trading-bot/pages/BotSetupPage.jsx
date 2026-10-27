@@ -1,4 +1,4 @@
-import { lazy, Suspense, useState } from "react";
+﻿import { lazy, Suspense, useState } from "react";
 import { getSymbolInfo } from "../services/symbolInfoCache";
 import { useBotConfig } from "../hooks/useBotConfig";
 import SymbolPicker from "../../../components/SymbolPicker";

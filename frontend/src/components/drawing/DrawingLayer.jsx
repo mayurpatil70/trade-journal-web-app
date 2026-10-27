@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+﻿import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { PanelLeftOpen, PanelLeftClose } from 'lucide-react';
 import DrawingToolbar from './DrawingToolbar';
 import DrawingSettings from './DrawingSettings';

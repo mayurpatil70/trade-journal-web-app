@@ -1,4 +1,4 @@
-import { memo } from "react";
+﻿import { memo } from "react";
 
 function BotMetricsCard({ label, value, hint, tone = "text-white" }) {
   return (

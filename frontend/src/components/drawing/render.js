@@ -1,4 +1,4 @@
-import { MARKERS } from './tools';
+﻿import { MARKERS } from './tools';
 
 const FIB_COLORS = ['#787B86', '#F23645', '#FF9800', '#4CAF50', '#089981', '#00BCD4', '#2962FF', '#9C27B0', '#E91E63'];
 const FIB_TIME = [0, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89];

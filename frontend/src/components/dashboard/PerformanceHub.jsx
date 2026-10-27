@@ -59,32 +59,42 @@ export function EdgeBreakdown({ trades }) {
   const maxAbs = Math.max(1, ...rows.map((x) => Math.abs(x.total)));
 
   return (
-    <div className="glossy rounded-2xl p-6">
+    <div className="mac-bento-card rounded-3xl p-6">
       <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
         <div>
-          <h2 className="text-[15px] font-semibold text-white">Where your edge comes from</h2>
-          <p className="text-[12px] text-gray-500 mt-1">Journal results grouped by what you logged on each trade</p>
+          <h2 className="text-[15px] font-bold text-neutral-900 dark:text-white">Where your edge comes from</h2>
+          <p className="text-[12px] text-neutral-500 dark:text-neutral-400 mt-1">Journal results grouped by what you logged on each trade</p>
         </div>
-        <div className="flex flex-wrap gap-1 bg-black/30 rounded-lg p-1">
+        <div className="flex flex-wrap gap-1 bg-black/[0.04] dark:bg-black/30 rounded-xl p-1 border border-black/[0.04] dark:border-white/5">
           {DIMENSIONS.map((d) => (
-            <button key={d.id} onClick={() => setDim(d.id)} className={`px-3 py-1 rounded-md text-xs font-medium ${dim === d.id ? 'bg-white/10 text-white' : 'text-gray-500 hover:text-gray-300'}`}>{d.label}</button>
+            <button
+              key={d.id}
+              onClick={() => setDim(d.id)}
+              className={`px-3 py-1 rounded-lg text-xs font-medium transition-all ${
+                dim === d.id
+                  ? 'bg-white dark:bg-white/15 text-neutral-900 dark:text-white shadow-sm font-semibold'
+                  : 'text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white'
+              }`}
+            >
+              {d.label}
+            </button>
           ))}
         </div>
       </div>
       {!rows.length ? (
-        <p className="text-sm text-gray-500">Log a few trades to see your breakdown.</p>
+        <p className="text-sm text-neutral-500 dark:text-neutral-400">Log a few trades to see your breakdown.</p>
       ) : (
         <div className="space-y-2.5">
           {rows.slice(0, 8).map((row) => (
             <div key={row.name} className="grid grid-cols-[minmax(0,1fr)_auto] md:grid-cols-[180px_minmax(0,1fr)_auto] items-center gap-3 text-xs">
-              <span className="text-gray-300 truncate" title={row.name}>{row.name}</span>
-              <div className="hidden md:block h-2 rounded-full bg-white/5 overflow-hidden">
-                <div className={`h-full rounded-full ${row.total >= 0 ? 'bg-emerald-400' : 'bg-red-400'}`} style={{ width: `${(Math.abs(row.total) / maxAbs) * 100}%` }} />
+              <span className="text-neutral-700 dark:text-neutral-300 truncate font-medium" title={row.name}>{row.name}</span>
+              <div className="hidden md:block h-2 rounded-full bg-black/5 dark:bg-white/5 overflow-hidden">
+                <div className={`h-full rounded-full ${row.total >= 0 ? 'bg-emerald-500 dark:bg-emerald-400' : 'bg-rose-500 dark:bg-rose-400'}`} style={{ width: `${(Math.abs(row.total) / maxAbs) * 100}%` }} />
               </div>
               <span className="flex gap-3 font-mono tabular-nums">
-                <span className="text-gray-500 w-16 text-right whitespace-nowrap">{row.n} trades</span>
-                <span className="text-gray-400 w-12 text-right">{row.winRate.toFixed(0)}%</span>
-                <span className={`w-16 text-right font-semibold ${row.total >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>{fmtR(row.total)}</span>
+                <span className="text-neutral-400 dark:text-neutral-500 w-16 text-right whitespace-nowrap">{row.n} trades</span>
+                <span className="text-neutral-600 dark:text-neutral-400 w-12 text-right">{row.winRate.toFixed(0)}%</span>
+                <span className={`w-16 text-right font-bold ${row.total >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>{fmtR(row.total)}</span>
               </span>
             </div>
           ))}
@@ -112,24 +122,24 @@ export function TradingHealth({ trades }) {
   const bar = (label, v) => (
     <div>
       <div className="flex justify-between text-xs mb-2">
-        <span className="text-gray-400">{label}</span>
-        <span className={`font-semibold ${v == null ? 'text-gray-500' : v >= 80 ? 'text-emerald-400' : v >= 50 ? 'text-amber-400' : 'text-red-400'}`}>{v == null ? '-' : `${v.toFixed(0)}%`}</span>
+        <span className="text-neutral-600 dark:text-neutral-400 font-medium">{label}</span>
+        <span className={`font-bold ${v == null ? 'text-neutral-400 dark:text-neutral-500' : v >= 80 ? 'text-emerald-600 dark:text-emerald-400' : v >= 50 ? 'text-amber-500' : 'text-rose-500'}`}>{v == null ? '-' : `${v.toFixed(0)}%`}</span>
       </div>
-      <div className="w-full bg-white/5 rounded-full h-1.5">
-        <div className={`h-1.5 rounded-full ${v >= 80 ? 'bg-emerald-400' : v >= 50 ? 'bg-amber-400' : 'bg-red-400'}`} style={{ width: `${v ?? 0}%` }} />
+      <div className="w-full bg-black/5 dark:bg-white/5 rounded-full h-1.5 overflow-hidden">
+        <div className={`h-1.5 rounded-full ${v >= 80 ? 'bg-emerald-500' : v >= 50 ? 'bg-amber-400' : 'bg-rose-500'}`} style={{ width: `${v ?? 0}%` }} />
       </div>
     </div>
   );
 
   return (
-    <div className="glossy rounded-2xl p-6 flex-1">
-      <h3 className="text-[11px] font-semibold text-gray-500 uppercase tracking-widest mb-5">Trading Health</h3>
+    <div className="mac-bento-card rounded-3xl p-6 flex-1">
+      <h3 className="text-[11px] font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-widest mb-5">Trading Health</h3>
       <div className="space-y-5">
         {bar('Rule following', h.rules)}
         {bar('Psychology tagged', h.tagged)}
-        <div className="pt-4 mt-2 border-t border-white/5 space-y-1.5 text-[12px]">
-          {h.brokenCost < 0 && <p className="text-gray-300">Broken rules cost you <span className="text-red-400 font-semibold">{fmtR(h.brokenCost)}</span></p>}
-          <p className="text-gray-500">{h.missing > 0 ? `${h.missing} trade${h.missing > 1 ? 's' : ''} missing psychology tags` : 'Every trade has psychology tags'}</p>
+        <div className="pt-4 mt-2 border-t border-black/[0.05] dark:border-white/5 space-y-1.5 text-[12px]">
+          {h.brokenCost < 0 && <p className="text-neutral-600 dark:text-neutral-300">Broken rules cost you <span className="text-rose-500 font-bold">{fmtR(h.brokenCost)}</span></p>}
+          <p className="text-neutral-400 dark:text-neutral-500">{h.missing > 0 ? `${h.missing} trade${h.missing > 1 ? 's' : ''} missing psychology tags` : 'Every trade has psychology tags'}</p>
         </div>
       </div>
     </div>
@@ -154,20 +164,20 @@ export function BacktestSummary({ live }) {
   }, [sessions]);
 
   return (
-    <div className="glossy rounded-2xl p-6">
+    <div className="mac-bento-card rounded-3xl p-6">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-[15px] font-semibold text-white">Backtesting</h2>
-        <Link to="/sessions" className="text-[12px] text-emerald-400 hover:text-emerald-300">Open sessions</Link>
+        <h2 className="text-[15px] font-bold text-neutral-900 dark:text-white">Backtesting</h2>
+        <Link to="/sessions" className="text-[12px] font-semibold text-emerald-600 dark:text-emerald-400 hover:underline">Open sessions</Link>
       </div>
       {!s.n ? (
-        <p className="text-sm text-gray-500">No saved backtest trades yet. Replay a market in Sessions to compare practice with live results.</p>
+        <p className="text-sm text-neutral-400 dark:text-neutral-500">No saved backtest trades yet. Replay a market in Sessions to compare practice with live results.</p>
       ) : (
         <div className="grid grid-cols-3 gap-3 text-center">
-          <div><p className="text-[10px] uppercase tracking-widest text-gray-500">Trades</p><p className="text-lg font-bold text-white">{s.n}</p></div>
-          <div><p className="text-[10px] uppercase tracking-widest text-gray-500">Win rate</p><p className="text-lg font-bold text-white">{s.winRate.toFixed(0)}%</p></div>
-          <div><p className="text-[10px] uppercase tracking-widest text-gray-500">Avg R</p><p className={`text-lg font-bold ${s.avgR >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>{fmtR(s.avgR)}</p></div>
-          {live && <p className="col-span-3 text-[12px] text-gray-500 mt-1">Live journal: <span className="text-gray-300">{live.winRate}% win rate, {live.avgR >= 0 ? '+' : ''}{live.avgR}R average</span></p>}
-          {s.best && <p className="col-span-3 text-[12px] text-gray-500">Best session: <span className="text-gray-300">{s.best.name}</span> ({s.best.pair})</p>}
+          <div><p className="text-[10px] uppercase font-bold tracking-widest text-neutral-400 dark:text-neutral-500">Trades</p><p className="text-lg font-bold text-neutral-900 dark:text-white">{s.n}</p></div>
+          <div><p className="text-[10px] uppercase font-bold tracking-widest text-neutral-400 dark:text-neutral-500">Win rate</p><p className="text-lg font-bold text-neutral-900 dark:text-white">{s.winRate.toFixed(0)}%</p></div>
+          <div><p className="text-[10px] uppercase font-bold tracking-widest text-neutral-400 dark:text-neutral-500">Avg R</p><p className={`text-lg font-bold ${s.avgR >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-500'}`}>{fmtR(s.avgR)}</p></div>
+          {live && <p className="col-span-3 text-[12px] text-neutral-400 dark:text-neutral-500 mt-1">Live journal: <span className="text-neutral-700 dark:text-neutral-300 font-semibold">{live.winRate}% win rate, {live.avgR >= 0 ? '+' : ''}{live.avgR}R average</span></p>}
+          {s.best && <p className="col-span-3 text-[12px] text-neutral-400 dark:text-neutral-500">Best session: <span className="text-neutral-700 dark:text-neutral-300 font-semibold">{s.best.name}</span> ({s.best.pair})</p>}
         </div>
       )}
     </div>

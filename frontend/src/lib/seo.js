@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+﻿import { useEffect } from 'react';
 import { SITE } from '../data/seoPages';
 
 const setMeta = (attr, key, content) => {

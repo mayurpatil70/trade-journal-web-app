@@ -1,5 +1,4 @@
-import { describe, it } from "node:test";
-import assert from "node:assert/strict";
+import { describe, it, expect } from "vitest";
 import {
   getAssetMultiplier,
   calculateStopDistance,
@@ -10,9 +9,9 @@ import {
 
 describe("lotSizeCalculator", () => {
   it("calculates stop distance accurately", () => {
-    assert.equal(calculateStopDistance(4170, 4160), 10);
-    assert.equal(calculateStopDistance(4160, 4170), 10);
-    assert.equal(calculateStopDistance(83050, 83300), 250);
+    expect(calculateStopDistance(4170, 4160)).toBe(10);
+    expect(calculateStopDistance(4160, 4170)).toBe(10);
+    expect(calculateStopDistance(83050, 83300)).toBe(250);
   });
 
   it("calculates Gold (XAUUSD) dollar risk and risk %", () => {
@@ -24,7 +23,7 @@ describe("lotSizeCalculator", () => {
       sl: 4160,
       lotSize: 0.5,
     });
-    assert.equal(cash, 500);
+    expect(cash).toBe(500);
 
     const riskPct = calculateRiskPercent({
       asset: "XAUUSD",
@@ -33,7 +32,7 @@ describe("lotSizeCalculator", () => {
       lotSize: 0.5,
       balance: 50000,
     });
-    assert.equal(riskPct, 1.0);
+    expect(riskPct).toBe(1.0);
   });
 
   it("calculates lot size from target risk % for Gold", () => {
@@ -46,7 +45,7 @@ describe("lotSizeCalculator", () => {
       riskPercent: 1.0,
       balance: 50000,
     });
-    assert.equal(lots, 0.5);
+    expect(lots).toBe(0.5);
   });
 
   it("calculates BTCUSD dollar risk and risk %", () => {
@@ -58,7 +57,7 @@ describe("lotSizeCalculator", () => {
       sl: 83300,
       lotSize: 1.0,
     });
-    assert.equal(cash, 250);
+    expect(cash).toBe(250);
 
     const riskPct = calculateRiskPercent({
       asset: "BTCUSD",
@@ -67,6 +66,6 @@ describe("lotSizeCalculator", () => {
       lotSize: 1.0,
       balance: 50000,
     });
-    assert.equal(riskPct, 0.5);
+    expect(riskPct).toBe(0.5);
   });
 });

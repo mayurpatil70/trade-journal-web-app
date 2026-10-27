@@ -1,5 +1,5 @@
 // frontend/src/App.jsx
-import { useEffect, useState, useRef, lazy, Suspense } from "react";
+import { useEffect, useState, useRef, Suspense } from "react";
 import {
   BrowserRouter,
   useLocation,
@@ -12,59 +12,72 @@ import { Loader2 } from "lucide-react";
 import api, { isSessionValid, clearSession } from "./api/axios";
 import { getCachedAccessStatus, getImmediateCachedStatus } from "./utils/subscriptionCache";
 import { markInAppNavigation } from "./utils/navigationState";
+import { safeLazy, registerRoutePrefetch } from "./utils/routePrefetch";
+import NavigationProgressBar from "./components/NavigationProgressBar";
 
 // CRITICAL: ErrorBoundary MUST be eagerly imported — it cannot be lazy-loaded
 // because if it fails to load, there's nothing to catch the error (causes #310 crash loop)
 import ErrorBoundary from "./components/ErrorBoundary.jsx";
 import Logo3DLoader from "./components/Logo3DLoader.jsx";
+import CookieConsent from "./components/CookieConsent.jsx";
 
 // Public Pages (eagerly loaded for SEO/LCP)
 import LandingPage from "./pages/LandingPage.jsx";
 import PrivacyPolicy from "./pages/PrivacyPolicy.jsx";
 import NotFound from "./pages/NotFound.jsx";
 import { SEO_PAGES } from "./data/seoPages";
-const CompetitorVsPage = lazy(() => import("./pages/CompetitorVsPage.jsx"));
-const SeoLandingPage = lazy(() => import("./pages/SeoLandingPage.jsx"));
+const CompetitorVsPage = safeLazy(() => import("./pages/CompetitorVsPage.jsx"), "competitor-vs");
+const SeoLandingPage = safeLazy(() => import("./pages/SeoLandingPage.jsx"), "seo-landing");
 
-// Lazy Loaded Protected App Pages
-const Login = lazy(() => import("./pages/Login.jsx"));
-const Verify = lazy(() => import("./pages/Verify.jsx"));
-const DiscordGate = lazy(() => import("./pages/DiscordGate.jsx"));
-const DiscordCallback = lazy(() => import("./pages/DiscordCallback.jsx"));
-const Paywall = lazy(() => import("./pages/Paywall.jsx"));
+// Protected Core Workspace Pages (Grouped into 'workspace-core' bundle for 0ms instant tab switches)
+const MainLayout = safeLazy(() => import("./layouts/MainLayout.jsx"), "main-layout");
+const Dashboard = safeLazy(() => import("./pages/Dashboard.jsx"), "dashboard");
+const AddTrade = safeLazy(() => import("./pages/AddTrade.jsx"), "add-trade");
+const PastTrades = safeLazy(() => import("./pages/PastTrades.jsx"), "past-trades");
+const PerformanceCalendar = safeLazy(() => import("./pages/PerformanceCalendar.jsx"), "calendar");
+const Analytics = safeLazy(() => import("./pages/Analytics.jsx"), "analytics");
+const Psychology = safeLazy(() => import("./pages/Psychology.jsx"), "psychology");
+const Mistakes = safeLazy(() => import("./pages/Mistakes.jsx"), "mistakes");
+const EconomicCalendar = safeLazy(() => import("./pages/EconomicCalendar.jsx"), "news");
+const PropAccounts = safeLazy(() => import("./pages/PropAccounts.jsx"), "accounts");
+const Settings = safeLazy(() => import("./pages/Settings.jsx"), "settings");
+const Profile = safeLazy(() => import("./pages/Profile.jsx"), "profile");
+const Support = safeLazy(() => import("./pages/Support.jsx"), "support");
+const AffiliateDashboard = safeLazy(() => import("./pages/AffiliateDashboard.jsx"), "affiliate");
+const CalculatorLayout = safeLazy(() => import("./pages/TraderProblems/Layout.jsx"), "calculator-layout");
+const PropFirm = safeLazy(() => import("./pages/TraderProblems/PropFirm.jsx"), "prop-firm");
+const LotSizeCalculator = safeLazy(() => import("./pages/TraderProblems/LotSizeCalculator.jsx"), "lot-size");
 
-const EconomicCalendar = lazy(() => import("./pages/EconomicCalendar.jsx"));
-const AddTrade = lazy(() => import("./pages/AddTrade.jsx"));
-const PastTrades = lazy(() => import("./pages/PastTrades.jsx"));
-const Dashboard = lazy(() => import("./pages/Dashboard.jsx"));
-const PerformanceCalendar = lazy(() => import("./pages/PerformanceCalendar.jsx"));
-const PropAccounts = lazy(() => import("./pages/PropAccounts.jsx"));
-const Settings = lazy(() => import("./pages/Settings.jsx"));
-const Profile = lazy(() => import("./pages/Profile.jsx"));
-const Support = lazy(() => import("./pages/Support.jsx"));
-const AffiliateDashboard = lazy(() => import("./pages/AffiliateDashboard.jsx"));
-const AdminDashboard = lazy(() => import("./pages/AdminDashboard.jsx"));
-const Charts = lazy(() => import("./pages/Charts.jsx"));
+// Heavy / Secondary Pages (Prefetched on hover and idle)
+const Charts = safeLazy(() => import("./pages/Charts.jsx"), "charts");
+const Sessions = safeLazy(() => import("./pages/Sessions.jsx"), "sessions");
+const Backtest = safeLazy(() => import("./pages/Backtest.jsx"), "backtest");
+const TradingBotDashboard = safeLazy(() => import("./features/trading-bot/pages/TradingBotDashboard.jsx"), "trading-bot");
+const BotSetupPage = safeLazy(() => import("./features/trading-bot/pages/BotSetupPage.jsx"), "bot-setup");
+const BotHubPage = safeLazy(() => import("./features/bot-hub/pages/BotHubPage.jsx"), "bot-hub");
+const ConnectionsPage = safeLazy(() => import("./features/bot-hub/pages/ConnectionsPage.jsx"), "connections");
+const Mt5BotPage = safeLazy(() => import("./features/bot-hub/pages/Mt5BotPage.jsx"), "mt5-bot");
+const AdminDashboard = safeLazy(() => import("./pages/AdminDashboard.jsx"), "admin");
 
-// Premium Workspaces
-const Analytics = lazy(() => import("./pages/Analytics.jsx"));
-const Psychology = lazy(() => import("./pages/Psychology.jsx"));
-const Mistakes = lazy(() => import("./pages/Mistakes.jsx"));
-const Backtest = lazy(() => import("./pages/Backtest.jsx"));
-const Sessions = lazy(() => import("./pages/Sessions.jsx"));
+// Auth and Gate Pages
+const Login = safeLazy(() => import("./pages/Login.jsx"), "login");
+const Verify = safeLazy(() => import("./pages/Verify.jsx"), "verify");
+const DiscordGate = safeLazy(() => import("./pages/DiscordGate.jsx"), "discord-gate");
+const DiscordCallback = safeLazy(() => import("./pages/DiscordCallback.jsx"), "discord-callback");
+const Paywall = safeLazy(() => import("./pages/Paywall.jsx"), "paywall");
 
-const TradingBotDashboard = lazy(() => import("./features/trading-bot/pages/TradingBotDashboard.jsx"));
-const BotSetupPage = lazy(() => import("./features/trading-bot/pages/BotSetupPage.jsx"));
-const BotHubPage = lazy(() => import("./features/bot-hub/pages/BotHubPage.jsx"));
-const ConnectionsPage = lazy(() => import("./features/bot-hub/pages/ConnectionsPage.jsx"));
-const Mt5BotPage = lazy(() => import("./features/bot-hub/pages/Mt5BotPage.jsx"));
-
-const MainLayout = lazy(() => import("./layouts/MainLayout.jsx"));
-const PreTradeGate = lazy(() => import("./components/PreTradeGate.jsx"));
-
-const CalculatorLayout = lazy(() => import("./pages/TraderProblems/Layout.jsx"));
-const PropFirm = lazy(() => import("./pages/TraderProblems/PropFirm.jsx"));
-const LotSizeCalculator = lazy(() => import("./pages/TraderProblems/LotSizeCalculator.jsx"));
+// Register prefetch handlers for instant hover / idle prefetching
+registerRoutePrefetch("/charts", () => import("./pages/Charts.jsx"));
+registerRoutePrefetch("/sessions", () => import("./pages/Sessions.jsx"));
+registerRoutePrefetch("/backtest", () => import("./pages/Backtest.jsx"));
+registerRoutePrefetch("/bot-hub", () => import("./features/bot-hub/pages/BotHubPage.jsx"));
+registerRoutePrefetch("/bot-hub/connections", () => import("./features/bot-hub/pages/ConnectionsPage.jsx"));
+registerRoutePrefetch("/bot-hub/mt5", () => import("./features/bot-hub/pages/Mt5BotPage.jsx"));
+registerRoutePrefetch("/admin", () => import("./pages/AdminDashboard.jsx"));
+registerRoutePrefetch("/admin/trading-bot", () => import("./features/trading-bot/pages/TradingBotDashboard.jsx"));
+registerRoutePrefetch("/admin/setup", () => import("./features/trading-bot/pages/BotSetupPage.jsx"));
+registerRoutePrefetch("/calculator/lot-size", () => import("./pages/TraderProblems/LotSizeCalculator.jsx"));
+registerRoutePrefetch("/calculator/prop-firm", () => import("./pages/TraderProblems/PropFirm.jsx"));
 
 const INDEXABLE_PATHS = ["/", "/privacy"];
 const isIndexable = (path) => INDEXABLE_PATHS.includes(path) || path.startsWith("/vs/") || SEO_PAGES.some((p) => p.path === path.replace(/\/$/, ""));
@@ -225,6 +238,7 @@ function App() {
 
   return (
     <BrowserRouter>
+      <NavigationProgressBar />
       <ScrollToTop />
       <RouteWatcher />
       <RouteSeo />
@@ -286,11 +300,12 @@ function App() {
               </Route>
             </Route>
 
-          {/* 404 Catch All */}
-          <Route path="*" element={<NotFound />} />
+            {/* 404 Catch All */}
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </ErrorBoundary>
       </Suspense>
+      <CookieConsent />
     </BrowserRouter>
   );
 }

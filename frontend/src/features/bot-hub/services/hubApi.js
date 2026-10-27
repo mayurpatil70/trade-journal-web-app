@@ -1,4 +1,4 @@
-import api from "../../../api/axios";
+﻿import api from "../../../api/axios";
 
 const base = "/api/bot-hub";
 const data = (r) => r.data;

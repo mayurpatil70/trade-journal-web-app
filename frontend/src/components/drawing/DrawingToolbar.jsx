@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+﻿import { useEffect, useRef, useState } from 'react';
 import { MousePointer2, Undo2, Redo2, Lock, Unlock, Eye, EyeOff, Trash2 } from 'lucide-react';
 import { GROUPS, TOOLS, MARKERS, parseTool } from './tools';
 

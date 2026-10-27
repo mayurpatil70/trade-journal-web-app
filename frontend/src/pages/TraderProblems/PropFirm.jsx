@@ -1,4 +1,4 @@
-// frontend/src/pages/TraderProblems/PropFirm.jsx
+﻿// frontend/src/pages/TraderProblems/PropFirm.jsx
 import { useState, useMemo } from "react";
 import {
   ShieldAlert,
