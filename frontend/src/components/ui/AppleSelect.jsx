@@ -20,15 +20,22 @@ export default function AppleSelect({
   const [isOpen, setIsOpen] = useState(false);
   const triggerRef = useRef(null);
   const menuRef = useRef(null);
-  const [coords, setCoords] = useState({ top: 0, left: 0, width: 0, placeAbove: false });
+  const [coords, setCoords] = useState({
+    top: 0,
+    left: 0,
+    width: 0,
+    placeAbove: false,
+  });
 
   // Normalize options: supports string[] or { value, label }[]
   const normalizedOptions = options.map((opt) =>
-    typeof opt === "object" && opt !== null ? opt : { value: opt, label: String(opt) }
+    typeof opt === "object" && opt !== null
+      ? opt
+      : { value: opt, label: String(opt) },
   );
 
   const selectedOption = normalizedOptions.find(
-    (opt) => String(opt.value) === String(value)
+    (opt) => String(opt.value) === String(value),
   );
 
   // Measure and position dropdown
@@ -37,7 +44,8 @@ export default function AppleSelect({
     const rect = triggerRef.current.getBoundingClientRect();
     const spaceBelow = window.innerHeight - rect.bottom;
     const estimatedHeight = Math.min(normalizedOptions.length * 40 + 20, 260);
-    const placeAbove = spaceBelow < estimatedHeight && rect.top > estimatedHeight;
+    const placeAbove =
+      spaceBelow < estimatedHeight && rect.top > estimatedHeight;
 
     setCoords({
       top: placeAbove ? rect.top - 8 : rect.bottom + 8,
@@ -109,8 +117,8 @@ export default function AppleSelect({
           error
             ? "border border-rose-500/80 ring-1 ring-rose-500/50 bg-rose-500/[0.04]"
             : isOpen
-            ? "border border-emerald-500/60 ring-2 ring-emerald-500/20 bg-white/95 dark:bg-white/[0.09]"
-            : "border border-black/[0.08] dark:border-white/10 bg-white/70 dark:bg-white/[0.05] hover:bg-white/90 dark:hover:bg-white/[0.08] hover:border-black/[0.15] dark:hover:border-white/20"
+              ? "border border-emerald-500/60 ring-2 ring-emerald-500/20 bg-white/95 dark:bg-white/[0.09]"
+              : "border border-black/[0.08] dark:border-white/10 bg-white/70 dark:bg-white/[0.05] hover:bg-white/90 dark:hover:bg-white/[0.08] hover:border-black/[0.15] dark:hover:border-white/20"
         } text-neutral-900 dark:text-white shadow-sm disabled:opacity-50 disabled:cursor-not-allowed`}
       >
         <span
@@ -137,7 +145,9 @@ export default function AppleSelect({
             style={{
               position: "fixed",
               top: coords.placeAbove ? undefined : coords.top,
-              bottom: coords.placeAbove ? window.innerHeight - coords.top : undefined,
+              bottom: coords.placeAbove
+                ? window.innerHeight - coords.top
+                : undefined,
               left: coords.left,
               width: coords.width,
               zIndex: 99999,
@@ -167,7 +177,7 @@ export default function AppleSelect({
               })}
             </div>
           </div>,
-          document.body
+          document.body,
         )}
     </div>
   );
