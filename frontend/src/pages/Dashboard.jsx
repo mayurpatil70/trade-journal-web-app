@@ -1,8 +1,6 @@
 import { useEffect, useState, useMemo } from "react";
 import { EdgeBreakdown, TradingHealth, BacktestSummary } from "../components/dashboard/PerformanceHub";
 import AccountFilter from "../components/AccountFilter";
-import NotificationBell from "../components/NotificationBell.jsx";
-import ThemeToggle from "../components/ThemeToggle.jsx";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
 import { mark3DLoaderShown } from "../utils/navigationState";
@@ -287,10 +285,8 @@ export default function Dashboard() {
             Your trading performance at a glance.
           </p>
         </div>
-        <div className="flex items-center gap-3 flex-wrap">
+        <div className="flex items-center gap-3 flex-wrap md:pr-28">
           <AccountFilter trades={allTrades} selectedAccount={selectedAccount} onChange={setSelectedAccount} />
-          <NotificationBell />
-          <ThemeToggle />
           <button
             onClick={() => navigate("/add-trade")}
             className="flex items-center gap-2 px-6 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-white font-semibold rounded-2xl transition-all text-[13px] shadow-lg shadow-emerald-500/25 active:scale-95 cursor-pointer"
