@@ -1,79 +1,78 @@
-﻿// frontend/src/pages/EconomicCalendar.jsx
+// frontend/src/pages/EconomicCalendar.jsx
 import { useEffect, useRef } from "react";
-import { Globe, ExternalLink, CalendarDays } from "lucide-react";
+import { Globe, ExternalLink, CalendarDays, ShieldAlert } from "lucide-react";
+import { useTheme } from "../components/theme-provider";
 
 export default function EconomicCalendar() {
   const container = useRef(null);
+  const { isDark } = useTheme();
 
   useEffect(() => {
-    // Prevent multiple script injections during React strict mode renders
-    if (container.current && container.current.children.length === 0) {
-      const isDark = document.documentElement.classList.contains("dark");
+    if (!container.current) return;
 
-      const script = document.createElement("script");
-      script.src =
-        "https://s3.tradingview.com/external-embedding/embed-widget-events.js";
-      script.type = "text/javascript";
-      script.async = true;
-      script.innerHTML = JSON.stringify({
-        colorTheme: isDark ? "dark" : "light",
-        isTransparent: true,
-        width: "100%",
-        height: "100%",
-        locale: "en",
-        importanceFilter: "-1,0,1",
-        currencyFilter: "USD,EUR,GBP,JPY,AUD,CAD,CHF,NZD,CNY",
-      });
+    // Clear previous widget before injecting new theme script
+    container.current.innerHTML = "";
 
-      container.current.appendChild(script);
-    }
-  }, []);
+    const script = document.createElement("script");
+    script.src = "https://s3.tradingview.com/external-embedding/embed-widget-events.js";
+    script.type = "text/javascript";
+    script.async = true;
+    script.innerHTML = JSON.stringify({
+      colorTheme: isDark ? "dark" : "light",
+      isTransparent: true,
+      width: "100%",
+      height: "100%",
+      locale: "en",
+      importanceFilter: "-1,0,1",
+      currencyFilter: "USD,EUR,GBP,JPY,AUD,CAD,CHF,NZD,CNY",
+    });
+
+    container.current.appendChild(script);
+  }, [isDark]);
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a]" style={{ fontFamily: "'Inter', sans-serif" }}>
-      <div className="w-full max-w-7xl mx-auto pb-16 px-4 md:px-8 mt-6 md:mt-8 box-border flex flex-col h-[calc(100vh-100px)]">
-        {/* Header */}
-        <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shrink-0">
-          <div className="flex items-center gap-4">
-            <div className="w-10 h-10 md:w-12 md:h-12 rounded-[2px] bg-[#ffb84d]/10 flex items-center justify-center border border-[#ffb84d]/20 shrink-0">
-              <Globe className="w-5 h-5 md:w-6 md:h-6 text-amber-700 dark:text-[#ffb84d]" />
-            </div>
-            <div>
-              <h1 className="text-xl md:text-3xl font-bold text-white tracking-tight mb-1">
-                Economic Calendar
-              </h1>
-              <p className="text-xs md:text-sm text-gray-400">
-                Live macroeconomic events, forecasts, and market impact data.
-              </p>
-            </div>
+    <div className="p-6 md:p-10 max-w-7xl mx-auto space-y-6 pb-20">
+      {/* ── Header ── */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-center gap-3.5">
+          <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 dark:bg-emerald-500/15 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 shadow-sm shadow-emerald-500/10">
+            <Globe className="w-6 h-6" />
           </div>
-
-          <button
-            onClick={() =>
-              window.open("https://www.forexfactory.com/calendar", "_blank")
-            }
-            className="px-6 py-3 bg-[#1a1d24] hover:bg-white/10 text-white font-bold rounded-[2px] border border-white/5 transition-all shadow-sm text-sm flex items-center justify-center gap-2"
-          >
-            Forex Factory <ExternalLink className="w-4 h-4" />
-          </button>
-        </div>
-
-        {/* TradingView Widget Container */}
-        <div className="flex-1 w-full bg-[#121418] border border-white/5 rounded-2xl shadow-xl overflow-hidden relative">
-          <div className="absolute inset-0 p-4" ref={container}>
-            {/* The TradingView script will automatically inject the calendar iframe here */}
+          <div>
+            <h1 className="font-serif text-2xl md:text-3xl font-medium text-neutral-800 dark:text-neutral-100">
+              Economic Calendar
+            </h1>
+            <p className="text-xs md:text-[13px] text-neutral-500 dark:text-neutral-400 mt-0.5">
+              Live macroeconomic events, forecasts, and market impact data.
+            </p>
           </div>
         </div>
 
-        {/* Pro Tip Footer */}
-        <div className="mt-6 p-4 bg-[#121418] border border-white/5 rounded-2xl shrink-0">
-          <p className="text-[10px] font-bold text-amber-700 dark:text-[#ffb84d] uppercase tracking-widest mb-1 flex items-center gap-1.5">
-            <CalendarDays className="w-3.5 h-3.5" /> News Trading Rule
+        <button
+          onClick={() => window.open("https://www.forexfactory.com/calendar", "_blank")}
+          className="self-start sm:self-auto px-5 py-2.5 rounded-2xl border border-black/[0.08] dark:border-white/[0.12] bg-white/75 dark:bg-white/[0.06] hover:bg-black/5 dark:hover:bg-white/10 text-neutral-700 dark:text-neutral-200 text-xs font-semibold backdrop-blur-xl shadow-sm hover:shadow transition-all flex items-center gap-2 cursor-pointer active:scale-95"
+        >
+          <span>Forex Factory</span>
+          <ExternalLink className="w-3.5 h-3.5 text-neutral-400" />
+        </button>
+      </div>
+
+      {/* ── TradingView Calendar Widget Container ── */}
+      <div className="w-full h-[640px] md:h-[700px] bg-white/70 dark:bg-[#10131b]/70 border border-black/[0.08] dark:border-white/[0.12] rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] backdrop-blur-2xl overflow-hidden relative p-2 md:p-3 transition-colors duration-300">
+        <div className="absolute inset-2 md:inset-3" ref={container} />
+      </div>
+
+      {/* ── Risk Management Rule Footer ── */}
+      <div className="p-5 rounded-3xl bg-white/70 dark:bg-[#10131b]/70 border border-black/[0.08] dark:border-white/[0.12] shadow-sm backdrop-blur-2xl flex items-start gap-3.5 transition-colors duration-300">
+        <div className="w-9 h-9 rounded-xl bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 flex items-center justify-center shrink-0 mt-0.5">
+          <ShieldAlert className="w-4 h-4" />
+        </div>
+        <div>
+          <p className="text-[11px] font-bold text-rose-600 dark:text-rose-400 uppercase tracking-widest mb-1">
+            News Execution Rule
           </p>
-          <p className="text-xs text-gray-400 leading-relaxed">
-            Avoid taking new technical setups 15 minutes before and after
-            high-impact (red) news releases due to unpredictable spread widening
-            and slippage.
+          <p className="text-xs text-neutral-600 dark:text-neutral-300 leading-relaxed font-normal">
+            Avoid taking new technical setups 15 minutes before and after high-impact (red folder) news releases due to unpredictable spread widening and slippage.
           </p>
         </div>
       </div>
