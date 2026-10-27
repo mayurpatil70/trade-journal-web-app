@@ -465,16 +465,6 @@ LANDING PAGE ANIMATIONS
   border: 1px solid rgba(255, 255, 255, 0.07);
 }
 
-/* Desktop-only nav links helper */
-.hidden {
-  display: none;
-}
-@media (min-width: 768px) {
-  .md\:block {
-    display: block;
-  }
-}
-
 /* Mobile: disable 3D grid layout for feature bento */
 @media (max-width: 768px) {
   [style*="grid-template-columns: repeat(3"] {
