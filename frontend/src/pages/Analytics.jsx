@@ -1,4 +1,4 @@
-﻿import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
 import AccountFilter from "../components/AccountFilter";
@@ -96,7 +96,7 @@ export default function Analytics() {
   return (
     <div className="w-full max-w-7xl mx-auto font-sans pb-24 px-4 md:px-8 mt-6">
       {/* Header with account filter */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10 md:pr-28">
         <div>
           <h1 className="text-2xl font-semibold text-white flex items-center gap-3">
             <Activity className="w-6 h-6 text-emerald-400" /> Strategy Analytics

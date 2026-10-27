@@ -1,4 +1,4 @@
-﻿import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { createChart } from 'lightweight-charts';
 import {
@@ -8,6 +8,8 @@ import {
 import SymbolPicker from '../components/SymbolPicker';
 import DrawingLayer from '../components/drawing/DrawingLayer';
 import ChartTrading from '../components/backtest/ChartTrading';
+import NotificationBell from '../components/NotificationBell';
+import ThemeToggle from '../components/ThemeToggle';
 import { marketApi } from '../api/market';
 import {
   createReplay, positionSize, validateOrder, stepReplay, placeOrder, closePosition,
@@ -546,7 +548,11 @@ export default function Backtest() {
             </span>
           )}
           {!watch && dirty && <span className="text-amber-400">Unsaved changes</span>}
-          {!watch && <button onClick={saveSession} className="px-3 py-1 bg-[#2962FF] hover:bg-[#1E4CDB] text-white font-bold rounded text-xs">Save Session</button>}
+          {!watch && <button onClick={saveSession} className="px-3 py-1 bg-[#2962FF] hover:bg-[#1E4CDB] text-white font-bold rounded text-xs cursor-pointer active:scale-95 transition-all">Save Session</button>}
+          <div className="flex items-center gap-2 border-l border-white/10 pl-2">
+            <NotificationBell />
+            <ThemeToggle />
+          </div>
         </div>
       </div>
 

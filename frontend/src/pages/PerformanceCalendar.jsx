@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
 import AccountFilter from "../components/AccountFilter";
@@ -77,7 +77,7 @@ export default function PerformanceCalendar() {
     <div className="w-full max-w-7xl mx-auto font-sans pb-24 px-4 md:px-8 mt-6">
       
       {/* HEADER */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10 md:pr-28">
         <div>
           <h1 className="text-2xl font-semibold text-white flex items-center gap-3">
             <CalendarIcon className="w-6 h-6 text-purple-400" />

@@ -33,7 +33,7 @@ export default function EconomicCalendar() {
   return (
     <div className="p-6 md:p-10 max-w-7xl mx-auto space-y-6 pb-20">
       {/* ── Header ── */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 md:pr-28">
         <div className="flex items-center gap-3.5">
           <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 dark:bg-emerald-500/15 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 shadow-sm shadow-emerald-500/10">
             <Globe className="w-6 h-6" />

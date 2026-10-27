@@ -59,7 +59,7 @@ export default function Sessions() {
 
   return (
     <div className="w-full max-w-7xl mx-auto font-sans pb-24 px-4 md:px-8 mt-6">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4 md:pr-28">
         <div>
           <h1 className="text-2xl font-semibold text-white flex items-center gap-3">
             <FolderClock className="w-6 h-6 text-emerald-400" /> Your Sessions
