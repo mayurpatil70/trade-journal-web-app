@@ -1,4 +1,4 @@
-﻿// frontend/src/pages/TraderProblems/Hindsight.jsx
+// frontend/src/pages/TraderProblems/Hindsight.jsx
 import { useState, useEffect } from "react";
 import {
   SlidersHorizontal,
@@ -7,6 +7,8 @@ import {
   Calendar,
   TrendingUp,
   TrendingDown,
+  ArrowUp,
+  ArrowDown,
 } from "lucide-react";
 import api from "../../api/axios";
 
@@ -140,12 +142,16 @@ export default function Hindsight() {
               </span>
               <span className="text-gray-300 dark:text-gray-600">|</span>
               <span
-                className={`font-bold flex items-center gap-1 ${selectedTrade.direction === "Long" ? "text-emerald-500" : "text-red-500"}`}
+                className={`font-bold flex items-center gap-1 ${
+                  (selectedTrade.direction || "").toUpperCase() === "LONG"
+                    ? "text-emerald-500"
+                    : "text-red-500"
+                }`}
               >
-                {selectedTrade.direction === "Long" ? (
-                  <TrendingUp className="w-4 h-4" />
+                {(selectedTrade.direction || "").toUpperCase() === "LONG" ? (
+                  <ArrowUp className="w-4 h-4 text-emerald-500" />
                 ) : (
-                  <TrendingDown className="w-4 h-4" />
+                  <ArrowDown className="w-4 h-4 text-red-500" />
                 )}
                 {selectedTrade.direction}
               </span>

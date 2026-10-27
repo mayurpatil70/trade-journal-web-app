@@ -10,6 +10,8 @@ import {
   Target,
   X,
   TrendingUp,
+  ArrowUp,
+  ArrowDown,
   Brain,
   Zap,
 } from "lucide-react";
@@ -216,9 +218,13 @@ export default function PerformanceCalendar() {
                  return (
                    <div key={idx} onClick={() => navigate("/trades", { state: { openTradeId: t.id } })} className="bg-[#15181D] border border-white/5 rounded-xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 cursor-pointer hover:bg-white/5 transition-colors">
                       <div className="flex items-center gap-4">
-                         <div className={`w-10 h-10 rounded-lg flex items-center justify-center font-bold text-xs border ${t.direction === "LONG" ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : "bg-purple-500/10 text-purple-400 border-purple-500/20"}`}>
-                           {t.direction === "LONG" ? "▲" : "▼"}
-                         </div>
+                          <div className={`w-10 h-10 rounded-lg flex items-center justify-center font-bold text-xs border ${t.direction === "LONG" ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : "bg-red-500/10 text-red-400 border-red-500/20"}`} title={t.direction}>
+                            {t.direction === "LONG" ? (
+                              <ArrowUp className="w-5 h-5 text-emerald-400" />
+                            ) : (
+                              <ArrowDown className="w-5 h-5 text-red-400" />
+                            )}
+                          </div>
                          <div>
                            <h3 className="font-semibold text-white text-[15px]">{t.asset}</h3>
                            <p className="text-[11px] text-gray-500 mt-0.5">{t.setup} • {t.session}</p>
@@ -240,3 +246,4 @@ export default function PerformanceCalendar() {
     </div>
   );
 }
+

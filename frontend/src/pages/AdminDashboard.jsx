@@ -1,4 +1,4 @@
-﻿// frontend/src/pages/AdminDashboard.jsx
+// frontend/src/pages/AdminDashboard.jsx
 import { useState, useEffect, useMemo, useRef } from "react";
 import {
   ShieldCheck,
@@ -21,6 +21,8 @@ import {
   Eye,
   Megaphone,
   TrendingUp,
+  ArrowUp,
+  ArrowDown,
   X,
   Check,
   XCircle,
@@ -1653,14 +1655,20 @@ export default function AdminDashboard() {
 
                           <td className="py-3 pr-4">
                             <span
-                              className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded ${
+                              className={`inline-flex items-center gap-1 text-[10px] font-bold uppercase px-2 py-0.5 rounded border ${
                                 (t.direction || "").toUpperCase() === "LONG"
-                                  ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                                  ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20"
                                   : (t.direction || "").toUpperCase() === "SHORT"
-                                  ? "bg-rose-500/10 text-rose-600 dark:text-rose-400"
-                                  : "text-gray-500"
+                                  ? "bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20"
+                                  : "text-gray-500 border-transparent"
                               }`}
                             >
+                              {(t.direction || "").toUpperCase() === "LONG" && (
+                                <ArrowUp className="w-2.5 h-2.5" />
+                              )}
+                              {(t.direction || "").toUpperCase() === "SHORT" && (
+                                <ArrowDown className="w-2.5 h-2.5" />
+                              )}
                               {t.direction || "N/A"}
                             </span>
                           </td>
@@ -2339,7 +2347,25 @@ export default function AdminDashboard() {
                       {selectedUserTrades.slice(0, 10).map((t) => (
                         <tr key={t.id} className="hover:bg-gray-50 dark:hover:bg-white/[0.02]">
                           <td className="p-3 font-mono font-bold text-gray-900 dark:text-white">{t.asset || "N/A"}</td>
-                          <td className="p-3 font-semibold uppercase">{t.direction || "-"}</td>
+                          <td className="p-3">
+                            <span
+                              className={`inline-flex items-center gap-1 text-[10px] font-bold uppercase px-2 py-0.5 rounded border ${
+                                (t.direction || "").toUpperCase() === "LONG"
+                                  ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20"
+                                  : (t.direction || "").toUpperCase() === "SHORT"
+                                  ? "bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20"
+                                  : "text-gray-500 border-transparent"
+                              }`}
+                            >
+                              {(t.direction || "").toUpperCase() === "LONG" && (
+                                <ArrowUp className="w-2.5 h-2.5" />
+                              )}
+                              {(t.direction || "").toUpperCase() === "SHORT" && (
+                                <ArrowDown className="w-2.5 h-2.5" />
+                              )}
+                              {t.direction || "-"}
+                            </span>
+                          </td>
                           <td className="p-3">
                             <span
                               className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${

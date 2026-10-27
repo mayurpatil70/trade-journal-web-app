@@ -9,6 +9,8 @@ import {
   PlusCircle,
   Clock,
   ArrowRight,
+  ArrowUp,
+  ArrowDown,
   List,
   Brain,
   ShieldCheck,
@@ -92,7 +94,23 @@ const EquityCurve = ({ data, trades = [] }) => {
           {ht ? (
             <>
               <div className="flex justify-between text-gray-400"><span>{ht.date}</span><span>#{hi}</span></div>
-              <div className="mt-1 font-semibold text-white">{ht.asset} {ht.direction}</div>
+              <div className="mt-1 font-semibold text-white flex items-center gap-1.5">
+                <span>{ht.asset}</span>
+                <span
+                  className={`inline-flex items-center gap-0.5 text-[9px] font-bold px-1.5 py-0.5 rounded border ${
+                    ht.direction === "LONG"
+                      ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/25"
+                      : "bg-red-500/15 text-red-400 border-red-500/25"
+                  }`}
+                >
+                  {ht.direction === "LONG" ? (
+                    <ArrowUp className="w-2.5 h-2.5" />
+                  ) : (
+                    <ArrowDown className="w-2.5 h-2.5" />
+                  )}
+                  {ht.direction}
+                </span>
+              </div>
               <div className={`font-mono font-bold ${(parseFloat(ht.r_multiple) || 0) >= 0 ? "text-emerald-400" : "text-red-400"}`}>
                 {(parseFloat(ht.r_multiple) || 0) >= 0 ? "+" : ""}{(parseFloat(ht.r_multiple) || 0).toFixed(2)}R
               </div>
@@ -423,9 +441,22 @@ export default function Dashboard() {
                   <div className="flex items-start justify-between mb-4">
                     <div>
                       <div className="flex items-center gap-2 mb-1">
-                        <span className={`w-2 h-2 rounded-full shrink-0 ${t.direction === "LONG" ? "bg-emerald-500" : "bg-rose-500"}`} />
+                        <span className={`w-2 h-2 rounded-full shrink-0 ${t.direction === "LONG" ? "bg-emerald-500" : "bg-red-500"}`} />
                         <h4 className="font-semibold text-[14px] text-neutral-900 dark:text-neutral-100">{t.asset}</h4>
-                        <span className="text-[9px] uppercase font-bold text-neutral-600 dark:text-neutral-400 px-1.5 py-0.5 bg-black/[0.04] dark:bg-white/[0.08] rounded-md">{t.direction}</span>
+                        <span
+                          className={`inline-flex items-center gap-0.5 text-[9px] uppercase font-bold px-1.5 py-0.5 rounded-md border ${
+                            t.direction === "LONG"
+                              ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20"
+                              : "bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20"
+                          }`}
+                        >
+                          {t.direction === "LONG" ? (
+                            <ArrowUp className="w-2.5 h-2.5" />
+                          ) : (
+                            <ArrowDown className="w-2.5 h-2.5" />
+                          )}
+                          {t.direction}
+                        </span>
                       </div>
                       <p className="text-[11px] text-neutral-500 dark:text-neutral-400 flex items-center gap-1.5"><Clock className="w-3 h-3" /> {t.date}</p>
                     </div>

@@ -1,4 +1,4 @@
-﻿// src/components/landing/DashboardMockup.jsx
+// src/components/landing/DashboardMockup.jsx
 // A pixel-perfect code-drawn replica of the Forex Notes dashboard
 // Used as the hero mockup element animated by GSAP ScrollTrigger
 
@@ -281,6 +281,9 @@ export default function DashboardMockup({ style = {}, className = '' }) {
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <span style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '2px',
                     padding: '2px 6px',
                     borderRadius: '4px',
                     fontSize: '7px',
@@ -289,7 +292,7 @@ export default function DashboardMockup({ style = {}, className = '' }) {
                     background: t.dir === 'LONG' ? 'rgba(16,185,129,0.12)' : 'rgba(239,68,68,0.12)',
                     color: t.dir === 'LONG' ? 'var(--l-gain)' : 'var(--l-loss)',
                     border: `1px solid ${t.dir === 'LONG' ? 'rgba(16,185,129,0.25)' : 'rgba(239,68,68,0.25)'}`,
-                  }}>{t.dir}</span>
+                  }}>{t.dir === 'LONG' ? '↑ LONG' : '↓ SHORT'}</span>
                   <span style={{ fontSize: '9px', fontWeight: 700, color: "var(--l-ink)" }}>{t.pair}</span>
                   <span style={{ fontSize: '8px', color: 'rgb(var(--l-fg) / calc(0.5 + var(--l-ta)))' }}>{t.setup}</span>
                 </div>

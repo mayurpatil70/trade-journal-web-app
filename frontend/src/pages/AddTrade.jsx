@@ -14,6 +14,8 @@ import {
   ChevronDown,
   ArrowRight,
   ArrowLeft,
+  ArrowUp,
+  ArrowDown,
   Activity,
   Check,
   UploadCloud,
@@ -911,9 +913,14 @@ export default function AddTrade() {
                           }));
                         }
                       }}
-                      className={`flex-1 py-3.5 rounded-2xl font-bold text-sm transition-all duration-200 border cursor-pointer ${formData.direction === "LONG" ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-600 dark:text-emerald-400 shadow-sm" : "bg-white/60 dark:bg-white/[0.05] border-black/10 dark:border-white/10 text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"}`}
+                      className={`flex-1 py-3.5 rounded-2xl font-bold text-sm transition-all duration-200 border cursor-pointer flex items-center justify-center gap-2 ${
+                        formData.direction === "LONG"
+                          ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-600 dark:text-emerald-400 shadow-sm"
+                          : "bg-white/60 dark:bg-white/[0.05] border-black/10 dark:border-white/10 text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
+                      }`}
                     >
-                      LONG ▲
+                      <ArrowUp className="w-4 h-4 text-emerald-500" />
+                      <span>LONG</span>
                     </button>
                     <button
                       type="button"
@@ -926,9 +933,14 @@ export default function AddTrade() {
                           }));
                         }
                       }}
-                      className={`flex-1 py-3.5 rounded-2xl font-bold text-sm transition-all duration-200 border cursor-pointer ${formData.direction === "SHORT" ? "bg-rose-500/15 border-rose-500/40 text-rose-600 dark:text-rose-400 shadow-sm" : "bg-white/60 dark:bg-white/[0.05] border-black/10 dark:border-white/10 text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"}`}
+                      className={`flex-1 py-3.5 rounded-2xl font-bold text-sm transition-all duration-200 border cursor-pointer flex items-center justify-center gap-2 ${
+                        formData.direction === "SHORT"
+                          ? "bg-red-500/15 border-red-500/40 text-red-600 dark:text-red-400 shadow-sm"
+                          : "bg-white/60 dark:bg-white/[0.05] border-black/10 dark:border-white/10 text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
+                      }`}
                     >
-                      SHORT ▼
+                      <ArrowDown className="w-4 h-4 text-red-500" />
+                      <span>SHORT</span>
                     </button>
                   </div>
                   {fieldErrors.direction && (

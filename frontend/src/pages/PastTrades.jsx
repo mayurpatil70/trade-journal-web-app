@@ -17,6 +17,8 @@ import {
   MoreHorizontal,
   Clock,
   ArrowRight,
+  ArrowUp,
+  ArrowDown,
   Brain,
   Pencil,
   Trash2,
@@ -290,9 +292,18 @@ export default function PastTrades() {
                   {/* Left: Asset & Time */}
                   <div className="flex items-center gap-4 md:w-[25%]">
                     <div
-                      className={`w-10 h-10 rounded-lg flex items-center justify-center font-bold text-xs border ${t.direction === "LONG" ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : "bg-purple-500/10 text-purple-400 border-purple-500/20"}`}
+                      className={`w-10 h-10 rounded-lg flex items-center justify-center font-bold text-xs border ${
+                        t.direction === "LONG"
+                          ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                          : "bg-red-500/10 text-red-400 border-red-500/20"
+                      }`}
+                      title={t.direction}
                     >
-                      {t.direction === "LONG" ? "?" : "?"}
+                      {t.direction === "LONG" ? (
+                        <ArrowUp className="w-5 h-5 text-emerald-400" />
+                      ) : (
+                        <ArrowDown className="w-5 h-5 text-red-400" />
+                      )}
                     </div>
                     <div>
                       <h3 className="font-semibold text-white text-[15px]">
@@ -399,8 +410,17 @@ export default function PastTrades() {
             <div className="px-6 py-5 border-b border-white/5 flex items-center justify-between bg-[#0A0B0D]">
               <div className="flex items-center gap-3">
                 <span
-                  className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-widest ${selectedTrade.direction === "LONG" ? "bg-emerald-500/10 text-emerald-400" : "bg-purple-500/10 text-purple-400"}`}
+                  className={`inline-flex items-center gap-1 px-2.5 py-1 rounded text-[10px] font-bold uppercase tracking-widest border ${
+                    selectedTrade.direction === "LONG"
+                      ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                      : "bg-red-500/10 text-red-400 border-red-500/20"
+                  }`}
                 >
+                  {selectedTrade.direction === "LONG" ? (
+                    <ArrowUp className="w-3 h-3 text-emerald-400" />
+                  ) : (
+                    <ArrowDown className="w-3 h-3 text-red-400" />
+                  )}
                   {selectedTrade.direction}
                 </span>
                 <h2 className="text-xl font-bold text-white">

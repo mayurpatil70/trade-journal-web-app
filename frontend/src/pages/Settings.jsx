@@ -12,6 +12,8 @@ import {
   Calendar,
   TrendingUp,
   TrendingDown,
+  ArrowUp,
+  ArrowDown,
   FileText,
   Table,
   FileType,
@@ -269,13 +271,13 @@ export default function Settings() {
                             className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] border w-fit ${
                               trade.direction === "LONG"
                                 ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20"
-                                : "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20"
+                                : "bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20"
                             }`}
                           >
                             {trade.direction === "LONG" ? (
-                              <TrendingUp className="w-3 h-3" />
+                              <ArrowUp className="w-3 h-3 text-emerald-500" />
                             ) : (
-                              <TrendingDown className="w-3 h-3" />
+                              <ArrowDown className="w-3 h-3 text-red-500" />
                             )}
                             {trade.direction}
                           </span>
@@ -351,12 +353,17 @@ export default function Settings() {
               <div className="px-6 py-5 border-b border-black/[0.06] dark:border-white/[0.08] flex items-center justify-between bg-black/[0.02] dark:bg-white/[0.02]">
                 <div className="flex items-center gap-3">
                   <span
-                    className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-widest border ${
+                    className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-widest border ${
                       selectedTrade.direction === "LONG"
                         ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20"
-                        : "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20"
+                        : "bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20"
                     }`}
                   >
+                    {selectedTrade.direction === "LONG" ? (
+                      <ArrowUp className="w-2.5 h-2.5 text-emerald-500" />
+                    ) : (
+                      <ArrowDown className="w-2.5 h-2.5 text-red-500" />
+                    )}
                     {selectedTrade.direction}
                   </span>
                   <h2 className="text-xl font-bold text-neutral-900 dark:text-white">
