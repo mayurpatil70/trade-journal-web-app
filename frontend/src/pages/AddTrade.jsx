@@ -29,6 +29,7 @@ import {
   BALANCE_PRESETS,
   LOT_PRESETS,
   RISK_PERCENT_PRESETS,
+  MULTIPLIER_PRESETS,
   getAssetMultiplier,
   calculateStopDistance,
   calculateCashRisk,
@@ -53,7 +54,27 @@ export default function AddTrade() {
   const [accountInputMode, setAccountInputMode] = useState("select"); // 'select' | 'new'
   const [newAccountName, setNewAccountName] = useState("");
 
-  const assets = ["XAUUSD", "BTCUSD", "ETHUSD", "XAGUSD", "Other"];
+  const assets = [
+    "XAUUSD",
+    "EURUSD",
+    "GBPUSD",
+    "USDJPY",
+    "US30",
+    "NAS100",
+    "BTCUSD",
+    "ETHUSD",
+    "SPX500",
+    "AUDUSD",
+    "USDCAD",
+    "USDCHF",
+    "NZDUSD",
+    "EURJPY",
+    "GBPJPY",
+    "EURGBP",
+    "XAGUSD",
+    "USOIL",
+    "Other",
+  ];
   const setups = [
     "FVG",
     "SMC",
@@ -122,6 +143,7 @@ export default function AddTrade() {
   }, [accountBalance]);
 
   const [customFields, setCustomFields] = useState({});
+  const [customMultiplier, setCustomMultiplier] = useState(null);
   const [images, setImages] = useState([null, null]);
 
   // Real-time R:R Calculations
@@ -237,13 +259,61 @@ export default function AddTrade() {
     }
   }, [formData.accountName]);
 
-  const recalculateFromEquity = (newEquity) => {
+  const applyMultiplier = (mult) => {
+    setCustomMultiplier(mult);
+    const activeAsset =
+      formData.asset === "Other" && customFields.asset
+        ? customFields.asset.trim()
+        : formData.asset;
+    const effectiveMult = mult !== null ? mult : getAssetMultiplier(activeAsset, formData.entry);
+
+    if (
+      formData.lotSize &&
+      formData.entry &&
+      formData.sl &&
+      !Number.isNaN(Number(formData.entry)) &&
+      !Number.isNaN(Number(formData.sl))
+    ) {
+      const calcRisk = calculateRiskPercent({
+        asset: activeAsset,
+        entry: formData.entry,
+        sl: formData.sl,
+        lotSize: formData.lotSize,
+        balance: accountBalance,
+        multiplier: effectiveMult,
+      });
+      if (calcRisk !== null) {
+        setFormData((p) => ({ ...p, risk: calcRisk.toFixed(2) }));
+      }
+    } else if (
+      formData.risk &&
+      formData.entry &&
+      formData.sl &&
+      !Number.isNaN(Number(formData.entry)) &&
+      !Number.isNaN(Number(formData.sl))
+    ) {
+      const calcLots = calculateLotSize({
+        asset: activeAsset,
+        entry: formData.entry,
+        sl: formData.sl,
+        riskPercent: formData.risk,
+        balance: accountBalance,
+        multiplier: effectiveMult,
+      });
+      if (calcLots !== null) {
+        setFormData((p) => ({ ...p, lotSize: String(calcLots) }));
+      }
+    }
+  };
+
+  const recalculateFromEquity = (newEquity, overrideMult) => {
     const val = Number(newEquity);
     if (!val || val <= 0) return;
     const activeAsset =
       formData.asset === "Other" && customFields.asset
-        ? customFields.asset
+        ? customFields.asset.trim()
         : formData.asset;
+    const mult = overrideMult !== undefined ? overrideMult : customMultiplier;
 
     if (
       formData.lotSize &&
@@ -258,6 +328,7 @@ export default function AddTrade() {
         sl: formData.sl,
         lotSize: formData.lotSize,
         balance: val,
+        multiplier: mult,
       });
       if (calcRisk !== null) {
         setFormData((p) => ({ ...p, risk: calcRisk.toFixed(2) }));
@@ -275,6 +346,7 @@ export default function AddTrade() {
         sl: formData.sl,
         riskPercent: formData.risk,
         balance: val,
+        multiplier: mult,
       });
       if (calcLots !== null) {
         setFormData((p) => ({ ...p, lotSize: String(calcLots) }));
@@ -310,7 +382,7 @@ export default function AddTrade() {
 
   const activeAssetSymbol = useMemo(() => {
     return formData.asset === "Other" && customFields.asset
-      ? customFields.asset
+      ? customFields.asset.trim()
       : formData.asset;
   }, [formData.asset, customFields.asset]);
 
@@ -320,12 +392,13 @@ export default function AddTrade() {
       entry: formData.entry,
       sl: formData.sl,
       lotSize: formData.lotSize,
+      multiplier: customMultiplier,
     });
-  }, [activeAssetSymbol, formData.entry, formData.sl, formData.lotSize]);
+  }, [activeAssetSymbol, formData.entry, formData.sl, formData.lotSize, customMultiplier]);
 
   const assetMultiplier = useMemo(() => {
-    return getAssetMultiplier(activeAssetSymbol, formData.entry);
-  }, [activeAssetSymbol, formData.entry]);
+    return getAssetMultiplier(activeAssetSymbol, formData.entry, customMultiplier);
+  }, [activeAssetSymbol, formData.entry, customMultiplier]);
 
   useEffect(() => {
     if (formData.entry && formData.sl && formData.tp) {
@@ -346,11 +419,14 @@ export default function AddTrade() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    if (name === "asset") {
+      setCustomMultiplier(null); // Reset custom multiplier override when selecting new base asset
+    }
     setFormData((prev) => {
       const updated = { ...prev, [name]: value };
       const currentAsset =
         updated.asset === "Other" && customFields.asset
-          ? customFields.asset
+          ? customFields.asset.trim()
           : updated.asset;
 
       if (name === "rMultiple" || name === "r_multiple") {
@@ -379,6 +455,7 @@ export default function AddTrade() {
             sl: updated.sl,
             lotSize: value,
             balance: accountBalance,
+            multiplier: customMultiplier,
           });
           if (calcRisk !== null) {
             updated.risk = calcRisk.toFixed(2);
@@ -402,6 +479,7 @@ export default function AddTrade() {
             sl: updated.sl,
             riskPercent: value,
             balance: accountBalance,
+            multiplier: customMultiplier,
           });
           if (calcLots !== null) {
             updated.lotSize = String(calcLots);
@@ -418,7 +496,7 @@ export default function AddTrade() {
         const assetForCalc =
           name === "asset"
             ? value === "Other" && customFields.asset
-              ? customFields.asset
+              ? customFields.asset.trim()
               : value
             : currentAsset;
 
@@ -436,6 +514,7 @@ export default function AddTrade() {
             sl,
             lotSize: updated.lotSize,
             balance: accountBalance,
+            multiplier: name === "asset" ? null : customMultiplier,
           });
           if (calcRisk !== null) {
             updated.risk = calcRisk.toFixed(2);
@@ -454,6 +533,7 @@ export default function AddTrade() {
             sl,
             riskPercent: updated.risk,
             balance: accountBalance,
+            multiplier: name === "asset" ? null : customMultiplier,
           });
           if (calcLots !== null) {
             updated.lotSize = String(calcLots);
@@ -513,8 +593,51 @@ export default function AddTrade() {
     }
   };
 
-  const handleCustomChange = (e) =>
-    setCustomFields({ ...customFields, [e.target.name]: e.target.value });
+  const handleCustomChange = (e) => {
+    const { name, value } = e.target;
+    setCustomFields((prev) => ({ ...prev, [name]: value }));
+
+    if (name === "asset") {
+      const targetAsset = value.trim() || "Other";
+      if (
+        formData.lotSize &&
+        formData.entry &&
+        formData.sl &&
+        !Number.isNaN(Number(formData.entry)) &&
+        !Number.isNaN(Number(formData.sl))
+      ) {
+        const calcRisk = calculateRiskPercent({
+          asset: targetAsset,
+          entry: formData.entry,
+          sl: formData.sl,
+          lotSize: formData.lotSize,
+          balance: accountBalance,
+          multiplier: customMultiplier,
+        });
+        if (calcRisk !== null) {
+          setFormData((p) => ({ ...p, risk: calcRisk.toFixed(2) }));
+        }
+      } else if (
+        formData.risk &&
+        formData.entry &&
+        formData.sl &&
+        !Number.isNaN(Number(formData.entry)) &&
+        !Number.isNaN(Number(formData.sl))
+      ) {
+        const calcLots = calculateLotSize({
+          asset: targetAsset,
+          entry: formData.entry,
+          sl: formData.sl,
+          riskPercent: formData.risk,
+          balance: accountBalance,
+          multiplier: customMultiplier,
+        });
+        if (calcLots !== null) {
+          setFormData((p) => ({ ...p, lotSize: String(calcLots) }));
+        }
+      }
+    }
+  };
 
   const handleImageChange = (index, e) => {
     const file = e.target.files[0];
@@ -1210,6 +1333,7 @@ export default function AddTrade() {
                                   sl: updated.sl,
                                   lotSize: newLots,
                                   balance: accountBalance,
+                                  multiplier: customMultiplier,
                                 });
                                 if (calcRisk !== null) {
                                   updated.risk = calcRisk.toFixed(2);
@@ -1279,6 +1403,7 @@ export default function AddTrade() {
                                   sl: updated.sl,
                                   riskPercent: newRisk,
                                   balance: accountBalance,
+                                  multiplier: customMultiplier,
                                 });
                                 if (calcLots !== null) {
                                   updated.lotSize = String(calcLots);
@@ -1317,8 +1442,17 @@ export default function AddTrade() {
                           Live Engine
                         </span>
                       </div>
-                      <p className="text-xs text-gray-400 font-mono mt-0.5">
-                        {formData.asset} • {assetMultiplier >= 1000 ? `$${assetMultiplier.toLocaleString()}/pt` : `$${assetMultiplier}/pt`} per lot
+                      <p className="text-xs text-gray-400 font-mono mt-0.5 flex items-center gap-1.5 flex-wrap">
+                        <span>{activeAssetSymbol || "Asset"}</span>
+                        <span>•</span>
+                        <span>
+                          ${assetMultiplier >= 1000 ? assetMultiplier.toLocaleString() : assetMultiplier}/pt per lot
+                        </span>
+                        {customMultiplier !== null && (
+                          <span className="text-[10px] text-amber-400 bg-amber-500/10 border border-amber-500/20 px-1.5 py-0.2 rounded font-sans">
+                            custom override
+                          </span>
+                        )}
                       </p>
                     </div>
                   </div>
@@ -1329,6 +1463,40 @@ export default function AddTrade() {
                       {formattedEquity}
                     </span>
                   </div>
+                </div>
+
+                {/* Contract Multiplier Preset Bar */}
+                <div className="flex items-center gap-1.5 flex-wrap pb-1">
+                  <span className="text-[10px] text-gray-400 uppercase tracking-wider font-semibold mr-1">
+                    Contract Multiplier:
+                  </span>
+                  {MULTIPLIER_PRESETS.map((preset) => {
+                    const isSelected = assetMultiplier === preset.multiplier;
+                    return (
+                      <button
+                        key={preset.label}
+                        type="button"
+                        onClick={() => applyMultiplier(preset.multiplier)}
+                        title={preset.hint}
+                        className={`px-2 py-1 text-[11px] rounded-lg font-mono transition-colors border cursor-pointer ${
+                          isSelected
+                            ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/40 font-bold shadow-sm"
+                            : "bg-white/5 text-gray-400 border-white/10 hover:bg-white/10 hover:text-white"
+                        }`}
+                      >
+                        {preset.label} (${preset.multiplier >= 1000 ? `${preset.multiplier / 1000}k` : preset.multiplier}/pt)
+                      </button>
+                    );
+                  })}
+                  {customMultiplier !== null && (
+                    <button
+                      type="button"
+                      onClick={() => applyMultiplier(null)}
+                      className="px-2 py-1 text-[10px] rounded-lg font-mono bg-rose-500/15 text-rose-400 border border-rose-500/30 hover:bg-rose-500/25 transition-colors cursor-pointer"
+                    >
+                      Reset Auto
+                    </button>
+                  )}
                 </div>
 
                 {/* Calculator Body: Left = Full-Size Down Column for Account Equity, Right = Live Sizing Breakdown */}
