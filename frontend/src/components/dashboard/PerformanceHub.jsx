@@ -123,10 +123,10 @@ export function TradingHealth({ trades }) {
     <div>
       <div className="flex justify-between text-xs mb-2">
         <span className="text-neutral-600 dark:text-neutral-400 font-medium">{label}</span>
-        <span className={`font-bold ${v == null ? 'text-neutral-400 dark:text-neutral-500' : v >= 80 ? 'text-emerald-600 dark:text-emerald-400' : v >= 50 ? 'text-amber-500' : 'text-rose-500'}`}>{v == null ? '-' : `${v.toFixed(0)}%`}</span>
+        <span className={`font-bold ${v == null ? 'text-neutral-400 dark:text-neutral-500' : v >= 60 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-500 dark:text-rose-400'}`}>{v == null ? '-' : `${v.toFixed(0)}%`}</span>
       </div>
       <div className="w-full bg-black/5 dark:bg-white/5 rounded-full h-1.5 overflow-hidden">
-        <div className={`h-1.5 rounded-full ${v >= 80 ? 'bg-emerald-500' : v >= 50 ? 'bg-amber-400' : 'bg-rose-500'}`} style={{ width: `${v ?? 0}%` }} />
+        <div className={`h-1.5 rounded-full ${v >= 60 ? 'bg-emerald-500' : 'bg-rose-500'}`} style={{ width: `${v ?? 0}%` }} />
       </div>
     </div>
   );

@@ -1,8 +1,12 @@
+// frontend/src/components/landing/LandingNavbar.jsx
+// Apple iOS / macOS Sequoia Blueprint Floating Glass Pill Navbar
+// Strict Color Palette: Black, White, Gray, Emerald Green (No random cyans/purples)
+// High-Fidelity Glassmorphism with Continuous Squircle Geometry
+
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, ArrowRight, BarChart2, Shield, BookOpen, Calculator, Layers, Zap } from 'lucide-react';
 import BrandLogo from '../BrandLogo';
-import IridescentButton from './IridescentButton';
 
 const NAV_LINKS = [
   { label: 'Markets', to: '/markets/four-asset-classes', icon: Layers },
@@ -15,7 +19,17 @@ const NAV_LINKS = [
 
 export default function LandingNavbar({ isFixed = true }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const { pathname } = useLocation();
+
+  // Scroll detection for subtle dynamic blur adjustment
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // Close mobile menu on route change
   useEffect(() => {
@@ -48,359 +62,192 @@ export default function LandingNavbar({ isFixed = true }) {
 
   return (
     <>
+      {/* ── Apple macOS / iOS Floating Glass Island Header ── */}
       <header
-        className="glossy-navbar"
-        style={{
-          position: isFixed ? 'fixed' : 'sticky',
-          top: 0,
-          left: 0,
-          right: 0,
-          height: '62px',
-          padding: '0 clamp(16px, 3.5vw, 44px)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          zIndex: 60,
-          background: 'linear-gradient(180deg, rgba(7, 26, 51, 0.55) 0%, rgba(7, 26, 51, 0.18) 70%, transparent 100%)',
-          backdropFilter: 'blur(16px)',
-          WebkitBackdropFilter: 'blur(16px)',
-          borderBottom: 'none',
-          boxShadow: 'none',
-          boxSizing: 'border-box',
-          transition: 'all 0.3s ease',
-        }}
+        className={`fixed top-0 left-0 right-0 z-[80] transition-all duration-300 px-4 md:px-8 ${
+          scrolled ? 'pt-2.5 pb-2.5' : 'pt-4 pb-3'
+        }`}
       >
-        {/* Left: Brand Logo & Title with Glossy Design */}
-        <Link
-          to="/"
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '10px',
-            textDecoration: 'none',
-            flexShrink: 0,
-            padding: '5px 14px 5px 6px',
-            borderRadius: '999px',
-            background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(95, 212, 232, 0.06) 50%, rgba(255, 255, 255, 0.02) 100%)',
-            border: '1px solid rgba(255, 255, 255, 0.2)',
-            boxShadow: 'inset 0 1px 1px 0 rgba(255, 255, 255, 0.35), 0 4px 16px rgba(0, 0, 0, 0.3)',
-            backdropFilter: 'blur(16px)',
-            WebkitBackdropFilter: 'blur(16px)',
-            transition: 'all 0.25s ease',
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.borderColor = 'rgba(95, 212, 232, 0.45)';
-            e.currentTarget.style.boxShadow = 'inset 0 1px 1px 0 rgba(255, 255, 255, 0.45), 0 6px 24px rgba(95, 212, 232, 0.28)';
-            e.currentTarget.style.transform = 'translateY(-1px)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.2)';
-            e.currentTarget.style.boxShadow = 'inset 0 1px 1px 0 rgba(255, 255, 255, 0.35), 0 4px 16px rgba(0, 0, 0, 0.3)';
-            e.currentTarget.style.transform = 'translateY(0)';
-          }}
-          onClick={() => {
-            if (pathname === '/') {
-              window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-            }
-          }}
-        >
-          <div style={{
-            width: 26,
-            height: 26,
-            borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(95, 212, 232, 0.3) 0%, rgba(14, 124, 134, 0.15) 70%)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            border: '1px solid rgba(95, 212, 232, 0.3)',
-            boxShadow: '0 0 12px rgba(95, 212, 232, 0.45)',
-          }}>
-            <img
-              src="/logo3d.png"
-              alt="Forex Notes"
-              style={{ width: 18, height: 18, objectFit: 'contain', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.5))' }}
-            />
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <span
-              style={{
-                fontFamily: "'Space Grotesk', -apple-system, sans-serif",
-                fontSize: '13.5px',
-                fontWeight: 800,
-                letterSpacing: '0.14em',
-                textTransform: 'uppercase',
-                background: 'linear-gradient(135deg, #FFFFFF 0%, #D4F4F9 50%, #5FD4E8 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                display: 'inline-block',
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          {/* Main Floating Glass Capsule */}
+          <div className="w-full flex items-center justify-between px-4 sm:px-6 py-2.5 rounded-full bg-[#0a0c12]/75 dark:bg-[#0a0c12]/80 backdrop-blur-2xl border border-white/[0.12] shadow-[0_12px_40px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.18)] transition-all duration-300">
+            {/* Left: Brand Identity */}
+            <Link
+              to="/"
+              className="flex items-center gap-2.5 py-1 px-2 rounded-full hover:bg-white/5 transition-colors group cursor-pointer"
+              onClick={() => {
+                if (pathname === '/') {
+                  window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+                }
               }}
             >
-              FOREX
-            </span>
-            <span
-              style={{
-                fontFamily: "'Instrument Serif', Georgia, serif",
-                fontSize: '17px',
-                fontWeight: 400,
-                fontStyle: 'italic',
-                letterSpacing: '0.04em',
-                color: '#5FD4E8',
-                textShadow: '0 0 14px rgba(95, 212, 232, 0.5)',
-                display: 'inline-block',
-                lineHeight: 1,
-              }}
-            >
-              Notes
-            </span>
-          </div>
-        </Link>
-
-        {/* Right: Start Free Trial Button + Three-Line Menu Button */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <IridescentButton to="/login" size="sm">
-            START FREE TRIAL
-          </IridescentButton>
-
-          {/* Three-Line Menu Toggle Button (Visible on all screens) */}
-          <button
-            type="button"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-label="Toggle navigation menu"
-            style={{
-              background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.03) 100%)',
-              border: '1px solid rgba(255, 255, 255, 0.18)',
-              borderRadius: '10px',
-              padding: '7px 9px',
-              color: '#EDEAE3',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 4px 12px rgba(0, 0, 0, 0.25)',
-              backdropFilter: 'blur(12px)',
-              WebkitBackdropFilter: 'blur(12px)',
-              transition: 'all 0.2s ease',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = 'rgba(95, 212, 232, 0.45)';
-              e.currentTarget.style.transform = 'translateY(-1px)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.18)';
-              e.currentTarget.style.transform = 'translateY(0)';
-            }}
-          >
-            {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
-          </button>
-        </div>
-      </header>
-
-      {/* ── UNIFIED NAVIGATION DRAWER (Desktop & Mobile) ── */}
-      {mobileMenuOpen && (
-        <>
-          {/* Backdrop Blur Overlay */}
-          <div
-            onClick={() => setMobileMenuOpen(false)}
-            style={{
-              position: 'fixed',
-              inset: 0,
-              zIndex: 58,
-              background: 'rgba(3, 8, 16, 0.55)',
-              backdropFilter: 'blur(8px)',
-              WebkitBackdropFilter: 'blur(8px)',
-              transition: 'opacity 0.2s ease',
-            }}
-          />
-
-          {/* Drawer Panel */}
-          <div
-            style={{
-              position: 'fixed',
-              top: '64px',
-              right: 'clamp(12px, 3.5vw, 44px)',
-              width: 'min(400px, calc(100vw - 24px))',
-              maxHeight: 'calc(100vh - 84px)',
-              zIndex: 59,
-              background: 'linear-gradient(180deg, rgba(7, 26, 51, 0.94) 0%, rgba(4, 14, 30, 0.98) 100%)',
-              backdropFilter: 'blur(36px) saturate(190%)',
-              WebkitBackdropFilter: 'blur(36px) saturate(190%)',
-              border: '1px solid rgba(255, 255, 255, 0.12)',
-              borderRadius: '24px',
-              boxShadow: 'inset 0 1px 0 0 rgba(255, 255, 255, 0.2), 0 24px 60px rgba(0, 0, 0, 0.65)',
-              padding: '24px 20px',
-              overflowY: 'auto',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-between',
-              gap: '20px',
-            }}
-          >
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  marginBottom: '6px',
-                  paddingLeft: '6px',
-                  paddingRight: '6px',
-                }}
-              >
-                <span
-                  style={{
-                    fontFamily: "'JetBrains Mono', monospace",
-                    fontSize: '10px',
-                    fontWeight: 700,
-                    letterSpacing: '0.16em',
-                    textTransform: 'uppercase',
-                    color: '#5FD4E8',
-                  }}
-                >
-                  MAIN ROUTES & PLATFORM HUBS
-                </span>
-                <button
-                  type="button"
-                  onClick={() => setMobileMenuOpen(false)}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    color: 'rgba(237, 234, 227, 0.6)',
-                    cursor: 'pointer',
-                    padding: '2px',
-                    display: 'flex',
-                    alignItems: 'center',
-                  }}
-                >
-                  <X size={16} />
-                </button>
+              <div className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center border border-white/20 shadow-[0_0_12px_rgba(16,185,129,0.3)]">
+                <img
+                  src="/logo3d.png"
+                  alt="Forex Notes"
+                  className="w-4 h-4 object-contain drop-shadow"
+                />
               </div>
+              <div className="flex items-center gap-1.5">
+                <span className="font-sans text-[13px] font-extrabold tracking-[0.14em] text-white uppercase">
+                  FOREX
+                </span>
+                <span className="font-serif italic text-[16px] text-emerald-400 font-normal">
+                  Notes
+                </span>
+              </div>
+            </Link>
 
+            {/* Center: Desktop Apple Segmented Navigation Links */}
+            <nav className="hidden lg:flex items-center gap-1 bg-black/20 border border-white/[0.06] rounded-full p-1">
               {NAV_LINKS.map((item) => {
-                const Icon = item.icon || Zap;
+                const isActive = pathname === item.to;
                 if (item.isAnchor) {
                   return (
                     <button
                       key={item.label}
                       type="button"
                       onClick={() => handleAnchorClick(item.to.replace('/', ''))}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        width: '100%',
-                        padding: '12px 16px',
-                        borderRadius: '14px',
-                        background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.015) 100%)',
-                        border: '1px solid rgba(255, 255, 255, 0.08)',
-                        boxShadow: 'inset 0 1px 0 0 rgba(255, 255, 255, 0.1)',
-                        color: '#EDEAE3',
-                        fontFamily: "'Manrope', sans-serif",
-                        fontSize: '14px',
-                        fontWeight: 600,
-                        textAlign: 'left',
-                        cursor: 'pointer',
-                        transition: 'all 0.2s ease',
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.borderColor = 'rgba(95, 212, 232, 0.4)';
-                        e.currentTarget.style.color = '#5FD4E8';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.08)';
-                        e.currentTarget.style.color = '#EDEAE3';
-                      }}
+                      className="px-3.5 py-1.5 rounded-full text-[12.5px] font-medium text-neutral-300 hover:text-white hover:bg-white/[0.08] transition-all duration-200 cursor-pointer"
                     >
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <Zap size={15} color="#5FD4E8" />
-                        <span>{item.label}</span>
-                      </div>
-                      <ArrowRight size={13} color="#5FD4E8" />
+                      {item.label}
                     </button>
                   );
                 }
-
                 return (
                   <Link
                     key={item.label}
                     to={item.to}
-                    onClick={() => {
-                      setMobileMenuOpen(false);
-                      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-                    }}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      padding: '12px 16px',
-                      borderRadius: '14px',
-                      background: pathname === item.to
-                        ? 'linear-gradient(135deg, rgba(14, 124, 134, 0.35) 0%, rgba(95, 212, 232, 0.1) 100%)'
-                        : 'linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.015) 100%)',
-                      border: pathname === item.to
-                        ? '1px solid rgba(95, 212, 232, 0.45)'
-                        : '1px solid rgba(255, 255, 255, 0.08)',
-                      boxShadow: pathname === item.to
-                        ? 'inset 0 1px 0 0 rgba(255, 255, 255, 0.2), 0 4px 16px rgba(14, 124, 134, 0.25)'
-                        : 'inset 0 1px 0 0 rgba(255, 255, 255, 0.1)',
-                      color: pathname === item.to ? '#5FD4E8' : '#EDEAE3',
-                      textDecoration: 'none',
-                      fontFamily: "'Manrope', sans-serif",
-                      fontSize: '14px',
-                      fontWeight: 600,
-                      transition: 'all 0.2s ease',
-                    }}
-                    onMouseEnter={(e) => {
-                      if (pathname !== item.to) {
-                        e.currentTarget.style.borderColor = 'rgba(95, 212, 232, 0.4)';
-                        e.currentTarget.style.color = '#5FD4E8';
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (pathname !== item.to) {
-                        e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.08)';
-                        e.currentTarget.style.color = '#EDEAE3';
-                      }
-                    }}
+                    className={`px-3.5 py-1.5 rounded-full text-[12.5px] font-medium transition-all duration-200 cursor-pointer ${
+                      isActive
+                        ? 'bg-white/10 text-emerald-400 font-semibold border border-white/10 shadow-sm'
+                        : 'text-neutral-300 hover:text-white hover:bg-white/[0.08]'
+                    }`}
                   >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                      <Icon size={15} color={pathname === item.to ? '#5FD4E8' : '#0E7C86'} />
-                      <span>{item.label}</span>
-                    </div>
-                    <ArrowRight size={13} color={pathname === item.to ? '#5FD4E8' : 'rgba(237, 234, 227, 0.4)'} />
+                    {item.label}
                   </Link>
                 );
               })}
+            </nav>
+
+            {/* Right: Actions Cluster */}
+            <div className="flex items-center gap-2.5">
+              <Link
+                to="/login"
+                className="hidden sm:inline-flex items-center px-4 py-2 rounded-full text-[12px] font-semibold text-neutral-300 hover:text-white hover:bg-white/[0.08] transition-colors border border-transparent hover:border-white/10"
+              >
+                Sign In
+              </Link>
+              <Link
+                to="/login"
+                className="inline-flex items-center gap-1.5 px-4 sm:px-5 py-2 rounded-full text-[12px] font-bold text-black bg-emerald-400 hover:bg-emerald-300 transition-all duration-200 shadow-md shadow-emerald-500/25 active:scale-95 cursor-pointer"
+              >
+                <span>Start Free Trial</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+
+              {/* Hamburger Button for Mobile & Tablet */}
+              <button
+                type="button"
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                aria-label="Toggle navigation menu"
+                className="lg:hidden p-2 rounded-full bg-white/[0.06] hover:bg-white/[0.12] text-white border border-white/10 transition-colors cursor-pointer"
+              >
+                {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* ── Apple iOS / macOS Frosted Drawer Menu ── */}
+      {mobileMenuOpen && (
+        <>
+          {/* Backdrop Blur Overlay */}
+          <div
+            onClick={() => setMobileMenuOpen(false)}
+            className="fixed inset-0 z-[88] bg-black/60 backdrop-blur-md transition-opacity duration-200"
+          />
+
+          {/* Drawer Sheet */}
+          <div className="fixed top-20 right-4 sm:right-8 z-[89] w-[min(380px,calc(100vw-32px))] max-h-[calc(100vh-100px)] overflow-y-auto bg-[#0e1117]/95 backdrop-blur-3xl border border-white/12 rounded-3xl p-5 shadow-[0_25px_70px_rgba(0,0,0,0.7),inset_0_1px_0_rgba(255,255,255,0.15)] animate-in fade-in zoom-in-95 duration-200 flex flex-col justify-between gap-5">
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between pb-3 px-1 border-b border-white/[0.08]">
+                <span className="text-[10px] font-bold tracking-widest text-emerald-400 uppercase font-mono">
+                  PLATFORM NAVIGATION
+                </span>
+                <button
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="p-1 rounded-full text-neutral-400 hover:text-white hover:bg-white/10 transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              <div className="pt-2 space-y-1">
+                {NAV_LINKS.map((item) => {
+                  const Icon = item.icon || Zap;
+                  if (item.isAnchor) {
+                    return (
+                      <button
+                        key={item.label}
+                        type="button"
+                        onClick={() => handleAnchorClick(item.to.replace('/', ''))}
+                        className="w-full flex items-center justify-between p-3 rounded-2xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.06] text-neutral-200 text-sm font-medium transition-colors text-left"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400">
+                            <Icon className="w-4 h-4" />
+                          </div>
+                          <span>{item.label}</span>
+                        </div>
+                        <ArrowRight className="w-3.5 h-3.5 text-neutral-500" />
+                      </button>
+                    );
+                  }
+
+                  const isActive = pathname === item.to;
+                  return (
+                    <Link
+                      key={item.label}
+                      to={item.to}
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+                      }}
+                      className={`flex items-center justify-between p-3 rounded-2xl border transition-colors ${
+                        isActive
+                          ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-400 font-semibold'
+                          : 'bg-white/[0.03] hover:bg-white/[0.08] border-white/[0.06] text-neutral-200'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className={`p-1.5 rounded-lg ${isActive ? 'bg-emerald-500/20 text-emerald-400' : 'bg-white/5 text-neutral-400'}`}>
+                          <Icon className="w-4 h-4" />
+                        </div>
+                        <span className="text-sm font-medium">{item.label}</span>
+                      </div>
+                      <ArrowRight className={`w-3.5 h-3.5 ${isActive ? 'text-emerald-400' : 'text-neutral-500'}`} />
+                    </Link>
+                  );
+                })}
+              </div>
             </div>
 
             {/* Bottom Actions */}
-            <div style={{ paddingTop: '16px', borderTop: '1px solid rgba(255, 255, 255, 0.08)', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              <IridescentButton
-                to="/login"
-                size="md"
-                onClick={() => setMobileMenuOpen(false)}
-                style={{ width: '100%', justifyContent: 'center' }}
-              >
-                START FREE TRIAL
-              </IridescentButton>
-
+            <div className="pt-4 border-t border-white/[0.08] space-y-2">
               <Link
                 to="/login"
                 onClick={() => setMobileMenuOpen(false)}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  padding: '11px',
-                  borderRadius: '999px',
-                  background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%)',
-                  border: '1px solid rgba(255, 255, 255, 0.14)',
-                  boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.16)',
-                  color: '#EDEAE3',
-                  fontFamily: "'Manrope', sans-serif",
-                  fontSize: '13px',
-                  fontWeight: 600,
-                  textDecoration: 'none',
-                }}
+                className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl bg-emerald-400 hover:bg-emerald-300 text-black font-bold text-sm shadow-lg shadow-emerald-500/20 transition-all"
+              >
+                <span>Start Free Trial</span>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+              <Link
+                to="/login"
+                onClick={() => setMobileMenuOpen(false)}
+                className="w-full flex items-center justify-center py-2.5 rounded-2xl bg-white/[0.05] hover:bg-white/[0.09] text-neutral-200 text-xs font-semibold border border-white/10 transition-colors"
               >
                 Sign In to Your Workspace
               </Link>

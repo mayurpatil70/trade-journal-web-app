@@ -256,14 +256,14 @@ export default function MainLayout() {
       className="flex h-screen w-full bg-[#f8f9fc] dark:bg-[#0a0c10] text-neutral-900 dark:text-neutral-100 transition-colors duration-300 overflow-hidden font-sans relative"
       style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif" }}
     >
-      {/* ── macOS Spatial Ambient Canvas Mesh ── */}
+      {/* ── macOS Spatial Ambient Canvas Mesh (Strict Emerald & Monochrome Neutrals) ── */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden z-0 select-none">
         {/* Top-left emerald mesh */}
-        <div className="absolute -top-[20%] -left-[10%] w-[55vw] h-[55vw] max-w-[800px] max-h-[800px] rounded-full bg-emerald-400/10 dark:bg-emerald-500/[0.07] blur-[120px] transition-colors duration-500" />
-        {/* Top-right indigo/violet mesh */}
-        <div className="absolute -top-[15%] right-[5%] w-[45vw] h-[45vw] max-w-[700px] max-h-[700px] rounded-full bg-indigo-400/[0.08] dark:bg-indigo-500/[0.06] blur-[130px] transition-colors duration-500" />
-        {/* Bottom-center subtle sapphire mesh */}
-        <div className="absolute -bottom-[20%] left-[25%] w-[50vw] h-[50vw] max-w-[750px] max-h-[750px] rounded-full bg-cyan-400/[0.06] dark:bg-cyan-500/[0.04] blur-[140px] transition-colors duration-500" />
+        <div className="absolute -top-[20%] -left-[10%] w-[55vw] h-[55vw] max-w-[800px] max-h-[800px] rounded-full bg-emerald-400/[0.08] dark:bg-emerald-500/[0.06] blur-[140px] transition-colors duration-500" />
+        {/* Top-right subtle neutral glow */}
+        <div className="absolute -top-[15%] right-[5%] w-[45vw] h-[45vw] max-w-[700px] max-h-[700px] rounded-full bg-white/[0.06] dark:bg-white/[0.02] blur-[140px] transition-colors duration-500" />
+        {/* Bottom-center emerald glow */}
+        <div className="absolute -bottom-[20%] left-[25%] w-[50vw] h-[50vw] max-w-[750px] max-h-[750px] rounded-full bg-emerald-400/[0.05] dark:bg-emerald-500/[0.04] blur-[150px] transition-colors duration-500" />
       </div>
 
       {/* ── REACT PORTAL: Feature Lock / Pro Popup ── */}
@@ -469,9 +469,9 @@ export default function MainLayout() {
                   setIsProfileOpen(false);
                   navigate("/paywall");
                 }}
-                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-amber-600 dark:text-amber-400 hover:bg-amber-500/10 transition-colors text-left"
+                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-neutral-700 dark:text-neutral-200 hover:bg-black/[0.04] dark:hover:bg-white/[0.08] transition-colors text-left"
               >
-                <div className="w-6 h-6 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center">
+                <div className="w-6 h-6 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
                   <CreditCard className="w-3.5 h-3.5" />
                 </div>
                 Subscription Plan
@@ -596,7 +596,7 @@ export default function MainLayout() {
                   }}
                   className="w-full flex items-center gap-3 px-3 py-2.5 text-xs font-medium text-neutral-700 dark:text-neutral-200 hover:bg-black/[0.04] dark:hover:bg-white/[0.06] rounded-xl transition-colors text-left group"
                 >
-                  <div className="w-6 h-6 rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center group-hover:scale-105 transition-transform">
+                  <div className="w-6 h-6 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center group-hover:scale-105 transition-transform">
                     <LayoutDashboard className="w-4 h-4" />
                   </div>
                   Go to Dashboard
@@ -608,7 +608,7 @@ export default function MainLayout() {
                   }}
                   className="w-full flex items-center gap-3 px-3 py-2.5 text-xs font-medium text-neutral-700 dark:text-neutral-200 hover:bg-black/[0.04] dark:hover:bg-white/[0.06] rounded-xl transition-colors text-left group"
                 >
-                  <div className="w-6 h-6 rounded-lg bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 flex items-center justify-center group-hover:scale-105 transition-transform">
+                  <div className="w-6 h-6 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center group-hover:scale-105 transition-transform">
                     <Activity className="w-4 h-4" />
                   </div>
                   Strategy Analytics

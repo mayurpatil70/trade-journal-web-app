@@ -1,7 +1,8 @@
-﻿import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import api from "../api/axios";
 import AccountFilter from "../components/AccountFilter";
+import AppleSelect from "../components/ui/AppleSelect";
 import {
   Loader2,
   Search,
@@ -177,25 +178,19 @@ export default function PastTrades() {
           />
         </div>
 
-        <div className="flex gap-2">
-          <select
+        <div className="flex gap-2 items-center">
+          <AppleSelect
             value={resultFilter}
             onChange={(e) => setResultFilter(e.target.value)}
-            className="appearance-none bg-[#101216] border border-white/5 rounded-xl py-3 pl-4 pr-10 text-white text-[13px] focus:border-emerald-500/50 outline-none min-w-[140px]"
-          >
-            <option value="" className="bg-[#101216] text-white">
-              All Results
-            </option>
-            <option value="win" className="bg-[#101216] text-white">
-              Win ✓
-            </option>
-            <option value="loss" className="bg-[#101216] text-white">
-              Loss ✗
-            </option>
-            <option value="be" className="bg-[#101216] text-white">
-              Break-Even
-            </option>
-          </select>
+            className="min-w-[145px]"
+            options={[
+              { value: "", label: "All Results" },
+              { value: "win", label: "Win ✓" },
+              { value: "loss", label: "Loss ✗" },
+              { value: "be", label: "Break-Even" },
+            ]}
+            placeholder="All Results"
+          />
           <div className="self-stretch flex items-center">
             <AccountFilter
               trades={trades}
@@ -207,7 +202,11 @@ export default function PastTrades() {
             type="button"
             onClick={() => setShowFilters((v) => !v)}
             aria-expanded={showFilters}
-            className={`px-4 py-3 bg-[#101216] border rounded-xl hover:text-white transition-colors flex items-center gap-2 text-[13px] ${showFilters || directionFilter || sessionFilter || accountFilter ? "border-emerald-500/40 text-emerald-400" : "border-white/5 text-gray-400"}`}
+            className={`px-4 py-2.5 rounded-2xl transition-all duration-200 flex items-center gap-2 text-[13px] font-medium backdrop-blur-xl cursor-pointer ${
+              showFilters || directionFilter || sessionFilter || accountFilter
+                ? "bg-emerald-500/15 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400"
+                : "bg-white/70 dark:bg-white/[0.05] border border-black/10 dark:border-white/10 text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
+            }`}
           >
             <Filter className="w-4 h-4" /> More Filters
           </button>
@@ -216,29 +215,30 @@ export default function PastTrades() {
 
       {showFilters && (
         <div className="flex flex-wrap items-center gap-3 mb-6">
-          <select
+          <AppleSelect
             value={directionFilter}
             onChange={(e) => setDirectionFilter(e.target.value)}
-            className="appearance-none bg-[#101216] border border-white/5 rounded-xl py-2.5 px-4 text-white text-[13px] outline-none min-w-[140px]"
-          >
-            <option value="">All Directions</option>
-            <option value="LONG">Long</option>
-            <option value="SHORT">Short</option>
-          </select>
-          <select
+            className="min-w-[145px]"
+            options={[
+              { value: "", label: "All Directions" },
+              { value: "LONG", label: "Long" },
+              { value: "SHORT", label: "Short" },
+            ]}
+            placeholder="All Directions"
+          />
+          <AppleSelect
             value={sessionFilter}
             onChange={(e) => setSessionFilter(e.target.value)}
-            className="appearance-none bg-[#101216] border border-white/5 rounded-xl py-2.5 px-4 text-white text-[13px] outline-none min-w-[140px]"
-          >
-            <option value="">All Sessions</option>
-            {[...new Set(trades.map((t) => t.session).filter(Boolean))].map(
-              (x) => (
-                <option key={x} value={x}>
-                  {x}
-                </option>
-              ),
-            )}
-          </select>
+            className="min-w-[145px]"
+            options={[
+              { value: "", label: "All Sessions" },
+              ...[...new Set(trades.map((t) => t.session).filter(Boolean))].map((x) => ({
+                value: x,
+                label: x,
+              })),
+            ]}
+            placeholder="All Sessions"
+          />
           {(directionFilter || sessionFilter || accountFilter) && (
             <button
               type="button"
@@ -292,7 +292,7 @@ export default function PastTrades() {
                     <div
                       className={`w-10 h-10 rounded-lg flex items-center justify-center font-bold text-xs border ${t.direction === "LONG" ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : "bg-purple-500/10 text-purple-400 border-purple-500/20"}`}
                     >
-                      {t.direction === "LONG" ? "▲" : "▼"}
+                      {t.direction === "LONG" ? "?" : "?"}
                     </div>
                     <div>
                       <h3 className="font-semibold text-white text-[15px]">
@@ -300,7 +300,7 @@ export default function PastTrades() {
                       </h3>
                       <p className="text-[11px] text-gray-500 flex items-center gap-1.5 mt-0.5">
                         <Clock className="w-3 h-3" /> {t.date}{" "}
-                        {t.time && `• ${t.time}`}
+                        {t.time && `� ${t.time}`}
                       </p>
                     </div>
                   </div>
@@ -312,7 +312,7 @@ export default function PastTrades() {
                         Setup
                       </p>
                       <p className="text-[13px] text-gray-300 font-medium">
-                        {t.setup || "—"}
+                        {t.setup || "�"}
                       </p>
                     </div>
                     <div>
@@ -320,7 +320,7 @@ export default function PastTrades() {
                         Session
                       </p>
                       <p className="text-[13px] text-gray-300 font-medium">
-                        {t.session || "—"}
+                        {t.session || "�"}
                       </p>
                     </div>
                   </div>
@@ -407,7 +407,7 @@ export default function PastTrades() {
                   {selectedTrade.asset}
                 </h2>
                 <span className="text-gray-500 text-sm">
-                  • {selectedTrade.date}
+                  � {selectedTrade.date}
                 </span>
               </div>
               <div className="flex items-center gap-2">
@@ -464,16 +464,16 @@ export default function PastTrades() {
                       },
                       { label: "Setup", value: selectedTrade.setup },
                       { label: "Session", value: selectedTrade.session },
-                      { label: "Entry", value: selectedTrade.entry || "—" },
-                      { label: "Stop Loss", value: selectedTrade.sl || "—" },
-                      { label: "Take Profit", value: selectedTrade.tp || "—" },
+                      { label: "Entry", value: selectedTrade.entry || "�" },
+                      { label: "Stop Loss", value: selectedTrade.sl || "�" },
+                      { label: "Take Profit", value: selectedTrade.tp || "�" },
                       {
                         label: selLot ? `Risk % (${selLot}L)` : "Risk %",
                         value: selectedTrade.risk
                           ? `${Number(selectedTrade.risk).toFixed(2)}%`
                           : selLot
                           ? `${selLot} Lots`
-                          : "—",
+                          : "�",
                       },
                     ].map((s, i) => (
                       <div
@@ -531,7 +531,7 @@ export default function PastTrades() {
                         Emotion Before
                       </p>
                       <p className="text-sm font-semibold text-white">
-                        {selectedTrade.emotion_before || "—"}
+                        {selectedTrade.emotion_before || "�"}
                       </p>
                     </div>
                     <ArrowRight className="w-4 h-4 text-gray-600" />
@@ -540,7 +540,7 @@ export default function PastTrades() {
                         Emotion After
                       </p>
                       <p className="text-sm font-semibold text-white">
-                        {selectedTrade.emotion_after || "—"}
+                        {selectedTrade.emotion_after || "�"}
                       </p>
                     </div>
                   </div>

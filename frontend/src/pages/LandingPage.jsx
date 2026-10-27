@@ -417,7 +417,7 @@ export default function LandingPage() {
         {/* Content running above smooth dark background */}
         <div style={{ position: "relative", zIndex: 1 }}>
 
-          {/* In-App Screenshots: Liquid Glass WebGL Carousel */}
+          {/* In-App Screenshots: Auto-Sliding Card Carousel */}
           <LiquidGlassCarousel />
 
           {/* Features Bento */}

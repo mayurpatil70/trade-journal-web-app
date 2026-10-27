@@ -50,7 +50,7 @@ const REVIEWS = [
   },
 ];
 
-const SHUFFLE_INTERVAL = 3500; // 3.5s per requirement
+const SHUFFLE_INTERVAL = 2000; // 2s per requirement
 
 export default function RolodexReviews() {
   const [order, setOrder] = useState([0, 1, 2, 3, 4]);
@@ -96,7 +96,7 @@ export default function RolodexReviews() {
     setProgress(0);
   }, [isFlying]);
 
-  // 3.5s auto shuffle timer with smooth progress bar
+  // 2s auto shuffle timer with smooth progress bar
   useEffect(() => {
     if (isPaused || isDragging) return;
 
@@ -107,9 +107,10 @@ export default function RolodexReviews() {
       setProgress(pct);
 
       if (elapsed >= SHUFFLE_INTERVAL) {
+        clearInterval(interval);
         shuffleNext();
       }
-    }, 60);
+    }, 40);
 
     return () => clearInterval(interval);
   }, [isPaused, isDragging, shuffleNext, order]);
@@ -165,8 +166,6 @@ export default function RolodexReviews() {
         borderTop: '1px solid rgba(255, 255, 255, 0.06)',
         backgroundColor: '#060b11',
       }}
-      onMouseEnter={() => setIsPaused(true)}
-      onMouseLeave={() => setIsPaused(false)}
     >
       {/* Background Soft Glow */}
       <div
@@ -238,6 +237,8 @@ export default function RolodexReviews() {
       {/* 5-Card Stacked Deck Stage */}
       <div
         ref={stageRef}
+        onMouseEnter={() => setIsPaused(true)}
+        onMouseLeave={() => setIsPaused(false)}
         style={{
           position: 'relative',
           width: '100%',
@@ -477,7 +478,7 @@ export default function RolodexReviews() {
         </button>
       </div>
 
-      {/* 3.5s auto shuffle timer track */}
+      {/* 2s auto shuffle timer track */}
       <div
         style={{
           marginTop: '12px',
@@ -491,7 +492,7 @@ export default function RolodexReviews() {
           zIndex: 10,
         }}
       >
-        <span>Auto-shuffles every 3.5s · Swipe on mobile</span>
+        <span>Auto-shuffles every 2s · Swipe on mobile</span>
         <div style={{ width: '50px', height: '3px', background: 'rgba(255, 255, 255, 0.1)', borderRadius: '999px', overflow: 'hidden' }}>
           <div style={{ width: `${progress}%`, height: '100%', background: '#10b981', transition: 'width 0.06s linear' }} />
         </div>

@@ -1,6 +1,8 @@
 import { useEffect, useState, useMemo } from "react";
 import { EdgeBreakdown, TradingHealth, BacktestSummary } from "../components/dashboard/PerformanceHub";
 import AccountFilter from "../components/AccountFilter";
+import NotificationBell from "../components/NotificationBell";
+import ThemeToggle from "../components/ThemeToggle";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
 import Logo3DLoader from "../components/Logo3DLoader";
@@ -282,9 +284,11 @@ export default function Dashboard() {
         </div>
         <div className="flex items-center gap-3 flex-wrap">
           <AccountFilter trades={allTrades} selectedAccount={selectedAccount} onChange={setSelectedAccount} />
+          <NotificationBell />
+          <ThemeToggle />
           <button
             onClick={() => navigate("/add-trade")}
-            className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white font-semibold rounded-2xl transition-all text-[13px] shadow-lg shadow-emerald-500/25 active:scale-95 cursor-pointer"
+            className="flex items-center gap-2 px-6 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-white font-semibold rounded-2xl transition-all text-[13px] shadow-lg shadow-emerald-500/25 active:scale-95 cursor-pointer"
           >
             <PlusCircle className="w-4 h-4" /> Log Trade
           </button>
@@ -351,7 +355,7 @@ export default function Dashboard() {
             <div className="mt-4 pt-4 border-t border-black/[0.06] dark:border-white/10 flex justify-between items-center relative z-10">
               <button
                 onClick={() => navigate("/affiliate")}
-                className="relative flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-bold text-black bg-gradient-to-r from-amber-400 to-yellow-300 hover:from-amber-300 hover:to-yellow-200 transition-all shadow-md shadow-amber-500/20 hover:scale-105 active:scale-95"
+                className="relative flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/15 border border-emerald-500/25 transition-all shadow-sm active:scale-95 cursor-pointer"
               >
                 <img src="/logo3d.png" alt="ForexNotes" className="w-3.5 h-3.5 object-contain inline-block shrink-0" /> Get 10% Off with Affiliate
               </button>
@@ -403,23 +407,23 @@ export default function Dashboard() {
               const r = normalizeTradeR(t);
               const isWin = isTradeWin(t);
               return (
-                <div key={i} onClick={() => navigate("/trades")} className="bg-[#101216] border border-white/5 rounded-2xl p-5 hover:bg-[#15181D] hover:border-white/10 transition-all cursor-pointer group flex flex-col justify-between h-full">
+                <div key={i} onClick={() => navigate("/trades")} className="mac-bento-card rounded-3xl p-5 hover:border-emerald-500/25 transition-all cursor-pointer group flex flex-col justify-between h-full">
                   <div className="flex items-start justify-between mb-4">
                     <div>
                       <div className="flex items-center gap-2 mb-1">
-                        <span className={`w-2 h-2 rounded-full shrink-0 ${t.direction === "LONG" ? "bg-emerald-400" : "bg-purple-400"}`} />
-                        <h4 className="font-semibold text-[14px] text-gray-100">{t.asset}</h4>
-                        <span className="text-[9px] uppercase font-bold text-gray-400 px-1.5 py-0.5 bg-white/5 rounded">{t.direction}</span>
+                        <span className={`w-2 h-2 rounded-full shrink-0 ${t.direction === "LONG" ? "bg-emerald-500" : "bg-rose-500"}`} />
+                        <h4 className="font-semibold text-[14px] text-neutral-900 dark:text-neutral-100">{t.asset}</h4>
+                        <span className="text-[9px] uppercase font-bold text-neutral-600 dark:text-neutral-400 px-1.5 py-0.5 bg-black/[0.04] dark:bg-white/[0.08] rounded-md">{t.direction}</span>
                       </div>
-                      <p className="text-[11px] text-gray-500 flex items-center gap-1.5"><Clock className="w-3 h-3" /> {t.date}</p>
+                      <p className="text-[11px] text-neutral-500 dark:text-neutral-400 flex items-center gap-1.5"><Clock className="w-3 h-3" /> {t.date}</p>
                     </div>
-                    <div className={`px-2 py-0.5 rounded-md border text-[11px] font-bold shrink-0 ${isWin ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : "bg-red-500/10 text-red-400 border-red-500/20"}`}>
+                    <div className={`px-2 py-0.5 rounded-lg border text-[11px] font-bold shrink-0 ${isWin ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20" : "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20"}`}>
                       {r >= 0 ? "+" : ""}{r.toFixed(2)}R
                     </div>
                   </div>
-                  <div className="flex items-center justify-between text-[11px] text-gray-400 border-t border-white/5 pt-3 mt-auto">
+                  <div className="flex items-center justify-between text-[11px] text-neutral-500 dark:text-neutral-400 border-t border-black/[0.05] dark:border-white/5 pt-3 mt-auto">
                     <span className="truncate max-w-[120px]">{t.setup || "No setup logged"}</span>
-                    <span className="font-medium group-hover:text-gray-900 dark:group-hover:text-white transition-colors">Details &rarr;</span>
+                    <span className="font-medium group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">Details &rarr;</span>
                   </div>
                 </div>
               );
@@ -431,96 +435,96 @@ export default function Dashboard() {
       {/* 5. DEEP ANALYSIS MINI-SECTIONS */}
       <div>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-[15px] font-semibold text-white">Deep Analysis</h2>
-          <span className="text-[11px] text-gray-500">{selectedAccount ? `Showing: ${selectedAccount}` : "All Accounts"}</span>
+          <h2 className="text-[15px] font-bold text-neutral-900 dark:text-white">Deep Analysis</h2>
+          <span className="text-[11px] text-neutral-500 dark:text-neutral-400">{selectedAccount ? `Showing: ${selectedAccount}` : "All Accounts"}</span>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
 
           {/* Strategy Analytics Mini */}
-          <div onClick={() => navigate("/analytics")} className="bg-[#101216] border border-white/5 hover:border-emerald-500/20 rounded-2xl p-5 cursor-pointer group transition-all hover:bg-[#101e18] flex flex-col justify-between h-full">
+          <div onClick={() => navigate("/analytics")} className="mac-bento-card rounded-3xl p-5 hover:border-emerald-500/25 cursor-pointer group transition-all flex flex-col justify-between h-full">
             <div>
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
-                  <div className="p-2 bg-emerald-500/10 rounded-xl"><Activity className="w-4 h-4 text-emerald-400" /></div>
-                  <span className="text-[13px] font-semibold text-white">Strategy Analytics</span>
+                  <div className="p-2 bg-emerald-500/10 rounded-xl"><Activity className="w-4 h-4 text-emerald-600 dark:text-emerald-400" /></div>
+                  <span className="text-[13px] font-semibold text-neutral-900 dark:text-white">Strategy Analytics</span>
                 </div>
-                <ChevronRight className="w-4 h-4 text-gray-600 group-hover:text-emerald-400 transition-colors" />
+                <ChevronRight className="w-4 h-4 text-neutral-400 group-hover:text-emerald-500 transition-colors" />
               </div>
               {analyticsSetups.length === 0 ? (
-                <p className="text-[12px] text-gray-500 dark:text-gray-400">No setup data yet.</p>
+                <p className="text-[12px] text-neutral-500 dark:text-neutral-400">No setup data yet.</p>
               ) : (
                 <div className="space-y-2.5">
                   {analyticsSetups.map((s, i) => (
                     <div key={i} className="flex items-center justify-between">
-                      <span className="text-[12px] text-gray-300 truncate max-w-[130px]">{s.name}</span>
-                      <span className={`text-[12px] font-bold ${s.netR >= 0 ? "text-emerald-400" : "text-red-400"}`}>{s.netR >= 0 ? "+" : ""}{s.netR.toFixed(2)}R</span>
+                      <span className="text-[12px] text-neutral-700 dark:text-neutral-300 truncate max-w-[130px]">{s.name}</span>
+                      <span className={`text-[12px] font-bold ${s.netR >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"}`}>{s.netR >= 0 ? "+" : ""}{s.netR.toFixed(2)}R</span>
                     </div>
                   ))}
                 </div>
               )}
             </div>
-            <div className="mt-4 pt-3 border-t border-white/5 text-[11px] text-emerald-400 font-semibold flex items-center gap-1">Full Analysis <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" /></div>
+            <div className="mt-4 pt-3 border-t border-black/[0.05] dark:border-white/5 text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">Full Analysis <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" /></div>
           </div>
 
           {/* Psychology Lab Mini */}
-          <div onClick={() => navigate("/psychology")} className="bg-[#101216] border border-white/5 hover:border-purple-500/20 rounded-2xl p-5 cursor-pointer group transition-all hover:bg-[#130e1a] flex flex-col justify-between h-full">
+          <div onClick={() => navigate("/psychology")} className="mac-bento-card rounded-3xl p-5 hover:border-emerald-500/25 cursor-pointer group transition-all flex flex-col justify-between h-full">
             <div>
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
-                  <div className="p-2 bg-purple-500/10 rounded-xl"><Brain className="w-4 h-4 text-purple-400" /></div>
-                  <span className="text-[13px] font-semibold text-white">Psychology Lab</span>
+                  <div className="p-2 bg-emerald-500/10 rounded-xl"><Brain className="w-4 h-4 text-emerald-600 dark:text-emerald-400" /></div>
+                  <span className="text-[13px] font-semibold text-neutral-900 dark:text-white">Psychology Lab</span>
                 </div>
-                <ChevronRight className="w-4 h-4 text-gray-600 group-hover:text-purple-400 transition-colors" />
+                <ChevronRight className="w-4 h-4 text-neutral-400 group-hover:text-emerald-500 transition-colors" />
               </div>
               {topEmotion.length === 0 ? (
-                <p className="text-[12px] text-gray-500 dark:text-gray-400">No psychology data yet.</p>
+                <p className="text-[12px] text-neutral-500 dark:text-neutral-400">No psychology data yet.</p>
               ) : (
                 <div className="space-y-2.5">
                   {topEmotion.map((e, i) => (
                     <div key={i} className="flex items-center justify-between">
-                      <span className="text-[12px] text-gray-300 truncate max-w-[130px]">{e.name}</span>
-                      <span className={`text-[12px] font-bold ${e.netR >= 0 ? "text-emerald-400" : "text-red-400"}`}>{e.netR >= 0 ? "+" : ""}{e.netR.toFixed(2)}R</span>
+                      <span className="text-[12px] text-neutral-700 dark:text-neutral-300 truncate max-w-[130px]">{e.name}</span>
+                      <span className={`text-[12px] font-bold ${e.netR >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"}`}>{e.netR >= 0 ? "+" : ""}{e.netR.toFixed(2)}R</span>
                     </div>
                   ))}
                 </div>
               )}
             </div>
-            <div className="mt-4 pt-3 border-t border-white/5 text-[11px] text-purple-400 font-semibold flex items-center gap-1">Full Analysis <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" /></div>
+            <div className="mt-4 pt-3 border-t border-black/[0.05] dark:border-white/5 text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">Full Analysis <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" /></div>
           </div>
 
           {/* Mistake Lab Mini */}
-          <div onClick={() => navigate("/mistakes")} className="bg-[#101216] border border-white/5 hover:border-amber-500/20 rounded-2xl p-5 cursor-pointer group transition-all hover:bg-[#1a1508] flex flex-col justify-between h-full">
+          <div onClick={() => navigate("/mistakes")} className="mac-bento-card rounded-3xl p-5 hover:border-rose-500/25 cursor-pointer group transition-all flex flex-col justify-between h-full">
             <div>
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
-                  <div className="p-2 bg-amber-500/10 rounded-xl"><ShieldCheck className="w-4 h-4 text-amber-400" /></div>
-                  <span className="text-[13px] font-semibold text-white">Mistake Lab</span>
+                  <div className="p-2 bg-rose-500/10 rounded-xl"><ShieldCheck className="w-4 h-4 text-rose-600 dark:text-rose-400" /></div>
+                  <span className="text-[13px] font-semibold text-neutral-900 dark:text-white">Mistake Lab</span>
                 </div>
-                <ChevronRight className="w-4 h-4 text-gray-600 group-hover:text-amber-400 transition-colors" />
+                <ChevronRight className="w-4 h-4 text-neutral-400 group-hover:text-rose-500 transition-colors" />
               </div>
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-[12px] text-gray-400">Unforced Errors</span>
-                  <span className="text-[13px] font-bold text-white">{mistakesData.count}</span>
+                  <span className="text-[12px] text-neutral-500 dark:text-neutral-400">Unforced Errors</span>
+                  <span className="text-[13px] font-bold text-neutral-900 dark:text-white">{mistakesData.count}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-[12px] text-gray-400">Cost of Mistakes</span>
-                  <span className={`text-[13px] font-bold ${mistakesData.cost < 0 ? "text-red-400" : "text-gray-300"}`}>{mistakesData.cost.toFixed(2)}R</span>
+                  <span className="text-[12px] text-neutral-500 dark:text-neutral-400">Cost of Mistakes</span>
+                  <span className={`text-[13px] font-bold ${mistakesData.cost < 0 ? "text-rose-600 dark:text-rose-400" : "text-neutral-600 dark:text-neutral-400"}`}>{mistakesData.cost.toFixed(2)}R</span>
                 </div>
                 {trades.length > 0 && (
                   <div>
-                    <div className="flex items-center justify-between text-[11px] text-gray-500 mb-1">
+                    <div className="flex items-center justify-between text-[11px] text-neutral-500 dark:text-neutral-400 mb-1">
                       <span>Rule Discipline</span>
                       <span>{(((trades.length - mistakesData.count) / trades.length) * 100).toFixed(0)}%</span>
                     </div>
-                    <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
+                    <div className="w-full h-1.5 bg-black/5 dark:bg-white/5 rounded-full overflow-hidden">
                       <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${((trades.length - mistakesData.count) / trades.length) * 100}%` }} />
                     </div>
                   </div>
                 )}
               </div>
             </div>
-            <div className="mt-4 pt-3 border-t border-white/5 text-[11px] text-amber-400 font-semibold flex items-center gap-1">Full Analysis <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" /></div>
+            <div className="mt-4 pt-3 border-t border-black/[0.05] dark:border-white/5 text-[11px] text-rose-600 dark:text-rose-400 font-semibold flex items-center gap-1">Full Analysis <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" /></div>
           </div>
 
         </div>

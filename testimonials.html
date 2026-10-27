@@ -749,7 +749,7 @@
 
     <!-- Timer countdown caption -->
     <div class="timer-caption">
-      <span>Auto-shuffles every 3.5s · Drag on mobile to swipe</span>
+      <span>Auto-shuffles every 2s · Drag on mobile to swipe</span>
       <div class="timer-meter">
         <div class="timer-fill" id="timerFill"></div>
       </div>
@@ -758,14 +758,14 @@
   </main>
 
   <!-- =====================================================================
-       VANILLA JS CONTROLLER: 3.5s deck flight, drag gestures, 60fps
+       VANILLA JS CONTROLLER: 2s deck flight, drag gestures, 60fps
        ===================================================================== -->
   <script>
     (function () {
       'use strict';
 
       const STACK_SIZE = 5;
-      const SHUFFLE_INTERVAL = 3500; // 3.5s per requirement
+      const SHUFFLE_INTERVAL = 2000; // 2s per requirement
       const stage = document.getElementById('deckStage');
       const cards = Array.from(stage.querySelectorAll('.deck-card'));
       const dots = Array.from(document.querySelectorAll('.deck-dot'));
@@ -891,7 +891,7 @@
       }
 
       /**
-       * 3.5s Auto-Shuffle Timer Management
+       * 2s Auto-Shuffle Timer Management
        */
       function startTimer() {
         if (prefersReducedMotion.matches) return;

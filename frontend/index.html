@@ -16,11 +16,25 @@
       r.style.colorScheme = t;
     } catch (e) { }
   </script>
-  <!-- Google Analytics: production domain only (skips localhost and the Capacitor app) -->
+  <!-- Google Analytics & Consent Mode v2: production domain only (skips localhost and the Capacitor app) -->
   <script>
     if (/(^|\.)forexnotes\.in$/.test(location.hostname)) {
       window.dataLayer = window.dataLayer || [];
       window.gtag = function () { dataLayer.push(arguments); };
+
+      var hasConsent = false;
+      try {
+        hasConsent = localStorage.getItem('cookie_consent_accepted') === 'true';
+      } catch (e) {}
+
+      // Google Consent Mode v2: default denied until user consents, or granted if previously stored
+      gtag('consent', 'default', {
+        'analytics_storage': hasConsent ? 'granted' : 'denied',
+        'ad_storage': hasConsent ? 'granted' : 'denied',
+        'ad_user_data': hasConsent ? 'granted' : 'denied',
+        'ad_personalization': hasConsent ? 'granted' : 'denied'
+      });
+
       gtag('js', new Date());
       gtag('config', 'G-GSW577JG22');
       var ga = document.createElement('script');

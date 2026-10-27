@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import api from "../api/axios";
+import AppleSelect from "../components/ui/AppleSelect";
 import {
   Save,
   X,
@@ -679,13 +680,13 @@ export default function AddTrade() {
   ];
 
   const inputClass =
-    "w-full bg-[#15181D] border border-white/10 rounded-xl px-4 py-3.5 text-white placeholder-gray-600 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none text-[15px] transition-all";
+    "w-full bg-white/70 dark:bg-white/[0.05] border border-black/10 dark:border-white/10 rounded-2xl px-4 py-3.5 text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-500 backdrop-blur-xl focus:border-emerald-500/60 focus:ring-2 focus:ring-emerald-500/20 outline-none text-[15px] transition-all";
   const selectClass =
-    "appearance-none w-full bg-[#15181D] border border-white/10 rounded-xl px-4 py-3.5 text-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none text-[15px] transition-all pr-10 cursor-pointer";
+    "appearance-none w-full bg-white/70 dark:bg-white/[0.05] border border-black/10 dark:border-white/10 rounded-2xl px-4 py-3.5 text-neutral-900 dark:text-white backdrop-blur-xl focus:border-emerald-500/60 focus:ring-2 focus:ring-emerald-500/20 outline-none text-[15px] transition-all pr-10 cursor-pointer";
   const textareaClass =
-    "w-full min-h-[120px] bg-[#15181D] border border-white/10 rounded-xl px-4 py-3.5 text-white placeholder-gray-600 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none text-[15px] resize-y transition-all";
+    "w-full min-h-[120px] bg-white/70 dark:bg-white/[0.05] border border-black/10 dark:border-white/10 rounded-2xl px-4 py-3.5 text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-500 backdrop-blur-xl focus:border-emerald-500/60 focus:ring-2 focus:ring-emerald-500/20 outline-none text-[15px] resize-y transition-all";
   const labelClass =
-    "text-[12px] font-semibold text-gray-400 mb-2 block uppercase tracking-wider";
+    "text-[12px] font-semibold text-neutral-500 dark:text-neutral-400 mb-2 block uppercase tracking-wider";
 
   return (
     <div className="w-full max-w-4xl mx-auto font-sans pb-24 px-4 md:px-8 mt-6">
@@ -807,37 +808,26 @@ export default function AddTrade() {
                     </p>
                   </div>
                 ) : (
-                  // Has existing accounts — show dropdown
+                  // Has existing accounts — show Apple frosted glass select dropdown
                   <div>
-                    <div className="relative">
-                      <select
-                        value={formData.accountName}
-                        onChange={(e) => {
-                          setFormData({
-                            ...formData,
-                            accountName: e.target.value,
-                          });
-                          if (fieldErrors.account_name) {
-                            setFieldErrors((prev) => ({
-                              ...prev,
-                              account_name: null,
-                            }));
-                          }
-                        }}
-                        className={`${selectClass} ${fieldErrors.account_name ? "border-red-500 focus:ring-red-500 ring-1 ring-red-500" : ""}`}
-                      >
-                        {existingAccounts.map((acc) => (
-                          <option
-                            key={acc}
-                            value={acc}
-                            className="bg-[#15181D] text-white"
-                          >
-                            {acc}
-                          </option>
-                        ))}
-                      </select>
-                      <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
-                    </div>
+                    <AppleSelect
+                      value={formData.accountName}
+                      onChange={(e) => {
+                        setFormData({
+                          ...formData,
+                          accountName: e.target.value,
+                        });
+                        if (fieldErrors.account_name) {
+                          setFieldErrors((prev) => ({
+                            ...prev,
+                            account_name: null,
+                          }));
+                        }
+                      }}
+                      options={existingAccounts}
+                      error={!!fieldErrors.account_name}
+                      placeholder="Select Trading Account"
+                    />
                     {fieldErrors.account_name && (
                       <p className="text-red-400 text-xs mt-1">
                         {fieldErrors.account_name}
@@ -863,25 +853,14 @@ export default function AddTrade() {
                   <label className={labelClass}>
                     Asset / Pair <span className="text-red-400">*</span>
                   </label>
-                  <div className="relative">
-                    <select
-                      name="asset"
-                      value={formData.asset}
-                      onChange={handleChange}
-                      className={`${selectClass} ${fieldErrors.asset ? "border-red-500 focus:ring-red-500 ring-1 ring-red-500" : ""}`}
-                    >
-                      {assets.map((a) => (
-                        <option
-                          key={a}
-                          value={a}
-                          className="bg-[#15181D] text-white"
-                        >
-                          {a}
-                        </option>
-                      ))}
-                    </select>
-                    <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
-                  </div>
+                  <AppleSelect
+                    name="asset"
+                    value={formData.asset}
+                    onChange={handleChange}
+                    options={assets}
+                    error={!!fieldErrors.asset}
+                    placeholder="Select Asset / Pair"
+                  />
                   {fieldErrors.asset && (
                     <p className="text-red-400 text-xs mt-1">
                       {fieldErrors.asset}
@@ -903,7 +882,7 @@ export default function AddTrade() {
                     Direction <span className="text-red-400">*</span>
                   </label>
                   <div
-                    className={`flex gap-3 p-0.5 rounded-xl ${fieldErrors.direction ? "border border-red-500 ring-1 ring-red-500" : ""}`}
+                    className={`flex gap-3 p-0.5 rounded-2xl ${fieldErrors.direction ? "border border-red-500 ring-1 ring-red-500" : ""}`}
                   >
                     <button
                       type="button"
@@ -916,7 +895,7 @@ export default function AddTrade() {
                           }));
                         }
                       }}
-                      className={`flex-1 py-3.5 rounded-xl font-bold text-sm transition-colors border ${formData.direction === "LONG" ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400" : "bg-[#15181D] border-white/10 text-gray-500 hover:text-white"}`}
+                      className={`flex-1 py-3.5 rounded-2xl font-bold text-sm transition-all duration-200 border cursor-pointer ${formData.direction === "LONG" ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-600 dark:text-emerald-400 shadow-sm" : "bg-white/60 dark:bg-white/[0.05] border-black/10 dark:border-white/10 text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"}`}
                     >
                       LONG ▲
                     </button>
@@ -931,7 +910,7 @@ export default function AddTrade() {
                           }));
                         }
                       }}
-                      className={`flex-1 py-3.5 rounded-xl font-bold text-sm transition-colors border ${formData.direction === "SHORT" ? "bg-red-500/10 border-red-500/30 text-red-400" : "bg-[#15181D] border-white/10 text-gray-500 hover:text-white"}`}
+                      className={`flex-1 py-3.5 rounded-2xl font-bold text-sm transition-all duration-200 border cursor-pointer ${formData.direction === "SHORT" ? "bg-rose-500/15 border-rose-500/40 text-rose-600 dark:text-rose-400 shadow-sm" : "bg-white/60 dark:bg-white/[0.05] border-black/10 dark:border-white/10 text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"}`}
                     >
                       SHORT ▼
                     </button>
@@ -946,27 +925,14 @@ export default function AddTrade() {
                   <label className={labelClass}>
                     Session <span className="text-red-400">*</span>
                   </label>
-                  <div className="relative">
-                    <select
-                      name="session"
-                      value={formData.session}
-                      onChange={handleChange}
-                      className={`${selectClass} ${fieldErrors.session ? "border-red-500 focus:ring-red-500 ring-1 ring-red-500" : ""}`}
-                    >
-                      {["London", "New York", "Asian", "Sydney", "Other"].map(
-                        (s) => (
-                          <option
-                            key={s}
-                            value={s}
-                            className="bg-[#15181D] text-white"
-                          >
-                            {s}
-                          </option>
-                        ),
-                      )}
-                    </select>
-                    <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
-                  </div>
+                  <AppleSelect
+                    name="session"
+                    value={formData.session}
+                    onChange={handleChange}
+                    options={["London", "New York", "Asian", "Sydney", "Other"]}
+                    error={!!fieldErrors.session}
+                    placeholder="Select Session"
+                  />
                   {fieldErrors.session && (
                     <p className="text-red-400 text-xs mt-1">
                       {fieldErrors.session}
@@ -1238,15 +1204,15 @@ export default function AddTrade() {
                 </div>
 
                 {/* Risk % Input */}
-                <div className="bg-[#15181D]/60 border border-white/5 p-4 rounded-2xl space-y-2">
+                <div className="mac-bento-card rounded-2xl p-4 space-y-2">
                   <div className="flex items-center justify-between">
-                    <label className="text-[12px] font-semibold text-gray-300 uppercase tracking-wider flex items-center gap-1.5">
+                    <label className="text-[12px] font-semibold text-neutral-700 dark:text-neutral-300 uppercase tracking-wider flex items-center gap-1.5">
                       <span>Risk %</span>
-                      <span className="text-[10px] text-blue-400 font-mono bg-blue-500/10 px-1.5 py-0.5 rounded border border-blue-500/20">
+                      <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-mono bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">
                         account risk
                       </span>
                     </label>
-                    <span className="text-[11px] text-emerald-400 font-mono font-medium bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20">
+                    <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-mono font-medium bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20">
                       of {formattedEquity} equity
                     </span>
                   </div>
@@ -1293,10 +1259,10 @@ export default function AddTrade() {
                               return updated;
                             });
                           }}
-                          className={`px-2 py-1 text-[11px] rounded font-mono transition-colors border ${
+                          className={`px-2 py-1 text-[11px] rounded-lg font-mono transition-colors border ${
                             isSelected
-                              ? "bg-blue-500/20 text-blue-400 border-blue-500/40 font-semibold"
-                              : "bg-white/5 text-gray-400 border-white/10 hover:bg-white/10 hover:text-white"
+                              ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/30 font-semibold"
+                              : "bg-black/5 dark:bg-white/5 text-neutral-500 dark:text-neutral-400 border-black/10 dark:border-white/10 hover:bg-black/10 dark:hover:bg-white/10 hover:text-neutral-900 dark:hover:text-white"
                           }`}
                         >
                           {preset.toFixed(2)}%
@@ -1427,12 +1393,12 @@ export default function AddTrade() {
                       </p>
                     </div>
 
-                    <div className="bg-[#15181D]/60 rounded-2xl p-4 border border-white/5 flex flex-col justify-between">
+                    <div className="mac-bento-card rounded-2xl p-4 flex flex-col justify-between">
                       <div className="flex items-center justify-between">
-                        <p className="text-[11px] text-gray-400 uppercase tracking-wider font-semibold">Account Risk %</p>
-                        <span className="text-[10px] text-blue-400/80 font-mono">of equity</span>
+                        <p className="text-[11px] text-neutral-500 dark:text-neutral-400 uppercase tracking-wider font-semibold">Account Risk %</p>
+                        <span className="text-[10px] text-neutral-400 font-mono">of equity</span>
                       </div>
-                      <p className="text-base sm:text-lg font-bold text-blue-400 font-mono mt-2">
+                      <p className="text-base sm:text-lg font-bold text-emerald-600 dark:text-emerald-400 font-mono mt-2">
                         {formData.risk ? `${Number(formData.risk).toFixed(2)}%` : "—"}
                       </p>
                     </div>
@@ -1612,25 +1578,14 @@ export default function AddTrade() {
                   <label className={labelClass}>
                     Strategy / Setup <span className="text-red-400">*</span>
                   </label>
-                  <div className="relative">
-                    <select
-                      name="setup"
-                      value={formData.setup}
-                      onChange={handleChange}
-                      className={`${selectClass} ${fieldErrors.setup ? "border-red-500 focus:ring-red-500 ring-1 ring-red-500" : ""}`}
-                    >
-                      {setups.map((s) => (
-                        <option
-                          key={s}
-                          value={s}
-                          className="bg-[#15181D] text-white"
-                        >
-                          {s}
-                        </option>
-                      ))}
-                    </select>
-                    <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
-                  </div>
+                  <AppleSelect
+                    name="setup"
+                    value={formData.setup}
+                    onChange={handleChange}
+                    options={setups}
+                    error={!!fieldErrors.setup}
+                    placeholder="Select Strategy / Setup"
+                  />
                   {formData.setup === "Other" && (
                     <input
                       type="text"
@@ -1655,7 +1610,7 @@ export default function AddTrade() {
                       onClick={() =>
                         setFormData({ ...formData, ruleBreak: "no" })
                       }
-                      className={`flex-1 py-3.5 rounded-xl font-bold text-sm transition-colors border ${formData.ruleBreak === "no" ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400" : "bg-[#15181D] border-white/10 text-gray-500 hover:text-white"}`}
+                      className={`flex-1 py-3.5 rounded-2xl font-bold text-sm transition-all duration-200 border cursor-pointer ${formData.ruleBreak === "no" ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-600 dark:text-emerald-400 shadow-sm" : "bg-white/60 dark:bg-white/[0.05] border-black/10 dark:border-white/10 text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"}`}
                     >
                       Followed Plan
                     </button>
@@ -1664,7 +1619,7 @@ export default function AddTrade() {
                       onClick={() =>
                         setFormData({ ...formData, ruleBreak: "yes" })
                       }
-                      className={`flex-1 py-3.5 rounded-xl font-bold text-sm transition-colors border ${formData.ruleBreak === "yes" ? "bg-amber-500/10 border-amber-500/30 text-amber-400" : "bg-[#15181D] border-white/10 text-gray-500 hover:text-white"}`}
+                      className={`flex-1 py-3.5 rounded-2xl font-bold text-sm transition-all duration-200 border cursor-pointer ${formData.ruleBreak === "yes" ? "bg-rose-500/15 border-rose-500/40 text-rose-600 dark:text-rose-400 shadow-sm" : "bg-white/60 dark:bg-white/[0.05] border-black/10 dark:border-white/10 text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"}`}
                     >
                       Broke Rule
                     </button>
@@ -1678,10 +1633,10 @@ export default function AddTrade() {
           {step === 4 && (
             <div className="space-y-6 animate-in fade-in slide-in-from-right-4">
               <div className="flex items-center gap-3 mb-6">
-                <div className="p-2 bg-purple-500/10 rounded-lg">
-                  <Brain className="w-5 h-5 text-purple-400" />
+                <div className="p-2.5 bg-emerald-500/10 rounded-2xl border border-emerald-500/20">
+                  <Brain className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                 </div>
-                <h2 className="text-xl font-semibold text-white">
+                <h2 className="text-xl font-bold text-neutral-900 dark:text-white">
                   Psychology Tracker
                 </h2>
               </div>
@@ -1695,28 +1650,14 @@ export default function AddTrade() {
                         : "Emotion After Trade"}{" "}
                       <span className="text-red-400">*</span>
                     </label>
-                    <div className="relative">
-                      <select
-                        name={field}
-                        value={formData[field]}
-                        onChange={handleChange}
-                        className={`${selectClass} ${fieldErrors[field] ? "border-red-500 focus:ring-red-500 ring-1 ring-red-500" : ""}`}
-                      >
-                        <option value="" className="bg-[#15181D] text-white">
-                          Select emotion...
-                        </option>
-                        {emotions.map((e) => (
-                          <option
-                            key={e}
-                            value={e}
-                            className="bg-[#15181D] text-white"
-                          >
-                            {e}
-                          </option>
-                        ))}
-                      </select>
-                      <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
-                    </div>
+                    <AppleSelect
+                      name={field}
+                      value={formData[field]}
+                      onChange={handleChange}
+                      options={emotions}
+                      error={!!fieldErrors[field]}
+                      placeholder={idx === 0 ? "Select Emotion Before" : "Select Emotion After"}
+                    />
                     {formData[field] === "Other" && (
                       <input
                         type="text"

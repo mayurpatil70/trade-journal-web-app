@@ -141,7 +141,7 @@ export default function Settings() {
   const exportFormats = [
     { fmt: "csv", label: "CSV", icon: <Table className="w-5 h-5" />, color: "from-emerald-500/20 to-green-500/20", border: "border-emerald-500/20", text: "text-emerald-400" },
     { fmt: "excel", label: "Excel", icon: <Table className="w-5 h-5" />, color: "from-emerald-500/20 to-emerald-500/20", border: "border-emerald-500/20", text: "text-emerald-400" },
-    { fmt: "doc", label: "Word (1 Trade / Page)", icon: <FileText className="w-5 h-5" />, color: "from-violet-500/20 to-purple-500/20", border: "border-violet-500/20", text: "text-violet-400" },
+    { fmt: "doc", label: "Word (1 Trade / Page)", icon: <FileText className="w-5 h-5" />, color: "from-black/5 to-black/10 dark:from-white/10 dark:to-white/5", border: "border-black/10 dark:border-white/10", text: "text-neutral-700 dark:text-neutral-300" },
     { fmt: "pdf", label: "PDF (1 Trade / Page)", icon: <FileType className="w-5 h-5" />, color: "from-red-500/20 to-rose-500/20", border: "border-red-500/20", text: "text-red-400" },
   ];
 
@@ -269,7 +269,7 @@ export default function Settings() {
                             className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] border w-fit ${
                               trade.direction === "LONG"
                                 ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20"
-                                : "bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20"
+                                : "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20"
                             }`}
                           >
                             {trade.direction === "LONG" ? (
@@ -354,7 +354,7 @@ export default function Settings() {
                     className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-widest border ${
                       selectedTrade.direction === "LONG"
                         ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20"
-                        : "bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20"
+                        : "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20"
                     }`}
                   >
                     {selectedTrade.direction}
@@ -512,7 +512,7 @@ export default function Settings() {
                   </div>
 
                   <div className="bg-black/[0.025] dark:bg-white/[0.04] border border-black/[0.05] dark:border-white/[0.08] p-5 rounded-2xl flex flex-col">
-                    <h3 className="text-xs font-bold text-purple-600 dark:text-purple-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                    <h3 className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest mb-4 flex items-center gap-2">
                       <Brain className="w-3.5 h-3.5" /> Psychology
                     </h3>
                     <div className="flex items-center gap-4 mb-4 pb-4 border-b border-black/[0.05] dark:border-white/[0.06]">

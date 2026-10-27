@@ -1,9 +1,10 @@
-﻿import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Play, Plus, Clock, TrendingUp, FolderClock, Edit, Trash2, Eye } from 'lucide-react';
 import api from '../api/axios';
 import { Button } from '@/components/ui/button';
 import SymbolPicker from '../components/SymbolPicker';
+import AppleSelect from '../components/ui/AppleSelect';
 
 export default function Sessions() {
   const navigate = useNavigate();
@@ -78,11 +79,15 @@ export default function Sessions() {
             <input value={draft.name} onChange={(e) => setDraft((d) => ({ ...d, name: e.target.value }))} placeholder="Optional" className="mt-1 w-full rounded-lg border border-white/10 bg-[#0a0a0a] px-3 py-2 text-sm text-white outline-none" />
           </label>
           <SymbolPicker label="Symbol" value={draft.pair} onChange={(pair) => setDraft((d) => ({ ...d, pair }))} />
-          <label className="block text-xs text-gray-400">Timeframe
-            <select value={draft.tf} onChange={(e) => setDraft((d) => ({ ...d, tf: e.target.value }))} className="mt-1 w-full rounded-lg border border-white/10 bg-[#0a0a0a] px-3 py-2 text-sm text-white outline-none">
-              {['1m', '5m', '15m', '30m', '1h', '4h', '1d'].map((t) => <option key={t} value={t} className="bg-[#0a0a0a] text-white">{t}</option>)}
-            </select>
-          </label>
+          <div>
+            <label className="block text-xs text-neutral-400 mb-1">Timeframe</label>
+            <AppleSelect
+              value={draft.tf}
+              onChange={(e) => setDraft((d) => ({ ...d, tf: e.target.value }))}
+              options={['1m', '5m', '15m', '30m', '1h', '4h', '1d']}
+              placeholder="Timeframe"
+            />
+          </div>
           <label className="block text-xs text-gray-400">Starting balance
             <input type="number" min="1" value={draft.balance} onChange={(e) => setDraft((d) => ({ ...d, balance: e.target.value }))} className="mt-1 w-full rounded-lg border border-white/10 bg-[#0a0a0a] px-3 py-2 text-sm text-white outline-none" />
           </label>
