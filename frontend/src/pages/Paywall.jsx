@@ -3,7 +3,7 @@ import { WagmiProvider, useWriteContract, useWaitForTransactionReceipt, useAccou
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { wagmiConfig } from '../lib/wagmi';
 import { parseUnits } from 'viem';
-import { Loader2, ArrowLeft, CheckCircle2, Zap, Sparkles } from 'lucide-react';
+import { Loader2, ArrowLeft, CheckCircle2, Zap } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/axios';
 import { invalidateSubscriptionCache } from '../utils/subscriptionCache';
@@ -454,7 +454,6 @@ function Paywall() {
                 border: '1px solid rgba(16, 185, 129, 0.35)',
               }}
             >
-              <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
               <span>{isYearly ? '⚡ SAVE 50% ON YEARLY ($114)' : '⚡ SAVE 25% ON MONTHLY ($14)'}</span>
             </div>
           </div>
