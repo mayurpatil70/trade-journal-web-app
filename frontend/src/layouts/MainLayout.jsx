@@ -291,6 +291,12 @@ export default function MainLayout() {
           document.body
         )}
 
+      {/* ── Desktop Top-Right Action Cluster (Always Visible & Accessible across ALL pages) ── */}
+      <div className="hidden md:flex fixed top-3.5 right-6 z-50 items-center gap-2 p-1 rounded-2xl bg-white/75 dark:bg-[#10131b]/75 backdrop-blur-2xl border border-black/[0.08] dark:border-white/[0.12] shadow-[0_4px_20px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.5)] transition-all">
+        <NotificationBell />
+        <ThemeToggle />
+      </div>
+
       {/* ── Mobile iOS Header ── */}
       <div className="md:hidden fixed top-0 left-0 right-0 h-14 bg-white/75 dark:bg-[#0c0e15]/75 backdrop-blur-2xl border-b border-black/[0.06] dark:border-white/[0.08] flex items-center justify-between px-4 z-40 shadow-sm">
         <div className="flex items-center gap-2">
@@ -488,12 +494,6 @@ export default function MainLayout() {
       <main className="flex-1 overflow-y-auto relative pt-14 pb-16 md:pt-0 md:pb-0 z-10">
         {/* System Broadcast Announcement */}
         <SystemAnnouncementBanner announcement={announcement} isDark={isDark} />
-
-        {/* ── Fixed Top-Right Action Cluster (Visible & Accessible on ALL pages) ── */}
-        <div className="hidden md:flex fixed top-4 right-6 z-40 items-center gap-2.5">
-          <NotificationBell />
-          <ThemeToggle />
-        </div>
 
         {/* Workspace Route Container */}
         <Suspense

@@ -3,8 +3,7 @@ import { EdgeBreakdown, TradingHealth, BacktestSummary } from "../components/das
 import AccountFilter from "../components/AccountFilter";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
-import Logo3DLoader from "../components/Logo3DLoader";
-import { shouldShow3DLoaderForDashboard, mark3DLoaderShown } from "../utils/navigationState";
+import { mark3DLoaderShown } from "../utils/navigationState";
 import {
   Activity,
   PlusCircle,
@@ -242,24 +241,29 @@ export default function Dashboard() {
     return { text: "Your average R-multiple is stable, but consistency could improve.", type: "neutral" };
   }, [trades, stats]);
 
-  // ── EARLY RETURN AFTER ALL HOOKS ──
+  // ── SKELETON WHILE BACKGROUND DATA INITIALIZES ──
   if (isLoading) {
-    // Only show 3D Logo on physical page refresh (or initial direct URL landing on /dashboard)
-    // In-app navigation (clicking /dashboard from paywall after access, sidebar, etc.) will NEVER display the 3D logo
-    if (shouldShow3DLoaderForDashboard()) {
-      return (
-        <Logo3DLoader
-          title="FOREX NOTES"
-          subtitle="Loading Performance Dashboard & Trade Journal..."
-        />
-      );
-    }
-
-    // Ultra-lightweight fallback for in-app transitions and subsequent background refreshes
     return (
-      <div className="min-h-[70vh] flex flex-col items-center justify-center p-8 bg-[#0a0a0a]">
-        <div className="w-8 h-8 rounded-full border-2 border-emerald-500/20 border-t-emerald-500 animate-spin mb-3" />
-        <p className="text-xs text-gray-400 font-medium tracking-wide">Updating workspace...</p>
+      <div className="p-6 md:p-10 max-w-7xl mx-auto space-y-8 pb-20 animate-pulse">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+          <div className="space-y-2">
+            <div className="h-8 w-64 bg-black/5 dark:bg-white/5 rounded-2xl" />
+            <div className="h-4 w-48 bg-black/5 dark:bg-white/5 rounded-xl" />
+          </div>
+          <div className="flex items-center gap-3 md:pr-24">
+            <div className="h-10 w-36 bg-black/5 dark:bg-white/5 rounded-2xl" />
+            <div className="h-10 w-28 bg-emerald-500/20 rounded-2xl" />
+          </div>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+          {[...Array(5)].map((_, i) => (
+            <div key={i} className="h-24 rounded-3xl bg-black/5 dark:bg-white/5 border border-black/[0.04] dark:border-white/[0.06]" />
+          ))}
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 h-72 rounded-3xl bg-black/5 dark:bg-white/5 border border-black/[0.04] dark:border-white/[0.06]" />
+          <div className="h-72 rounded-3xl bg-black/5 dark:bg-white/5 border border-black/[0.04] dark:border-white/[0.06]" />
+        </div>
       </div>
     );
   }
@@ -280,7 +284,7 @@ export default function Dashboard() {
             Your trading performance at a glance.
           </p>
         </div>
-        <div className="flex items-center gap-3 flex-wrap">
+        <div className="flex items-center gap-3 flex-wrap md:pr-24">
           <AccountFilter trades={allTrades} selectedAccount={selectedAccount} onChange={setSelectedAccount} />
           <button
             onClick={() => navigate("/add-trade")}

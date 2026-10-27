@@ -33,7 +33,7 @@ createRoot(document.getElementById("root")).render(
 if (typeof window !== "undefined") {
   requestAnimationFrame(() => {
     if (typeof window.__dismissLoader === "function") {
-      window.__dismissLoader(true);
+      window.__dismissLoader(false);
     }
   });
 }

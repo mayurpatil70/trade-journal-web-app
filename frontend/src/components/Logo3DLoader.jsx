@@ -1,14 +1,38 @@
 // frontend/src/components/Logo3DLoader.jsx
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 
 export default function Logo3DLoader({
   title = "FOREX NOTES",
   subtitle = "Preparing Your Trading Journal & Performance Analytics...",
+  duration = 2000,
+  onComplete,
   className = "",
 }) {
   const [fading, setFading] = useState(false);
+  const [mounted, setMounted] = useState(true);
 
-  return (
+  useEffect(() => {
+    // Start smooth fade-out at (duration - 400ms) so cross-dissolve finishes cleanly at duration
+    const fadeDelay = Math.max(600, duration - 400);
+    const fadeTimer = setTimeout(() => {
+      setFading(true);
+    }, fadeDelay);
+
+    const completeTimer = setTimeout(() => {
+      setMounted(false);
+      if (onComplete) onComplete();
+    }, duration);
+
+    return () => {
+      clearTimeout(fadeTimer);
+      clearTimeout(completeTimer);
+    };
+  }, [duration, onComplete]);
+
+  if (!mounted || typeof document === "undefined") return null;
+
+  return createPortal(
     <div
       className={`fn-loader-overlay ${fading ? "fn-loader-hidden" : ""} ${className}`}
       style={{
@@ -26,6 +50,9 @@ export default function Logo3DLoader({
         alignItems: "center",
         justifyContent: "center",
         overflow: "hidden",
+        transition: "opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
+        opacity: fading ? 0 : 1,
+        pointerEvents: fading ? "none" : "auto",
       }}
     >
       {/* Glowing backdrop pulse */}
@@ -73,6 +100,7 @@ export default function Logo3DLoader({
           <div className="fn-loader-subtext">{subtitle}</div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
