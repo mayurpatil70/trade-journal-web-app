@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { createChart } from 'lightweight-charts';
 import {
-  Play, Pause, StepForward, ChevronLeft, Loader2, SkipBack, Rewind, FastForward,
+  Play, Pause, StepForward, ChevronLeft, ChevronDown, Loader2, SkipBack, Rewind, FastForward,
   SkipForward, BarChart2, Activity, ChevronRight, X, ArrowUp, ArrowDown,
 } from 'lucide-react';
 import SymbolPicker from '../components/SymbolPicker';
@@ -78,6 +79,104 @@ function EquityCurve({ points }) {
     <svg viewBox="0 0 260 90" className="w-full h-24">
       <polyline points={path} fill="none" stroke="#2962FF" strokeWidth="1.5" />
     </svg>
+  );
+}
+
+// Custom TradingView-style Timeframe Dropdown (immune to OS native select styling & theme bugs)
+function TimeframePicker({ value, onChange, options = TFS }) {
+  const [open, setOpen] = useState(false);
+  const [pos, setPos] = useState(null);
+  const triggerRef = useRef(null);
+  const menuRef = useRef(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const close = (e) => {
+      if (triggerRef.current?.contains(e.target) || menuRef.current?.contains(e.target)) return;
+      setOpen(false);
+    };
+    document.addEventListener('mousedown', close);
+    return () => document.removeEventListener('mousedown', close);
+  }, [open]);
+
+  useLayoutEffect(() => {
+    if (!open) return;
+    const place = () => {
+      const r = triggerRef.current?.getBoundingClientRect();
+      if (!r) return;
+      const below = window.innerHeight - r.bottom;
+      const flip = below < 260 && r.top > below;
+      setPos(
+        flip
+          ? { left: r.left, bottom: window.innerHeight - r.top + 4 }
+          : { left: r.left, top: r.bottom + 4 }
+      );
+    };
+    place();
+    window.addEventListener('resize', place);
+    window.addEventListener('scroll', place, true);
+    return () => {
+      window.removeEventListener('resize', place);
+      window.removeEventListener('scroll', place, true);
+    };
+  }, [open]);
+
+  return (
+    <div className="relative inline-flex items-center">
+      <button
+        ref={triggerRef}
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        className={`flex items-center gap-1.5 font-semibold px-2.5 py-1.5 rounded transition-all cursor-pointer ${
+          open
+            ? 'bg-[#1B1C20] text-white ring-1 ring-[#2962FF]/50'
+            : 'bg-transparent text-[#D1D4DC] hover:text-white hover:bg-[#1B1C20]'
+        }`}
+        title="Change timeframe"
+      >
+        <span>{value}</span>
+        <ChevronDown
+          className={`w-3.5 h-3.5 text-[#787B86] transition-transform duration-200 ${
+            open ? 'rotate-180 text-[#2962FF]' : ''
+          }`}
+        />
+      </button>
+
+      {open && pos && createPortal(
+        <div
+          ref={menuRef}
+          style={pos}
+          className="fixed z-[500] min-w-[96px] rounded-xl border border-white/10 bg-[#121418] p-1 shadow-2xl backdrop-blur-xl animate-in fade-in zoom-in-95 duration-100"
+        >
+          <div className="space-y-0.5">
+            {options.map((t) => {
+              const isSelected = t === value;
+              return (
+                <button
+                  key={t}
+                  type="button"
+                  onClick={() => {
+                    onChange(t);
+                    setOpen(false);
+                  }}
+                  className={`w-full flex items-center justify-between px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer text-left ${
+                    isSelected
+                      ? 'bg-[#2962FF]/20 text-[#2962FF] font-bold'
+                      : 'text-[#D1D4DC] hover:bg-white/10 hover:text-white'
+                  }`}
+                >
+                  <span>{t}</span>
+                  {isSelected && (
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#2962FF]" />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>,
+        document.body
+      )}
+    </div>
   );
 }
 
@@ -518,7 +617,7 @@ export default function Backtest() {
   );
 
   return (
-    <div className="flex flex-col h-dvh bg-[#0A0B0D] text-[#D1D4DC] overflow-hidden font-sans text-xs fixed inset-0 z-[100]">
+    <div className="flex flex-col h-dvh bg-[#0A0B0D] text-[#D1D4DC] overflow-hidden font-sans text-xs fixed inset-0 z-[100] terminal" data-theme="dark" style={{ colorScheme: 'dark' }}>
       <div className="h-12 border-b border-[#1B1C20] flex items-center justify-between px-3 shrink-0 overflow-x-auto whitespace-nowrap gap-2">
         <div className="flex items-center gap-1">
           <button onClick={() => navigate('/sessions')} className="p-1.5 hover:bg-[#1B1C20] rounded text-[#787B86] hover:text-white">
@@ -530,9 +629,7 @@ export default function Backtest() {
             <>
               <SymbolPicker variant="compact" value={symbol} onChange={changeSymbol} />
               <div className="h-4 w-px bg-[#1B1C20] mx-2" />
-              <select value={tf} onChange={(e) => changeTf(e.target.value)} className="bg-transparent text-[#D1D4DC] font-semibold px-2 py-1.5 rounded hover:bg-[#1B1C20] outline-none">
-                {TFS.map((t) => <option key={t} value={t} className="bg-[#0A0B0D]">{t}</option>)}
-              </select>
+              <TimeframePicker value={tf} onChange={changeTf} />
               <div className="h-4 w-px bg-[#1B1C20] mx-2" />
               <button onClick={() => { setTab('analytics'); setShowRightPane(true); }} className="flex items-center gap-1 px-2 py-1.5 hover:bg-[#1B1C20] rounded text-[#787B86] hover:text-[#D1D4DC]">
                 <BarChart2 className="w-4 h-4" /> Analytics
@@ -611,10 +708,11 @@ export default function Backtest() {
                 title="Risk per trade"
                 value={RISKS.includes(Number(riskPct)) ? Number(riskPct) : 'custom'}
                 onChange={(e) => { setRiskPct(Number(e.target.value)); setCustomRisk(false); }}
-                className="bg-[#0A0B0D] text-[#D1D4DC] font-mono px-1.5 outline-none border-x border-[#222429]"
+                className="bg-[#0A0B0D] text-[#D1D4DC] font-mono px-1.5 outline-none border-x border-[#222429] [color-scheme:dark] cursor-pointer"
+                style={{ colorScheme: 'dark' }}
               >
-                {!RISKS.includes(Number(riskPct)) && <option value="custom">{riskPct}%</option>}
-                {RISKS.map((r) => <option key={r} value={r}>{r}%</option>)}
+                {!RISKS.includes(Number(riskPct)) && <option value="custom" className="bg-[#121418] text-[#D1D4DC]">{riskPct}%</option>}
+                {RISKS.map((r) => <option key={r} value={r} className="bg-[#121418] text-[#D1D4DC]">{r}%</option>)}
               </select>
               <button onClick={() => punch('Buy')} disabled={!candle || finished || loading} className="px-3 py-1.5 bg-[#089981] hover:bg-[#07806b] text-white font-bold flex items-center gap-1 disabled:opacity-40">
                 Buy <ArrowUp className="w-3.5 h-3.5" />

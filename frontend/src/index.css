@@ -267,9 +267,33 @@ GLOBAL RESET
     color: #111827;
   }
 
-  .dark select option {
-    background-color: #11141d;
-    color: #f3f4f6;
+  .dark select option,
+  body.terminal select option,
+  body.terminal option,
+  .terminal select option,
+  .terminal option,
+  select[data-theme="dark"] option,
+  [data-theme="dark"] select option,
+  select[style*="colorScheme: dark"] option,
+  select[style*="color-scheme: dark"] option,
+  option[class*="bg-[#0"],
+  option[class*="bg-[#1"],
+  option[class*="bg-black"],
+  option[class*="bg-gray-9"],
+  option[class*="bg-neutral-9"] {
+    background-color: #11141d !important;
+    color: #f3f4f6 !important;
+  }
+
+  body.terminal,
+  body.terminal select,
+  .terminal,
+  .terminal select,
+  select[data-theme="dark"],
+  [data-theme="dark"] select,
+  select[style*="colorScheme: dark"],
+  select[style*="color-scheme: dark"] {
+    color-scheme: dark !important;
   }
 }
 
