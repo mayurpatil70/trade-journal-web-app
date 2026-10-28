@@ -35,6 +35,8 @@ const Dashboard = safeLazy(() => import("./pages/Dashboard.jsx"), "dashboard");
 const AddTrade = safeLazy(() => import("./pages/AddTrade.jsx"), "add-trade");
 const PastTrades = safeLazy(() => import("./pages/PastTrades.jsx"), "past-trades");
 const PerformanceCalendar = safeLazy(() => import("./pages/PerformanceCalendar.jsx"), "calendar");
+const PerformanceAnalytics = safeLazy(() => import("./pages/PerformanceAnalytics.jsx"), "performance-analytics");
+const TradeAnalysis = safeLazy(() => import("./pages/TradeAnalysis.jsx"), "trade-analysis");
 const Analytics = safeLazy(() => import("./pages/Analytics.jsx"), "analytics");
 const Psychology = safeLazy(() => import("./pages/Psychology.jsx"), "psychology");
 const Mistakes = safeLazy(() => import("./pages/Mistakes.jsx"), "mistakes");
@@ -68,6 +70,8 @@ const Paywall = safeLazy(() => import("./pages/Paywall.jsx"), "paywall");
 const Onboarding = safeLazy(() => import("./pages/Onboarding.jsx"), "onboarding");
 
 // Register prefetch handlers for instant hover / idle prefetching
+registerRoutePrefetch("/analysis/performance", () => import("./pages/PerformanceAnalytics.jsx"));
+registerRoutePrefetch("/analysis/trades", () => import("./pages/TradeAnalysis.jsx"));
 registerRoutePrefetch("/onboarding", () => import("./pages/Onboarding.jsx"));
 registerRoutePrefetch("/charts", () => import("./pages/Charts.jsx"));
 registerRoutePrefetch("/sessions", () => import("./pages/Sessions.jsx"));
@@ -242,6 +246,7 @@ const RouteWatcher = () => {
       "/news",
       "/trades",
       "/calendar",
+      "/analysis",
       "/analytics",
       "/psychology",
       "/mistakes",
@@ -308,7 +313,10 @@ function App() {
                   <Route path="news" element={<EconomicCalendar />} />
                   <Route path="trades" element={<PastTrades />} />
                   <Route path="calendar" element={<PerformanceCalendar />} />
-                  <Route path="analytics" element={<Analytics />} />
+                  <Route path="analysis" element={<Navigate to="/analysis/performance" replace />} />
+                  <Route path="analysis/performance" element={<PerformanceAnalytics />} />
+                  <Route path="analysis/trades" element={<TradeAnalysis />} />
+                  <Route path="analytics" element={<Navigate to="/analysis/performance" replace />} />
                   <Route path="psychology" element={<Psychology />} />
                   <Route path="mistakes" element={<Mistakes />} />
                   <Route path="accounts" element={<PropAccounts />} />

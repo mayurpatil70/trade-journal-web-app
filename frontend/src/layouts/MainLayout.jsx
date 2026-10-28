@@ -25,6 +25,10 @@ import {
   LogOut,
   Activity,
   ChevronDown,
+  ChevronUp,
+  BarChart2,
+  TrendingUp,
+  FileText,
   User,
   CreditCard,
   ShieldCheck,
@@ -93,6 +97,102 @@ const NavItem = ({
         {isLocked && <Lock className="w-3.5 h-3.5 text-neutral-400 dark:text-neutral-500" />}
       </div>
     </Link>
+  );
+};
+
+
+// Expandable Nav Item for Nested Route Groups (Matches TradeFXBook Analysis Menu)
+const ExpandableNavItem = ({ item, currentPath, closeMenu }) => {
+  const isChildActive = item.children?.some(
+    (c) => currentPath === c.to || currentPath.startsWith(c.to + "/")
+  );
+  const [isOpen, setIsOpen] = useState(
+    isChildActive || currentPath.startsWith("/analysis")
+  );
+
+  useEffect(() => {
+    if (isChildActive || currentPath.startsWith("/analysis")) {
+      setIsOpen(true);
+    }
+  }, [currentPath, isChildActive]);
+
+  const Icon = item.icon;
+
+  return (
+    <div className="space-y-1">
+      <div
+        className={`group relative flex items-center justify-between px-3.5 py-2.5 rounded-2xl transition-all duration-300 font-medium text-[13px] cursor-pointer ${
+          isChildActive
+            ? "bg-white dark:bg-white/[0.09] text-blue-600 dark:text-blue-400 font-semibold border border-black/[0.06] dark:border-white/[0.12] shadow-sm"
+            : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white hover:bg-black/[0.035] dark:hover:bg-white/[0.06] border border-transparent"
+        }`}
+        onClick={() => setIsOpen((prev) => !prev)}
+      >
+        {isChildActive && (
+          <span className="absolute left-1.5 top-2.5 bottom-2.5 w-1 rounded-full bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.8)]" />
+        )}
+
+        <div className="flex items-center gap-3 pl-1">
+          <Icon
+            className={`w-[18px] h-[18px] transition-all duration-300 ${
+              isChildActive
+                ? "text-blue-600 dark:text-blue-400 drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]"
+                : "text-neutral-400 dark:text-neutral-500 group-hover:text-neutral-800 dark:group-hover:text-neutral-200"
+            }`}
+            strokeWidth={isChildActive ? 2.4 : 2}
+          />
+          <span className="tracking-tight">{item.label}</span>
+        </div>
+
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsOpen((prev) => !prev);
+          }}
+          className="p-1 rounded-lg text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200"
+          aria-label="Toggle analysis menu"
+        >
+          {isOpen ? (
+            <ChevronUp className="w-4 h-4 text-blue-500" />
+          ) : (
+            <ChevronDown className="w-4 h-4" />
+          )}
+        </button>
+      </div>
+
+      {isOpen && (
+        <div className="pl-4 space-y-1 pt-0.5">
+          {item.children.map((sub) => {
+            const isSubActive =
+              currentPath === sub.to || currentPath.startsWith(sub.to + "/");
+            const SubIcon = sub.icon;
+            return (
+              <Link
+                key={sub.to}
+                to={sub.to}
+                onClick={closeMenu}
+                className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all ${
+                  isSubActive
+                    ? "bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 shadow-sm"
+                    : "text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white hover:bg-black/[0.03] dark:hover:bg-white/[0.04]"
+                }`}
+              >
+                <SubIcon
+                  className={`w-4 h-4 ${
+                    isSubActive
+                      ? "text-blue-600 dark:text-blue-400"
+                      : "text-neutral-400 dark:text-neutral-500"
+                  }`}
+                  strokeWidth={isSubActive ? 2.4 : 2}
+                />
+                <span>{sub.label}</span>
+              </Link>
+            );
+          })}
+        </div>
+      )}
+    </div>
   );
 };
 
@@ -236,6 +336,9 @@ export default function MainLayout() {
     if (p.includes("add-trade")) return "Add Trade";
     if (p.includes("trades")) return "Past Trades";
     if (p.includes("calendar")) return "Calendar";
+    if (p.includes("analysis/performance")) return "Performance Analytics";
+    if (p.includes("analysis/trades")) return "Trade Analysis";
+    if (p.includes("analysis")) return "Performance Analytics";
     if (p.includes("analytics")) return "Strategy Analytics";
     if (p.includes("psychology")) return "Psychology Lab";
     if (p.includes("mistakes")) return "Mistake Lab";
