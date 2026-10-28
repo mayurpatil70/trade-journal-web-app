@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Activity, ArrowUpRight, ArrowDownRight, TrendingUp } from "lucide-react";
+import { Activity } from "lucide-react";
 import { normalizeTradeR } from "../../pages/Dashboard.jsx";
 
 const TIMEFRAMES = [
@@ -88,6 +88,9 @@ export default function PerformanceEquityCurve({ trades = [] }) {
   }, [filteredTrades]);
 
   // Headline value
+  const isProfitable = (equityPoints.hasPnl ? equityPoints.finalPnl : equityPoints.finalR) >= 0;
+  const strokeColor = isProfitable ? "#10b981" : "#ef4444"; // Emerald green or rose red
+
   const headlineDisplay = useMemo(() => {
     if (filteredTrades.length === 0) return "+$0.00";
     if (equityPoints.hasPnl) {
@@ -115,8 +118,6 @@ export default function PerformanceEquityCurve({ trades = [] }) {
   });
 
   const polylinePoints = svgPoints.map((pt) => `${pt.x},${pt.y}`).join(" ");
-  const isProfitable = (equityPoints.hasPnl ? equityPoints.finalPnl : equityPoints.finalR) >= 0;
-  const strokeColor = isProfitable ? "#2563eb" : "#ef4444"; // TradeFXBook blue or red
 
   // Date labels along the bottom (at down)
   const dateInterval = Math.max(1, Math.floor(svgPoints.length / 7));
@@ -124,19 +125,23 @@ export default function PerformanceEquityCurve({ trades = [] }) {
 
   return (
     <div className="rounded-3xl p-6 bg-white dark:bg-[#121622] border border-black/[0.06] dark:border-white/[0.08] shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] flex flex-col justify-between h-full relative">
-      {/* ── CARD HEADER (Screenshots 1 & 3) ── */}
+      {/* ── CARD HEADER ── */}
       <div className="flex items-start justify-between mb-4 flex-wrap gap-3">
         <div>
           <div className="flex items-center gap-2 text-[11px] font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-widest">
-            <Activity className="w-3.5 h-3.5 text-blue-500" />
+            <Activity className="w-3.5 h-3.5 text-emerald-500" />
             <span>Performance</span>
           </div>
-          <h2 className="text-3xl font-extrabold text-neutral-900 dark:text-white mt-1 tracking-tight font-mono">
+          <h2
+            className={`text-3xl font-extrabold mt-1 tracking-tight font-mono ${
+              isProfitable ? "text-emerald-500 dark:text-emerald-400" : "text-rose-500 dark:text-rose-400"
+            }`}
+          >
             {headlineDisplay}
           </h2>
         </div>
 
-        {/* Timeframe Filter Buttons: 1D, 1W, 1M, 1Y, ALL (Screenshots 1 & 3) */}
+        {/* Timeframe Filter Buttons: 1D, 1W, 1M, 1Y, ALL */}
         <div className="flex items-center gap-1 p-1 rounded-2xl bg-neutral-100 dark:bg-white/[0.05] border border-black/[0.04] dark:border-white/[0.06]">
           {TIMEFRAMES.map((tf) => (
             <button
@@ -145,7 +150,7 @@ export default function PerformanceEquityCurve({ trades = [] }) {
               onClick={() => setTimeframe(tf.key)}
               className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                 timeframe === tf.key
-                  ? "bg-blue-600 text-white shadow-sm shadow-blue-500/25"
+                  ? "bg-emerald-500 text-white shadow-sm shadow-emerald-500/25"
                   : "text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
               }`}
             >
@@ -175,7 +180,6 @@ export default function PerformanceEquityCurve({ trades = [] }) {
                 onMouseMove={(e) => {
                   const rect = e.currentTarget.getBoundingClientRect();
                   const mouseX = e.clientX - rect.left;
-                  // Find nearest point
                   let nearest = svgPoints[0];
                   let minDistance = Infinity;
                   svgPoints.forEach((pt) => {
@@ -190,7 +194,7 @@ export default function PerformanceEquityCurve({ trades = [] }) {
               >
                 <defs>
                   <linearGradient id="curveGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor={strokeColor} stopOpacity="0.18" />
+                    <stop offset="0%" stopColor={strokeColor} stopOpacity="0.2" />
                     <stop offset="100%" stopColor={strokeColor} stopOpacity="0.0" />
                   </linearGradient>
                 </defs>
@@ -243,7 +247,7 @@ export default function PerformanceEquityCurve({ trades = [] }) {
                   points={polylinePoints}
                 />
 
-                {/* Points */}
+                {/* Data Points */}
                 {svgPoints.map((pt, idx) => (
                   <circle
                     key={idx}
@@ -264,7 +268,7 @@ export default function PerformanceEquityCurve({ trades = [] }) {
                     x2={hoverData.x}
                     y1={paddingY}
                     y2={chartHeight - paddingY}
-                    stroke="#3b82f6"
+                    stroke={strokeColor}
                     strokeWidth="1.5"
                     strokeDasharray="3 3"
                   />
@@ -284,7 +288,7 @@ export default function PerformanceEquityCurve({ trades = [] }) {
                 ))}
               </div>
 
-              {/* ── HOVER TOOLTIP CARD (Matching Screenshot 3) ── */}
+              {/* ── HOVER TOOLTIP CARD ── */}
               {hoverData && (
                 <div
                   className="absolute pointer-events-none z-30 rounded-2xl bg-white/95 dark:bg-[#121622]/95 border border-black/[0.08] dark:border-white/[0.12] p-3.5 shadow-2xl backdrop-blur-xl transition-all"
@@ -298,7 +302,11 @@ export default function PerformanceEquityCurve({ trades = [] }) {
                   <p className="text-[11px] font-medium text-neutral-500 dark:text-neutral-400">
                     {hoverData.point.fullDateStr}
                   </p>
-                  <p className="text-xl font-bold font-mono text-neutral-900 dark:text-white mt-0.5">
+                  <p
+                    className={`text-xl font-bold font-mono mt-0.5 ${
+                      hoverData.point.r >= 0 ? "text-emerald-500 dark:text-emerald-400" : "text-rose-500 dark:text-rose-400"
+                    }`}
+                  >
                     {hoverData.point.r >= 0 ? "+" : ""}{hoverData.point.r.toFixed(2)}R
                   </p>
                   <p className="text-[9px] font-extrabold uppercase tracking-widest text-neutral-400 dark:text-neutral-500 mt-0.5">
@@ -312,10 +320,10 @@ export default function PerformanceEquityCurve({ trades = [] }) {
                           {hoverData.point.trade.asset}
                         </span>
                         <span
-                          className={`text-[9px] font-extrabold px-1.5 py-0.5 rounded-md ${
+                          className={`text-[9px] font-extrabold px-1.5 py-0.5 rounded-md border ${
                             hoverData.point.trade.direction === "LONG"
-                              ? "bg-blue-500/10 text-blue-600 dark:text-blue-400"
-                              : "bg-rose-500/10 text-rose-500 dark:text-rose-400"
+                              ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/25"
+                              : "bg-rose-500/15 text-rose-600 dark:text-rose-400 border-rose-500/25"
                           }`}
                         >
                           {hoverData.point.trade.direction}

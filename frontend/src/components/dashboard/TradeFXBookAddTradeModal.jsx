@@ -125,7 +125,7 @@ export default function TradeFXBookAddTradeModal({ isOpen, onClose, onTradeAdded
         {/* Modal Top Header (Screenshots 4 & 5) */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-blue-500/10 dark:bg-blue-500/15 border border-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 dark:bg-emerald-500/15 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
               <Plus className="w-5 h-5 stroke-[2.5]" />
             </div>
             <h2 className="text-xl font-bold text-neutral-900 dark:text-white">Add Trade</h2>
@@ -152,11 +152,11 @@ export default function TradeFXBookAddTradeModal({ isOpen, onClose, onTradeAdded
               onClick={() => setDirection("LONG")}
               className={`flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                 direction === "LONG"
-                  ? "bg-white dark:bg-[#1c2233] text-blue-600 dark:text-blue-400 shadow-sm border border-black/[0.05] dark:border-white/[0.1]"
+                  ? "bg-white dark:bg-[#1c2233] text-emerald-600 dark:text-emerald-400 shadow-sm border border-black/[0.05] dark:border-white/[0.1]"
                   : "text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
               }`}
             >
-              <ArrowUpRight className="w-4 h-4 text-blue-500" />
+              <ArrowUpRight className="w-4 h-4 text-emerald-500" />
               <span>Long</span>
             </button>
             <button
@@ -184,7 +184,7 @@ export default function TradeFXBookAddTradeModal({ isOpen, onClose, onTradeAdded
                 value={symbol}
                 onChange={(e) => setSymbol(e.target.value.toUpperCase())}
                 placeholder="E.G. XAUUSD"
-                className="w-full h-11 px-3.5 rounded-xl border border-black/[0.08] dark:border-white/[0.12] bg-white/70 dark:bg-white/[0.04] text-neutral-900 dark:text-white text-sm font-medium placeholder-neutral-400 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all uppercase"
+                className="w-full h-11 px-3.5 rounded-xl border border-black/[0.08] dark:border-white/[0.12] bg-white/70 dark:bg-white/[0.04] text-neutral-900 dark:text-white text-sm font-medium placeholder-neutral-400 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all uppercase"
                 required
               />
             </div>
@@ -198,7 +198,7 @@ export default function TradeFXBookAddTradeModal({ isOpen, onClose, onTradeAdded
                 value={quantity}
                 onChange={(e) => setQuantity(e.target.value)}
                 placeholder="Lots"
-                className="w-full h-11 px-3.5 rounded-xl border border-black/[0.08] dark:border-white/[0.12] bg-white/70 dark:bg-white/[0.04] text-neutral-900 dark:text-white text-sm font-medium placeholder-neutral-400 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
+                className="w-full h-11 px-3.5 rounded-xl border border-black/[0.08] dark:border-white/[0.12] bg-white/70 dark:bg-white/[0.04] text-neutral-900 dark:text-white text-sm font-medium placeholder-neutral-400 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all"
               />
             </div>
           </div>
@@ -215,7 +215,7 @@ export default function TradeFXBookAddTradeModal({ isOpen, onClose, onTradeAdded
                 value={entryPrice}
                 onChange={(e) => setEntryPrice(e.target.value)}
                 placeholder="0.00"
-                className="w-full h-11 px-3.5 rounded-xl border border-black/[0.08] dark:border-white/[0.12] bg-white/70 dark:bg-white/[0.04] text-neutral-900 dark:text-white text-sm font-medium placeholder-neutral-400 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all font-mono"
+                className="w-full h-11 px-3.5 rounded-xl border border-black/[0.08] dark:border-white/[0.12] bg-white/70 dark:bg-white/[0.04] text-neutral-900 dark:text-white text-sm font-medium placeholder-neutral-400 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all font-mono"
                 required
               />
             </div>
@@ -229,7 +229,7 @@ export default function TradeFXBookAddTradeModal({ isOpen, onClose, onTradeAdded
                 value={exitPrice}
                 onChange={(e) => setExitPrice(e.target.value)}
                 placeholder="Optional"
-                className="w-full h-11 px-3.5 rounded-xl border border-black/[0.08] dark:border-white/[0.12] bg-white/70 dark:bg-white/[0.04] text-neutral-900 dark:text-white text-sm font-medium placeholder-neutral-400 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all font-mono"
+                className="w-full h-11 px-3.5 rounded-xl border border-black/[0.08] dark:border-white/[0.12] bg-white/70 dark:bg-white/[0.04] text-neutral-900 dark:text-white text-sm font-medium placeholder-neutral-400 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all font-mono"
               />
             </div>
           </div>
@@ -260,7 +260,7 @@ export default function TradeFXBookAddTradeModal({ isOpen, onClose, onTradeAdded
               <div className="flex items-center gap-2">
                 <ChevronRight
                   className={`w-4 h-4 text-neutral-400 transition-transform duration-200 ${
-                    isChecklistOpen ? "rotate-90 text-blue-500" : ""
+                    isChecklistOpen ? "rotate-90 text-emerald-500" : ""
                   }`}
                 />
                 <span>Pre-Trade Checklist (Optional)</span>
@@ -288,7 +288,7 @@ export default function TradeFXBookAddTradeModal({ isOpen, onClose, onTradeAdded
                       onChange={(e) =>
                         setChecklist((prev) => ({ ...prev, [item.key]: e.target.checked }))
                       }
-                      className="rounded border-neutral-300 text-blue-600 focus:ring-blue-500"
+                      className="rounded border-neutral-300 text-emerald-600 focus:ring-emerald-500"
                     />
                     <span>{item.label}</span>
                   </label>
@@ -307,7 +307,7 @@ export default function TradeFXBookAddTradeModal({ isOpen, onClose, onTradeAdded
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Trade rationale, entry/exit notes..."
-              className="w-full px-3.5 py-2.5 rounded-xl border border-black/[0.08] dark:border-white/[0.12] bg-white/70 dark:bg-white/[0.04] text-neutral-900 dark:text-white text-sm placeholder-neutral-400 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all resize-none"
+              className="w-full px-3.5 py-2.5 rounded-xl border border-black/[0.08] dark:border-white/[0.12] bg-white/70 dark:bg-white/[0.04] text-neutral-900 dark:text-white text-sm placeholder-neutral-400 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all resize-none"
             />
           </div>
 
@@ -324,7 +324,7 @@ export default function TradeFXBookAddTradeModal({ isOpen, onClose, onTradeAdded
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded-xl transition-all shadow-md shadow-blue-500/25 active:scale-95 flex items-center gap-2 cursor-pointer disabled:opacity-50"
+              className="px-6 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-white text-xs font-bold rounded-xl transition-all shadow-md shadow-emerald-500/25 active:scale-95 flex items-center gap-2 cursor-pointer disabled:opacity-50"
             >
               {isSubmitting ? (
                 <>

@@ -24,7 +24,7 @@ export function formatTradeFXDateTime(dateObj) {
   const minutes = dateObj.getMinutes().toString().padStart(2, "0");
   const ampm = hours >= 12 ? "PM" : "AM";
   hours = hours % 12;
-  hours = hours ? hours : 12; // 0 becomes 12
+  hours = hours ? hours : 12;
 
   return `${m} ${d}, ${y} ${hours}:${minutes} ${ampm}`;
 }
@@ -39,7 +39,6 @@ export function formatTradeFXDateOnly(dateObj) {
   const d = dateObj.getDate();
   const y = dateObj.getFullYear();
 
-  // Add ordinal suffix (1st, 2nd, 3rd, 28th...)
   const suffix = ["th", "st", "nd", "rd"][d % 10 > 3 ? 0 : (d % 100 - d % 10 != 10) * d % 10] || "th";
   return `${m} ${d}${suffix}, ${y}`;
 }
@@ -56,7 +55,6 @@ export default function DateTimePickerPopover({
   const [viewMode, setViewMode] = useState("date"); // "date" | "time"
   const popoverRef = useRef(null);
 
-  // Parse initial date
   const parsedDate = useMemo(() => {
     if (!value) return null;
     if (value instanceof Date) return isNaN(value.getTime()) ? null : value;
@@ -64,17 +62,14 @@ export default function DateTimePickerPopover({
     return isNaN(d.getTime()) ? null : d;
   }, [value]);
 
-  // Working state when popover is open
   const [selectedDate, setSelectedDate] = useState(() => parsedDate || new Date());
   const [navMonthDate, setNavMonthDate] = useState(() => parsedDate || new Date());
 
-  // Time components
   const hours24 = selectedDate.getHours();
   const currentHour12 = hours24 % 12 || 12;
   const currentMinute = selectedDate.getMinutes();
   const currentAmPm = hours24 >= 12 ? "PM" : "AM";
 
-  // Sync internal state when external value changes
   useEffect(() => {
     if (parsedDate) {
       setSelectedDate(parsedDate);
@@ -82,7 +77,6 @@ export default function DateTimePickerPopover({
     }
   }, [parsedDate]);
 
-  // Click outside to close
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (popoverRef.current && !popoverRef.current.contains(e.target)) {
@@ -96,7 +90,6 @@ export default function DateTimePickerPopover({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isOpen]);
 
-  // Month navigation helpers
   const navYear = navMonthDate.getFullYear();
   const navMonth = navMonthDate.getMonth();
   const monthNamesShort = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -111,7 +104,6 @@ export default function DateTimePickerPopover({
     setNavMonthDate(new Date(navYear, navMonth + 1, 1));
   };
 
-  // Calendar matrix calculation (Sunday through Saturday)
   const calendarDays = useMemo(() => {
     const firstDay = new Date(navYear, navMonth, 1);
     const startDayOfWeek = firstDay.getDay(); // 0 = Sunday
@@ -120,7 +112,6 @@ export default function DateTimePickerPopover({
 
     const days = [];
 
-    // Previous month spillover days
     for (let i = startDayOfWeek - 1; i >= 0; i--) {
       days.push({
         dayNumber: daysInPrevMonth - i,
@@ -129,7 +120,6 @@ export default function DateTimePickerPopover({
       });
     }
 
-    // Current month days
     for (let i = 1; i <= daysInCurrentMonth; i++) {
       days.push({
         dayNumber: i,
@@ -138,7 +128,6 @@ export default function DateTimePickerPopover({
       });
     }
 
-    // Next month spillover to complete 35 or 42 cells
     const remaining = (7 - (days.length % 7)) % 7;
     for (let i = 1; i <= remaining; i++) {
       days.push({
@@ -151,7 +140,6 @@ export default function DateTimePickerPopover({
     return days;
   }, [navYear, navMonth]);
 
-  // Presets
   const handlePresetNow = () => {
     const now = new Date();
     setSelectedDate(now);
@@ -175,7 +163,6 @@ export default function DateTimePickerPopover({
     setViewMode("date");
   };
 
-  // Select day
   const handleSelectDay = (dayObj) => {
     const newDate = new Date(dayObj.date);
     newDate.setHours(selectedDate.getHours());
@@ -184,10 +171,9 @@ export default function DateTimePickerPopover({
     newDate.setMilliseconds(0);
     setSelectedDate(newDate);
     onChange(newDate);
-    setViewMode("time"); // Exact TradeFXBook flow: day selection switches to Set Time
+    setViewMode("time");
   };
 
-  // Time adjustment handlers
   const adjustHour = (delta) => {
     const updated = new Date(selectedDate);
     let h = updated.getHours() + delta;
@@ -248,14 +234,14 @@ export default function DateTimePickerPopover({
         </label>
       )}
 
-      {/* Input Trigger Button matching Screenshot 4 & 5 */}
+      {/* Input Trigger Button */}
       <button
         type="button"
         disabled={disabled}
         onClick={() => setIsOpen(!isOpen)}
         className={`w-full h-11 px-3.5 rounded-xl border flex items-center justify-between text-left transition-all ${
           isOpen
-            ? "border-blue-500 ring-2 ring-blue-500/20 bg-white dark:bg-[#121622]"
+            ? "border-emerald-500 ring-2 ring-emerald-500/20 bg-white dark:bg-[#121622]"
             : "border-black/[0.08] dark:border-white/[0.12] bg-white/70 dark:bg-white/[0.04] hover:border-black/20 dark:hover:border-white/20"
         } ${disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
       >
@@ -284,38 +270,38 @@ export default function DateTimePickerPopover({
         )}
       </button>
 
-      {/* Popover Dropdown matching Screenshot 4 & 5 */}
+      {/* Popover Dropdown */}
       {isOpen && (
         <div className="absolute top-full left-0 mt-2 z-[9999] w-[320px] rounded-3xl bg-white dark:bg-[#121622] border border-black/[0.08] dark:border-white/[0.12] shadow-[0_20px_60px_rgba(0,0,0,0.18)] dark:shadow-[0_25px_70px_rgba(0,0,0,0.7)] backdrop-blur-2xl p-4 animate-in fade-in zoom-in-95 duration-150 select-none">
           {viewMode === "date" ? (
-            /* ──────── DATE SELECTION VIEW (Screenshot 4) ──────── */
+            /* ──────── DATE SELECTION VIEW ──────── */
             <div>
               {/* Presets Row: Now, Yesterday, Clear */}
               <div className="grid grid-cols-3 gap-2 mb-4">
                 <button
                   type="button"
                   onClick={handlePresetNow}
-                  className="py-1.5 px-3 rounded-xl text-xs font-semibold bg-neutral-100 dark:bg-white/[0.06] hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-600/20 dark:hover:text-blue-400 text-neutral-700 dark:text-neutral-300 transition-colors cursor-pointer text-center"
+                  className="py-1.5 px-3 rounded-xl text-xs font-semibold bg-neutral-100 dark:bg-white/[0.06] hover:bg-emerald-500/10 hover:text-emerald-600 dark:hover:bg-emerald-500/20 dark:hover:text-emerald-400 text-neutral-700 dark:text-neutral-300 transition-colors cursor-pointer text-center"
                 >
                   Now
                 </button>
                 <button
                   type="button"
                   onClick={handlePresetYesterday}
-                  className="py-1.5 px-3 rounded-xl text-xs font-semibold bg-neutral-100 dark:bg-white/[0.06] hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-600/20 dark:hover:text-blue-400 text-neutral-700 dark:text-neutral-300 transition-colors cursor-pointer text-center"
+                  className="py-1.5 px-3 rounded-xl text-xs font-semibold bg-neutral-100 dark:bg-white/[0.06] hover:bg-emerald-500/10 hover:text-emerald-600 dark:hover:bg-emerald-500/20 dark:hover:text-emerald-400 text-neutral-700 dark:text-neutral-300 transition-colors cursor-pointer text-center"
                 >
                   Yesterday
                 </button>
                 <button
                   type="button"
                   onClick={handleClear}
-                  className="py-1.5 px-3 rounded-xl text-xs font-semibold bg-neutral-100 dark:bg-white/[0.06] hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-600/20 dark:hover:text-rose-400 text-neutral-700 dark:text-neutral-300 transition-colors cursor-pointer text-center"
+                  className="py-1.5 px-3 rounded-xl text-xs font-semibold bg-neutral-100 dark:bg-white/[0.06] hover:bg-rose-500/10 hover:text-rose-600 dark:hover:bg-rose-500/20 dark:hover:text-rose-400 text-neutral-700 dark:text-neutral-300 transition-colors cursor-pointer text-center"
                 >
                   Clear
                 </button>
               </div>
 
-              {/* Month Header: < Oct 2026 > */}
+              {/* Month Header */}
               <div className="flex items-center justify-between mb-3 px-1">
                 <button
                   type="button"
@@ -336,7 +322,7 @@ export default function DateTimePickerPopover({
                 </button>
               </div>
 
-              {/* Weekday Names Header (SU MO TU WE TH FR SA) */}
+              {/* Weekday Names Header */}
               <div className="grid grid-cols-7 mb-2 text-center">
                 {["SU", "MO", "TU", "WE", "TH", "FR", "SA"].map((d) => (
                   <span key={d} className="text-[10px] font-bold text-neutral-400 dark:text-neutral-500">
@@ -358,7 +344,7 @@ export default function DateTimePickerPopover({
                       onClick={() => handleSelectDay(dObj)}
                       className={`relative w-8 h-8 mx-auto flex items-center justify-center text-xs font-semibold rounded-full transition-all cursor-pointer ${
                         sel
-                          ? "bg-blue-600 text-white shadow-md shadow-blue-500/30 font-bold"
+                          ? "bg-emerald-500 text-white shadow-md shadow-emerald-500/30 font-bold"
                           : dObj.isCurrentMonth
                           ? "text-neutral-800 dark:text-neutral-200 hover:bg-black/5 dark:hover:bg-white/10"
                           : "text-neutral-300 dark:text-neutral-600 hover:bg-black/5 dark:hover:bg-white/5"
@@ -366,20 +352,20 @@ export default function DateTimePickerPopover({
                     >
                       <span>{dObj.dayNumber}</span>
                       {tod && !sel && (
-                        <span className="absolute bottom-1 w-1 h-1 rounded-full bg-blue-500" />
+                        <span className="absolute bottom-1 w-1 h-1 rounded-full bg-emerald-500" />
                       )}
                     </button>
                   );
                 })}
               </div>
 
-              {/* Optional footer link to switch to time mode if already selected */}
+              {/* Adjust time footer */}
               {parsedDate && (
                 <div className="mt-3 pt-2.5 border-t border-black/[0.06] dark:border-white/[0.08] flex justify-end">
                   <button
                     type="button"
                     onClick={() => setViewMode("time")}
-                    className="text-xs font-medium text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 cursor-pointer"
+                    className="text-xs font-medium text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1 cursor-pointer"
                   >
                     <Clock className="w-3.5 h-3.5" /> Adjust Time
                   </button>
@@ -387,13 +373,13 @@ export default function DateTimePickerPopover({
               )}
             </div>
           ) : (
-            /* ──────── TIME SELECTION VIEW (Screenshot 5) ──────── */
+            /* ──────── TIME SELECTION VIEW ──────── */
             <div>
-              {/* Back to Calendar Header: < 📅 October 28th, 2026 */}
+              {/* Back to Calendar Header */}
               <button
                 type="button"
                 onClick={() => setViewMode("date")}
-                className="flex items-center gap-2 text-xs font-semibold text-neutral-800 dark:text-neutral-200 hover:text-blue-600 dark:hover:text-blue-400 transition-colors mb-3 cursor-pointer"
+                className="flex items-center gap-2 text-xs font-semibold text-neutral-800 dark:text-neutral-200 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors mb-3 cursor-pointer"
               >
                 <div className="p-1 rounded-lg border border-black/[0.08] dark:border-white/[0.1] bg-neutral-50 dark:bg-white/[0.04]">
                   <ChevronLeft className="w-3.5 h-3.5" />
@@ -404,7 +390,7 @@ export default function DateTimePickerPopover({
 
               <div className="border-t border-black/[0.06] dark:border-white/[0.08] my-3" />
 
-              {/* Subtitle: 🕒 Set Time */}
+              {/* Subtitle */}
               <div className="flex items-center justify-center gap-1.5 text-xs font-medium text-neutral-500 dark:text-neutral-400 mb-4">
                 <Clock className="w-3.5 h-3.5" />
                 <span>Set Time</span>
@@ -412,7 +398,6 @@ export default function DateTimePickerPopover({
 
               {/* Hour & Minute Spinners with AM/PM Pill */}
               <div className="flex items-center justify-center gap-4 py-2">
-                {/* Hour Column */}
                 <div className="flex flex-col items-center">
                   <button
                     type="button"
@@ -435,7 +420,6 @@ export default function DateTimePickerPopover({
 
                 <span className="text-2xl font-bold text-neutral-400 dark:text-neutral-500 pb-2">:</span>
 
-                {/* Minute Column */}
                 <div className="flex flex-col items-center">
                   <button
                     type="button"
@@ -456,7 +440,6 @@ export default function DateTimePickerPopover({
                   </button>
                 </div>
 
-                {/* AM / PM Toggle Pill */}
                 <div className="ml-2">
                   <button
                     type="button"
@@ -468,7 +451,7 @@ export default function DateTimePickerPopover({
                 </div>
               </div>
 
-              {/* Done Button (Screenshot 5) */}
+              {/* Done Button */}
               <button
                 type="button"
                 onClick={() => {
@@ -476,7 +459,7 @@ export default function DateTimePickerPopover({
                   setIsOpen(false);
                   setViewMode("date");
                 }}
-                className="w-full mt-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-2xl transition-all shadow-md shadow-blue-500/25 active:scale-[0.98] flex items-center justify-center gap-1.5 text-sm cursor-pointer"
+                className="w-full mt-5 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-white font-semibold rounded-2xl transition-all shadow-md shadow-emerald-500/25 active:scale-[0.98] flex items-center justify-center gap-1.5 text-sm cursor-pointer"
               >
                 <Check className="w-4 h-4 stroke-[2.5]" /> Done
               </button>

@@ -28,7 +28,6 @@ export default function MonthlyPnlCalendar({ trades = [], onTradeClick }) {
     trades.forEach((t) => {
       const d = t.entry_date || t.date;
       if (!d) return;
-      // Extract YYYY-MM-DD
       const dateKey = d.slice(0, 10);
       if (!map[dateKey]) map[dateKey] = [];
       map[dateKey].push(t);
@@ -68,8 +67,7 @@ export default function MonthlyPnlCalendar({ trades = [], onTradeClick }) {
   // Build calendar weeks (8 columns: M, T, W, T, F, S, S, Weekly)
   const calendarWeeks = useMemo(() => {
     const firstDay = new Date(year, month, 1);
-    // Sunday is 0; Monday should be 0 in Europe/TradeFXBook (M, T, W, T, F, S, S)
-    const dayOfWeek = (firstDay.getDay() + 6) % 7; // Monday = 0, Sunday = 6
+    const dayOfWeek = (firstDay.getDay() + 6) % 7; // Monday = 0
     const daysInMonth = new Date(year, month + 1, 0).getDate();
 
     const weeks = [];
@@ -133,7 +131,6 @@ export default function MonthlyPnlCalendar({ trades = [], onTradeClick }) {
       weeks.push(currentWeek);
     }
 
-    // Calculate weekly summary for each week row
     return weeks.map((week) => {
       let weekR = 0;
       let weekPnl = 0;
@@ -176,7 +173,7 @@ export default function MonthlyPnlCalendar({ trades = [], onTradeClick }) {
 
   return (
     <div className="rounded-3xl p-6 bg-white dark:bg-[#121622] border border-black/[0.06] dark:border-white/[0.08] shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] flex flex-col justify-between h-full relative">
-      {/* ── CARD HEADER (Screenshot 1 & 3) ── */}
+      {/* ── CARD HEADER ── */}
       <div className="flex items-center justify-between mb-5 flex-wrap gap-2">
         <h2 className="text-[15px] font-bold text-neutral-900 dark:text-white">
           Monthly P&L
@@ -185,7 +182,16 @@ export default function MonthlyPnlCalendar({ trades = [], onTradeClick }) {
         <div className="flex items-center gap-2">
           {/* Monthly Value Badge */}
           <span className="text-xs font-semibold px-2.5 py-1 rounded-xl bg-neutral-100 dark:bg-white/[0.06] text-neutral-700 dark:text-neutral-300">
-            Monthly: <span className={monthlyStats.netR >= 0 ? "text-blue-600 dark:text-blue-400 font-bold" : "text-rose-600 dark:text-rose-400 font-bold"}>{monthlyStats.displayVal}</span>
+            Monthly:{" "}
+            <span
+              className={
+                monthlyStats.netR >= 0
+                  ? "text-emerald-500 dark:text-emerald-400 font-bold font-mono"
+                  : "text-rose-500 dark:text-rose-400 font-bold font-mono"
+              }
+            >
+              {monthlyStats.displayVal}
+            </span>
           </span>
 
           {/* Month Navigation: < October 2026 > */}
@@ -211,7 +217,7 @@ export default function MonthlyPnlCalendar({ trades = [], onTradeClick }) {
         </div>
       </div>
 
-      {/* ── 8-COLUMN CALENDAR GRID (Screenshot 1 & 3) ── */}
+      {/* ── 8-COLUMN CALENDAR GRID ── */}
       <div className="space-y-1.5 flex-1">
         {/* Column Headers (M T W T F S S Weekly) */}
         <div className="grid grid-cols-8 gap-1.5 text-center mb-1">
@@ -243,7 +249,7 @@ export default function MonthlyPnlCalendar({ trades = [], onTradeClick }) {
                   className={`min-h-[46px] rounded-xl p-1.5 flex flex-col justify-between transition-all select-none ${
                     d.isCurrentMonth
                       ? d.hasTrades
-                        ? "bg-neutral-100/90 dark:bg-white/[0.06] border border-black/[0.08] dark:border-white/[0.1] hover:border-blue-500/50 hover:shadow-sm cursor-pointer"
+                        ? "bg-neutral-100/90 dark:bg-white/[0.06] border border-black/[0.08] dark:border-white/[0.1] hover:border-emerald-500/50 hover:shadow-sm cursor-pointer"
                         : "bg-neutral-50/70 dark:bg-white/[0.02] border border-black/[0.03] dark:border-white/[0.04]"
                       : "opacity-25 bg-transparent border border-transparent"
                   }`}
@@ -259,27 +265,27 @@ export default function MonthlyPnlCalendar({ trades = [], onTradeClick }) {
                     {d.dayNumber}
                   </span>
 
-                  {/* Day Status Indicators (Screenshots 1 & 3) */}
+                  {/* Day Status Indicators */}
                   <div className="flex items-center justify-center gap-1 mt-auto">
-                    {/* Today indicator: small blue dot under day number */}
+                    {/* Today indicator: small emerald dot */}
                     {isTodayCell && !d.hasTrades && (
-                      <span className="w-1.5 h-1.5 rounded-full bg-blue-500 inline-block shadow-sm" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block shadow-sm" />
                     )}
 
-                    {/* Trade Result Dot: Blue for profit, Red for loss */}
+                    {/* Trade Result Dot: Emerald for profit, Rose for loss */}
                     {d.hasTrades && (
                       <div className="flex items-center gap-1">
                         <span
                           className={`w-2 h-2 rounded-full inline-block ${
                             d.isProfit
-                              ? "bg-blue-600 dark:bg-blue-400 shadow-sm shadow-blue-500/50"
+                              ? "bg-emerald-500 dark:bg-emerald-400 shadow-sm shadow-emerald-500/50"
                               : "bg-rose-500 dark:bg-rose-400 shadow-sm shadow-rose-500/50"
                           }`}
                         />
                         <span
                           className={`text-[10px] font-bold font-mono hidden md:inline-block ${
                             d.isProfit
-                              ? "text-blue-600 dark:text-blue-400"
+                              ? "text-emerald-600 dark:text-emerald-400"
                               : "text-rose-600 dark:text-rose-400"
                           }`}
                         >
@@ -292,7 +298,7 @@ export default function MonthlyPnlCalendar({ trades = [], onTradeClick }) {
               );
             })}
 
-            {/* 8th Column: Weekly Summary Card (Screenshot 1 & 3) */}
+            {/* 8th Column: Weekly Summary Card */}
             <div className="min-h-[46px] rounded-xl p-1.5 bg-neutral-100/60 dark:bg-white/[0.03] border border-black/[0.04] dark:border-white/[0.05] flex flex-col justify-center items-center text-center">
               <span className="text-[9px] font-extrabold uppercase tracking-tight text-neutral-400 dark:text-neutral-500">
                 Weekly
@@ -300,7 +306,7 @@ export default function MonthlyPnlCalendar({ trades = [], onTradeClick }) {
               <span
                 className={`text-[11px] font-bold font-mono my-0.5 ${
                   weekObj.weeklyStat.isProfit
-                    ? "text-blue-600 dark:text-blue-400"
+                    ? "text-emerald-600 dark:text-emerald-400"
                     : weekObj.weeklyStat.isLoss
                     ? "text-rose-600 dark:text-rose-400"
                     : "text-neutral-600 dark:text-neutral-400"
@@ -316,10 +322,10 @@ export default function MonthlyPnlCalendar({ trades = [], onTradeClick }) {
         ))}
       </div>
 
-      {/* ── BOTTOM LEGEND (Screenshot 1 & 3) ── */}
+      {/* ── BOTTOM LEGEND ── */}
       <div className="mt-4 pt-3 border-t border-black/[0.05] dark:border-white/[0.06] flex items-center justify-center gap-6 text-[11px] font-medium text-neutral-500 dark:text-neutral-400">
         <div className="flex items-center gap-1.5">
-          <span className="w-2 h-2 rounded-full bg-blue-600 dark:bg-blue-400 inline-block" />
+          <span className="w-2 h-2 rounded-full bg-emerald-500 dark:bg-emerald-400 inline-block" />
           <span>Profit</span>
         </div>
         <div className="flex items-center gap-1.5">
@@ -338,14 +344,14 @@ export default function MonthlyPnlCalendar({ trades = [], onTradeClick }) {
               </h3>
               <p className="text-[11px] text-neutral-500 dark:text-neutral-400">
                 Net Day Performance:{" "}
-                <span className={selectedDayInfo.isProfit ? "text-blue-600 font-bold" : "text-rose-500 font-bold"}>
+                <span className={selectedDayInfo.isProfit ? "text-emerald-500 font-bold font-mono" : "text-rose-500 font-bold font-mono"}>
                   {selectedDayInfo.netR >= 0 ? "+" : ""}{selectedDayInfo.netR.toFixed(2)}R
                 </span>
               </p>
             </div>
             <button
               onClick={() => setSelectedDayInfo(null)}
-              className="p-1 rounded-full text-neutral-400 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-white/[0.08] transition-colors"
+              className="p-1 rounded-full text-neutral-400 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-white/[0.08] transition-colors cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
@@ -362,13 +368,13 @@ export default function MonthlyPnlCalendar({ trades = [], onTradeClick }) {
                   onClick={() => {
                     if (onTradeClick) onTradeClick(t);
                   }}
-                  className="p-3 rounded-2xl border border-black/[0.06] dark:border-white/[0.08] bg-neutral-50 dark:bg-white/[0.03] hover:border-blue-500/30 transition-all flex items-center justify-between cursor-pointer"
+                  className="p-3 rounded-2xl border border-black/[0.06] dark:border-white/[0.08] bg-neutral-50 dark:bg-white/[0.03] hover:border-emerald-500/30 transition-all flex items-center justify-between cursor-pointer"
                 >
                   <div className="flex items-center gap-3">
                     <div
                       className={`p-2 rounded-xl ${
                         t.direction === "LONG"
-                          ? "bg-blue-500/10 text-blue-600 dark:text-blue-400"
+                          ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
                           : "bg-rose-500/10 text-rose-500 dark:text-rose-400"
                       }`}
                     >
@@ -400,7 +406,7 @@ export default function MonthlyPnlCalendar({ trades = [], onTradeClick }) {
                     <span
                       className={`text-xs font-bold font-mono px-2 py-0.5 rounded-lg ${
                         isWin
-                          ? "bg-blue-500/10 text-blue-600 dark:text-blue-400"
+                          ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
                           : "bg-rose-500/10 text-rose-600 dark:text-rose-400"
                       }`}
                     >

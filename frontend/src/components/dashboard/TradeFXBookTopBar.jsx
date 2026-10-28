@@ -4,19 +4,18 @@ import {
   Search,
   Plus,
   Clock,
-  Bell,
-  Sun,
-  Moon,
   PenSquare,
   RefreshCw,
   BarChart2,
-  PlusCircle,
-  User,
 } from "lucide-react";
 import ThemeToggle from "../ThemeToggle";
 import NotificationBell from "../NotificationBell";
+import AccountFilter from "../AccountFilter";
 
 export default function TradeFXBookTopBar({
+  trades = [],
+  selectedAccount = "",
+  onSelectAccount,
   onOpenAddTradeModal,
   onOpenSearch,
 }) {
@@ -28,7 +27,14 @@ export default function TradeFXBookTopBar({
 
   const userEmail = localStorage.getItem("userEmail") || "Trader";
 
-  // Live real-time clock updating every second (e.g. 01:14:37 PM)
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return "Good morning";
+    if (hour < 18) return "Good afternoon";
+    return "Good evening";
+  };
+
+  // Live real-time clock updating every second (e.g. 08:04:40 PM)
   useEffect(() => {
     const updateTime = () => {
       const now = new Date();
@@ -45,6 +51,7 @@ export default function TradeFXBookTopBar({
           weekday: "short",
           month: "short",
           day: "numeric",
+          year: "numeric",
         })
       );
     };
@@ -68,11 +75,14 @@ export default function TradeFXBookTopBar({
   }, [isQuickActionsOpen]);
 
   return (
-    <div className="w-full flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b border-black/[0.05] dark:border-white/[0.06]">
-      {/* ── LEFT: Title & Live Date (Screenshots 1 & 2) ── */}
-      <div>
+    <div className="w-full flex flex-col xl:flex-row xl:items-center justify-between gap-4 pb-3 border-b border-black/[0.06] dark:border-white/[0.08]">
+      {/* ── LEFT: Welcome {Name} & Live Date ── */}
+      <div className="shrink-0">
         <h1 className="text-2xl font-bold text-neutral-900 dark:text-white tracking-tight">
-          Dashboard
+          {getGreeting()},{" "}
+          <span className="text-emerald-500 font-semibold">
+            {userEmail.split("@")[0] || "Trader"}
+          </span>
         </h1>
         <p className="text-xs font-medium text-neutral-500 dark:text-neutral-400 mt-0.5">
           {currentDateStr || "Today"}
@@ -80,7 +90,7 @@ export default function TradeFXBookTopBar({
       </div>
 
       {/* ── CENTER: Search Bar with Ctrl+K ── */}
-      <div className="flex-1 max-w-md mx-auto hidden lg:block">
+      <div className="flex-1 max-w-sm mx-auto hidden 2xl:block">
         <button
           type="button"
           onClick={onOpenSearch}
@@ -96,23 +106,25 @@ export default function TradeFXBookTopBar({
         </button>
       </div>
 
-      {/* ── RIGHT: Action Cluster (Screenshots 1 & 2) ── */}
-      <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+      {/* ── RIGHT ACTION CLUSTER (Cleanly aligned horizontally and vertically) ── */}
+      <div className="flex items-center gap-2 sm:gap-2.5 flex-wrap">
         {/* Mobile Search trigger */}
         <button
           type="button"
           onClick={onOpenSearch}
-          className="lg:hidden p-2.5 rounded-2xl border border-black/[0.06] dark:border-white/[0.08] bg-white dark:bg-[#121622] text-neutral-600 dark:text-neutral-300"
+          className="2xl:hidden h-10 w-10 flex items-center justify-center rounded-2xl border border-black/[0.06] dark:border-white/[0.08] bg-white dark:bg-[#121622] text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-white/[0.06]"
         >
           <Search className="w-4 h-4" />
         </button>
 
-        {/* Theme Toggle */}
-        <div className="p-0.5 rounded-2xl bg-white/80 dark:bg-[#121622]/80 border border-black/[0.06] dark:border-white/[0.08] shadow-sm">
-          <ThemeToggle />
-        </div>
+        {/* 1. Account Dropdown Switcher (Positioned strictly to the left of the '+' symbol) */}
+        <AccountFilter
+          trades={trades}
+          selectedAccount={selectedAccount}
+          onChange={onSelectAccount}
+        />
 
-        {/* Quick Action (+) Button & Dropdown Menu (Screenshot 2) */}
+        {/* 2. Quick Action (+) Button & Dropdown Menu */}
         <div className="relative" ref={dropdownRef}>
           <button
             type="button"
@@ -123,7 +135,6 @@ export default function TradeFXBookTopBar({
             <Plus className={`w-5 h-5 transition-transform duration-200 ${isQuickActionsOpen ? "rotate-45" : ""}`} />
           </button>
 
-          {/* Quick Actions Dropdown Menu (Screenshot 2) */}
           {isQuickActionsOpen && (
             <div className="absolute right-0 top-full mt-2 w-56 rounded-2xl bg-white dark:bg-[#121622] border border-black/[0.08] dark:border-white/[0.12] shadow-[0_20px_50px_rgba(0,0,0,0.15)] dark:shadow-[0_25px_60px_rgba(0,0,0,0.7)] backdrop-blur-2xl p-2 z-50 animate-in fade-in zoom-in-95 duration-150">
               <div className="px-3 py-2 text-[11px] font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-wider border-b border-black/[0.05] dark:border-white/[0.06] mb-1">
@@ -136,9 +147,9 @@ export default function TradeFXBookTopBar({
                   setIsQuickActionsOpen(false);
                   if (onOpenAddTradeModal) onOpenAddTradeModal();
                 }}
-                className="w-full px-3 py-2.5 rounded-xl text-xs font-semibold text-neutral-700 dark:text-neutral-200 hover:bg-blue-500/10 hover:text-blue-600 dark:hover:text-blue-400 flex items-center gap-2.5 transition-colors cursor-pointer text-left"
+                className="w-full px-3 py-2.5 rounded-xl text-xs font-semibold text-neutral-700 dark:text-neutral-200 hover:bg-emerald-500/10 hover:text-emerald-600 dark:hover:text-emerald-400 flex items-center gap-2.5 transition-colors cursor-pointer text-left"
               >
-                <Plus className="w-4 h-4 text-blue-500" />
+                <Plus className="w-4 h-4 text-emerald-500" />
                 <span>Add Manual Trade</span>
               </button>
 
@@ -148,9 +159,9 @@ export default function TradeFXBookTopBar({
                   setIsQuickActionsOpen(false);
                   navigate("/trades");
                 }}
-                className="w-full px-3 py-2.5 rounded-xl text-xs font-semibold text-neutral-700 dark:text-neutral-200 hover:bg-blue-500/10 hover:text-blue-600 dark:hover:text-blue-400 flex items-center gap-2.5 transition-colors cursor-pointer text-left"
+                className="w-full px-3 py-2.5 rounded-xl text-xs font-semibold text-neutral-700 dark:text-neutral-200 hover:bg-emerald-500/10 hover:text-emerald-600 dark:hover:text-emerald-400 flex items-center gap-2.5 transition-colors cursor-pointer text-left"
               >
-                <PenSquare className="w-4 h-4 text-neutral-500" />
+                <PenSquare className="w-4 h-4 text-neutral-400" />
                 <span>New Journal Entry</span>
               </button>
 
@@ -160,9 +171,9 @@ export default function TradeFXBookTopBar({
                   setIsQuickActionsOpen(false);
                   navigate("/admin/setup");
                 }}
-                className="w-full px-3 py-2.5 rounded-xl text-xs font-semibold text-neutral-700 dark:text-neutral-200 hover:bg-blue-500/10 hover:text-blue-600 dark:hover:text-blue-400 flex items-center gap-2.5 transition-colors cursor-pointer text-left"
+                className="w-full px-3 py-2.5 rounded-xl text-xs font-semibold text-neutral-700 dark:text-neutral-200 hover:bg-emerald-500/10 hover:text-emerald-600 dark:hover:text-emerald-400 flex items-center gap-2.5 transition-colors cursor-pointer text-left"
               >
-                <RefreshCw className="w-4 h-4 text-neutral-500" />
+                <RefreshCw className="w-4 h-4 text-neutral-400" />
                 <span>Sync MT5 Account</span>
               </button>
 
@@ -172,42 +183,47 @@ export default function TradeFXBookTopBar({
                   setIsQuickActionsOpen(false);
                   navigate("/analytics");
                 }}
-                className="w-full px-3 py-2.5 rounded-xl text-xs font-semibold text-neutral-700 dark:text-neutral-200 hover:bg-blue-500/10 hover:text-blue-600 dark:hover:text-blue-400 flex items-center gap-2.5 transition-colors cursor-pointer text-left"
+                className="w-full px-3 py-2.5 rounded-xl text-xs font-semibold text-neutral-700 dark:text-neutral-200 hover:bg-emerald-500/10 hover:text-emerald-600 dark:hover:text-emerald-400 flex items-center gap-2.5 transition-colors cursor-pointer text-left"
               >
-                <BarChart2 className="w-4 h-4 text-neutral-500" />
+                <BarChart2 className="w-4 h-4 text-neutral-400" />
                 <span>View Analytics</span>
               </button>
             </div>
           )}
         </div>
 
-        {/* Live Real-Time Clock Badge (Screenshot 1 & 2) */}
-        <div className="h-10 px-3.5 rounded-2xl border border-black/[0.06] dark:border-white/[0.08] bg-white/80 dark:bg-[#121622]/80 text-neutral-700 dark:text-neutral-300 flex items-center gap-2 text-xs font-mono font-bold shadow-sm select-none">
+        {/* 3. Live Clock Badge */}
+        <div className="h-10 px-3 rounded-2xl border border-black/[0.06] dark:border-white/[0.08] bg-white/80 dark:bg-[#121622]/80 text-neutral-700 dark:text-neutral-300 flex items-center gap-2 text-xs font-mono font-bold shadow-sm select-none">
           <Clock className="w-3.5 h-3.5 text-neutral-400" />
           <span>{currentTimeStr || "--:--:--"}</span>
         </div>
 
-        {/* Notification Bell */}
-        <div className="p-0.5 rounded-2xl bg-white/80 dark:bg-[#121622]/80 border border-black/[0.06] dark:border-white/[0.08] shadow-sm">
-          <NotificationBell />
-        </div>
-
-        {/* User Profile Badge (Screenshot 1) */}
+        {/* 4. User Profile Badge */}
         <div
           onClick={() => navigate("/profile")}
-          className="flex items-center gap-2 p-1 pl-1.5 pr-2 rounded-2xl bg-white/80 dark:bg-[#121622]/80 border border-black/[0.06] dark:border-white/[0.08] hover:border-blue-500/30 transition-all cursor-pointer shadow-sm"
+          className="h-10 flex items-center gap-2 px-2 rounded-2xl bg-white/80 dark:bg-[#121622]/80 border border-black/[0.06] dark:border-white/[0.08] hover:border-emerald-500/30 transition-all cursor-pointer shadow-sm select-none"
         >
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 text-white flex items-center justify-center font-bold text-xs shadow-inner">
+          <div className="w-6 h-6 rounded-lg bg-gradient-to-tr from-emerald-500 to-teal-500 text-white flex items-center justify-center font-bold text-[11px] shadow-sm">
             {userEmail.charAt(0).toUpperCase()}
           </div>
           <div className="hidden sm:flex flex-col items-start leading-none pr-1">
-            <span className="text-[12px] font-bold text-neutral-800 dark:text-neutral-200 truncate max-w-[90px]">
+            <span className="text-[11px] font-bold text-neutral-800 dark:text-neutral-200 truncate max-w-[80px]">
               {userEmail.split("@")[0]}
             </span>
-            <span className="text-[9px] uppercase font-bold text-blue-600 dark:text-blue-400 mt-0.5">
+            <span className="text-[8px] uppercase font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">
               PRO
             </span>
           </div>
+        </div>
+
+        {/* 5. Notification Bell (Right side of profile icon) */}
+        <div className="h-10 p-0.5 rounded-2xl bg-white/80 dark:bg-[#121622]/80 border border-black/[0.06] dark:border-white/[0.08] shadow-sm flex items-center justify-center">
+          <NotificationBell />
+        </div>
+
+        {/* 6. Theme Switcher (Right side of notification bell) */}
+        <div className="h-10 p-0.5 rounded-2xl bg-white/80 dark:bg-[#121622]/80 border border-black/[0.06] dark:border-white/[0.08] shadow-sm flex items-center justify-center">
+          <ThemeToggle />
         </div>
       </div>
     </div>
