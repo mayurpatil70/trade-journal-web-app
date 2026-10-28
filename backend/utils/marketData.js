@@ -204,7 +204,8 @@ function parseXmlCalendarEvent(ev) {
     if (match[3] === "pm" && hour < 12) hour += 12;
     if (match[3] === "am" && hour === 12) hour = 0;
   }
-  const isoTime = `${String(hour).padStart(2, "0")}:${String(min).padStart(2, "0")}:00-04:00`;
+  // Forex Factory XML event times are in UTC; parse with Z
+  const isoTime = `${String(hour).padStart(2, "0")}:${String(min).padStart(2, "0")}:00Z`;
   const dateIso = `${yyyy}-${mm.padStart(2, "0")}-${dd.padStart(2, "0")}T${isoTime}`;
   return {
     title: ev.title || "",

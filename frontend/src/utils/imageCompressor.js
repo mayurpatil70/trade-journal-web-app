@@ -21,6 +21,16 @@ export async function compressImageFile(file, maxWidth = 1920, maxHeight = 1200,
   }
 
   return new Promise((resolve) => {
+    // 5-second safety timeout: never hang the submission UI if image processing stalls
+    const timeoutTimer = setTimeout(() => {
+      resolve(file);
+    }, 5000);
+
+    const safeResolve = (res) => {
+      clearTimeout(timeoutTimer);
+      resolve(res || file);
+    };
+
     try {
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -45,7 +55,7 @@ export async function compressImageFile(file, maxWidth = 1920, maxHeight = 1200,
             canvas.height = height;
             const ctx = canvas.getContext("2d");
             if (!ctx) {
-              return resolve(file);
+              return safeResolve(file);
             }
 
             ctx.drawImage(img, 0, 0, width, height);
@@ -54,33 +64,45 @@ export async function compressImageFile(file, maxWidth = 1920, maxHeight = 1200,
             const mimeType = "image/webp";
             canvas.toBlob(
               (blob) => {
-                if (!blob || blob.size >= file.size) {
-                  // If compression didn't reduce size, keep original
-                  return resolve(file);
+                try {
+                  if (!blob || blob.size >= file.size) {
+                    // If compression didn't reduce size, keep original
+                    return safeResolve(file);
+                  }
+                  const newName = file.name.replace(/\.[^/.]+$/, "") + ".webp";
+                  let resultFile;
+                  try {
+                    resultFile = new File([blob], newName, {
+                      type: mimeType,
+                      lastModified: Date.now(),
+                    });
+                  } catch (_) {
+                    // Fallback for iOS / WebKit where new File() is unsupported
+                    blob.name = newName;
+                    resultFile = blob;
+                  }
+                  safeResolve(resultFile || file);
+                } catch (toBlobErr) {
+                  console.warn("toBlob error, fallback to original:", toBlobErr);
+                  safeResolve(file);
                 }
-                const newName = file.name.replace(/\.[^/.]+$/, "") + ".webp";
-                const optimizedFile = new File([blob], newName, {
-                  type: mimeType,
-                  lastModified: Date.now(),
-                });
-                resolve(optimizedFile);
               },
               mimeType,
               quality
             );
           } catch (canvasErr) {
             console.warn("Canvas compression failed, using original file:", canvasErr);
-            resolve(file);
+            safeResolve(file);
           }
         };
-        img.onerror = () => resolve(file);
+        img.onerror = () => safeResolve(file);
         img.src = e.target.result;
       };
-      reader.onerror = () => resolve(file);
+      reader.onerror = () => safeResolve(file);
       reader.readAsDataURL(file);
     } catch (err) {
       console.warn("Image compression error:", err);
-      resolve(file);
+      safeResolve(file);
     }
   });
 }

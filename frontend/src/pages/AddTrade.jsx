@@ -725,6 +725,7 @@ export default function AddTrade() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (isSubmitting) return;
 
     if (step !== 6) {
       handleContinue();
@@ -777,8 +778,11 @@ export default function AddTrade() {
         })
       );
 
-      optimizedImages.forEach((img) => {
-        if (img) submitData.append("images", img);
+      optimizedImages.forEach((img, idx) => {
+        if (img) {
+          const filename = img.name || `chart_${idx === 0 ? "entry" : "exit"}.webp`;
+          submitData.append("images", img, filename);
+        }
       });
 
       const uploadConfig = {
@@ -2104,15 +2108,17 @@ export default function AddTrade() {
               <button
                 type="submit"
                 disabled={isSubmitting || (!isEditing && (!images[0] || !images[1]))}
-                className="px-8 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white font-bold text-sm transition-all shadow-lg shadow-emerald-500/30 flex items-center gap-2 disabled:opacity-50 disabled:hover:bg-emerald-500 disabled:cursor-not-allowed"
+                className="min-w-[150px] px-8 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white font-bold text-sm transition-all shadow-lg shadow-emerald-500/30 flex items-center justify-center gap-2 disabled:opacity-50 disabled:hover:bg-emerald-500 disabled:cursor-not-allowed cursor-pointer shrink-0"
               >
                 {isSubmitting ? (
                   <>
-                    <Loader2 className="w-4 h-4 animate-spin" /> {isEditing ? "Updating Trade..." : "Uploading & Saving..."}
+                    <Loader2 className="w-4 h-4 animate-spin shrink-0" />
+                    <span className="whitespace-nowrap">{isEditing ? "Updating Trade..." : "Saving Trade..."}</span>
                   </>
                 ) : (
                   <>
-                    <Save className="w-4 h-4" /> {isEditing ? "Update Trade" : "Save Trade"}
+                    <Save className="w-4 h-4 shrink-0" />
+                    <span className="whitespace-nowrap">{isEditing ? "Update Trade" : "Save Trade"}</span>
                   </>
                 )}
               </button>
