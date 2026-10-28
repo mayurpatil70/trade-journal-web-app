@@ -120,28 +120,25 @@ const ExpandableNavItem = ({ item, currentPath, closeMenu }) => {
 
   return (
     <div className="space-y-1">
+      {/* Parent Pill matching Screenshot 1 */}
       <div
         className={`group relative flex items-center justify-between px-3.5 py-2.5 rounded-2xl transition-all duration-300 font-medium text-[13px] cursor-pointer ${
           isChildActive
-            ? "bg-white dark:bg-white/[0.09] text-blue-600 dark:text-blue-400 font-semibold border border-black/[0.06] dark:border-white/[0.12] shadow-sm"
+            ? "bg-white dark:bg-white/[0.09] text-blue-600 dark:text-blue-400 font-bold border border-black/[0.06] dark:border-white/[0.12] shadow-sm"
             : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white hover:bg-black/[0.035] dark:hover:bg-white/[0.06] border border-transparent"
         }`}
         onClick={() => setIsOpen((prev) => !prev)}
       >
-        {isChildActive && (
-          <span className="absolute left-1.5 top-2.5 bottom-2.5 w-1 rounded-full bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.8)]" />
-        )}
-
         <div className="flex items-center gap-3 pl-1">
           <Icon
             className={`w-[18px] h-[18px] transition-all duration-300 ${
               isChildActive
-                ? "text-blue-600 dark:text-blue-400 drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]"
+                ? "text-blue-600 dark:text-blue-400"
                 : "text-neutral-400 dark:text-neutral-500 group-hover:text-neutral-800 dark:group-hover:text-neutral-200"
             }`}
             strokeWidth={isChildActive ? 2.4 : 2}
           />
-          <span className="tracking-tight">{item.label}</span>
+          <span className="tracking-tight text-[13px]">{item.label}</span>
         </div>
 
         <button
@@ -150,19 +147,20 @@ const ExpandableNavItem = ({ item, currentPath, closeMenu }) => {
             e.stopPropagation();
             setIsOpen((prev) => !prev);
           }}
-          className="p-1 rounded-lg text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200"
+          className="w-6 h-6 rounded-lg flex items-center justify-center bg-blue-500/10 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 transition-colors hover:bg-blue-500/20"
           aria-label="Toggle analysis menu"
         >
           {isOpen ? (
-            <ChevronUp className="w-4 h-4 text-blue-500" />
+            <ChevronUp className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" strokeWidth={2.5} />
           ) : (
-            <ChevronDown className="w-4 h-4" />
+            <ChevronDown className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" strokeWidth={2.5} />
           )}
         </button>
       </div>
 
+      {/* Sub-items matching Screenshot 1 */}
       {isOpen && (
-        <div className="pl-4 space-y-1 pt-0.5">
+        <div className="pl-3 space-y-1 pt-0.5">
           {item.children.map((sub) => {
             const isSubActive =
               currentPath === sub.to || currentPath.startsWith(sub.to + "/");
@@ -172,10 +170,10 @@ const ExpandableNavItem = ({ item, currentPath, closeMenu }) => {
                 key={sub.to}
                 to={sub.to}
                 onClick={closeMenu}
-                className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all ${
+                className={`flex items-center gap-2.5 px-3.5 py-2 rounded-xl text-[12.5px] font-semibold transition-all ${
                   isSubActive
-                    ? "bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 shadow-sm"
-                    : "text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white hover:bg-black/[0.03] dark:hover:bg-white/[0.04]"
+                    ? "bg-white dark:bg-white/[0.09] text-neutral-900 dark:text-white font-bold border border-black/[0.05] dark:border-white/[0.1] shadow-sm"
+                    : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white hover:bg-black/[0.03] dark:hover:bg-white/[0.04]"
                 }`}
               >
                 <SubIcon
@@ -298,9 +296,16 @@ export default function MainLayout() {
     {
       label: "Analyze",
       items: [
-        { to: "/analytics", icon: Activity, label: "Strategy Analytics" },
-        { to: "/psychology", icon: User, label: "Psychology Lab" },
-        { to: "/mistakes", icon: ShieldCheck, label: "Mistake Lab" },
+        {
+          label: "Analysis",
+          to: "/analysis/performance",
+          icon: BarChart2,
+          isExpandable: true,
+          children: [
+            { to: "/analysis/performance", icon: TrendingUp, label: "Performance" },
+            { to: "/analysis/trades", icon: FileText, label: "Trade Analysis" },
+          ],
+        },
       ],
     },
     {
@@ -456,20 +461,29 @@ export default function MainLayout() {
                 {section.label}
               </p>
               <div className="space-y-1">
-                {section.items.map((item) => (
-                  <NavItem
-                    key={item.to}
-                    to={item.to}
-                    icon={item.icon}
-                    label={item.label}
-                    isBeta={item.isBeta}
-                    isDisabled={item.isDisabled}
-                    isLocked={!isAdmin && item.requiresAdmin}
-                    onLockedClick={() => setShowLockPopup(true)}
-                    currentPath={location.pathname}
-                    onClick={closeMenu}
-                  />
-                ))}
+                {section.items.map((item) =>
+                  item.isExpandable ? (
+                    <ExpandableNavItem
+                      key={item.label}
+                      item={item}
+                      currentPath={location.pathname}
+                      closeMenu={closeMenu}
+                    />
+                  ) : (
+                    <NavItem
+                      key={item.to}
+                      to={item.to}
+                      icon={item.icon}
+                      label={item.label}
+                      isBeta={item.isBeta}
+                      isDisabled={item.isDisabled}
+                      isLocked={!isAdmin && item.requiresAdmin}
+                      onLockedClick={() => setShowLockPopup(true)}
+                      currentPath={location.pathname}
+                      onClick={closeMenu}
+                    />
+                  )
+                )}
               </div>
             </div>
           ))}

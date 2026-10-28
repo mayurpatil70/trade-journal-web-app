@@ -5,6 +5,9 @@ import TradeFXBookKpiCards from "../components/dashboard/TradeFXBookKpiCards";
 import PerformanceEquityCurve from "../components/dashboard/PerformanceEquityCurve";
 import MonthlyPnlCalendar from "../components/dashboard/MonthlyPnlCalendar";
 import TradeFXBookAddTradeModal from "../components/dashboard/TradeFXBookAddTradeModal";
+import OnboardingRulesModal from "../components/guardrails/OnboardingRulesModal";
+import RuleBreachAlert from "../components/guardrails/RuleBreachAlert";
+import { validateTradeAgainstRules } from "../utils/guardrailValidator";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
 import { mark3DLoaderShown } from "../utils/navigationState";
@@ -102,10 +105,35 @@ export default function Dashboard() {
   const [isAddTradeModalOpen, setIsAddTradeModalOpen] = useState(false);
   const navigate = useNavigate();
 
+  const userId = localStorage.getItem("userId") || localStorage.getItem("userEmail") || "trader";
+  const [showOnboardingRules, setShowOnboardingRules] = useState(() => {
+    const onboarded =
+      localStorage.getItem(`rules_onboarded_${userId}`) === "true" ||
+      localStorage.getItem("rules_onboarded") === "true";
+    return !onboarded;
+  });
+
+  const [disciplineRules, setDisciplineRules] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem(`trader_discipline_${userId}`) || "{}");
+    } catch (e) {
+      return {};
+    }
+  });
+
+  // Check 24-hour timeline and daily loss guardrail violations
+  const dailyBreach = useMemo(() => {
+    return validateTradeAgainstRules({
+      trade: {},
+      rules: disciplineRules,
+      allTrades,
+    });
+  }, [disciplineRules, allTrades]);
+
   useEffect(() => {
-    const userId = localStorage.getItem("userId") || localStorage.getItem("userEmail");
+    const activeUserId = localStorage.getItem("userId") || localStorage.getItem("userEmail");
     const isOnboardingCompleted =
-      localStorage.getItem(`onboarding_completed_${userId}`) === "true" ||
+      localStorage.getItem(`onboarding_completed_${activeUserId}`) === "true" ||
       localStorage.getItem("onboarding_completed") === "true";
 
     if (!isOnboardingCompleted) {
@@ -223,6 +251,11 @@ export default function Dashboard() {
           window.dispatchEvent(new KeyboardEvent("keydown", { key: "k", metaKey: true }));
         }}
       />
+
+      {/* ── REAL-TIME GUARDRAIL BREACH ALERT (Top Red Card) ── */}
+      {dailyBreach.isBreached && (
+        <RuleBreachAlert breach={dailyBreach.primaryBreach} />
+      )}
 
       {/* ── 2. TRADEFXBOOK 4 KPI CARDS (Screenshot 1) ── */}
       <TradeFXBookKpiCards stats={stats} trades={trades} />
@@ -466,6 +499,17 @@ export default function Dashboard() {
         onClose={() => setIsAddTradeModalOpen(false)}
         onTradeAdded={() => {
           fetchTrades();
+        }}
+        trades={allTrades}
+      />
+
+      {/* ── 8. MANDATORY ONBOARDING GUARDRAILS MODAL (New User First Login) ── */}
+      <OnboardingRulesModal
+        isOpen={showOnboardingRules}
+        userId={userId}
+        onComplete={(savedRules) => {
+          setShowOnboardingRules(false);
+          setDisciplineRules(savedRules);
         }}
       />
     </div>

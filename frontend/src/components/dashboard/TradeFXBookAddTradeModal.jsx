@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { createPortal } from "react-dom";
 import {
   X,
@@ -11,14 +12,32 @@ import {
   Check,
 } from "lucide-react";
 import DateTimePickerPopover from "../ui/DateTimePickerPopover";
+import { validateTradeAgainstRules } from "../../utils/guardrailValidator";
+import RuleBreachAlert from "../guardrails/RuleBreachAlert";
 import api from "../../api/axios";
 
-export default function TradeFXBookAddTradeModal({ isOpen, onClose, onTradeAdded }) {
+export default function TradeFXBookAddTradeModal({ isOpen, onClose, onTradeAdded, trades = [] }) {
+  const navigate = useNavigate();
+  const userId = localStorage.getItem("userId") || localStorage.getItem("userEmail") || "trader";
+
+  const disciplineRules = useMemo(() => {
+    try {
+      return JSON.parse(localStorage.getItem(`trader_discipline_${userId}`) || "{}");
+    } catch (e) {
+      return {};
+    }
+  }, [userId]);
+
   const [direction, setDirection] = useState("LONG");
   const [symbol, setSymbol] = useState("");
   const [quantity, setQuantity] = useState("");
   const [entryPrice, setEntryPrice] = useState("");
   const [exitPrice, setExitPrice] = useState("");
+  const [stopLoss, setStopLoss] = useState("");
+  const [riskPercent, setRiskPercent] = useState(() => {
+    const raw = disciplineRules?.maxRiskPerTrade || "1.0";
+    return String(raw).replace("%", "");
+  });
   const [entryDateTime, setEntryDateTime] = useState(() => new Date());
   const [exitDateTime, setExitDateTime] = useState(null);
   const [notes, setNotes] = useState("");
@@ -31,6 +50,21 @@ export default function TradeFXBookAddTradeModal({ isOpen, onClose, onTradeAdded
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+
+  // Real-time Guardrails Validation
+  const guardrailValidation = useMemo(() => {
+    return validateTradeAgainstRules({
+      trade: {
+        risk: riskPercent,
+        riskPercent,
+        entry: entryPrice,
+        sl: stopLoss,
+        tp: exitPrice,
+      },
+      rules: disciplineRules,
+      allTrades: trades,
+    });
+  }, [riskPercent, entryPrice, stopLoss, exitPrice, disciplineRules, trades]);
 
   if (!isOpen) return null;
 
@@ -87,6 +121,9 @@ export default function TradeFXBookAddTradeModal({ isOpen, onClose, onTradeAdded
         }
       }
 
+      const numRisk = riskPercent ? Number(riskPercent) : 1.0;
+      const numSl = stopLoss ? Number(stopLoss) : null;
+
       const payload = {
         userId,
         asset: symbol.trim().toUpperCase(),
@@ -94,6 +131,8 @@ export default function TradeFXBookAddTradeModal({ isOpen, onClose, onTradeAdded
         entry: numEntry,
         exitPrice: numExit,
         exit_price: numExit,
+        stop_loss: numSl,
+        sl: numSl,
         lotSize: quantity ? Number(quantity) : 1.0,
         lot_size: quantity ? Number(quantity) : 1.0,
         date: dateStr,
@@ -107,7 +146,8 @@ export default function TradeFXBookAddTradeModal({ isOpen, onClose, onTradeAdded
         lesson: Object.values(checklist).filter(Boolean).length > 0 ? "Checklist items satisfied" : "",
         setup: "Manual Trade",
         session: "New York",
-        risk: 1.0,
+        risk: numRisk,
+        risk_percent: numRisk,
       };
 
       const res = await api.post("/api/trades", payload);
@@ -149,6 +189,19 @@ export default function TradeFXBookAddTradeModal({ isOpen, onClose, onTradeAdded
             <X className="w-5 h-5" />
           </button>
         </div>
+
+        {/* Red Rule Breach Alert Card */}
+        {guardrailValidation.isBreached && (
+          <div className="mb-4">
+            <RuleBreachAlert
+              breach={guardrailValidation.primaryBreach}
+              onNavigateToRules={() => {
+                onClose();
+                navigate("/profile?tab=profile&highlight=rules#trading-rules");
+              }}
+            />
+          </div>
+        )}
 
         {errorMsg && (
           <div className="mb-4 p-3 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 text-xs font-semibold">
@@ -240,6 +293,54 @@ export default function TradeFXBookAddTradeModal({ isOpen, onClose, onTradeAdded
                 step="any"
                 value={exitPrice}
                 onChange={(e) => setExitPrice(e.target.value)}
+                placeholder="Optional"
+                className="w-full h-11 px-3.5 rounded-xl border border-black/[0.08] dark:border-white/[0.12] bg-white/70 dark:bg-white/[0.04] text-neutral-900 dark:text-white text-sm font-medium placeholder-neutral-400 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all font-mono"
+              />
+            </div>
+          </div>
+
+          {/* Risk / Trade (%) & Stop Loss (Invalidation) */}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="text-[11px] font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">
+                  Risk / Trade (%)
+                </label>
+                <span className="text-[10px] font-bold text-neutral-400 font-mono">
+                  Ceiling: {disciplineRules.maxRiskPerTrade || "2%"}
+                </span>
+              </div>
+              <div className="relative">
+                <input
+                  type="number"
+                  step="0.1"
+                  min="0.1"
+                  max="100"
+                  value={riskPercent}
+                  onChange={(e) => setRiskPercent(e.target.value)}
+                  placeholder="1.0"
+                  className={`w-full h-11 px-3.5 pr-8 rounded-xl border bg-white/70 dark:bg-white/[0.04] text-neutral-900 dark:text-white text-sm font-medium outline-none transition-all font-mono ${
+                    guardrailValidation.breaches.some((b) => b.ruleKey === "maxRiskPerTrade")
+                      ? "border-rose-500 ring-2 ring-rose-500/20 text-rose-500 font-bold"
+                      : "border-black/[0.08] dark:border-white/[0.12] focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
+                  }`}
+                  required
+                />
+                <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-neutral-400 pointer-events-none font-mono">
+                  %
+                </span>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-[11px] font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-1.5">
+                Stop Loss Price
+              </label>
+              <input
+                type="number"
+                step="any"
+                value={stopLoss}
+                onChange={(e) => setStopLoss(e.target.value)}
                 placeholder="Optional"
                 className="w-full h-11 px-3.5 rounded-xl border border-black/[0.08] dark:border-white/[0.12] bg-white/70 dark:bg-white/[0.04] text-neutral-900 dark:text-white text-sm font-medium placeholder-neutral-400 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all font-mono"
               />

@@ -121,10 +121,23 @@ export default function Profile({ defaultTab }) {
   const [activeTab, setActiveTab] = useState(
     tabParam === "settings" || tabParam === "billing" ? tabParam : defaultTab || "profile"
   );
+  const [highlightRules, setHighlightRules] = useState(false);
 
   useEffect(() => {
     const current = searchParams.get("tab");
-    if (current === "settings" || current === "billing") {
+    const highlight = searchParams.get("highlight");
+    if (highlight === "rules" || window.location.hash === "#trading-rules") {
+      setActiveTab("profile");
+      setHighlightRules(true);
+      setTimeout(() => {
+        const el = document.getElementById("trading-rules");
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+      }, 150);
+      const timer = setTimeout(() => setHighlightRules(false), 5000);
+      return () => clearTimeout(timer);
+    } else if (current === "settings" || current === "billing") {
       setActiveTab(current);
     } else if (!current && defaultTab) {
       setActiveTab(defaultTab);
@@ -554,6 +567,7 @@ export default function Profile({ defaultTab }) {
     e.preventDefault();
     setDisciplineRules(editRulesForm);
     localStorage.setItem(`trader_discipline_${userId}`, JSON.stringify(editRulesForm));
+    localStorage.setItem(`rules_onboarded_${userId}`, "true");
     setIsEditRulesOpen(false);
 
     try {
@@ -772,7 +786,14 @@ export default function Profile({ defaultTab }) {
       {activeTab === "profile" && (
         <div className="space-y-6">
           {/* ── TRADING RULES SECTION (5 Bento Cards + Edit Rules) ── */}
-          <div className="rounded-3xl p-6 bg-white dark:bg-[#121622] border border-black/[0.06] dark:border-white/[0.08] shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] space-y-4">
+          <div
+            id="trading-rules"
+            className={`rounded-3xl p-6 bg-white dark:bg-[#121622] border transition-all duration-500 ${
+              highlightRules
+                ? "ring-4 ring-rose-500/70 dark:ring-rose-400/80 border-rose-500 shadow-[0_0_50px_rgba(244,63,94,0.35)] scale-[1.01]"
+                : "border-black/[0.06] dark:border-white/[0.08] shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)]"
+            } space-y-4`}
+          >
             <div className="flex items-center justify-between flex-wrap gap-2">
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/20 flex items-center justify-center">
@@ -1803,6 +1824,21 @@ export default function Profile({ defaultTab }) {
                 >
                   <X className="w-4 h-4" />
                 </button>
+              </div>
+
+              {/* Psychological Warning Banner */}
+              <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-500/15 via-rose-500/15 to-amber-500/15 border-2 border-amber-500/35 dark:border-amber-400/35 space-y-1.5 shadow-sm">
+                <div className="flex items-center gap-2">
+                  <div className="w-6 h-6 rounded-lg bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-sm shadow-amber-500/30">
+                    <AlertTriangle className="w-3.5 h-3.5" />
+                  </div>
+                  <span className="text-xs font-black tracking-wider text-amber-700 dark:text-amber-300 uppercase">
+                    &quot;DISCIPLINE TODAY, FREEDOM TOMORROW&quot;
+                  </span>
+                </div>
+                <p className="text-[11px] font-medium text-neutral-600 dark:text-neutral-300 leading-relaxed pl-8">
+                  Changing guardrails in an emotional state ruins long-term edge. Only update risk ceilings during calm market reviews, never during active drawdowns or revenge trading.
+                </p>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

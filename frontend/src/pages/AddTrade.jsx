@@ -3,6 +3,8 @@ import { useNavigate, useLocation } from "react-router-dom";
 import api from "../api/axios";
 import AppleSelect from "../components/ui/AppleSelect";
 import DateTimePickerPopover from "../components/ui/DateTimePickerPopover";
+import RuleBreachAlert from "../components/guardrails/RuleBreachAlert";
+import { validateTradeAgainstRules } from "../utils/guardrailValidator";
 import {
   Save,
   X,
@@ -158,6 +160,30 @@ export default function AddTrade() {
 
   // Real-time R:R Calculations
   const [calcRR, setCalcRR] = useState(0);
+  const [allUserTrades, setAllUserTrades] = useState([]);
+
+  const disciplineRules = useMemo(() => {
+    const activeId = localStorage.getItem("userId") || localStorage.getItem("userEmail") || "trader";
+    try {
+      return JSON.parse(localStorage.getItem(`trader_discipline_${activeId}`) || "{}");
+    } catch (e) {
+      return {};
+    }
+  }, []);
+
+  const guardrailBreach = useMemo(() => {
+    return validateTradeAgainstRules({
+      trade: {
+        risk: formData.risk,
+        entry: formData.entry,
+        sl: formData.sl,
+        tp: formData.tp,
+        targetRR: calcRR,
+      },
+      rules: disciplineRules,
+      allTrades: allUserTrades,
+    });
+  }, [formData.risk, formData.entry, formData.sl, formData.tp, calcRR, disciplineRules, allUserTrades]);
 
   // Fetch existing accounts from user's trades
   useEffect(() => {
@@ -168,6 +194,7 @@ export default function AddTrade() {
       try {
         const res = await api.get(`/api/trades?userId=${userId}`);
         const trades = res.data?.data || [];
+        setAllUserTrades(trades);
         const names = new Set();
         trades.forEach((t) => {
           if (
@@ -892,6 +919,13 @@ export default function AddTrade() {
 
       {/* FORM CONTAINER */}
       <div className="bg-[#101216] border border-white/5 rounded-3xl p-6 md:p-10 shadow-2xl relative min-h-[400px]">
+        {/* GUARDRAIL VIOLATION ALERT (Top Red Card) */}
+        {guardrailBreach.isBreached && (
+          <div className="mb-6">
+            <RuleBreachAlert breach={guardrailBreach.primaryBreach} />
+          </div>
+        )}
+
         {/* INLINE VALIDATION ALERT */}
         {Object.keys(fieldErrors).some((k) => fieldErrors[k]) && (
           <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs flex items-center gap-3 animate-in fade-in">

@@ -6,20 +6,41 @@ export const normalizeTradeR = (t) => {
   const res = (t.result || "").toLowerCase().trim();
   let r = parseFloat(t.r_multiple);
   if (Number.isNaN(r)) r = 0;
-  if (res === "loss" && r > 0) return -1;
+  if (res === "loss") return r !== 0 ? -Math.abs(r) : -1.0;
   if (res === "be") return 0;
-  if (res === "win" && r < 0) return Math.abs(r);
+  if (res === "win") return r !== 0 ? Math.abs(r) : 1.0;
   return r;
 };
 
 export const getTradePnL = (t) => {
   if (!t) return 0;
-  if (t.pnl !== null && t.pnl !== undefined && t.pnl !== "" && !Number.isNaN(Number(t.pnl))) {
+
+  // 1. If explicit non-zero pnl is recorded, use it directly
+  if (
+    t.pnl !== null &&
+    t.pnl !== undefined &&
+    t.pnl !== "" &&
+    Number(t.pnl) !== 0 &&
+    !Number.isNaN(Number(t.pnl))
+  ) {
     return Number(t.pnl);
   }
-  // Fallback to normalized R multiple * dollar risk
+
+  // 2. If trade was marked as breakeven, it is 0
+  const res = (t.result || "").toLowerCase().trim();
   const r = normalizeTradeR(t);
-  const dollarRisk = Number(t.risk) > 0 ? Number(t.risk) : 100;
+  if (res === "be" || r === 0) {
+    return 0;
+  }
+
+  // 3. Derive dollar PnL from R-Multiple and Risk
+  // Default benchmark: 1R = $100 (or dollar risk if specified)
+  const rawRisk = Number(t.risk);
+  let dollarRisk = 100;
+  if (!Number.isNaN(rawRisk) && rawRisk > 0) {
+    dollarRisk = rawRisk >= 10 ? rawRisk : rawRisk * 100;
+  }
+
   return r * dollarRisk;
 };
 
@@ -28,8 +49,7 @@ export const isTradeWin = (t) => {
   const res = (t.result || "").toLowerCase().trim();
   if (res === "win") return true;
   if (res === "loss" || res === "be") return false;
-  const pnl = getTradePnL(t);
-  return pnl > 0;
+  return normalizeTradeR(t) > 0 || getTradePnL(t) > 0;
 };
 
 export const isTradeLoss = (t) => {
@@ -37,8 +57,7 @@ export const isTradeLoss = (t) => {
   const res = (t.result || "").toLowerCase().trim();
   if (res === "loss") return true;
   if (res === "win" || res === "be") return false;
-  const pnl = getTradePnL(t);
-  return pnl < 0;
+  return normalizeTradeR(t) < 0 || getTradePnL(t) < 0;
 };
 
 export const isTradeBE = (t) => {
@@ -46,7 +65,7 @@ export const isTradeBE = (t) => {
   const res = (t.result || "").toLowerCase().trim();
   if (res === "be") return true;
   if (isTradeWin(t) || isTradeLoss(t)) return false;
-  return getTradePnL(t) === 0;
+  return normalizeTradeR(t) === 0 || getTradePnL(t) === 0;
 };
 
 export const formatCurrency = (val, currency = "$", showSign = true) => {
@@ -141,6 +160,7 @@ export const calculatePerformanceMetrics = (rawTrades, currency = "$") => {
 
   // Realized PnL collections
   let totalPnL = 0;
+  let totalNetR = 0;
   let grossProfit = 0;
   let grossLoss = 0;
   let totalCommissions = 0;
@@ -159,7 +179,9 @@ export const calculatePerformanceMetrics = (rawTrades, currency = "$") => {
 
   closedTrades.forEach((t) => {
     const pnl = getTradePnL(t);
+    const r = normalizeTradeR(t);
     totalPnL += pnl;
+    totalNetR += r;
 
     if (pnl > 0) {
       grossProfit += pnl;
@@ -204,7 +226,7 @@ export const calculatePerformanceMetrics = (rawTrades, currency = "$") => {
   const avgWinner = winCount > 0 ? grossProfit / winCount : 0;
   const avgLoser = lossCount > 0 ? grossLoss / lossCount : 0; // negative
 
-  // Expectancy = (Win% * AvgWin) - (Loss% * |AvgLoss|) or netResult / totalTrades
+  // Expectancy = netResult / totalTrades
   const expectancy = totalClosed > 0 ? netResult / totalClosed : 0;
 
   // Risk Reward Ratio
@@ -232,7 +254,6 @@ export const calculatePerformanceMetrics = (rawTrades, currency = "$") => {
       currentWinStreak = 0;
       if (currentLossStreak > maxLossStreak) maxLossStreak = currentLossStreak;
     } else {
-      // breakeven doesn't increment streaks
       currentWinStreak = 0;
       currentLossStreak = 0;
     }
@@ -303,7 +324,7 @@ export const calculatePerformanceMetrics = (rawTrades, currency = "$") => {
   sortedChronological.forEach((t) => {
     const d = (t.date || t.entry_date || "").split("T")[0];
     if (!d) return;
-    const monthKey = d.substring(0, 7); // "YYYY-MM"
+    const monthKey = d.substring(0, 7);
     if (!monthlyPnLMap[monthKey]) monthlyPnLMap[monthKey] = 0;
     monthlyPnLMap[monthKey] += getTradePnL(t);
   });
@@ -408,9 +429,8 @@ export const calculatePerformanceMetrics = (rawTrades, currency = "$") => {
     const dateStr = t.date || t.entry_date;
     if (!dateStr) return;
     const d = new Date(dateStr);
-    // Sunday is 0, Monday is 1, ..., Saturday is 6
     const dayIdx = d.getDay();
-    const dayMap = [6, 0, 1, 2, 3, 4, 5]; // maps Sun=6, Mon=0, Tue=1, etc.
+    const dayMap = [6, 0, 1, 2, 3, 4, 5];
     const key = weekdays[dayMap[dayIdx]];
     if (key && dayPerformanceMap[key]) {
       const p = getTradePnL(t);
@@ -451,15 +471,16 @@ export const calculatePerformanceMetrics = (rawTrades, currency = "$") => {
       winRate: s.count > 0 ? (s.wins / s.count) * 100 : 0,
     }));
 
-  // Strategy Setup Lab Breakdown
+  // ── STRATEGY ANALYTICS (Collected from user setup records) ──
   const setupsMap = {};
   closedTrades.forEach((t) => {
     const s = t.setup || "Discretionary";
     if (!setupsMap[s]) {
-      setupsMap[s] = { name: s, count: 0, wins: 0, pnl: 0, r: 0 };
+      setupsMap[s] = { name: s, count: 0, wins: 0, losses: 0, pnl: 0, r: 0 };
     }
     setupsMap[s].count++;
     if (isTradeWin(t)) setupsMap[s].wins++;
+    else if (isTradeLoss(t)) setupsMap[s].losses++;
     setupsMap[s].pnl += getTradePnL(t);
     setupsMap[s].r += normalizeTradeR(t);
   });
@@ -468,18 +489,39 @@ export const calculatePerformanceMetrics = (rawTrades, currency = "$") => {
     .map((s) => ({
       ...s,
       winRate: s.count > 0 ? (s.wins / s.count) * 100 : 0,
+      avgR: s.count > 0 ? s.r / s.count : 0,
     }));
 
-  // Psychology Emotion Breakdown
+  // Sessions breakdown (Asian, London, New York)
+  const sessionMap = {};
+  closedTrades.forEach((t) => {
+    const sess = t.session || "Unspecified";
+    if (!sessionMap[sess]) {
+      sessionMap[sess] = { name: sess, count: 0, wins: 0, pnl: 0, r: 0 };
+    }
+    sessionMap[sess].count++;
+    if (isTradeWin(t)) sessionMap[sess].wins++;
+    sessionMap[sess].pnl += getTradePnL(t);
+    sessionMap[sess].r += normalizeTradeR(t);
+  });
+  const sessionInsights = Object.values(sessionMap)
+    .sort((a, b) => b.pnl - a.pnl)
+    .map((s) => ({
+      ...s,
+      winRate: s.count > 0 ? (s.wins / s.count) * 100 : 0,
+    }));
+
+  // ── PSYCHOLOGY LAB (Collected from emotional & mental state records) ──
   const emotionsMap = {};
   closedTrades.forEach((t) => {
-    const emo = t.emotion_before || t.emotion_after || "Neutral";
+    const emo = t.emotion_before || "Neutral";
     if (!emotionsMap[emo]) {
-      emotionsMap[emo] = { name: emo, count: 0, wins: 0, pnl: 0 };
+      emotionsMap[emo] = { name: emo, count: 0, wins: 0, pnl: 0, r: 0 };
     }
     emotionsMap[emo].count++;
     if (isTradeWin(t)) emotionsMap[emo].wins++;
     emotionsMap[emo].pnl += getTradePnL(t);
+    emotionsMap[emo].r += normalizeTradeR(t);
   });
   const emotionInsights = Object.values(emotionsMap)
     .sort((a, b) => b.pnl - a.pnl)
@@ -488,18 +530,47 @@ export const calculatePerformanceMetrics = (rawTrades, currency = "$") => {
       winRate: e.count > 0 ? (e.wins / e.count) * 100 : 0,
     }));
 
-  // Mistake Lab Unforced Errors
+  // Rule Followed vs Rule Broken comparison
+  const rulesFollowedTrades = closedTrades.filter(
+    (t) => (t.rule_break || "").toLowerCase() !== "yes"
+  );
+  const rulesBrokenTrades = closedTrades.filter(
+    (t) => (t.rule_break || "").toLowerCase() === "yes"
+  );
+
+  const rulesFollowed = {
+    count: rulesFollowedTrades.length,
+    wins: rulesFollowedTrades.filter(isTradeWin).length,
+    winRate:
+      rulesFollowedTrades.length > 0
+        ? (rulesFollowedTrades.filter(isTradeWin).length / rulesFollowedTrades.length) * 100
+        : 0,
+    pnl: rulesFollowedTrades.reduce((acc, t) => acc + getTradePnL(t), 0),
+    r: rulesFollowedTrades.reduce((acc, t) => acc + normalizeTradeR(t), 0),
+  };
+
+  const rulesBroken = {
+    count: rulesBrokenTrades.length,
+    wins: rulesBrokenTrades.filter(isTradeWin).length,
+    winRate:
+      rulesBrokenTrades.length > 0
+        ? (rulesBrokenTrades.filter(isTradeWin).length / rulesBrokenTrades.length) * 100
+        : 0,
+    pnl: rulesBrokenTrades.reduce((acc, t) => acc + getTradePnL(t), 0),
+    r: rulesBrokenTrades.reduce((acc, t) => acc + normalizeTradeR(t), 0),
+  };
+
+  // ── MISTAKE LAB (Collected from rule violation & unforced error records) ──
   const unforcedErrors = closedTrades.filter(
     (t) => isTradeLoss(t) && (t.rule_break || "").toLowerCase() === "yes"
   );
   const costOfMistakes = unforcedErrors.reduce((acc, t) => acc + Math.abs(getTradePnL(t)), 0);
-  const rulesFollowedCount = closedTrades.filter(
-    (t) => (t.rule_break || "").toLowerCase() === "no" || !t.rule_break
-  ).length;
-  const ruleAdherenceRate = totalClosed > 0 ? (rulesFollowedCount / totalClosed) * 100 : 100;
+  const costOfMistakesR = unforcedErrors.reduce((acc, t) => acc + Math.abs(normalizeTradeR(t)), 0);
+  const ruleAdherenceRate = totalClosed > 0 ? (rulesFollowed.count / totalClosed) * 100 : 100;
 
   return {
     totalPnL,
+    totalNetR,
     closedTradesCount: totalClosed,
     openTradesCount: openTrades.length,
     winCount,
@@ -559,11 +630,16 @@ export const calculatePerformanceMetrics = (rawTrades, currency = "$") => {
     dayPerformance,
     topSymbols,
     setupInsights,
+    sessionInsights,
     emotionInsights,
+    rulesFollowed,
+    rulesBroken,
     mistakes: {
       unforcedErrorsCount: unforcedErrors.length,
       costOfMistakes,
+      costOfMistakesR,
       ruleAdherenceRate,
+      unforcedErrors,
     },
   };
 };
