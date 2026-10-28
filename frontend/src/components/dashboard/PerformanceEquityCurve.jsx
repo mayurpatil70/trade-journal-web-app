@@ -35,46 +35,108 @@ export default function PerformanceEquityCurve({ trades = [] }) {
     };
   }, []);
 
-  // Filter trades based on selected timeframe
+  // Compute precise timeline bounds based on selected timeframe
+  const { startTime, endTime } = useMemo(() => {
+    const end = new Date();
+    let start = new Date();
+
+    if (timeframe === "1D") {
+      start.setDate(end.getDate() - 1);
+    } else if (timeframe === "1W") {
+      start.setDate(end.getDate() - 7);
+    } else if (timeframe === "1M") {
+      start.setMonth(end.getMonth() - 1);
+    } else if (timeframe === "1Y") {
+      start.setFullYear(end.getFullYear() - 1);
+    } else if (timeframe === "ALL") {
+      if (trades && trades.length > 0) {
+        const sorted = [...trades].sort(
+          (a, b) => new Date(a.date || a.created_at) - new Date(b.date || b.created_at)
+        );
+        const earliest = new Date(sorted[0].date || sorted[0].created_at);
+        if (!isNaN(earliest.getTime())) {
+          start = new Date(earliest);
+          start.setDate(1);
+          start.setHours(0, 0, 0, 0);
+        } else {
+          start.setFullYear(end.getFullYear() - 1);
+        }
+      } else {
+        start.setFullYear(end.getFullYear() - 1);
+      }
+    }
+
+    return {
+      startTime: start.getTime(),
+      endTime: end.getTime(),
+    };
+  }, [timeframe, trades]);
+
+  // Filter trades based on selected timeframe timeline
   const filteredTrades = useMemo(() => {
     if (!trades || trades.length === 0) return [];
-    const now = new Date();
     const sorted = [...trades].sort(
       (a, b) => new Date(a.date || a.created_at) - new Date(b.date || b.created_at)
     );
 
-    if (timeframe === "ALL") return sorted;
+    return sorted.filter((t) => {
+      const tradeTime = new Date(t.date || t.created_at).getTime();
+      return tradeTime >= startTime && tradeTime <= endTime + 24 * 60 * 60 * 1000;
+    });
+  }, [trades, startTime, endTime]);
 
-    let cutoff = new Date();
-    if (timeframe === "1D") {
-      cutoff.setDate(now.getDate() - 1);
-    } else if (timeframe === "1W") {
-      cutoff.setDate(now.getDate() - 7);
-    } else if (timeframe === "1M") {
-      cutoff.setMonth(now.getMonth() - 1);
-    } else if (timeframe === "1Y") {
-      cutoff.setFullYear(now.getFullYear() - 1);
+  // Dynamic X-axis timeline ticks matching the selected timeframe
+  // For 1Y -> Month and Year ('Nov 25', 'Jan 26', 'Mar 26', 'Oct 26')
+  // For 1M -> Month and Day ('Sep 29', 'Oct 4', 'Oct 9', 'Oct 14', 'Oct 19', 'Oct 24', 'Oct 29')
+  // For 1W -> Weekday and Day ('Thu 22', 'Sat 24', 'Mon 26', 'Wed 28')
+  // For 1D -> Hour and Minute ('02:00', '06:00', '10:00', '14:00', '18:00', '22:00')
+  // For ALL -> Month and Year across full history
+  const timelineTicks = useMemo(() => {
+    const ticks = [];
+    const tickCount = timeframe === "1D" ? 6 : timeframe === "1W" ? 7 : timeframe === "1M" ? 7 : 7;
+    const timeSpan = Math.max(1000, endTime - startTime);
+
+    for (let i = 0; i < tickCount; i++) {
+      const ratio = i / (tickCount - 1);
+      const tickTime = startTime + ratio * timeSpan;
+      const d = new Date(tickTime);
+
+      let label = "";
+      if (timeframe === "1D") {
+        label = d.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: false });
+      } else if (timeframe === "1W") {
+        label = d.toLocaleDateString("en-US", { weekday: "short", day: "numeric" });
+      } else if (timeframe === "1M") {
+        label = d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+      } else if (timeframe === "1Y") {
+        label = d.toLocaleDateString("en-US", { month: "short", year: "2-digit" });
+      } else if (timeframe === "ALL") {
+        label = d.toLocaleDateString("en-US", { month: "short", year: "2-digit" });
+      }
+
+      ticks.push({
+        label,
+        ratio,
+        timestamp: tickTime,
+      });
     }
 
-    return sorted.filter((t) => {
-      const tradeDate = new Date(t.date || t.created_at);
-      return tradeDate >= cutoff;
-    });
-  }, [trades, timeframe]);
+    return ticks;
+  }, [timeframe, startTime, endTime]);
 
-  // Compute cumulative equity data points
+  // Compute cumulative equity data points mapped onto timeline timestamps
   const equityPoints = useMemo(() => {
     let cumulativeR = 0;
     let cumulativePnl = 0;
     let hasPnl = false;
 
-    // Start point
+    // Start point at timeline startTime
     const points = [
       {
         r: 0,
         pnl: 0,
-        date: "Start",
-        fullDateStr: new Date().toLocaleDateString("en-US", {
+        timestamp: startTime,
+        fullDateStr: new Date(startTime).toLocaleDateString("en-US", {
           weekday: "short",
           month: "short",
           day: "numeric",
@@ -84,6 +146,15 @@ export default function PerformanceEquityCurve({ trades = [] }) {
       },
     ];
 
+    // Stagger intra-day trades so each has its own distinct timestamp along the timeline
+    const tradesByDay = {};
+    filteredTrades.forEach((t) => {
+      const dKey = (t.date || t.created_at || "").slice(0, 10);
+      tradesByDay[dKey] = (tradesByDay[dKey] || 0) + 1;
+    });
+
+    const daySeenCounts = {};
+
     filteredTrades.forEach((t) => {
       const r = normalizeTradeR(t);
       cumulativeR += r;
@@ -92,11 +163,32 @@ export default function PerformanceEquityCurve({ trades = [] }) {
         hasPnl = true;
       }
 
-      const d = t.date ? new Date(t.date) : new Date();
+      let d = new Date(t.date || t.created_at);
+      if (isNaN(d.getTime())) d = new Date();
+
+      const dKey = (t.date || t.created_at || "").slice(0, 10);
+      const totalOnDay = tradesByDay[dKey] || 1;
+      const seenIdx = (daySeenCounts[dKey] = (daySeenCounts[dKey] || 0) + 1);
+
+      let tradeTimestamp = d.getTime();
+      if (t.time || t.entry_time) {
+        const timeParts = (t.entry_time || t.time).split(":");
+        if (timeParts.length >= 2) {
+          d.setHours(parseInt(timeParts[0], 10), parseInt(timeParts[1], 10), 0, 0);
+          tradeTimestamp = d.getTime();
+        }
+      } else if (totalOnDay > 1) {
+        // Space intra-day trades across an 8-hour trading window
+        const dayStart = new Date(d).setHours(9, 0, 0, 0);
+        tradeTimestamp = dayStart + ((seenIdx - 1) / Math.max(1, totalOnDay - 1 || 1)) * 28800000;
+      }
+
+      tradeTimestamp = Math.max(startTime, Math.min(endTime, tradeTimestamp));
+
       points.push({
         r: cumulativeR,
         pnl: cumulativePnl,
-        date: d.toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+        timestamp: tradeTimestamp,
         fullDateStr: d.toLocaleDateString("en-US", {
           weekday: "short",
           month: "short",
@@ -107,8 +199,28 @@ export default function PerformanceEquityCurve({ trades = [] }) {
       });
     });
 
+    // Trail current equity line up to the rightmost edge (endTime)
+    if (points.length > 1) {
+      const last = points[points.length - 1];
+      if (endTime - last.timestamp > 3600000) {
+        points.push({
+          r: cumulativeR,
+          pnl: cumulativePnl,
+          timestamp: endTime,
+          fullDateStr: new Date(endTime).toLocaleDateString("en-US", {
+            weekday: "short",
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+          }),
+          trade: null,
+          isCurrentTrailing: true,
+        });
+      }
+    }
+
     return { points, hasPnl, finalR: cumulativeR, finalPnl: cumulativePnl };
-  }, [filteredTrades]);
+  }, [filteredTrades, startTime, endTime]);
 
   // Headline value
   const isProfitable = (equityPoints.hasPnl ? equityPoints.finalPnl : equityPoints.finalR) >= 0;
@@ -123,35 +235,29 @@ export default function PerformanceEquityCurve({ trades = [] }) {
   }, [filteredTrades, equityPoints]);
 
   // SVG dimensions: full width edge-to-edge, minimal side padding
-  const minWidthPerPoint = 48;
-  const dynamicPointsWidth = equityPoints.points.length * minWidthPerPoint;
-  const chartWidth = Math.max(containerWidth, dynamicPointsWidth);
+  const chartWidth = Math.max(containerWidth, 600);
   const chartHeight = 310;
-  const paddingX = 12; // minimal side padding: stretches curve across full width
+  const paddingX = 14; // Minimal side padding: stretches curve across full width
   const paddingY = 28;
 
+  const timeSpan = Math.max(1000, endTime - startTime);
   const dataValues = equityPoints.points.map((p) => (equityPoints.hasPnl ? p.pnl : p.r));
   const minVal = Math.min(0, ...dataValues);
   const maxVal = Math.max(1, ...dataValues);
   const range = maxVal - minVal || 1;
 
-  const svgPoints = equityPoints.points.map((p, idx) => {
+  // Compute SVG x and y using timeline positioning
+  const svgPoints = equityPoints.points.map((p) => {
     const val = equityPoints.hasPnl ? p.pnl : p.r;
-    const x =
-      equityPoints.points.length <= 1
-        ? chartWidth / 2
-        : paddingX + (idx / (equityPoints.points.length - 1)) * (chartWidth - paddingX * 2);
+    const ratio = Math.min(1, Math.max(0, (p.timestamp - startTime) / timeSpan));
+    const x = paddingX + ratio * (chartWidth - paddingX * 2);
     const y = chartHeight - paddingY - ((val - minVal) / range) * (chartHeight - paddingY * 2);
     return { x, y, point: p };
   });
 
   const polylinePoints = svgPoints.map((pt) => `${pt.x},${pt.y}`).join(" ");
-
-  // Date labels along the bottom
-  const dateInterval = Math.max(1, Math.floor(svgPoints.length / 8));
-  const bottomDateLabels = svgPoints.filter(
-    (_, i) => i % dateInterval === 0 || i === svgPoints.length - 1
-  );
+  // Points that represent actual trades for circle rendering and tooltips
+  const tradeSvgPoints = svgPoints.filter((pt) => pt.point.trade);
 
   return (
     <div className="rounded-3xl p-6 bg-white dark:bg-[#121622] border border-black/[0.06] dark:border-white/[0.08] shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] flex flex-col justify-between h-full relative overflow-hidden">
@@ -197,11 +303,11 @@ export default function PerformanceEquityCurve({ trades = [] }) {
       >
         {filteredTrades.length === 0 ? (
           <div className="w-full h-[280px] rounded-2xl border border-dashed border-black/[0.08] dark:border-white/[0.08] flex flex-col items-center justify-center text-neutral-400 dark:text-neutral-500 bg-neutral-50/50 dark:bg-white/[0.01]">
-            <p className="text-sm font-medium">No trades taken</p>
+            <p className="text-sm font-medium">No trades taken in this timeframe</p>
           </div>
         ) : (
           <div
-            className="relative select-none"
+            className="relative select-none w-full"
             style={{
               width: `${chartWidth}px`,
               minWidth: "100%",
@@ -212,13 +318,14 @@ export default function PerformanceEquityCurve({ trades = [] }) {
             <svg
               width={chartWidth}
               height={chartHeight}
-              className="overflow-visible block"
+              className="overflow-visible block w-full"
               onMouseMove={(e) => {
                 const rect = e.currentTarget.getBoundingClientRect();
                 const mouseX = e.clientX - rect.left;
-                let nearest = svgPoints[0];
+                if (tradeSvgPoints.length === 0) return;
+                let nearest = tradeSvgPoints[0];
                 let minDistance = Infinity;
-                svgPoints.forEach((pt) => {
+                tradeSvgPoints.forEach((pt) => {
                   const dist = Math.abs(pt.x - mouseX);
                   if (dist < minDistance) {
                     minDistance = dist;
@@ -256,8 +363,8 @@ export default function PerformanceEquityCurve({ trades = [] }) {
                 points={polylinePoints}
               />
 
-              {/* Data Points */}
-              {svgPoints.map((pt, idx) => (
+              {/* Data Points for executed trades */}
+              {tradeSvgPoints.map((pt, idx) => (
                 <circle
                   key={idx}
                   cx={pt.x}
@@ -284,11 +391,12 @@ export default function PerformanceEquityCurve({ trades = [] }) {
               )}
             </svg>
 
-            {/* ── DATES AT DOWN (Spanning full width edge-to-edge) ── */}
+            {/* ── TIMELINE DATES AT DOWN ROW (Dynamically changes by Year, Month, Week, Day) ── */}
             <div className="absolute bottom-1 left-0 right-0 pointer-events-none text-[11px] font-semibold text-neutral-500 dark:text-neutral-400">
-              {bottomDateLabels.map((lbl, idx) => {
+              {timelineTicks.map((tick, idx) => {
                 const isFirst = idx === 0;
-                const isLast = idx === bottomDateLabels.length - 1;
+                const isLast = idx === timelineTicks.length - 1;
+                const x = paddingX + tick.ratio * (chartWidth - paddingX * 2);
                 const transform = isFirst
                   ? "translateX(0%)"
                   : isLast
@@ -300,19 +408,19 @@ export default function PerformanceEquityCurve({ trades = [] }) {
                     key={idx}
                     style={{
                       position: "absolute",
-                      left: `${lbl.x}px`,
+                      left: `${x}px`,
                       transform,
                     }}
-                    className="whitespace-nowrap select-none"
+                    className="whitespace-nowrap select-none font-medium text-neutral-500 dark:text-neutral-400"
                   >
-                    {lbl.point.date}
+                    {tick.label}
                   </span>
                 );
               })}
             </div>
 
             {/* ── HOVER TOOLTIP CARD ── */}
-            {hoverData && (
+            {hoverData && hoverData.point && (
               <div
                 className="absolute pointer-events-none z-30 rounded-2xl bg-white/95 dark:bg-[#121622]/95 border border-black/[0.08] dark:border-white/[0.12] p-3.5 shadow-2xl backdrop-blur-xl transition-all"
                 style={{

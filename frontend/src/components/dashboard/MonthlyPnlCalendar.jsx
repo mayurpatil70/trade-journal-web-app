@@ -1,5 +1,5 @@
-import { useState, useMemo } from "react";
-import { ChevronLeft, ChevronRight, X, Calendar, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight } from "lucide-react";
+import { useState, useMemo, useRef, useEffect } from "react";
+import { ChevronLeft, ChevronRight, ChevronDown, Check, X, Calendar, TrendingUp, TrendingDown } from "lucide-react";
 import { normalizeTradeR, isTradeWin } from "../../pages/Dashboard.jsx";
 
 const monthNames = [
@@ -64,7 +64,7 @@ export default function MonthlyPnlCalendar({ trades = [], onTradeClick }) {
         month: "2-digit",
         day: "2-digit",
       });
-      const [y, m] = formatter.format(new Date()).split("-").map(Number);
+      const [y, m, d] = formatter.format(new Date()).split("-").map(Number);
       return new Date(y, m - 1, 1);
     } catch {
       const d = new Date();
@@ -73,9 +73,38 @@ export default function MonthlyPnlCalendar({ trades = [], onTradeClick }) {
   });
 
   const [selectedDayInfo, setSelectedDayInfo] = useState(null);
+  const [isMonthDropdownOpen, setIsMonthDropdownOpen] = useState(false);
+  const [isYearDropdownOpen, setIsYearDropdownOpen] = useState(false);
+
+  const monthDropdownRef = useRef(null);
+  const yearDropdownRef = useRef(null);
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
+
+  // Dismiss custom dropdowns on outside click or Escape
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (monthDropdownRef.current && !monthDropdownRef.current.contains(e.target)) {
+        setIsMonthDropdownOpen(false);
+      }
+      if (yearDropdownRef.current && !yearDropdownRef.current.contains(e.target)) {
+        setIsYearDropdownOpen(false);
+      }
+    };
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") {
+        setIsMonthDropdownOpen(false);
+        setIsYearDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
 
   const handlePrevMonth = () => {
     setCurrentDate(new Date(year, month - 1, 1));
@@ -87,13 +116,6 @@ export default function MonthlyPnlCalendar({ trades = [], onTradeClick }) {
 
   const handleJumpToToday = () => {
     setCurrentDate(new Date(indianTodayObj.year, indianTodayObj.month, 1));
-  };
-
-  const handleYearChange = (e) => {
-    const selectedYear = parseInt(e.target.value, 10);
-    if (!isNaN(selectedYear)) {
-      setCurrentDate(new Date(selectedYear, month, 1));
-    }
   };
 
   // Group trades accurately by Indian Date Key "YYYY-MM-DD"
@@ -114,11 +136,9 @@ export default function MonthlyPnlCalendar({ trades = [], onTradeClick }) {
   const availableYears = useMemo(() => {
     const set = new Set();
     const currentY = indianTodayObj.year;
-    // Base standard window
     for (let y = currentY - 3; y <= currentY + 3; y++) {
       set.add(y);
     }
-    // Also include any years from actual logged trades
     Object.keys(tradesByDate).forEach((key) => {
       const y = parseInt(key.slice(0, 4), 10);
       if (!isNaN(y)) set.add(y);
@@ -159,8 +179,7 @@ export default function MonthlyPnlCalendar({ trades = [], onTradeClick }) {
   // Headers: Sun, Mon, Tue, Wed, Thu, Fri, Sat, Weekly
   const calendarWeeks = useMemo(() => {
     const firstDay = new Date(year, month, 1);
-    // Indian calendar standard: Week starts on SUNDAY (0 = Sun, 1 = Mon, ..., 6 = Sat)
-    const dayOfWeek = firstDay.getDay();
+    const dayOfWeek = firstDay.getDay(); // 0 = Sun, 1 = Mon, ..., 6 = Sat
     const daysInMonth = new Date(year, month + 1, 0).getDate();
 
     const weeks = [];
@@ -347,7 +366,7 @@ export default function MonthlyPnlCalendar({ trades = [], onTradeClick }) {
             <span>Today</span>
           </button>
 
-          {/* Month & Year Navigation with Year Selector */}
+          {/* Month & Year Navigation with Apple-Styled Custom Dropdowns */}
           <div className="flex items-center rounded-xl border border-black/[0.06] dark:border-white/[0.08] bg-neutral-50 dark:bg-white/[0.03] p-0.5">
             <button
               onClick={handlePrevMonth}
@@ -356,21 +375,97 @@ export default function MonthlyPnlCalendar({ trades = [], onTradeClick }) {
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
-            <span className="text-xs font-bold text-neutral-800 dark:text-neutral-200 px-1 min-w-[75px] text-center select-none">
-              {monthNames[month]}
-            </span>
-            {/* Year Selector Dropdown for all years */}
-            <select
-              value={year}
-              onChange={handleYearChange}
-              className="bg-transparent text-xs font-bold text-neutral-800 dark:text-neutral-200 pr-1 cursor-pointer focus:outline-none"
-            >
-              {availableYears.map((y) => (
-                <option key={y} value={y} className="bg-white dark:bg-[#121622] text-neutral-900 dark:text-white">
-                  {y}
-                </option>
-              ))}
-            </select>
+
+            {/* Custom Month Dropdown */}
+            <div className="relative" ref={monthDropdownRef}>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsMonthDropdownOpen((prev) => !prev);
+                  setIsYearDropdownOpen(false);
+                }}
+                className="flex items-center gap-1 px-2 py-1 rounded-lg hover:bg-black/[0.04] dark:hover:bg-white/[0.06] text-xs font-bold text-neutral-800 dark:text-neutral-200 transition-all cursor-pointer"
+              >
+                <span>{monthNames[month]}</span>
+                <ChevronDown
+                  className={`w-3 h-3 text-neutral-400 transition-transform duration-200 ${
+                    isMonthDropdownOpen ? "rotate-180 text-emerald-500" : ""
+                  }`}
+                />
+              </button>
+
+              {isMonthDropdownOpen && (
+                <div className="absolute left-0 top-full mt-2 w-36 bg-white/95 dark:bg-[#121622]/95 border border-black/[0.08] dark:border-white/[0.12] rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.18)] dark:shadow-[0_25px_60px_rgba(0,0,0,0.7)] backdrop-blur-2xl z-50 p-1.5 max-h-60 overflow-y-auto scrollbar-thin animate-in fade-in zoom-in-95 duration-150 space-y-0.5">
+                  {monthNames.map((name, idx) => {
+                    const isSelected = idx === month;
+                    return (
+                      <button
+                        key={name}
+                        type="button"
+                        onClick={() => {
+                          setCurrentDate(new Date(year, idx, 1));
+                          setIsMonthDropdownOpen(false);
+                        }}
+                        className={`w-full text-left px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center justify-between cursor-pointer ${
+                          isSelected
+                            ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/25"
+                            : "text-neutral-700 dark:text-neutral-300 hover:bg-black/[0.04] dark:hover:bg-white/[0.08]"
+                        }`}
+                      >
+                        <span>{name}</span>
+                        {isSelected && <Check className="w-3.5 h-3.5 text-emerald-500" />}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* Custom Year Dropdown (Matching Application Dropdowns, NO native OS menu) */}
+            <div className="relative" ref={yearDropdownRef}>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsYearDropdownOpen((prev) => !prev);
+                  setIsMonthDropdownOpen(false);
+                }}
+                className="flex items-center gap-1 px-2 py-1 rounded-lg hover:bg-black/[0.04] dark:hover:bg-white/[0.06] text-xs font-bold text-neutral-800 dark:text-neutral-200 transition-all cursor-pointer"
+              >
+                <span>{year}</span>
+                <ChevronDown
+                  className={`w-3 h-3 text-neutral-400 transition-transform duration-200 ${
+                    isYearDropdownOpen ? "rotate-180 text-emerald-500" : ""
+                  }`}
+                />
+              </button>
+
+              {isYearDropdownOpen && (
+                <div className="absolute right-0 top-full mt-2 w-32 bg-white/95 dark:bg-[#121622]/95 border border-black/[0.08] dark:border-white/[0.12] rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.18)] dark:shadow-[0_25px_60px_rgba(0,0,0,0.7)] backdrop-blur-2xl z-50 p-1.5 max-h-60 overflow-y-auto scrollbar-thin animate-in fade-in zoom-in-95 duration-150 space-y-0.5">
+                  {availableYears.map((y) => {
+                    const isSelected = y === year;
+                    return (
+                      <button
+                        key={y}
+                        type="button"
+                        onClick={() => {
+                          setCurrentDate(new Date(y, month, 1));
+                          setIsYearDropdownOpen(false);
+                        }}
+                        className={`w-full text-left px-3 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-between cursor-pointer ${
+                          isSelected
+                            ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/25"
+                            : "text-neutral-700 dark:text-neutral-300 hover:bg-black/[0.04] dark:hover:bg-white/[0.08]"
+                        }`}
+                      >
+                        <span>{y}</span>
+                        {isSelected && <Check className="w-3.5 h-3.5 text-emerald-500" />}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
             <button
               onClick={handleNextMonth}
               className="p-1 rounded-lg text-neutral-500 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-200/60 dark:hover:bg-white/[0.08] transition-colors cursor-pointer"
@@ -403,10 +498,10 @@ export default function MonthlyPnlCalendar({ trades = [], onTradeClick }) {
           </div>
         </div>
 
-        {/* Rows of Weeks with elevated hover effects matching top cards */}
+        {/* Rows of Weeks with elevated 3D hover effects matching top cards */}
         {calendarWeeks.map((weekObj, wIdx) => (
           <div key={wIdx} className="grid grid-cols-8 gap-1.5">
-            {/* 7 Days: each card equipped with tactile hover elevation */}
+            {/* 7 Days: each card equipped with tactile 3D hover elevation */}
             {weekObj.days.map((d, dIdx) => {
               const isTodayCell = d.dateKey === indianTodayObj.dateKey;
 
@@ -414,27 +509,27 @@ export default function MonthlyPnlCalendar({ trades = [], onTradeClick }) {
                 <div
                   key={dIdx}
                   onClick={() => setSelectedDayInfo(d)}
-                  className={`min-h-[48px] rounded-2xl p-1.5 flex flex-col justify-between transition-all duration-200 select-none cursor-pointer ${
+                  className={`relative group min-h-[48px] rounded-2xl p-1.5 flex flex-col justify-between transition-all duration-200 ease-out select-none cursor-pointer hover:z-30 hover:-translate-y-1 hover:scale-[1.06] active:scale-95 ${
                     d.isCurrentMonth
                       ? isTodayCell
-                        ? "ring-2 ring-emerald-500 dark:ring-emerald-400 bg-emerald-500/[0.12] dark:bg-emerald-500/[0.18] border border-emerald-500/50 shadow-md shadow-emerald-500/15 hover:border-emerald-500 hover:shadow-xl hover:shadow-emerald-500/25 hover:scale-[1.07] active:scale-95"
+                        ? "ring-2 ring-emerald-500 dark:ring-emerald-400 bg-emerald-500/[0.12] dark:bg-emerald-500/[0.18] border border-emerald-500/50 shadow-md shadow-emerald-500/15 hover:ring-3 hover:shadow-2xl hover:shadow-emerald-500/30 hover:bg-emerald-500/[0.22]"
                         : d.hasTrades
                         ? d.isProfit
-                          ? "bg-emerald-500/[0.08] dark:bg-emerald-500/[0.14] border border-emerald-500/35 hover:border-emerald-500 hover:bg-emerald-500/[0.16] dark:hover:bg-emerald-500/[0.22] hover:shadow-lg hover:shadow-emerald-500/20 hover:scale-[1.06] active:scale-95"
-                          : "bg-rose-500/[0.08] dark:bg-rose-500/[0.14] border border-rose-500/35 hover:border-rose-500 hover:bg-rose-500/[0.16] dark:hover:bg-rose-500/[0.22] hover:shadow-lg hover:shadow-rose-500/20 hover:scale-[1.06] active:scale-95"
-                        : "bg-neutral-50/80 dark:bg-white/[0.03] border border-black/[0.06] dark:border-white/[0.08] shadow-[0_2px_8px_rgba(0,0,0,0.02)] hover:border-emerald-500/60 dark:hover:border-emerald-400/60 hover:bg-white dark:hover:bg-white/[0.08] hover:shadow-lg hover:shadow-emerald-500/10 hover:scale-[1.05] active:scale-95"
-                      : "bg-neutral-50/30 dark:bg-white/[0.015] border border-black/[0.04] dark:border-white/[0.04] text-neutral-400 dark:text-neutral-600 hover:border-emerald-500/30 dark:hover:border-emerald-400/30 hover:bg-neutral-100/70 dark:hover:bg-white/[0.05] hover:scale-[1.03] active:scale-95"
+                          ? "bg-emerald-500/[0.08] dark:bg-emerald-500/[0.14] border border-emerald-500/35 hover:border-emerald-500 hover:bg-emerald-500/[0.22] dark:hover:bg-emerald-500/[0.3] hover:shadow-xl hover:shadow-emerald-500/25"
+                          : "bg-rose-500/[0.08] dark:bg-rose-500/[0.14] border border-rose-500/35 hover:border-rose-500 hover:bg-rose-500/[0.22] dark:hover:bg-rose-500/[0.3] hover:shadow-xl hover:shadow-rose-500/25"
+                        : "bg-neutral-50/70 dark:bg-white/[0.02] border border-black/[0.06] dark:border-white/[0.08] shadow-[0_2px_8px_rgba(0,0,0,0.02)] hover:border-emerald-500/80 dark:hover:border-emerald-400/80 hover:bg-emerald-50/80 dark:hover:bg-emerald-500/15 hover:shadow-xl hover:shadow-emerald-500/20"
+                      : "bg-neutral-50/30 dark:bg-white/[0.015] border border-black/[0.04] dark:border-white/[0.04] text-neutral-400 dark:text-neutral-600 hover:border-emerald-500/50 dark:hover:border-emerald-400/50 hover:bg-emerald-50/50 dark:hover:bg-emerald-500/10 hover:shadow-md hover:text-neutral-800 dark:hover:text-white"
                   }`}
                 >
                   {/* Day Number + Today Micro-badge */}
                   <div className="flex items-center justify-between w-full">
                     <span
-                      className={`text-[11px] leading-none font-bold ${
+                      className={`text-[11px] leading-none font-bold transition-colors ${
                         isTodayCell
                           ? "text-emerald-600 dark:text-emerald-400 font-extrabold"
                           : d.isCurrentMonth
-                          ? "text-neutral-800 dark:text-neutral-200"
-                          : "text-neutral-400 dark:text-neutral-600"
+                          ? "text-neutral-800 dark:text-neutral-200 group-hover:text-emerald-600 dark:group-hover:text-emerald-400"
+                          : "text-neutral-400 dark:text-neutral-600 group-hover:text-neutral-700 dark:group-hover:text-neutral-300"
                       }`}
                     >
                       {d.dayNumber}
@@ -477,9 +572,9 @@ export default function MonthlyPnlCalendar({ trades = [], onTradeClick }) {
               );
             })}
 
-            {/* 8th Column: Weekly Summary Card with matching top-card elevated hover */}
-            <div className="min-h-[48px] rounded-2xl p-1.5 bg-neutral-100/70 dark:bg-white/[0.04] border border-black/[0.06] dark:border-white/[0.08] shadow-xs flex flex-col justify-center items-center text-center transition-all duration-200 hover:border-emerald-500/60 dark:hover:border-emerald-400/60 hover:bg-white dark:hover:bg-white/[0.08] hover:shadow-lg hover:shadow-emerald-500/10 hover:scale-[1.05] active:scale-95 cursor-default">
-              <span className="text-[9px] font-extrabold uppercase tracking-tight text-neutral-400 dark:text-neutral-500">
+            {/* 8th Column: Weekly Summary Card with matching top-card elevated 3D hover */}
+            <div className="relative group min-h-[48px] rounded-2xl p-1.5 bg-neutral-100/70 dark:bg-white/[0.04] border border-black/[0.06] dark:border-white/[0.08] shadow-xs flex flex-col justify-center items-center text-center transition-all duration-200 ease-out hover:z-30 hover:-translate-y-1 hover:border-emerald-500/80 dark:hover:border-emerald-400/80 hover:bg-emerald-50/80 dark:hover:bg-emerald-500/15 hover:shadow-xl hover:shadow-emerald-500/20 hover:scale-[1.06] active:scale-95 cursor-default">
+              <span className="text-[9px] font-extrabold uppercase tracking-tight text-neutral-400 dark:text-neutral-500 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
                 Weekly
               </span>
               <span
@@ -515,7 +610,7 @@ export default function MonthlyPnlCalendar({ trades = [], onTradeClick }) {
 
       {/* ── DAY TRADES MODAL/POPOVER ON CLICK ── */}
       {selectedDayInfo && (
-        <div className="absolute inset-0 z-20 rounded-3xl bg-white/95 dark:bg-[#121622]/95 backdrop-blur-md p-5 flex flex-col animate-in fade-in zoom-in-95 duration-150">
+        <div className="absolute inset-0 z-40 rounded-3xl bg-white/95 dark:bg-[#121622]/95 backdrop-blur-md p-5 flex flex-col animate-in fade-in zoom-in-95 duration-150">
           <div className="flex items-center justify-between pb-3 border-b border-black/[0.06] dark:border-white/[0.08]">
             <div>
               <h3 className="text-sm font-bold text-neutral-900 dark:text-white">
