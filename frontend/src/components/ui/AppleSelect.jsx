@@ -16,6 +16,8 @@ export default function AppleSelect({
   className = "",
   name,
   disabled = false,
+  icon: Icon = null,
+  compact = false,
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const triggerRef = useRef(null);
@@ -118,26 +120,37 @@ export default function AppleSelect({
         type="button"
         disabled={disabled}
         onClick={toggleOpen}
-        className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl text-[14px] font-medium transition-all duration-200 cursor-pointer text-left backdrop-blur-xl ${
+        className={`w-full flex items-center justify-between ${
+          compact ? "px-3 py-2 rounded-xl text-xs" : "px-4 py-3 rounded-2xl text-[14px]"
+        } font-medium transition-all duration-200 cursor-pointer text-left backdrop-blur-xl ${
           error
             ? "border border-rose-500/80 ring-1 ring-rose-500/50 bg-rose-500/[0.04]"
             : isOpen
-              ? "border border-emerald-500/60 ring-2 ring-emerald-500/20 bg-white/95 dark:bg-white/[0.09]"
+              ? "border border-blue-500/60 ring-2 ring-blue-500/20 bg-white/95 dark:bg-white/[0.09]"
               : "border border-black/[0.08] dark:border-white/10 bg-white/70 dark:bg-white/[0.05] hover:bg-white/90 dark:hover:bg-white/[0.08] hover:border-black/[0.15] dark:hover:border-white/20"
         } text-neutral-900 dark:text-white shadow-sm disabled:opacity-50 disabled:cursor-not-allowed`}
       >
-        <span
-          className={`truncate ${
-            selectedOption
-              ? "text-neutral-900 dark:text-white font-medium"
-              : "text-neutral-400 dark:text-neutral-500"
-          }`}
-        >
-          {selectedOption ? selectedOption.label : placeholder}
-        </span>
+        <div className="flex items-center min-w-0 pr-2">
+          {Icon && (
+            <Icon
+              className={`w-3.5 h-3.5 text-neutral-400 dark:text-neutral-500 mr-2 shrink-0 ${
+                isOpen ? "text-blue-500 dark:text-blue-400" : ""
+              }`}
+            />
+          )}
+          <span
+            className={`truncate ${
+              selectedOption
+                ? "text-neutral-900 dark:text-white font-medium"
+                : "text-neutral-400 dark:text-neutral-500"
+            }`}
+          >
+            {selectedOption ? selectedOption.label : placeholder}
+          </span>
+        </div>
         <ChevronDown
-          className={`w-4 h-4 text-neutral-400 dark:text-neutral-500 transition-transform duration-300 shrink-0 ml-2 ${
-            isOpen ? "rotate-180 text-emerald-500" : ""
+          className={`w-3.5 h-3.5 text-neutral-400 dark:text-neutral-500 transition-transform duration-300 shrink-0 ml-1.5 ${
+            isOpen ? "rotate-180 text-blue-500" : ""
           }`}
         />
       </button>
