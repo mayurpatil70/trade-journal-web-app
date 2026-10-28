@@ -257,3 +257,168 @@ export const saveOnboardingProfile = async (req, res) => {
     res.status(500).json({ success: false, error: "Failed to save profile." });
   }
 };
+
+export const getProfile = async (req, res) => {
+  try {
+    const userId = req.query?.userId || req.headers["x-user-id"] || req.user?.id;
+    const email = req.query?.email;
+
+    if (!userId && !email) {
+      return res.status(400).json({ success: false, error: "Missing userId or email" });
+    }
+
+    let profileData = null;
+
+    if (userId) {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", userId)
+        .maybeSingle();
+
+      if (!error && data) {
+        profileData = data;
+      }
+    }
+
+    if (!profileData && email) {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("email", email)
+        .maybeSingle();
+
+      if (!error && data) {
+        profileData = data;
+      }
+    }
+
+    // Fallback: check users table if not found in profiles
+    if (!profileData && userId) {
+      const { data: userRow } = await supabase
+        .from("users")
+        .select("id, email, display_name, avatar_url, created_at")
+        .eq("id", userId)
+        .maybeSingle();
+
+      if (userRow) {
+        profileData = {
+          id: userRow.id,
+          email: userRow.email,
+          display_name: userRow.display_name,
+          avatar_url: userRow.avatar_url,
+          created_at: userRow.created_at,
+        };
+      }
+    }
+
+    res.json({
+      success: true,
+      profile: profileData || {},
+    });
+  } catch (error) {
+    console.error("[Auth] getProfile error:", error);
+    res.status(500).json({ success: false, error: "Failed to fetch profile." });
+  }
+};
+
+export const updateProfile = async (req, res) => {
+  try {
+    const {
+      userId,
+      email,
+      displayName,
+      username,
+      bio,
+      avatarUrl,
+      currency,
+      timezone,
+      disciplineRules,
+      preTradeChecklist,
+      currentPlan,
+    } = req.body;
+
+    const targetId = userId || req.headers["x-user-id"] || req.user?.id;
+
+    if (!targetId && !email) {
+      return res.status(400).json({ success: false, error: "Missing userId or email" });
+    }
+
+    const updatePayload = {
+      updated_at: new Date().toISOString(),
+    };
+
+    if (displayName !== undefined) updatePayload.display_name = displayName;
+    if (username !== undefined) updatePayload.username = username?.replace(/^@/, "");
+    if (bio !== undefined) updatePayload.bio = bio;
+    if (avatarUrl !== undefined) updatePayload.avatar_url = avatarUrl;
+    if (currency !== undefined) updatePayload.currency = currency;
+    if (timezone !== undefined) updatePayload.timezone = timezone;
+    if (disciplineRules !== undefined) updatePayload.discipline_rules = disciplineRules;
+    if (preTradeChecklist !== undefined) updatePayload.pre_trade_checklist = preTradeChecklist;
+    if (currentPlan !== undefined) updatePayload.current_plan = currentPlan;
+
+    if (targetId) {
+      updatePayload.id = targetId;
+      try {
+        await supabase
+          .from("profiles")
+          .upsert(updatePayload, { onConflict: "id" });
+      } catch (profErr) {
+        console.warn("[Auth] updateProfile profiles notice:", profErr.message);
+      }
+
+      // Sync users table if applicable
+      try {
+        const userSync = {};
+        if (displayName !== undefined) userSync.display_name = displayName;
+        if (avatarUrl !== undefined) userSync.avatar_url = avatarUrl;
+        if (Object.keys(userSync).length > 0) {
+          await supabase.from("users").update(userSync).eq("id", targetId);
+        }
+      } catch (userErr) {
+        console.warn("[Auth] updateProfile users notice:", userErr.message);
+      }
+    }
+
+    res.json({
+      success: true,
+      message: "Profile updated successfully.",
+      profile: updatePayload,
+    });
+  } catch (error) {
+    console.error("[Auth] updateProfile error:", error);
+    res.status(500).json({ success: false, error: "Failed to update profile." });
+  }
+};
+
+export const updateChecklist = async (req, res) => {
+  try {
+    const { userId, checklist } = req.body;
+    const targetId = userId || req.headers["x-user-id"] || req.user?.id;
+
+    if (!targetId) {
+      return res.status(400).json({ success: false, error: "Missing userId" });
+    }
+
+    if (!Array.isArray(checklist)) {
+      return res.status(400).json({ success: false, error: "Checklist must be an array" });
+    }
+
+    await supabase
+      .from("profiles")
+      .upsert(
+        {
+          id: targetId,
+          pre_trade_checklist: checklist,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: "id" }
+      );
+
+    res.json({ success: true, checklist });
+  } catch (error) {
+    console.error("[Auth] updateChecklist error:", error);
+    res.status(500).json({ success: false, error: "Failed to update checklist." });
+  }
+};

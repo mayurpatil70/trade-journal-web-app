@@ -26,6 +26,7 @@ export default function TradeFXBookTopBar({
   const dropdownRef = useRef(null);
 
   const userEmail = localStorage.getItem("userEmail") || "Trader";
+  const userAvatar = localStorage.getItem("userAvatar") || "";
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -203,9 +204,17 @@ export default function TradeFXBookTopBar({
           onClick={() => navigate("/profile")}
           className="h-10 flex items-center gap-2 px-2 rounded-2xl bg-white/80 dark:bg-[#121622]/80 border border-black/[0.06] dark:border-white/[0.08] hover:border-emerald-500/30 transition-all cursor-pointer shadow-sm select-none"
         >
-          <div className="w-6 h-6 rounded-lg bg-gradient-to-tr from-emerald-500 to-teal-500 text-white flex items-center justify-center font-bold text-[11px] shadow-sm">
-            {userEmail.charAt(0).toUpperCase()}
-          </div>
+          {userAvatar ? (
+            <img
+              src={userAvatar}
+              alt="avatar"
+              className="w-6 h-6 rounded-lg object-cover ring-1 ring-emerald-500/20 shadow-sm"
+            />
+          ) : (
+            <div className="w-6 h-6 rounded-lg bg-gradient-to-tr from-emerald-500 to-teal-500 text-white flex items-center justify-center font-bold text-[11px] shadow-sm">
+              {userEmail.charAt(0).toUpperCase()}
+            </div>
+          )}
           <div className="hidden sm:flex flex-col items-start leading-none pr-1">
             <span className="text-[11px] font-bold text-neutral-800 dark:text-neutral-200 truncate max-w-[80px]">
               {userEmail.split("@")[0]}
