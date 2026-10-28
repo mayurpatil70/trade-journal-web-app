@@ -28,6 +28,18 @@ class PaywallErrorBoundary extends React.Component {
 }
 
 // Fallback view if Web3 / crypto library fails to load
+const redirectAfterAccess = (navigate) => {
+  const userId = localStorage.getItem('userId') || localStorage.getItem('userEmail') || '';
+  const onboardingDone =
+    localStorage.getItem(`onboarding_completed_${userId}`) === 'true' ||
+    localStorage.getItem('onboarding_completed') === 'true';
+  if (!onboardingDone) {
+    navigate('/onboarding');
+  } else {
+    navigate('/dashboard');
+  }
+};
+
 function PaywallFallbackView() {
   const navigate = useNavigate();
   const [isStartingTrial, setIsStartingTrial] = useState(false);
@@ -42,7 +54,7 @@ function PaywallFallbackView() {
       });
       if (response.data.success) {
         invalidateSubscriptionCache();
-        navigate('/dashboard');
+        redirectAfterAccess(navigate);
       }
     } catch (error) {
       alert(error.response?.data?.error || 'Failed to start trial');
@@ -244,7 +256,7 @@ function Paywall() {
       });
       if (response.data.success) {
         invalidateSubscriptionCache();
-        navigate('/dashboard');
+        redirectAfterAccess(navigate);
       }
     } catch (error) {
       console.error('Start trial error:', error);
@@ -297,7 +309,7 @@ function Paywall() {
         .then((response) => {
           if (response.data.success) {
             invalidateSubscriptionCache();
-            navigate('/dashboard');
+            redirectAfterAccess(navigate);
           }
         })
         .catch((err) => {

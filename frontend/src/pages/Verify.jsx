@@ -1,4 +1,4 @@
-﻿// frontend/src/pages/Verify.jsx
+// frontend/src/pages/Verify.jsx
 import { useEffect, useState, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import api, { saveSession } from "../api/axios";
@@ -51,7 +51,14 @@ export default function Verify() {
           } else if (!hasPaid) {
             navigate("/paywall");
           } else {
-            navigate("/dashboard");
+            const onboardingCompleted =
+              localStorage.getItem(`onboarding_completed_${userId}`) === "true" ||
+              localStorage.getItem("onboarding_completed") === "true";
+            if (!onboardingCompleted) {
+              navigate("/onboarding");
+            } else {
+              navigate("/dashboard");
+            }
           }
         }, 1500);
       } catch (error) {

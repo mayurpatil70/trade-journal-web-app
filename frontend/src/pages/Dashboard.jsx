@@ -103,8 +103,17 @@ export default function Dashboard() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    const userId = localStorage.getItem("userId") || localStorage.getItem("userEmail");
+    const isOnboardingCompleted =
+      localStorage.getItem(`onboarding_completed_${userId}`) === "true" ||
+      localStorage.getItem("onboarding_completed") === "true";
+
+    if (!isOnboardingCompleted) {
+      navigate("/onboarding", { replace: true });
+      return;
+    }
     fetchTrades();
-  }, []);
+  }, [navigate]);
 
   const fetchTrades = async () => {
     try {

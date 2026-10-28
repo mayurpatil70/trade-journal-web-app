@@ -65,8 +65,10 @@ const Verify = safeLazy(() => import("./pages/Verify.jsx"), "verify");
 const DiscordGate = safeLazy(() => import("./pages/DiscordGate.jsx"), "discord-gate");
 const DiscordCallback = safeLazy(() => import("./pages/DiscordCallback.jsx"), "discord-callback");
 const Paywall = safeLazy(() => import("./pages/Paywall.jsx"), "paywall");
+const Onboarding = safeLazy(() => import("./pages/Onboarding.jsx"), "onboarding");
 
 // Register prefetch handlers for instant hover / idle prefetching
+registerRoutePrefetch("/onboarding", () => import("./pages/Onboarding.jsx"));
 registerRoutePrefetch("/charts", () => import("./pages/Charts.jsx"));
 registerRoutePrefetch("/sessions", () => import("./pages/Sessions.jsx"));
 registerRoutePrefetch("/backtest", () => import("./pages/Backtest.jsx"));
@@ -261,6 +263,7 @@ function App() {
 
               {/* Guard 2: Must be logged in AND Paid (or Active Trial / Admin) */}
               <Route element={<PaywallGuard />}>
+                  <Route path="/onboarding" element={<Onboarding />} />
                   <Route path="/backtest/:id" element={<Backtest />} />
                   <Route path="/backtest" element={<Navigate to="/sessions" replace />} />
                   <Route path="/" element={<MainLayout />}>
