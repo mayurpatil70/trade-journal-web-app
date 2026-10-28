@@ -34,9 +34,14 @@ export default function AppleSelect({
       : { value: opt, label: String(opt) },
   );
 
-  const selectedOption = normalizedOptions.find(
+  let selectedOption = normalizedOptions.find(
     (opt) => String(opt.value) === String(value),
   );
+  if (!selectedOption && value) {
+    selectedOption = normalizedOptions.find(
+      (opt) => String(opt.value).toLowerCase() === String(value).toLowerCase(),
+    ) || { value, label: String(value) };
+  }
 
   // Measure and position dropdown
   const updatePosition = useCallback(() => {

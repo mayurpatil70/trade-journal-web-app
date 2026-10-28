@@ -42,6 +42,7 @@ import {
   ExternalLink,
   Sparkles,
 } from "lucide-react";
+import AppleSelect from "../components/ui/AppleSelect";
 import api from "../api/axios";
 
 const DEFAULT_CHECKLIST = [
@@ -1067,25 +1068,17 @@ export default function Profile({ defaultTab }) {
                 </div>
               </div>
 
-              {/* Timezone Selection */}
+              {/* Timezone Selection (Apple macOS / iOS Frosted Custom Dropdown) */}
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider text-neutral-500 dark:text-neutral-400 mb-2">
                   Trading Timezone
                 </label>
-                <div className="relative">
-                  <select
-                    value={preferences.timezone}
-                    onChange={(e) => handleUpdatePreference("timezone", e.target.value)}
-                    className="w-full px-4 py-3 rounded-2xl bg-neutral-50 dark:bg-white/[0.03] border border-black/[0.08] dark:border-white/[0.1] text-neutral-900 dark:text-white text-xs font-semibold focus:outline-none focus:border-emerald-500 appearance-none cursor-pointer"
-                  >
-                    {TIMEZONE_OPTIONS.map((tz) => (
-                      <option key={tz.value} value={tz.value} className="bg-white dark:bg-[#121622] text-neutral-900 dark:text-white">
-                        {tz.label}
-                      </option>
-                    ))}
-                  </select>
-                  <ChevronDown className="w-4 h-4 text-neutral-400 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none" />
-                </div>
+                <AppleSelect
+                  value={preferences.timezone}
+                  onChange={(e) => handleUpdatePreference("timezone", e.target.value)}
+                  options={TIMEZONE_OPTIONS}
+                  placeholder="Select trading timezone"
+                />
                 <p className="text-[11px] text-neutral-400 dark:text-neutral-500 mt-2">
                   Session timings, economic announcements, and execution timestamps align to this timezone.
                 </p>
