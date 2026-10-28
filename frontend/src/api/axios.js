@@ -38,6 +38,10 @@ export function clearSession() {
   localStorage.removeItem("token");
   localStorage.removeItem("userEmail");
   localStorage.removeItem("sessionCreatedAt");
+  if (typeof window !== "undefined") {
+    sessionStorage.removeItem("user_in_app");
+    sessionStorage.removeItem("prev_path");
+  }
 }
 
 // Returns true if a valid session exists and hasn't exceeded the daily reset window.

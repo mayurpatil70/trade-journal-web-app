@@ -26,8 +26,12 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import api from '../api/axios';
-import { invalidateSubscriptionCache } from '../utils/subscriptionCache';
+import api, { isSessionValid } from '../api/axios';
+import {
+  invalidateSubscriptionCache,
+  getCachedAccessStatus,
+  getImmediateCachedStatus,
+} from '../utils/subscriptionCache';
 
 class PaywallErrorBoundary extends React.Component {
   constructor(props) {
@@ -67,7 +71,54 @@ function PaywallFallbackView() {
   const [billingCycle, setBillingCycle] = useState('monthly');
   const isYearly = billingCycle === 'yearly';
 
+  // Don't show /paywall to paid user
+  const cachedStatus = getImmediateCachedStatus();
+  if (cachedStatus?.hasPaid || cachedStatus?.isAdmin) {
+    redirectAfterAccess(navigate);
+    return null;
+  }
+
+  useEffect(() => {
+    getCachedAccessStatus()
+      .then((data) => {
+        if (data?.hasPaid || data?.isAdmin) {
+          redirectAfterAccess(navigate);
+        }
+      })
+      .catch(() => {});
+  }, [navigate]);
+
+  const [inApp] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    const token = localStorage.getItem('token');
+    const inAppFlag = sessionStorage.getItem('user_in_app') === 'true';
+    const prevPath = sessionStorage.getItem('prev_path') || '';
+
+    if (!token) return false;
+    if (
+      prevPath.includes('/login') ||
+      prevPath.includes('/verify') ||
+      prevPath.includes('/link-discord') ||
+      prevPath.includes('/discord')
+    ) {
+      return false;
+    }
+    return inAppFlag;
+  });
+
+  const handleBack = () => {
+    if (inApp) {
+      navigate('/dashboard');
+    } else {
+      navigate('/');
+    }
+  };
+
   const handleStartFree = async () => {
+    if (!localStorage.getItem('token') && !localStorage.getItem('userId')) {
+      navigate('/login');
+      return;
+    }
     setIsStartingTrial(true);
     try {
       const response = await api.post('/api/subscriptions/start-trial', {
@@ -87,10 +138,10 @@ function PaywallFallbackView() {
   return (
     <div className="paywall-container min-h-screen bg-[#060b11] text-white flex flex-col items-center pt-16 pb-24 px-4 relative overflow-x-hidden">
       <button
-        onClick={() => navigate('/dashboard')}
+        onClick={handleBack}
         className="absolute top-6 left-6 text-gray-400 hover:text-white flex items-center gap-2 text-sm font-medium transition-colors z-20 cursor-pointer"
       >
-        <ArrowLeft className="w-4 h-4" /> Back to Dashboard
+        <ArrowLeft className="w-4 h-4" /> {inApp ? 'Back to Dashboard' : 'Back to Home'}
       </button>
       <div className="text-center relative z-10 max-w-2xl mb-8">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-mono font-bold tracking-wider uppercase mb-3">
@@ -439,16 +490,60 @@ function WalletConnectModal({ isOpen, onClose, onSelect, isConnecting }) {
 // MAIN PAYWALL COMPONENT
 // -------------------------------------------------------------
 function Paywall() {
+  const navigate = useNavigate();
+
+  // Don't show paywall to paid user: redirect to dashboard/onboarding
+  const immediateCached = getImmediateCachedStatus();
+  if (immediateCached?.hasPaid || immediateCached?.isAdmin) {
+    redirectAfterAccess(navigate);
+    return null;
+  }
+
+  useEffect(() => {
+    getCachedAccessStatus()
+      .then((data) => {
+        if (data?.hasPaid || data?.isAdmin) {
+          redirectAfterAccess(navigate);
+        }
+      })
+      .catch(() => {});
+  }, [navigate]);
+
   const [isStartingTrial, setIsStartingTrial] = useState(false);
   const [billingCycle, setBillingCycle] = useState('monthly'); // 'monthly' | 'yearly'
   const [selectedPlanType, setSelectedPlanType] = useState('monthly');
+
+  // Check if user is navigating from inside the application
+  const [inApp] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    const token = localStorage.getItem('token');
+    const inAppFlag = sessionStorage.getItem('user_in_app') === 'true';
+    const prevPath = sessionStorage.getItem('prev_path') || '';
+
+    if (!token) return false;
+    if (
+      prevPath.includes('/login') ||
+      prevPath.includes('/verify') ||
+      prevPath.includes('/link-discord') ||
+      prevPath.includes('/discord')
+    ) {
+      return false;
+    }
+    return inAppFlag;
+  });
+
+  const handleBack = () => {
+    if (inApp) {
+      navigate('/dashboard');
+    } else {
+      navigate('/');
+    }
+  };
 
   // Wallet Connection & Payment State
   const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
   const [paymentState, setPaymentState] = useState('idle'); // 'idle' | 'signing' | 'confirming' | 'verifying' | 'success' | 'error'
   const [paymentError, setPaymentError] = useState('');
-
-  const navigate = useNavigate();
 
   // Wagmi hooks
   const { address, isConnected, chainId } = useAccount();
@@ -477,6 +572,10 @@ function Paywall() {
   }, []);
 
   const handleStartFree = async () => {
+    if (!localStorage.getItem('token') && !localStorage.getItem('userId')) {
+      navigate('/login');
+      return;
+    }
     setIsStartingTrial(true);
     try {
       const response = await api.post('/api/subscriptions/start-trial', {
@@ -672,10 +771,10 @@ function Paywall() {
       {/* Top Bar Navigation & Wallet Connection Status */}
       <div className="w-full max-w-5xl flex items-center justify-between mb-6 relative z-20">
         <button
-          onClick={() => navigate('/dashboard')}
+          onClick={handleBack}
           className="text-gray-400 hover:text-white flex items-center gap-2 text-sm font-medium transition-colors cursor-pointer"
         >
-          <ArrowLeft className="w-4 h-4" /> Back to Dashboard
+          <ArrowLeft className="w-4 h-4" /> {inApp ? 'Back to Dashboard' : 'Back to Home'}
         </button>
 
         {isConnected && address && (

@@ -216,14 +216,81 @@ const ScrollToTop = () => {
   return null;
 };
 
-// Route observer: marks in-app navigation when user transitions between routes
+// Paywall Route: Only for users who have NOT yet paid. Paid users are redirected to dashboard.
+const PaywallRoute = () => {
+  const [isPaid, setIsPaid] = useState(() => {
+    const cached = getImmediateCachedStatus();
+    if (cached && (cached.hasPaid || cached.isAdmin)) {
+      return true;
+    }
+    return false;
+  });
+
+  useEffect(() => {
+    let active = true;
+    getCachedAccessStatus()
+      .then((data) => {
+        if (!active) return;
+        if (data?.hasPaid || data?.isAdmin) {
+          setIsPaid(true);
+        }
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  if (isPaid) {
+    const userId = localStorage.getItem("userId") || localStorage.getItem("userEmail") || "";
+    const onboardingCompleted =
+      localStorage.getItem(`onboarding_completed_${userId}`) === "true" ||
+      localStorage.getItem("onboarding_completed") === "true";
+    return <Navigate to={onboardingCompleted ? "/dashboard" : "/onboarding"} replace />;
+  }
+
+  return <Paywall />;
+};
+
+// Route observer: marks in-app navigation and tracks protected dashboard usage
 const RouteWatcher = () => {
   const { pathname } = useLocation();
   const initialPath = useRef(pathname);
+  const prevPathRef = useRef(pathname);
 
   useEffect(() => {
     if (pathname !== initialPath.current) {
       markInAppNavigation();
+    }
+    if (pathname !== prevPathRef.current) {
+      sessionStorage.setItem("prev_path", prevPathRef.current);
+      prevPathRef.current = pathname;
+    }
+
+    const appRoutes = [
+      "/dashboard",
+      "/add-trade",
+      "/news",
+      "/trades",
+      "/calendar",
+      "/analytics",
+      "/psychology",
+      "/mistakes",
+      "/accounts",
+      "/settings",
+      "/profile",
+      "/support",
+      "/affiliate",
+      "/charts",
+      "/sessions",
+      "/calculator",
+      "/bot-hub",
+    ];
+
+    if (appRoutes.some((route) => pathname.startsWith(route))) {
+      sessionStorage.setItem("user_in_app", "true");
+    } else if (pathname === "/login" || pathname === "/verify") {
+      sessionStorage.removeItem("user_in_app");
     }
   }, [pathname]);
 
@@ -254,12 +321,12 @@ function App() {
             {SEO_PAGES.map((p) => <Route key={p.path} path={p.path} element={<SeoLandingPage />} />)}
             <Route path="/login" element={<Login />} />
             <Route path="/verify" element={<Verify />} />
+            <Route path="/paywall" element={<PaywallRoute />} />
 
             {/* Guard 1: Must be logged in */}
             <Route element={<AuthGuard />}>
               <Route path="/link-discord" element={<DiscordGate />} />
               <Route path="/discord/callback" element={<DiscordCallback />} />
-              <Route path="/paywall" element={<Paywall />} />
 
               {/* Guard 2: Must be logged in AND Paid (or Active Trial / Admin) */}
               <Route element={<PaywallGuard />}>
