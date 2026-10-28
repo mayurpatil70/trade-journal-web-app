@@ -6,7 +6,6 @@ import {
   Calendar,
   ShieldAlert,
   Search,
-  Sparkles,
   AlertTriangle,
   Info,
   Clock,
@@ -688,8 +687,8 @@ export default function EconomicCalendar() {
                                       {/* Market Reaction & Pairs Column */}
                                       <div className="space-y-4 text-xs">
                                         <div className="flex items-center justify-between pb-2 border-b border-black/[0.06] dark:border-white/[0.08]">
-                                          <span className="font-extrabold uppercase tracking-wider text-[11px] text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
-                                            <Sparkles className="w-4 h-4" /> Market Reaction & Pairs
+                                          <span className="font-extrabold uppercase tracking-wider text-[11px] text-emerald-600 dark:text-emerald-400">
+                                            Market Reaction & Pairs
                                           </span>
                                           <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${impactData.badgeBg}`}>
                                             {impactData.bias}
@@ -754,8 +753,7 @@ export default function EconomicCalendar() {
             {/* Impact Analysis Side Panel */}
             <div className="w-full lg:w-88 p-5 bg-neutral-50/90 dark:bg-[#0c0e14]/90 shrink-0 flex flex-col justify-between">
               <div>
-                <div className="flex items-center gap-2 mb-4">
-                  <Sparkles className="w-4 h-4 text-emerald-500" />
+                <div className="mb-4">
                   <h4 className="font-extrabold text-xs uppercase tracking-wider text-neutral-900 dark:text-neutral-100">
                     News Impact Analysis
                   </h4>
