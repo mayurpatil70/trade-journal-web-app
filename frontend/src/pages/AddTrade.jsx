@@ -891,7 +891,7 @@ export default function AddTrade() {
       </div>
 
       {/* FORM CONTAINER */}
-      <div className="bg-[#101216] border border-white/5 rounded-3xl p-6 md:p-10 shadow-2xl relative overflow-hidden min-h-[400px]">
+      <div className="bg-[#101216] border border-white/5 rounded-3xl p-6 md:p-10 shadow-2xl relative min-h-[400px]">
         {/* INLINE VALIDATION ALERT */}
         {Object.keys(fieldErrors).some((k) => fieldErrors[k]) && (
           <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs flex items-center gap-3 animate-in fade-in">
@@ -1110,14 +1110,19 @@ export default function AddTrade() {
                       Entry Date & Time (GMT+0:00) <span className="text-red-400">*</span>
                     </label>
                     <DateTimePickerPopover
-                      value={formData.date ? new Date(`${formData.date}T${formData.time || "12:00"}`) : new Date()}
+                      value={formData.date ? new Date(`${formData.date}T${formData.time || "12:00"}`) : null}
                       onChange={(newD) => {
                         if (!newD) {
                           setFormData((p) => ({ ...p, date: "", time: "", entry_date: "", entry_time: "" }));
                           return;
                         }
-                        const dateStr = newD.toISOString().slice(0, 10);
-                        const timeStr = newD.toLocaleTimeString("en-US", { hour12: false, hour: "2-digit", minute: "2-digit" });
+                        const y = newD.getFullYear();
+                        const m = String(newD.getMonth() + 1).padStart(2, "0");
+                        const d = String(newD.getDate()).padStart(2, "0");
+                        const dateStr = `${y}-${m}-${d}`;
+                        const h = String(newD.getHours()).padStart(2, "0");
+                        const min = String(newD.getMinutes()).padStart(2, "0");
+                        const timeStr = `${h}:${min}`;
                         setFormData((p) => ({
                           ...p,
                           date: dateStr,
@@ -1125,8 +1130,12 @@ export default function AddTrade() {
                           entry_date: dateStr,
                           entry_time: timeStr,
                         }));
+                        if (fieldErrors.date) {
+                          setFieldErrors((prev) => ({ ...prev, date: null }));
+                        }
                       }}
                       placeholder="Select Entry Date & Time"
+                      error={!!fieldErrors.date}
                     />
                     {fieldErrors.date && (
                       <p className="text-red-400 text-xs mt-1">
@@ -1143,8 +1152,13 @@ export default function AddTrade() {
                           setFormData((p) => ({ ...p, exit_date: "", exit_time: "" }));
                           return;
                         }
-                        const dateStr = newD.toISOString().slice(0, 10);
-                        const timeStr = newD.toLocaleTimeString("en-US", { hour12: false, hour: "2-digit", minute: "2-digit" });
+                        const y = newD.getFullYear();
+                        const m = String(newD.getMonth() + 1).padStart(2, "0");
+                        const d = String(newD.getDate()).padStart(2, "0");
+                        const dateStr = `${y}-${m}-${d}`;
+                        const h = String(newD.getHours()).padStart(2, "0");
+                        const min = String(newD.getMinutes()).padStart(2, "0");
+                        const timeStr = `${h}:${min}`;
                         setFormData((p) => ({
                           ...p,
                           exit_date: dateStr,

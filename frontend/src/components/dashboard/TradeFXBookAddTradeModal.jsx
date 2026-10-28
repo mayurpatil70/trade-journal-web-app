@@ -51,14 +51,26 @@ export default function TradeFXBookAddTradeModal({ isOpen, onClose, onTradeAdded
     try {
       const userId = localStorage.getItem("userId") || localStorage.getItem("userEmail");
       const eDate = entryDateTime || new Date();
-      const dateStr = eDate.toISOString().slice(0, 10);
-      const timeStr = eDate.toLocaleTimeString("en-US", { hour12: false, hour: "2-digit", minute: "2-digit" });
+      const formatLocalDate = (d) => {
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, "0");
+        const day = String(d.getDate()).padStart(2, "0");
+        return `${y}-${m}-${day}`;
+      };
+      const formatLocalTime = (d) => {
+        const h = String(d.getHours()).padStart(2, "0");
+        const min = String(d.getMinutes()).padStart(2, "0");
+        return `${h}:${min}`;
+      };
+
+      const dateStr = formatLocalDate(eDate);
+      const timeStr = formatLocalTime(eDate);
 
       let exDateStr = null;
       let exTimeStr = null;
       if (exitDateTime) {
-        exDateStr = exitDateTime.toISOString().slice(0, 10);
-        exTimeStr = exitDateTime.toLocaleTimeString("en-US", { hour12: false, hour: "2-digit", minute: "2-digit" });
+        exDateStr = formatLocalDate(exitDateTime);
+        exTimeStr = formatLocalTime(exitDateTime);
       }
 
       // Compute result if exit price is provided
