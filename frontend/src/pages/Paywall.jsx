@@ -1,9 +1,30 @@
-import React, { useState, useEffect } from 'react';
-import { WagmiProvider, useWriteContract, useWaitForTransactionReceipt, useAccount, useConnect } from 'wagmi';
+import React, { useState, useEffect, useRef } from 'react';
+import {
+  WagmiProvider,
+  useWriteContract,
+  useWaitForTransactionReceipt,
+  useAccount,
+  useConnect,
+  useDisconnect,
+  useSwitchChain,
+} from 'wagmi';
+import { bsc } from 'wagmi/chains';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { wagmiConfig } from '../lib/wagmi';
 import { parseUnits } from 'viem';
-import { Loader2, ArrowLeft, CheckCircle2, Zap } from 'lucide-react';
+import {
+  Loader2,
+  ArrowLeft,
+  CheckCircle2,
+  Zap,
+  QrCode,
+  Wallet,
+  X,
+  ExternalLink,
+  AlertCircle,
+  LogOut,
+  ShieldCheck,
+} from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/axios';
 import { invalidateSubscriptionCache } from '../utils/subscriptionCache';
@@ -67,7 +88,7 @@ function PaywallFallbackView() {
     <div className="paywall-container min-h-screen bg-[#060b11] text-white flex flex-col items-center pt-16 pb-24 px-4 relative overflow-x-hidden">
       <button
         onClick={() => navigate('/dashboard')}
-        className="absolute top-6 left-6 text-gray-400 hover:text-white flex items-center gap-2 text-sm font-medium transition-colors z-20"
+        className="absolute top-6 left-6 text-gray-400 hover:text-white flex items-center gap-2 text-sm font-medium transition-colors z-20 cursor-pointer"
       >
         <ArrowLeft className="w-4 h-4" /> Back to Dashboard
       </button>
@@ -96,7 +117,7 @@ function PaywallFallbackView() {
           <button
             onClick={handleStartFree}
             disabled={isStartingTrial}
-            className="w-full mt-auto py-3.5 rounded-xl font-bold text-xs tracking-wider uppercase border border-white/20 text-white hover:bg-white/5 transition-all"
+            className="w-full mt-auto py-3.5 rounded-xl font-bold text-xs tracking-wider uppercase border border-white/20 text-white hover:bg-white/5 transition-all cursor-pointer"
           >
             {isStartingTrial ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : 'Start For Free'}
           </button>
@@ -110,8 +131,8 @@ function PaywallFallbackView() {
             <span className="text-gray-400 text-xs font-mono ml-1">{isYearly ? '/year' : '/month'}</span>
           </div>
           <button
-            onClick={() => alert('Please connect using a Web3-enabled browser (e.g. MetaMask) or contact support.')}
-            className="w-full mt-auto py-3.5 rounded-xl font-bold text-xs tracking-wider uppercase bg-emerald-600 hover:bg-emerald-500 text-white transition-all"
+            onClick={() => alert('Please connect using a Web3-enabled browser (e.g. MetaMask, WalletConnect) or contact support.')}
+            className="w-full mt-auto py-3.5 rounded-xl font-bold text-xs tracking-wider uppercase bg-emerald-600 hover:bg-emerald-500 text-white transition-all cursor-pointer"
           >
             Subscribe With USDT
           </button>
@@ -123,22 +144,24 @@ function PaywallFallbackView() {
 
 // BSC USDT Contract Address
 const USDT_ADDRESS = '0x55d398326f99059fF775485246999027B3197955';
-// Merchant Wallet from .env
-const MERCHANT_WALLET = import.meta.env.VITE_BEP20_ADDRESS;
+// Merchant Wallet from .env (with fallback)
+const MERCHANT_WALLET =
+  (typeof import.meta !== 'undefined' && import.meta.env?.VITE_BEP20_ADDRESS) ||
+  '0xeEE0DCbddd4cf94913dd2E69cA1009290F5B076E';
 
 const ERC20_ABI = [
   {
-    "constant": false,
-    "inputs": [
-      { "name": "_to", "type": "address" },
-      { "name": "_value", "type": "uint256" }
+    constant: false,
+    inputs: [
+      { name: '_to', type: 'address' },
+      { name: '_value', type: 'uint256' },
     ],
-    "name": "transfer",
-    "outputs": [{ "name": "", "type": "bool" }],
-    "payable": false,
-    "stateMutability": "nonpayable",
-    "type": "function"
-  }
+    name: 'transfer',
+    outputs: [{ name: '', type: 'bool' }],
+    payable: false,
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
 ];
 
 const queryClient = new QueryClient();
@@ -222,13 +245,229 @@ function OdometerPrice({ value, height = 40 }) {
   );
 }
 
+// -------------------------------------------------------------
+// WALLET SELECTION MODAL (WALLETCONNECT / METAMASK / INJECTED)
+// -------------------------------------------------------------
+function WalletConnectModal({ isOpen, onClose, onSelect, isConnecting }) {
+  if (!isOpen) return null;
+
+  const isMetaMaskDetected =
+    typeof window !== 'undefined' && Boolean(window.ethereum?.isMetaMask);
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200"
+      onClick={onClose}
+    >
+      <div
+        className="relative w-full max-w-md bg-[#0b131f] border border-white/15 rounded-2xl p-6 shadow-2xl text-white"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between pb-4 border-b border-white/10">
+          <div>
+            <h3 className="text-lg font-bold text-white flex items-center gap-2">
+              <Wallet className="w-5 h-5 text-emerald-400" />
+              Connect Wallet
+            </h3>
+            <p className="text-xs text-gray-400 mt-0.5">
+              Choose how you would like to connect and pay
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Wallet Options List */}
+        <div className="mt-5 space-y-3">
+          {/* Option 1: WalletConnect (QR Scanner) */}
+          <button
+            type="button"
+            onClick={() => onSelect('walletConnect')}
+            disabled={isConnecting}
+            className="w-full flex items-center justify-between p-4 rounded-xl bg-[#0f1d2e] hover:bg-[#13273d] border border-emerald-500/35 hover:border-emerald-500/70 transition-all group text-left cursor-pointer"
+          >
+            <div className="flex items-center gap-3.5">
+              <div className="w-11 h-11 rounded-xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-blue-400 group-hover:scale-105 transition-transform shrink-0">
+                <QrCode className="w-6 h-6 text-emerald-400" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="font-bold text-sm text-white">WalletConnect</span>
+                  <span className="text-[10px] uppercase font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/35">
+                    QR Scanner
+                  </span>
+                </div>
+                <p className="text-xs text-gray-400 mt-1 leading-snug">
+                  Scan QR with Trust Wallet, Binance Web3, MetaMask Mobile, Rainbow & 300+ wallets
+                </p>
+              </div>
+            </div>
+            <div className="text-gray-500 group-hover:text-emerald-400 text-lg transition-colors pl-2">
+              →
+            </div>
+          </button>
+
+          {/* Option 2: MetaMask */}
+          <button
+            type="button"
+            onClick={() => onSelect('metaMask')}
+            disabled={isConnecting}
+            className="w-full flex items-center justify-between p-4 rounded-xl bg-[#0f1d2e] hover:bg-[#13273d] border border-white/10 hover:border-amber-500/50 transition-all group text-left cursor-pointer"
+          >
+            <div className="flex items-center gap-3.5">
+              <div className="w-11 h-11 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 group-hover:scale-105 transition-transform shrink-0">
+                <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none">
+                  <path
+                    d="M21.5 6L13.5 12L16 3.5L21.5 6Z"
+                    fill="#E2761B"
+                    stroke="#E2761B"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M2.5 6L10.5 12L8 3.5L2.5 6Z"
+                    fill="#E4761B"
+                    stroke="#E4761B"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M19 15.5L21.5 19L16 20.5L13.5 17L19 15.5Z"
+                    fill="#E4761B"
+                    stroke="#E4761B"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M5 15.5L2.5 19L8 20.5L10.5 17L5 15.5Z"
+                    fill="#E4761B"
+                    stroke="#E4761B"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M8 12L10.5 17L8 20.5L2.5 19L5 15.5L8 12Z"
+                    fill="#D7C1B3"
+                    stroke="#D7C1B3"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M16 12L13.5 17L16 20.5L21.5 19L19 15.5L16 12Z"
+                    fill="#D7C1B3"
+                    stroke="#D7C1B3"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M10.5 12L12 15L13.5 12L16 3.5H8L10.5 12Z"
+                    fill="#233447"
+                    stroke="#233447"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="font-bold text-sm text-white">MetaMask</span>
+                  {isMetaMaskDetected && (
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                      Extension Ready
+                    </span>
+                  )}
+                </div>
+                <p className="text-xs text-gray-400 mt-1 leading-snug">
+                  Connect to your MetaMask browser extension
+                </p>
+              </div>
+            </div>
+            <div className="text-gray-500 group-hover:text-amber-400 text-lg transition-colors pl-2">
+              →
+            </div>
+          </button>
+
+          {/* Option 3: Browser Wallet / Injected */}
+          <button
+            type="button"
+            onClick={() => onSelect('injected')}
+            disabled={isConnecting}
+            className="w-full flex items-center justify-between p-4 rounded-xl bg-[#0f1d2e] hover:bg-[#13273d] border border-white/10 hover:border-purple-500/50 transition-all group text-left cursor-pointer"
+          >
+            <div className="flex items-center gap-3.5">
+              <div className="w-11 h-11 rounded-xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400 group-hover:scale-105 transition-transform shrink-0">
+                <Wallet className="w-6 h-6 text-purple-400" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="font-bold text-sm text-white">Other Browser Wallet</span>
+                </div>
+                <p className="text-xs text-gray-400 mt-1 leading-snug">
+                  Coinbase, Rabby, OKX, Brave, Phantom or other web3 extension
+                </p>
+              </div>
+            </div>
+            <div className="text-gray-500 group-hover:text-purple-400 text-lg transition-colors pl-2">
+              →
+            </div>
+          </button>
+        </div>
+
+        {/* Footer info */}
+        <div className="mt-5 pt-4 border-t border-white/10 flex items-center justify-between text-[11px] text-gray-400 font-mono">
+          <span className="flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 inline-block animate-pulse" />
+            BNB Smart Chain (BEP-20)
+          </span>
+          <span className="flex items-center gap-1 text-emerald-400">
+            <ShieldCheck className="w-3.5 h-3.5" />
+            Instant Verification
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// -------------------------------------------------------------
+// MAIN PAYWALL COMPONENT
+// -------------------------------------------------------------
 function Paywall() {
   const [isStartingTrial, setIsStartingTrial] = useState(false);
   const [billingCycle, setBillingCycle] = useState('monthly'); // 'monthly' | 'yearly'
   const [selectedPlanType, setSelectedPlanType] = useState('monthly');
-  const { isConnected } = useAccount();
-  const { connectors, connect } = useConnect();
+
+  // Wallet Connection & Payment State
+  const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
+  const [paymentState, setPaymentState] = useState('idle'); // 'idle' | 'signing' | 'confirming' | 'verifying' | 'success' | 'error'
+  const [paymentError, setPaymentError] = useState('');
+
   const navigate = useNavigate();
+
+  // Wagmi hooks
+  const { address, isConnected, chainId } = useAccount();
+  const { disconnect } = useDisconnect();
+  const { switchChain } = useSwitchChain();
+  const { connectors, connect, isPending: isConnecting } = useConnect();
+
+  const { data: hash, writeContract, isPending: isWritePending } = useWriteContract();
+
+  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
+    hash,
+    query: {
+      enabled: Boolean(hash),
+    },
+  });
+
+  const verifiedHashesRef = useRef(new Set());
+  const subType = localStorage.getItem('subscriptionType') || 'free';
+  const isYearly = billingCycle === 'yearly';
 
   useEffect(() => {
     document.body.classList.add('terminal');
@@ -236,17 +475,6 @@ function Paywall() {
       document.body.classList.remove('terminal');
     };
   }, []);
-
-  const { data: hash, writeContract } = useWriteContract();
-
-  const { isSuccess: isConfirmed } = useWaitForTransactionReceipt({
-    hash,
-    query: {
-      enabled: Boolean(hash),
-    },
-  });
-
-  const subType = localStorage.getItem('subscriptionType') || 'free';
 
   const handleStartFree = async () => {
     setIsStartingTrial(true);
@@ -266,40 +494,114 @@ function Paywall() {
     }
   };
 
-  const handleCryptoPayment = async (plan, price) => {
+  // Called when user clicks Upgrade Pro button on card
+  const handleUpgradeClick = (plan, price) => {
     setSelectedPlanType(plan);
+    setPaymentError('');
+
     if (!isConnected) {
-      const hasInjected = typeof window !== 'undefined' && window.ethereum;
-      const wcConnector = connectors.find((c) => c.id === 'walletConnect');
-      const injectedConnector =
-        connectors.find((c) => c.id === 'injected' || c.id === 'metaMask') || connectors[0];
-
-      const connectorToUse = hasInjected ? injectedConnector : wcConnector || injectedConnector;
-
-      if (connectorToUse) {
-        connect({ connector: connectorToUse });
-      } else {
-        alert('Wallet connection failed. Please try again.');
-      }
+      setIsWalletModalOpen(true);
       return;
     }
 
-    try {
-      const amount = parseUnits(price.toString(), 18);
-      writeContract({
-        address: USDT_ADDRESS,
-        abi: ERC20_ABI,
-        functionName: 'transfer',
-        args: [MERCHANT_WALLET, amount],
-      });
-    } catch (error) {
-      console.error(error);
-      alert('Transaction initialization failed.');
+    executePayment(plan, price);
+  };
+
+  // Called from WalletConnectModal when user chooses a wallet provider
+  const handleSelectConnector = (type) => {
+    setIsWalletModalOpen(false);
+    setPaymentError('');
+
+    let targetConnector = null;
+    if (type === 'walletConnect') {
+      targetConnector = connectors.find((c) => c.id === 'walletConnect');
+    } else if (type === 'metaMask') {
+      targetConnector =
+        connectors.find((c) => c.id === 'metaMask' || c.id === 'io.metamask') ||
+        connectors.find((c) => c.id === 'injected');
+    } else {
+      targetConnector =
+        connectors.find((c) => c.id === 'injected') ||
+        connectors[0];
+    }
+
+    if (targetConnector) {
+      connect(
+        { connector: targetConnector },
+        {
+          onError: (err) => {
+            console.warn('[Wallet] Connection failed or closed by user:', err?.message);
+            if (!err?.message?.includes('User rejected') && !err?.message?.includes('Modal closed')) {
+              setPaymentError(err?.shortMessage || err?.message || 'Wallet connection was not completed.');
+            }
+          },
+        }
+      );
+    } else {
+      alert('Selected wallet connector is not available. Please try another option.');
     }
   };
 
+  // Execute BSC USDT transfer
+  const executePayment = async (plan, price) => {
+    setSelectedPlanType(plan);
+    setPaymentError('');
+
+    // Ensure wallet is on BSC network
+    if (chainId && chainId !== bsc.id && switchChain) {
+      try {
+        await switchChain({ chainId: bsc.id });
+      } catch (switchErr) {
+        console.warn('[Wallet] Network switch rejected or failed:', switchErr?.message);
+        setPaymentError('Please switch your wallet network to BNB Smart Chain (BSC) to continue.');
+        return;
+      }
+    }
+
+    try {
+      setPaymentState('signing');
+      const amount = parseUnits(price.toString(), 18);
+      writeContract(
+        {
+          address: USDT_ADDRESS,
+          abi: ERC20_ABI,
+          functionName: 'transfer',
+          args: [MERCHANT_WALLET, amount],
+        },
+        {
+          onError: (err) => {
+            console.error('[Payment] writeContract error:', err);
+            setPaymentState('idle');
+            if (err?.message?.includes('User rejected') || err?.message?.includes('denied')) {
+              setPaymentError('Transaction cancelled by user in wallet.');
+            } else if (err?.message?.includes('insufficient funds')) {
+              setPaymentError('Insufficient BNB for gas fees or insufficient USDT balance.');
+            } else {
+              setPaymentError(err?.shortMessage || err?.message || 'Transaction could not be submitted.');
+            }
+          },
+        }
+      );
+    } catch (error) {
+      console.error('[Payment] executePayment error:', error);
+      setPaymentState('idle');
+      setPaymentError(error?.shortMessage || error?.message || 'Transaction initialization failed.');
+    }
+  };
+
+  // Update payment state when hash is broadcasted
   useEffect(() => {
-    if (isConfirmed && hash) {
+    if (hash && paymentState === 'signing') {
+      setPaymentState('confirming');
+    }
+  }, [hash, paymentState]);
+
+  // Once confirmed on chain, verify with backend securely
+  useEffect(() => {
+    if (isConfirmed && hash && !verifiedHashesRef.current.has(hash)) {
+      verifiedHashesRef.current.add(hash);
+      setPaymentState('verifying');
+
       api
         .post('/api/subscriptions/verify-crypto', {
           referredBy: localStorage.getItem('referred_by'),
@@ -308,18 +610,52 @@ function Paywall() {
         })
         .then((response) => {
           if (response.data.success) {
+            setPaymentState('success');
             invalidateSubscriptionCache();
-            redirectAfterAccess(navigate);
+            setTimeout(() => {
+              redirectAfterAccess(navigate);
+            }, 1800);
+          } else {
+            setPaymentState('error');
+            setPaymentError(response.data.error || 'Payment verification failed.');
           }
         })
         .catch((err) => {
-          console.error(err);
-          alert('Payment confirmed on chain, but verification failed. Contact support.');
+          console.error('[Payment] Backend verification failed:', err);
+          setPaymentState('error');
+          setPaymentError(
+            err.response?.data?.error ||
+              'Payment confirmed on-chain, but server verification failed. Please click Retry below.'
+          );
         });
     }
-  }, [isConfirmed, hash, selectedPlanType]);
+  }, [isConfirmed, hash, selectedPlanType, navigate]);
 
-  const isYearly = billingCycle === 'yearly';
+  // Retry verification if network failed previously
+  const handleRetryVerification = async () => {
+    if (!hash) return;
+    setPaymentState('verifying');
+    setPaymentError('');
+    try {
+      const response = await api.post('/api/subscriptions/verify-crypto', {
+        referredBy: localStorage.getItem('referred_by'),
+        txHash: hash,
+        plan: selectedPlanType,
+      });
+      if (response.data.success) {
+        setPaymentState('success');
+        invalidateSubscriptionCache();
+        setTimeout(() => {
+          redirectAfterAccess(navigate);
+        }, 1500);
+      }
+    } catch (err) {
+      setPaymentState('error');
+      setPaymentError(err.response?.data?.error || 'Verification failed. Contact support.');
+    }
+  };
+
+  const isWrongChain = isConnected && chainId && chainId !== bsc.id;
 
   return (
     <div className="paywall-container min-h-screen bg-[#060b11] text-white flex flex-col items-center pt-16 pb-24 px-4 relative overflow-x-hidden">
@@ -333,12 +669,142 @@ function Paywall() {
         }}
       />
 
-      <button
-        onClick={() => navigate('/dashboard')}
-        className="absolute top-6 left-6 text-gray-400 hover:text-white flex items-center gap-2 text-sm font-medium transition-colors z-20"
-      >
-        <ArrowLeft className="w-4 h-4" /> Back to Dashboard
-      </button>
+      {/* Top Bar Navigation & Wallet Connection Status */}
+      <div className="w-full max-w-5xl flex items-center justify-between mb-6 relative z-20">
+        <button
+          onClick={() => navigate('/dashboard')}
+          className="text-gray-400 hover:text-white flex items-center gap-2 text-sm font-medium transition-colors cursor-pointer"
+        >
+          <ArrowLeft className="w-4 h-4" /> Back to Dashboard
+        </button>
+
+        {isConnected && address && (
+          <div className="flex items-center gap-2 bg-[#0b131f] border border-white/10 px-3.5 py-1.5 rounded-full text-xs font-mono shadow-lg">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 inline-block animate-pulse" />
+            <span className="text-gray-300 font-semibold">
+              {address.slice(0, 6)}...{address.slice(-4)}
+            </span>
+            <span className="text-gray-500 font-mono text-[10px] uppercase">
+              {chainId === bsc.id ? 'BSC' : 'Wrong Net'}
+            </span>
+            <button
+              type="button"
+              onClick={() => disconnect()}
+              title="Disconnect Wallet"
+              className="ml-1 text-gray-400 hover:text-red-400 transition-colors p-1 rounded cursor-pointer"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Wrong Network Warning Banner */}
+      {isWrongChain && (
+        <div className="w-full max-w-2xl mb-6 p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-between gap-3 text-amber-300 text-xs font-medium relative z-20">
+          <div className="flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 shrink-0" />
+            <span>Your wallet is connected to a different network. Switch to BNB Smart Chain to pay with USDT.</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => switchChain && switchChain({ chainId: bsc.id })}
+            className="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-black font-bold rounded-lg text-xs tracking-wider uppercase transition-colors shrink-0 cursor-pointer"
+          >
+            Switch to BSC
+          </button>
+        </div>
+      )}
+
+      {/* Payment In-Flight or Result Card */}
+      {paymentState !== 'idle' && (
+        <div className="w-full max-w-xl mb-6 p-5 rounded-2xl bg-[#0f1d2e] border border-emerald-500/40 relative z-20 shadow-2xl text-center animate-in fade-in">
+          {paymentState === 'signing' && (
+            <div className="flex flex-col items-center gap-2">
+              <Loader2 className="w-6 h-6 text-emerald-400 animate-spin" />
+              <p className="font-bold text-sm text-white">Please confirm the transfer in your wallet...</p>
+              <p className="text-xs text-gray-400">Approve the USDT transfer prompt in MetaMask or your mobile wallet.</p>
+            </div>
+          )}
+
+          {paymentState === 'confirming' && (
+            <div className="flex flex-col items-center gap-2">
+              <Loader2 className="w-6 h-6 text-emerald-400 animate-spin" />
+              <p className="font-bold text-sm text-white">Transaction broadcasting on BSC blockchain...</p>
+              <p className="text-xs text-gray-400">Waiting for on-chain block confirmation (typically ~3 seconds).</p>
+              {hash && (
+                <a
+                  href={`https://bscscan.com/tx/${hash}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-emerald-400 hover:underline inline-flex items-center gap-1 font-mono mt-1"
+                >
+                  View on BscScan <ExternalLink className="w-3 h-3" />
+                </a>
+              )}
+            </div>
+          )}
+
+          {paymentState === 'verifying' && (
+            <div className="flex flex-col items-center gap-2">
+              <Loader2 className="w-6 h-6 text-emerald-400 animate-spin" />
+              <p className="font-bold text-sm text-white">Blockchain confirmed! Verifying payment on server...</p>
+              <p className="text-xs text-gray-400">Activating your Pro Trader account privileges.</p>
+            </div>
+          )}
+
+          {paymentState === 'success' && (
+            <div className="flex flex-col items-center gap-2">
+              <CheckCircle2 className="w-7 h-7 text-emerald-400 animate-bounce" />
+              <p className="font-bold text-base text-white">Payment Verified & Pro Trader Unlocked!</p>
+              <p className="text-xs text-emerald-300">Redirecting to your trading workspace...</p>
+            </div>
+          )}
+
+          {paymentState === 'error' && (
+            <div className="flex flex-col items-center gap-2.5">
+              <AlertCircle className="w-6 h-6 text-red-400" />
+              <p className="font-bold text-sm text-red-300">{paymentError || 'Payment verification encountered an issue.'}</p>
+              {hash && (
+                <div className="flex items-center gap-3 mt-1">
+                  <button
+                    type="button"
+                    onClick={handleRetryVerification}
+                    className="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider cursor-pointer transition-colors"
+                  >
+                    Retry Verification
+                  </button>
+                  <a
+                    href={`https://bscscan.com/tx/${hash}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs text-gray-300 hover:text-white underline inline-flex items-center gap-1 font-mono"
+                  >
+                    View TX on BscScan <ExternalLink className="w-3 h-3" />
+                  </a>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Payment Inline Error (if idle) */}
+      {paymentState === 'idle' && paymentError && (
+        <div className="w-full max-w-xl mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/30 flex items-center justify-between text-xs text-red-300 relative z-20">
+          <div className="flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 shrink-0 text-red-400" />
+            <span>{paymentError}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setPaymentError('')}
+            className="text-gray-400 hover:text-white p-1 cursor-pointer"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
 
       {/* Header */}
       <div className="text-center relative z-10 max-w-2xl mb-8">
@@ -366,7 +832,7 @@ function Paywall() {
         <button
           type="button"
           onClick={() => setBillingCycle('monthly')}
-          className={`relative z-10 w-40 py-2.5 px-3 text-xs font-bold font-mono tracking-wider flex items-center justify-center gap-2 transition-colors duration-200 ${
+          className={`relative z-10 w-40 py-2.5 px-3 text-xs font-bold font-mono tracking-wider flex items-center justify-center gap-2 transition-colors duration-200 cursor-pointer ${
             !isYearly ? 'text-white' : 'text-gray-400 hover:text-white'
           }`}
         >
@@ -383,7 +849,7 @@ function Paywall() {
         <button
           type="button"
           onClick={() => setBillingCycle('yearly')}
-          className={`relative z-10 w-40 py-2.5 px-3 text-xs font-bold font-mono tracking-wider flex items-center justify-center gap-2 transition-colors duration-200 ${
+          className={`relative z-10 w-40 py-2.5 px-3 text-xs font-bold font-mono tracking-wider flex items-center justify-center gap-2 transition-colors duration-200 cursor-pointer ${
             isYearly ? 'text-white' : 'text-gray-400 hover:text-white'
           }`}
         >
@@ -439,13 +905,13 @@ function Paywall() {
           <button
             onClick={handleStartFree}
             disabled={isStartingTrial}
-            className="w-full mt-auto py-3.5 rounded-xl font-bold text-xs tracking-wider uppercase border border-white/20 text-white bg-white/5 hover:bg-white/10 transition-all disabled:opacity-50"
+            className="w-full mt-auto py-3.5 rounded-xl font-bold text-xs tracking-wider uppercase border border-white/20 text-white bg-white/5 hover:bg-white/10 transition-all disabled:opacity-50 cursor-pointer"
           >
             {isStartingTrial ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : 'Start For Free'}
           </button>
         </div>
 
-        {/* Card 2: Pro Trader (Most Popular, 50% Odometer Roll) */}
+        {/* Card 2: Pro Trader */}
         <div className="bg-[#0f1d2e] border-2 border-emerald-500 p-8 rounded-2xl flex flex-col backdrop-blur-xl relative shadow-[0_0_40px_rgba(16,185,129,0.22)]">
           <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-emerald-400 to-teal-400 text-[#060b11] text-[10px] font-extrabold font-mono tracking-widest uppercase py-1 px-3.5 rounded-full shadow-lg">
             MOST POPULAR
@@ -470,7 +936,7 @@ function Paywall() {
             </p>
           </div>
 
-          {/* Discount Pop Badge (25% on Monthly, 50% on Yearly) */}
+          {/* Discount Pop Badge */}
           <div className="h-8 mb-4 flex items-center">
             <div
               className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-[11px] font-bold font-mono tracking-wide transition-all duration-300"
@@ -507,12 +973,51 @@ function Paywall() {
             </li>
           </ul>
 
-          <button
-            onClick={() => handleCryptoPayment(isYearly ? 'yearly' : 'monthly', isYearly ? 114 : 14)}
-            className="w-full mt-auto py-3.5 rounded-xl font-bold text-xs tracking-wider uppercase bg-emerald-600 hover:bg-emerald-500 text-white transition-all shadow-lg shadow-emerald-500/25"
-          >
-            {isYearly ? 'Upgrade Pro Yearly ($114)' : 'Upgrade Pro Monthly ($14)'}
-          </button>
+          {/* Action button */}
+          <div className="space-y-2 mt-auto">
+            <button
+              onClick={() => handleUpgradeClick(isYearly ? 'yearly' : 'monthly', isYearly ? 114 : 14)}
+              disabled={paymentState !== 'idle' && paymentState !== 'error'}
+              className="w-full py-3.5 rounded-xl font-bold text-xs tracking-wider uppercase bg-emerald-600 hover:bg-emerald-500 text-white transition-all shadow-lg shadow-emerald-500/25 disabled:opacity-60 cursor-pointer flex items-center justify-center gap-2"
+            >
+              {paymentState === 'signing' || isWritePending ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>Confirm in Wallet...</span>
+                </>
+              ) : paymentState === 'confirming' || isConfirming ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>Confirming on BSC...</span>
+                </>
+              ) : paymentState === 'verifying' ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>Verifying Payment...</span>
+                </>
+              ) : paymentState === 'success' ? (
+                <>
+                  <CheckCircle2 className="w-4 h-4 text-white" />
+                  <span>Account Activated!</span>
+                </>
+              ) : isConnected ? (
+                <span>
+                  {isYearly ? 'Pay $114 USDT on BSC' : 'Pay $14 USDT on BSC'}
+                </span>
+              ) : (
+                <span>
+                  {isYearly ? 'Upgrade Pro Yearly ($114)' : 'Upgrade Pro Monthly ($14)'}
+                </span>
+              )}
+            </button>
+
+            {/* Subtext info under button */}
+            <p className="text-[11px] text-center text-gray-400 font-mono">
+              {isConnected && address
+                ? `Connected: ${address.slice(0, 6)}...${address.slice(-4)} (BEP-20 USDT)`
+                : 'Supports WalletConnect (QR Scanner), MetaMask & Web3 Wallets'}
+            </p>
+          </div>
         </div>
 
       </div>
@@ -521,13 +1026,21 @@ function Paywall() {
       {subType === 'yearly' && (
         <div className="mt-8 max-w-md w-full text-center">
           <button
-            onClick={() => handleCryptoPayment('yearly', 114)}
-            className="text-xs text-emerald-400 underline hover:text-emerald-300 transition-colors"
+            onClick={() => handleUpgradeClick('yearly', 114)}
+            className="text-xs text-emerald-400 underline hover:text-emerald-300 transition-colors cursor-pointer"
           >
             Already an active Yearly subscriber? Click here to renew your membership ($114).
           </button>
         </div>
       )}
+
+      {/* Modal for selecting wallet connection method */}
+      <WalletConnectModal
+        isOpen={isWalletModalOpen}
+        onClose={() => setIsWalletModalOpen(false)}
+        onSelect={handleSelectConnector}
+        isConnecting={isConnecting}
+      />
     </div>
   );
 }
