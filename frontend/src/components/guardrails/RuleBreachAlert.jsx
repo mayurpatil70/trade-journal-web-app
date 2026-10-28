@@ -69,3 +69,4 @@ export default function RuleBreachAlert({ breach, onDismiss, onNavigateToRules }
     </div>
   );
 }
+

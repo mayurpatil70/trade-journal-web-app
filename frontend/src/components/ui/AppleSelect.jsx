@@ -29,6 +29,12 @@ export default function AppleSelect({
     placeAbove: false,
   });
 
+  // Extract string value in case an object/event was accidentally passed
+  const rawValue =
+    typeof value === "object" && value !== null
+      ? (value.target?.value ?? value.value ?? "")
+      : value;
+
   // Normalize options: supports string[] or { value, label }[]
   const normalizedOptions = options.map((opt) =>
     typeof opt === "object" && opt !== null
@@ -37,12 +43,12 @@ export default function AppleSelect({
   );
 
   let selectedOption = normalizedOptions.find(
-    (opt) => String(opt.value) === String(value),
+    (opt) => String(opt.value) === String(rawValue),
   );
-  if (!selectedOption && value) {
+  if (!selectedOption && rawValue !== undefined && rawValue !== null && rawValue !== "") {
     selectedOption = normalizedOptions.find(
-      (opt) => String(opt.value).toLowerCase() === String(value).toLowerCase(),
-    ) || { value, label: String(value) };
+      (opt) => String(opt.value).toLowerCase() === String(rawValue).toLowerCase(),
+    ) || { value: rawValue, label: String(rawValue) };
   }
 
   // Measure and position dropdown
@@ -107,7 +113,14 @@ export default function AppleSelect({
 
   const handleSelect = (val) => {
     if (onChange) {
-      onChange({ target: { name: name || "", value: val } });
+      // Pass a hybrid event that also coerces to the primitive string value
+      const evt = {
+        target: { name: name || "", value: val },
+        value: val,
+        toString: () => String(val),
+        valueOf: () => val,
+      };
+      onChange(evt);
     }
     setIsOpen(false);
   };

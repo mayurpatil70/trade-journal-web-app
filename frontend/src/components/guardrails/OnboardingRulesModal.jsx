@@ -396,3 +396,4 @@ export default function OnboardingRulesModal({ isOpen, onComplete, userId }) {
     document.body
   );
 }
+

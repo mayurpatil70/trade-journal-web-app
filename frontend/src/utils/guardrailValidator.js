@@ -7,7 +7,7 @@ export function parseRuleNumber(val, fallback = 0) {
   if (val === undefined || val === null || val === "") return fallback;
   if (typeof val === "number") return val;
   const str = String(val).trim();
-  
+
   // Handle ratio e.g. "1:2" or "1:2.5" -> returns 2.5
   if (str.includes(":")) {
     const parts = str.split(":");
@@ -108,14 +108,18 @@ export function calculateTodayLoss(tradesToday = []) {
  * 3. Daily Loss Cap
  * 4. Losing Streak Break
  * 5. Target Risk / Reward
- * 
+ *
  * @param {Object} params
  * @param {Object} params.trade - The trade being logged (risk, entry, sl, tp, rr, etc.)
  * @param {Object} params.rules - The user's disciplineRules
  * @param {Array} params.allTrades - All user past trades
  * @returns {Object} validation result
  */
-export function validateTradeAgainstRules({ trade = {}, rules = {}, allTrades = [] }) {
+export function validateTradeAgainstRules({
+  trade = {},
+  rules = {},
+  allTrades = [],
+}) {
   if (!rules || Object.keys(rules).length === 0) {
     return { isBreached: false, breaches: [], primaryBreach: null };
   }
@@ -179,7 +183,10 @@ export function validateTradeAgainstRules({ trade = {}, rules = {}, allTrades = 
 
   // ── 5. TARGET RISK / REWARD RATIO ──
   const ruleTargetRR = parseRuleNumber(rules.targetRR, 2.0);
-  let enteredRR = parseRuleNumber(trade.targetRR || trade.rr || trade.calcRR, 0);
+  let enteredRR = parseRuleNumber(
+    trade.targetRR || trade.rr || trade.calcRR,
+    0,
+  );
 
   // If entry, sl, tp are provided, calculate RR dynamically
   if (enteredRR === 0 && trade.entry && trade.sl && trade.tp) {

@@ -109,7 +109,7 @@ export default function TradeAnalysis() {
     const now = new Date();
     const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
 
-    return allTrades.filter((t) => {
+    const filtered = allTrades.filter((t) => {
       const dateStr = t.date || t.entry_date;
       if (!dateStr) return true;
       const tTime = new Date(dateStr).getTime();
@@ -141,6 +141,8 @@ export default function TradeAnalysis() {
       }
       return true;
     });
+
+    return filtered.length > 0 || allTrades.length === 0 ? filtered : allTrades;
   }, [allTrades, timeFilter]);
 
   // Counts for top tabs based on time-filtered set
@@ -208,9 +210,16 @@ export default function TradeAnalysis() {
 
   // Selected trade object
   const selectedTrade = useMemo(() => {
-    if (!selectedTradeId) return null;
-    return allTrades.find((t) => t.id === selectedTradeId) || null;
-  }, [selectedTradeId, allTrades]);
+    if (!selectedTradeId) return visibleTrades[0] || null;
+    return allTrades.find((t) => t.id === selectedTradeId) || visibleTrades[0] || null;
+  }, [selectedTradeId, allTrades, visibleTrades]);
+
+  // Auto-sync selectedTradeId if null
+  useEffect(() => {
+    if (!selectedTradeId && visibleTrades.length > 0) {
+      setSelectedTradeId(visibleTrades[0].id);
+    }
+  }, [selectedTradeId, visibleTrades]);
 
   return (
     <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6 font-sans transition-colors duration-300">
@@ -285,7 +294,10 @@ export default function TradeAnalysis() {
           <div className="grid grid-cols-2 gap-2 mb-4">
             <AppleSelect
               value={timeFilter}
-              onChange={(e) => setTimeFilter(e.target.value)}
+              onChange={(val) => {
+                const f = typeof val === "object" && val !== null ? (val.target?.value ?? val.value ?? String(val)) : String(val);
+                setTimeFilter(f);
+              }}
               options={timeOptions}
               icon={Calendar}
               compact={true}
@@ -293,7 +305,10 @@ export default function TradeAnalysis() {
             />
             <AppleSelect
               value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
+              onChange={(val) => {
+                const s = typeof val === "object" && val !== null ? (val.target?.value ?? val.value ?? String(val)) : String(val);
+                setSortBy(s);
+              }}
               options={sortOptions}
               icon={ArrowUpDown}
               compact={true}
@@ -371,7 +386,15 @@ export default function TradeAnalysis() {
                         {t.date || t.entry_date}
                         {t.time ? ` • ${t.time}` : ""}
                       </span>
-                      <span className="font-mono font-medium">
+                      <span
+                        className={`font-mono font-semibold ${
+                          r > 0
+                            ? "text-emerald-500 dark:text-emerald-400"
+                            : r < 0
+                            ? "text-rose-500 dark:text-rose-400"
+                            : "text-neutral-400"
+                        }`}
+                      >
                         {r > 0 ? `+${r.toFixed(2)}R` : `${r.toFixed(2)}R`}
                       </span>
                     </div>

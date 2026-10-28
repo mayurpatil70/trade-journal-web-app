@@ -93,8 +93,13 @@ export default function PerformanceAnalytics() {
   // Filter pipeline
   const filteredTrades = useMemo(() => {
     let list = allTrades;
-    if (selectedAccount !== "All Accounts") {
-      list = list.filter((t) => t.account_name === selectedAccount);
+    const activeAccount =
+      typeof selectedAccount === "object" && selectedAccount !== null
+        ? (selectedAccount.target?.value ?? selectedAccount.value ?? String(selectedAccount))
+        : String(selectedAccount || "All Accounts");
+
+    if (activeAccount && activeAccount !== "All Accounts") {
+      list = list.filter((t) => t.account_name === activeAccount);
     }
     list = filterTradesByTimePeriod(list, timePeriod);
     list = filterTradesByOutcome(list, outcomeFilter);
@@ -296,8 +301,18 @@ export default function PerformanceAnalytics() {
           {/* Account Filter using AppleSelect */}
           <div className="w-44">
             <AppleSelect
-              value={selectedAccount}
-              onChange={setSelectedAccount}
+              value={
+                typeof selectedAccount === "object" && selectedAccount !== null
+                  ? (selectedAccount.target?.value ?? selectedAccount.value ?? "All Accounts")
+                  : selectedAccount
+              }
+              onChange={(val) => {
+                const acc =
+                  typeof val === "object" && val !== null
+                    ? (val.target?.value ?? val.value ?? String(val))
+                    : String(val);
+                setSelectedAccount(acc);
+              }}
               options={accountOptions}
               placeholder="Account"
             />
@@ -1077,119 +1092,182 @@ export default function PerformanceAnalytics() {
         </div>
       </div>
 
-      {/* ── ROW 7: Integrated Labs (Strategy, Psychology, Mistake Intelligence) ── */}
+      {/* ── ROW 7: Integrated Labs (Strategy Analytics, Psychology Lab, Mistake Lab Intelligence) ── */}
       <div className="rounded-3xl bg-white dark:bg-[#12151e]/85 backdrop-blur-xl border border-black/[0.06] dark:border-white/[0.08] shadow-[0_4px_24px_rgba(0,0,0,0.03)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.35)] p-6 mb-6">
-        <div className="flex items-center gap-2 mb-2">
-          <Brain className="w-5 h-5 text-purple-500" />
-          <h3 className="text-sm font-bold text-neutral-900 dark:text-white">
-            Trading Intelligence & Lab Insights
-          </h3>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-6">
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center font-bold">
+              <Brain className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="text-sm font-bold text-neutral-900 dark:text-white">
+                Trading Intelligence & Labs Hub
+              </h3>
+              <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                Consolidated Strategy Analytics, Psychology Lab discipline, and Mistake Lab leak detection.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+              Discipline: {metrics.mistakes.ruleAdherenceRate.toFixed(0)}%
+            </span>
+          </div>
         </div>
-        <p className="text-xs text-neutral-500 dark:text-neutral-400 mb-6">
-          Cross-correlated behavioral and execution insights derived from your Strategy, Psychology, and Mistake records.
-        </p>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Strategy Setup Insights */}
-          <div className="p-4 rounded-2xl bg-neutral-50 dark:bg-white/[0.03] border border-black/[0.04] dark:border-white/[0.05]">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-bold text-neutral-800 dark:text-neutral-200 flex items-center gap-1.5">
-                <Target className="w-3.5 h-3.5 text-emerald-500" /> Top Setups
-              </span>
-              <button
-                onClick={() => navigate("/analytics")}
-                className="text-[10px] text-blue-500 hover:underline font-semibold"
-              >
-                Deep View →
-              </button>
-            </div>
-            {metrics.setupInsights.length === 0 ? (
-              <p className="text-xs text-neutral-400 py-4 text-center">No setup data logged</p>
-            ) : (
-              <div className="space-y-2">
-                {metrics.setupInsights.slice(0, 4).map((s) => (
-                  <div key={s.name} className="flex items-center justify-between text-xs">
-                    <span className="font-medium text-neutral-700 dark:text-neutral-300 truncate max-w-[120px]">
-                      {s.name}
-                    </span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-[10px] text-neutral-400">{s.winRate.toFixed(0)}% WR</span>
-                      <span className={`font-bold ${s.pnl >= 0 ? "text-emerald-500" : "text-rose-500"}`}>
-                        {formatCurrency(s.pnl)}
-                      </span>
+        {/* 3 Core Labs Bento Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+          {/* LAB 1: Strategy Analytics */}
+          <div className="p-5 rounded-2xl bg-neutral-50 dark:bg-white/[0.03] border border-black/[0.04] dark:border-white/[0.05] flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between mb-3.5 pb-2.5 border-b border-black/[0.04] dark:border-white/[0.05]">
+                <span className="text-xs font-bold text-neutral-800 dark:text-neutral-200 flex items-center gap-1.5">
+                  <Target className="w-4 h-4 text-emerald-500" /> Strategy Edge
+                </span>
+                <span className="text-[10px] font-medium text-neutral-400">
+                  {metrics.setupInsights.length} Setups
+                </span>
+              </div>
+
+              {metrics.setupInsights.length === 0 ? (
+                <p className="text-xs text-neutral-400 py-6 text-center">No setup data logged</p>
+              ) : (
+                <div className="space-y-2.5">
+                  {metrics.setupInsights.slice(0, 4).map((s) => (
+                    <div key={s.name} className="flex items-center justify-between text-xs p-2 rounded-xl bg-white/70 dark:bg-white/[0.02] border border-black/[0.03] dark:border-white/[0.03]">
+                      <div className="truncate max-w-[110px]">
+                        <p className="font-semibold text-neutral-800 dark:text-neutral-200 truncate">{s.name}</p>
+                        <p className="text-[10px] text-neutral-400">{s.count} trades • {s.r > 0 ? `+${s.r}R` : `${s.r}R`}</p>
+                      </div>
+                      <div className="text-right">
+                        <span className={`font-bold font-mono ${s.pnl >= 0 ? "text-emerald-500 dark:text-emerald-400" : "text-rose-500 dark:text-rose-400"}`}>
+                          {formatCurrency(s.pnl)}
+                        </span>
+                        <p className="text-[10px] font-medium text-neutral-400">{s.winRate.toFixed(0)}% Win Rate</p>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Session Breakdown Mini Bar */}
+            {metrics.sessionInsights && metrics.sessionInsights.length > 0 && (
+              <div className="mt-4 pt-3 border-t border-black/[0.04] dark:border-white/[0.05]">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-neutral-400 mb-2">Session Edge</p>
+                <div className="grid grid-cols-3 gap-1.5 text-center">
+                  {metrics.sessionInsights.slice(0, 3).map((sess) => (
+                    <div key={sess.name} className="p-1.5 rounded-lg bg-white/80 dark:bg-white/[0.02] border border-black/[0.02] dark:border-white/[0.04]">
+                      <p className="text-[10px] font-bold text-neutral-700 dark:text-neutral-300 truncate">{sess.name}</p>
+                      <p className={`text-[10px] font-mono font-bold ${sess.pnl >= 0 ? "text-emerald-500" : "text-rose-500"}`}>{formatCurrency(sess.pnl)}</p>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
           </div>
 
-          {/* Psychology & Emotional Edge */}
-          <div className="p-4 rounded-2xl bg-neutral-50 dark:bg-white/[0.03] border border-black/[0.04] dark:border-white/[0.05]">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-bold text-neutral-800 dark:text-neutral-200 flex items-center gap-1.5">
-                <Brain className="w-3.5 h-3.5 text-purple-500" /> Emotional Impact
-              </span>
-              <button
-                onClick={() => navigate("/psychology")}
-                className="text-[10px] text-blue-500 hover:underline font-semibold"
-              >
-                Deep View →
-              </button>
-            </div>
-            {metrics.emotionInsights.length === 0 ? (
-              <p className="text-xs text-neutral-400 py-4 text-center">No emotion tags logged</p>
-            ) : (
-              <div className="space-y-2">
-                {metrics.emotionInsights.slice(0, 4).map((e) => (
-                  <div key={e.name} className="flex items-center justify-between text-xs">
-                    <span className="font-medium text-neutral-700 dark:text-neutral-300 truncate max-w-[120px]">
-                      {e.name}
-                    </span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-[10px] text-neutral-400">{e.count}t</span>
-                      <span className={`font-bold ${e.pnl >= 0 ? "text-emerald-500" : "text-rose-500"}`}>
-                        {formatCurrency(e.pnl)}
-                      </span>
-                    </div>
-                  </div>
-                ))}
+          {/* LAB 2: Psychology Lab */}
+          <div className="p-5 rounded-2xl bg-neutral-50 dark:bg-white/[0.03] border border-black/[0.04] dark:border-white/[0.05] flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between mb-3.5 pb-2.5 border-b border-black/[0.04] dark:border-white/[0.05]">
+                <span className="text-xs font-bold text-neutral-800 dark:text-neutral-200 flex items-center gap-1.5">
+                  <Brain className="w-4 h-4 text-purple-500" /> Psychology & Discipline
+                </span>
+                <span className="text-[10px] font-medium text-neutral-400">Rules vs Emotions</span>
               </div>
-            )}
+
+              {/* Side-by-Side: Followed vs Broken Rules */}
+              <div className="grid grid-cols-2 gap-2 mb-3.5">
+                <div className="p-2.5 rounded-xl bg-emerald-500/[0.06] border border-emerald-500/20 text-center">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Rules Followed</p>
+                  <p className="text-base font-extrabold text-emerald-600 dark:text-emerald-400 font-mono mt-0.5">
+                    {formatCurrency(metrics.rulesFollowed?.pnl || 0)}
+                  </p>
+                  <p className="text-[10px] text-neutral-500 dark:text-neutral-400 mt-0.5">
+                    {metrics.rulesFollowed?.count || 0} trades • {(metrics.rulesFollowed?.winRate || 0).toFixed(0)}% WR
+                  </p>
+                </div>
+                <div className="p-2.5 rounded-xl bg-rose-500/[0.06] border border-rose-500/20 text-center">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400">Rules Broken</p>
+                  <p className="text-base font-extrabold text-rose-600 dark:text-rose-400 font-mono mt-0.5">
+                    {formatCurrency(metrics.rulesBroken?.pnl || 0)}
+                  </p>
+                  <p className="text-[10px] text-neutral-500 dark:text-neutral-400 mt-0.5">
+                    {metrics.rulesBroken?.count || 0} trades • {(metrics.rulesBroken?.winRate || 0).toFixed(0)}% WR
+                  </p>
+                </div>
+              </div>
+
+              {/* Emotions Tag Feed */}
+              {metrics.emotionInsights && metrics.emotionInsights.length > 0 && (
+                <div className="space-y-1.5">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-neutral-400">Pre-Trade Emotional States</p>
+                  {metrics.emotionInsights.slice(0, 3).map((e) => (
+                    <div key={e.name} className="flex items-center justify-between text-xs py-1 px-2 rounded-lg bg-white/70 dark:bg-white/[0.02]">
+                      <span className="font-medium text-neutral-700 dark:text-neutral-300">{e.name}</span>
+                      <div className="flex items-center gap-2 font-mono">
+                        <span className="text-[10px] text-neutral-400">{e.count}t</span>
+                        <span className={`font-bold ${e.pnl >= 0 ? "text-emerald-500" : "text-rose-500"}`}>{formatCurrency(e.pnl)}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
-          {/* Mistake Lab & Leak Detection */}
-          <div className="p-4 rounded-2xl bg-neutral-50 dark:bg-white/[0.03] border border-black/[0.04] dark:border-white/[0.05]">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-bold text-neutral-800 dark:text-neutral-200 flex items-center gap-1.5">
-                <ShieldCheck className="w-3.5 h-3.5 text-amber-500" /> Discipline Edge
-              </span>
-              <button
-                onClick={() => navigate("/mistakes")}
-                className="text-[10px] text-blue-500 hover:underline font-semibold"
-              >
-                Deep View →
-              </button>
-            </div>
-            <div className="space-y-2 text-xs">
-              <div className="flex items-center justify-between">
-                <span className="text-neutral-600 dark:text-neutral-400">Rule Adherence Rate</span>
-                <span className="font-bold text-emerald-500">
-                  {metrics.mistakes.ruleAdherenceRate.toFixed(1)}%
+          {/* LAB 3: Mistake Lab */}
+          <div className="p-5 rounded-2xl bg-neutral-50 dark:bg-white/[0.03] border border-black/[0.04] dark:border-white/[0.05] flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between mb-3.5 pb-2.5 border-b border-black/[0.04] dark:border-white/[0.05]">
+                <span className="text-xs font-bold text-neutral-800 dark:text-neutral-200 flex items-center gap-1.5">
+                  <ShieldCheck className="w-4 h-4 text-amber-500" /> Mistake Lab
+                </span>
+                <span className="text-[10px] font-bold text-rose-500">
+                  {metrics.mistakes.unforcedErrorsCount} Breaches
                 </span>
               </div>
-              <div className="flex items-center justify-between">
-                <span className="text-neutral-600 dark:text-neutral-400">Unforced Rule Breaks</span>
-                <span className="font-bold text-rose-500">
-                  {metrics.mistakes.unforcedErrorsCount} trades
-                </span>
+
+              <div className="space-y-2 text-xs mb-3.5">
+                <div className="flex items-center justify-between p-2 rounded-xl bg-white/70 dark:bg-white/[0.02] border border-black/[0.03] dark:border-white/[0.03]">
+                  <span className="text-neutral-600 dark:text-neutral-400">Rule Adherence Rate</span>
+                  <span className="font-bold text-emerald-500 font-mono">
+                    {metrics.mistakes.ruleAdherenceRate.toFixed(1)}%
+                  </span>
+                </div>
+                <div className="flex items-center justify-between p-2 rounded-xl bg-white/70 dark:bg-white/[0.02] border border-black/[0.03] dark:border-white/[0.03]">
+                  <span className="text-neutral-600 dark:text-neutral-400">Capital Leak to Mistakes</span>
+                  <span className="font-bold text-rose-500 font-mono">
+                    {formatCurrency(-metrics.mistakes.costOfMistakes)}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between p-2 rounded-xl bg-white/70 dark:bg-white/[0.02] border border-black/[0.03] dark:border-white/[0.03]">
+                  <span className="text-neutral-600 dark:text-neutral-400">Total R Drag</span>
+                  <span className="font-bold text-rose-500 font-mono">
+                    -{Math.abs(metrics.mistakes.costOfMistakesR || 0).toFixed(1)}R
+                  </span>
+                </div>
               </div>
-              <div className="flex items-center justify-between">
-                <span className="text-neutral-600 dark:text-neutral-400">Cost of Rule Breaks</span>
-                <span className="font-bold text-rose-500 font-mono">
-                  {formatCurrency(-metrics.mistakes.costOfMistakes)}
-                </span>
-              </div>
+
+              {/* Mistake Audit Feed */}
+              {metrics.mistakes.unforcedErrors && metrics.mistakes.unforcedErrors.length > 0 && (
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-neutral-400 mb-1.5">Recent Unforced Errors</p>
+                  <div className="space-y-1.5">
+                    {metrics.mistakes.unforcedErrors.slice(0, 2).map((err, i) => (
+                      <div key={i} className="p-2 rounded-xl bg-rose-500/[0.04] border border-rose-500/10 text-[11px]">
+                        <div className="flex items-center justify-between mb-0.5">
+                          <span className="font-bold text-rose-600 dark:text-rose-400">{err.setup || "Discretionary"}</span>
+                          <span className="font-mono text-rose-500 font-bold">{formatCurrency(err.pnl)}</span>
+                        </div>
+                        {err.reason && <p className="text-neutral-500 dark:text-neutral-400 truncate">Why: {err.reason}</p>}
+                        {err.lesson && <p className="text-neutral-600 dark:text-neutral-300 font-medium truncate">Fix: {err.lesson}</p>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

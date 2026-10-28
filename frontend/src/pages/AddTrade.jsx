@@ -121,6 +121,7 @@ export default function AddTrade() {
     exit_date: "",
     exit_time: "",
     exit_price: "",
+    pnl: "",
     asset: location?.state?.asset || "XAUUSD",
     direction: location?.state?.direction || "LONG",
     session: "London",
@@ -265,6 +266,7 @@ export default function AddTrade() {
             emotionBefore: t.emotion_before || "",
             emotionAfter: t.emotion_after || "",
             psychNote: t.psych_note || "",
+            pnl: t.pnl !== null && t.pnl !== undefined ? String(t.pnl) : "",
             accountName: t.account_name || "",
           });
           if (t.account_name) {
@@ -721,6 +723,14 @@ export default function AddTrade() {
           : formData.rMultiple;
       if (!rVal && rVal !== 0 && rVal !== "0") {
         errors.r_multiple = "R-multiple is required";
+      }
+      if (
+        formData.pnl === undefined ||
+        formData.pnl === null ||
+        String(formData.pnl).trim() === "" ||
+        isNaN(Number(formData.pnl))
+      ) {
+        errors.pnl = "Profit made in USD ($) is required";
       }
     }
     if (s === 3) {
@@ -1702,12 +1712,19 @@ export default function AddTrade() {
                             : formData.rMultiple && Number(formData.rMultiple) > 0
                             ? formData.rMultiple
                             : "1.00";
-                        setFormData((prev) => ({
-                          ...prev,
-                          result: "win",
-                          rMultiple: targetR,
-                          r_multiple: targetR,
-                        }));
+                        setFormData((prev) => {
+                          let nextPnl = prev.pnl;
+                          if (nextPnl && Number(nextPnl) < 0) {
+                            nextPnl = String(Math.abs(Number(nextPnl)));
+                          }
+                          return {
+                            ...prev,
+                            result: "win",
+                            pnl: nextPnl,
+                            rMultiple: targetR,
+                            r_multiple: targetR,
+                          };
+                        });
                         if (fieldErrors.result) {
                           setFieldErrors((prev) => ({ ...prev, result: null }));
                         }
@@ -1725,12 +1742,19 @@ export default function AddTrade() {
                             : formData.rMultiple && Number(formData.rMultiple) < 0
                             ? formData.rMultiple
                             : "-1.00";
-                        setFormData((prev) => ({
-                          ...prev,
-                          result: "loss",
-                          rMultiple: targetLossR,
-                          r_multiple: targetLossR,
-                        }));
+                        setFormData((prev) => {
+                          let nextPnl = prev.pnl;
+                          if (nextPnl && Number(nextPnl) > 0) {
+                            nextPnl = `-${Math.abs(Number(nextPnl))}`;
+                          }
+                          return {
+                            ...prev,
+                            result: "loss",
+                            pnl: nextPnl,
+                            rMultiple: targetLossR,
+                            r_multiple: targetLossR,
+                          };
+                        });
                         if (fieldErrors.result) {
                           setFieldErrors((prev) => ({ ...prev, result: null }));
                         }
@@ -1745,6 +1769,7 @@ export default function AddTrade() {
                         setFormData((prev) => ({
                           ...prev,
                           result: "be",
+                          pnl: "0.00",
                           rMultiple: "0.00",
                           r_multiple: "0.00",
                         }));
@@ -1763,6 +1788,92 @@ export default function AddTrade() {
                     </p>
                   )}
                 </div>
+
+                {/* NUMERIC PROFIT / LOSS MADE IN USD ($) - REQUIRED */}
+                <div className="space-y-1.5 mac-bento-card rounded-2xl p-4 border border-black/[0.08] dark:border-white/[0.1] bg-black/[0.02] dark:bg-white/[0.02]">
+                  <div className="flex items-center justify-between">
+                    <label className={labelClass}>
+                      Profit / Loss Made ($ USD) <span className="text-red-400">*</span>
+                    </label>
+                    <span className="text-[11px] font-mono font-bold px-2 py-0.5 rounded-md bg-black/[0.05] dark:bg-white/[0.06] text-neutral-600 dark:text-neutral-300">
+                      {formData.result === "loss" ? "Loss (Negative $)" : formData.result === "win" ? "Win (Positive $)" : "Break-Even ($0.00)"}
+                    </span>
+                  </div>
+
+                  <div className="relative">
+                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-bold text-neutral-400 pointer-events-none font-mono">
+                      $
+                    </span>
+                    <input
+                      type="number"
+                      step="any"
+                      name="pnl"
+                      required
+                      value={formData.pnl}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setFormData((prev) => {
+                          const updated = { ...prev, pnl: val };
+                          const num = Number(val);
+                          if (!isNaN(num) && val !== "") {
+                            if (num < 0 && prev.result !== "loss") {
+                              updated.result = "loss";
+                              if (!prev.rMultiple || Number(prev.rMultiple) >= 0) {
+                                updated.rMultiple = "-1.00";
+                                updated.r_multiple = "-1.00";
+                              }
+                            } else if (num > 0 && prev.result !== "win") {
+                              updated.result = "win";
+                              if (!prev.rMultiple || Number(prev.rMultiple) <= 0) {
+                                updated.rMultiple = "1.00";
+                                updated.r_multiple = "1.00";
+                              }
+                            } else if (num === 0 && prev.result !== "be") {
+                              updated.result = "be";
+                              updated.rMultiple = "0.00";
+                              updated.r_multiple = "0.00";
+                            }
+                          }
+                          return updated;
+                        });
+                        if (fieldErrors.pnl) {
+                          setFieldErrors((prev) => ({ ...prev, pnl: null }));
+                        }
+                      }}
+                      className={`${inputClass} pl-8 font-mono ${
+                        fieldErrors.pnl ? "border-red-500 focus:ring-red-500 ring-1 ring-red-500" : ""
+                      } ${
+                        Number(formData.pnl) > 0
+                          ? "text-emerald-500 dark:text-emerald-400 font-bold"
+                          : Number(formData.pnl) < 0
+                          ? "text-rose-500 dark:text-rose-400 font-bold"
+                          : "text-neutral-800 dark:text-neutral-200"
+                      }`}
+                      placeholder={
+                        formData.result === "loss"
+                          ? "-150.00"
+                          : formData.result === "be"
+                          ? "0.00"
+                          : "250.00"
+                      }
+                    />
+                  </div>
+
+                  {/* Mandatory Psychological Reality-Check Description */}
+                  <div className="p-2.5 rounded-xl bg-amber-500/10 dark:bg-amber-500/15 border border-amber-500/25 flex items-start gap-2 mt-1.5">
+                    <span className="text-xs shrink-0">⚠️</span>
+                    <p className="text-[11.5px] font-medium text-amber-700 dark:text-amber-300 leading-snug">
+                      &ldquo;dear trader please enter exact profit made in current trade dont fool yourself by entering big profits for flex&rdquo;
+                    </p>
+                  </div>
+
+                  {fieldErrors.pnl && (
+                    <p className="text-red-400 text-xs mt-1 font-semibold">
+                      {fieldErrors.pnl}
+                    </p>
+                  )}
+                </div>
+
                 <div>
                   <div className="flex items-center justify-between mb-2">
                     <label className={labelClass}>
