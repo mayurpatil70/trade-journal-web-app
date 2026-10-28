@@ -1,5 +1,5 @@
 import { useState, useMemo, useRef, useEffect } from "react";
-import { Activity, Layers, Calendar, TrendingUp, TrendingDown } from "lucide-react";
+import { Activity, TrendingUp, TrendingDown } from "lucide-react";
 import { normalizeTradeR } from "../../pages/Dashboard.jsx";
 
 const TIMEFRAMES = [
@@ -66,7 +66,6 @@ export function formatTradeDate(trade, includeTime = false) {
 
 export default function PerformanceEquityCurve({ trades = [] }) {
   const [timeframe, setTimeframe] = useState("1M");
-  const [viewMode, setViewMode] = useState("trades"); // "trades" (By Trade sequence) | "timeline" (Calendar Timeline)
   const [hoverData, setHoverData] = useState(null);
   const containerRef = useRef(null);
   const [containerWidth, setContainerWidth] = useState(800);
@@ -151,26 +150,7 @@ export default function PerformanceEquityCurve({ trades = [] }) {
     let cumPnl = 0;
     let hasPnl = false;
 
-    // Start baseline at 0
-    const points = [
-      {
-        r: 0,
-        pnl: 0,
-        tradeR: 0,
-        tradePnl: 0,
-        tradeIndex: 0,
-        timestamp: startTime,
-        dateLabel: "Start",
-        fullDateStr: new Date(startTime).toLocaleDateString("en-US", {
-          month: "short",
-          day: "numeric",
-          year: "numeric",
-        }),
-        trade: null,
-      },
-    ];
-
-    filteredTrades.forEach((t, i) => {
+    const rawTradePoints = filteredTrades.map((t, i) => {
       const r = normalizeTradeR(t);
       cumR += r;
       if (t.pnl !== null && t.pnl !== undefined && !isNaN(Number(t.pnl))) {
@@ -182,9 +162,9 @@ export default function PerformanceEquityCurve({ trades = [] }) {
       const d = new Date(ts);
       const dateLabel = !isNaN(d.getTime())
         ? d.toLocaleDateString("en-US", { month: "short", day: "numeric" })
-        : `T${i + 1}`;
+        : `Trade #${i + 1}`;
 
-      points.push({
+      return {
         r: cumR,
         pnl: cumPnl,
         tradeR: r,
@@ -194,11 +174,11 @@ export default function PerformanceEquityCurve({ trades = [] }) {
         dateLabel,
         fullDateStr: formatTradeDate(t, true),
         trade: t,
-      });
+      };
     });
 
     return {
-      points,
+      trades: rawTradePoints,
       finalR: cumR,
       finalPnl: cumPnl,
       hasPnl,
@@ -213,11 +193,12 @@ export default function PerformanceEquityCurve({ trades = [] }) {
 
   // Compute SVG Points & Axis Ticks
   const svgData = useMemo(() => {
-    const { points, hasPnl } = equityData;
-    if (points.length <= 1) {
+    const { trades: tradeData, hasPnl } = equityData;
+    if (tradeData.length === 0) {
       return {
         svgPoints: [],
         polylinePoints: "",
+        areaPolygonPoints: "",
         tradePoints: [],
         ticks: [],
         minVal: 0,
@@ -227,103 +208,105 @@ export default function PerformanceEquityCurve({ trades = [] }) {
       };
     }
 
-    const dataValues = points.map((p) => (hasPnl ? p.pnl : p.r));
-    const minVal = Math.min(0, ...dataValues);
-    const maxVal = Math.max(1, ...dataValues);
-    const range = maxVal - minVal || 1;
-    const zeroY = chartHeight - paddingY - ((0 - minVal) / range) * (chartHeight - paddingY * 2);
+    const allVals = [0, ...tradeData.map((t) => (hasPnl ? t.pnl : t.r))];
+    const minVal = Math.min(...allVals);
+    const maxVal = Math.max(...allVals);
+    const rawRange = maxVal - minVal || 1;
+    // 8% breathing padding top & bottom so peaks/valleys never collide with edge
+    const paddingVal = rawRange * 0.08;
+    const chartMin = Math.min(0, minVal - paddingVal);
+    const chartMax = maxVal + paddingVal;
+    const range = chartMax - chartMin || 1;
 
-    let svgPoints = [];
-    let ticks = [];
+    const getY = (val) =>
+      chartHeight - paddingY - ((val - chartMin) / range) * (chartHeight - paddingY * 2);
+    const zeroY = getY(0);
 
-    if (viewMode === "trades") {
-      // ──────── MODE 1: BY TRADE SEQUENCE (EQUAL HORIZONTAL SPACING PER TRADE) ────────
-      // Classic trading equity curve: every trade has its own distinct step.
-      // Wins step UP, losses step DOWN! Zero vertical spikes, zero backwards lines!
-      const totalPoints = points.length;
-      svgPoints = points.map((p, idx) => {
-        const val = hasPnl ? p.pnl : p.r;
-        const x = paddingX + (idx / Math.max(1, totalPoints - 1)) * (chartWidth - paddingX * 2);
-        const y = chartHeight - paddingY - ((val - minVal) / range) * (chartHeight - paddingY * 2);
-        return { x, y, point: p };
-      });
+    const timeSpan = Math.max(1000, endTime - startTime);
+    const usableWidth = chartWidth - paddingX * 2;
+    // Ensure intra-day trades have at least 16px horizontal spacing to step clearly
+    const minStepPx = Math.min(18, usableWidth / (tradeData.length * 1.5 || 1));
 
-      // Sample 5-7 evenly spaced date ticks across the trade progression
-      const maxTicks = Math.min(7, totalPoints);
-      for (let i = 0; i < maxTicks; i++) {
-        const idx = Math.round((i / (maxTicks - 1)) * (totalPoints - 1));
-        const pt = svgPoints[idx];
-        ticks.push({
-          label: pt.point.trade ? pt.point.dateLabel : "Start",
-          subLabel: pt.point.trade ? `T${pt.point.tradeIndex}` : "",
-          x: pt.x,
-          ratio: idx / Math.max(1, totalPoints - 1),
-        });
+    let lastX = paddingX;
+    const mappedTrades = tradeData.map((t, idx) => {
+      const val = hasPnl ? t.pnl : t.r;
+      let naturalRatio = (t.timestamp - startTime) / timeSpan;
+      naturalRatio = Math.max(0, Math.min(1, naturalRatio));
+      let x = paddingX + naturalRatio * usableWidth;
+
+      // Strictly forward progression so same-day trades never stack into a vertical needle
+      if (idx > 0) {
+        x = Math.max(lastX + minStepPx, x);
       }
-    } else {
-      // ──────── MODE 2: TIMELINE (SMART STEPPED EQUITY WITH CALENDAR TICKS) ────────
-      // Preserves calendar timeline: flat during non-trading days, stepping on execution
-      const timeSpan = Math.max(1000, endTime - startTime);
+      x = Math.min(chartWidth - paddingX - 4, x);
+      lastX = x;
 
-      let lastX = paddingX;
-      const minStepPx = Math.min(24, (chartWidth - paddingX * 2) / Math.max(1, points.length));
+      const y = getY(val);
+      return { x, y, point: t };
+    });
 
-      svgPoints = points.map((p, idx) => {
-        const val = hasPnl ? p.pnl : p.r;
-        let naturalRatio = (p.timestamp - startTime) / timeSpan;
-        naturalRatio = Math.max(0, Math.min(1, naturalRatio));
-        let x = paddingX + naturalRatio * (chartWidth - paddingX * 2);
+    // ── AUTHENTIC STEPPED EQUITY CURVE GENERATION ──
+    // 1. Flat horizontal baseline at zeroY from startTime until the first trade
+    const steppedPoints = [];
+    steppedPoints.push(`${paddingX},${zeroY}`);
 
-        // Ensure strictly forward x progression so same-day trades never stack into a vertical needle
-        if (idx > 0) {
-          x = Math.max(lastX + minStepPx, x);
-        }
-        x = Math.min(chartWidth - paddingX, x);
-        lastX = x;
+    let currentY = zeroY;
+    mappedTrades.forEach((mt) => {
+      // Horizontal hold until trade execution
+      steppedPoints.push(`${mt.x},${currentY}`);
+      // Vertical step on trade close: UP for win, DOWN for loss
+      steppedPoints.push(`${mt.x},${mt.y}`);
+      currentY = mt.y;
+    });
 
-        const y = chartHeight - paddingY - ((val - minVal) / range) * (chartHeight - paddingY * 2);
-        return { x, y, point: p };
-      });
-
-      // Calendar timeline ticks
-      const tickCount = timeframe === "1D" ? 6 : 7;
-      for (let i = 0; i < tickCount; i++) {
-        const ratio = i / (tickCount - 1);
-        const tickTime = startTime + ratio * timeSpan;
-        const d = new Date(tickTime);
-        let label = "";
-        if (timeframe === "1D") {
-          label = d.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: false });
-        } else if (timeframe === "1W") {
-          label = d.toLocaleDateString("en-US", { weekday: "short", day: "numeric" });
-        } else if (timeframe === "1M") {
-          label = d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
-        } else {
-          label = d.toLocaleDateString("en-US", { month: "short", year: "2-digit" });
-        }
-        ticks.push({
-          label,
-          subLabel: "",
-          x: paddingX + ratio * (chartWidth - paddingX * 2),
-          ratio,
-        });
-      }
+    // Hold flat at final equity value up to the end of the timeline
+    const endX = chartWidth - paddingX;
+    if (endX > lastX) {
+      steppedPoints.push(`${endX},${currentY}`);
     }
 
-    const polylinePoints = svgPoints.map((pt) => `${pt.x},${pt.y}`).join(" ");
-    const tradePoints = svgPoints.filter((pt) => pt.point.trade);
+    const polylinePoints = steppedPoints.join(" ");
+
+    // Filled area polygon underneath the curve
+    const fillBottomY = chartHeight - paddingY;
+    const areaPolygonPoints = `${paddingX},${fillBottomY} ${polylinePoints} ${endX},${fillBottomY}`;
+
+    // ── CLEAN TIMELINE CALENDAR TICKS (NO T1/T2, NO DUPLICATE DATES) ──
+    const tickCount = timeframe === "1D" ? 6 : 7;
+    const ticks = [];
+    for (let i = 0; i < tickCount; i++) {
+      const ratio = i / (tickCount - 1);
+      const tickTime = startTime + ratio * timeSpan;
+      const d = new Date(tickTime);
+      let label = "";
+      if (timeframe === "1D") {
+        label = d.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: false });
+      } else if (timeframe === "1W") {
+        label = d.toLocaleDateString("en-US", { weekday: "short", day: "numeric" });
+      } else if (timeframe === "1M") {
+        label = d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+      } else {
+        label = d.toLocaleDateString("en-US", { month: "short", year: "2-digit" });
+      }
+      ticks.push({
+        label,
+        x: paddingX + ratio * usableWidth,
+        ratio,
+      });
+    }
 
     return {
-      svgPoints,
+      svgPoints: mappedTrades,
       polylinePoints,
-      tradePoints,
+      areaPolygonPoints,
+      tradePoints: mappedTrades,
       ticks,
       minVal,
       maxVal,
       range,
       zeroY,
     };
-  }, [equityData, viewMode, chartWidth, startTime, endTime, timeframe]);
+  }, [equityData, chartWidth, startTime, endTime, timeframe]);
 
   // Headline value display
   const isProfitable = (equityData.hasPnl ? equityData.finalPnl : equityData.finalR) >= 0;
@@ -339,7 +322,7 @@ export default function PerformanceEquityCurve({ trades = [] }) {
 
   return (
     <div className="rounded-3xl p-6 bg-white dark:bg-[#121622] border border-black/[0.06] dark:border-white/[0.08] shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] flex flex-col justify-between h-full relative overflow-hidden">
-      {/* ── CARD HEADER ── */}
+      {/* ── CARD HEADER (TradeFXBook style: Performance title + headline + timeframe tabs) ── */}
       <div className="flex items-start justify-between mb-4 flex-wrap gap-3">
         <div>
           <div className="flex items-center gap-2 text-[11px] font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-widest">
@@ -360,53 +343,22 @@ export default function PerformanceEquityCurve({ trades = [] }) {
           </div>
         </div>
 
-        {/* Controls: Mode Switcher (By Trade / Timeline) + Timeframe Filter Buttons */}
-        <div className="flex items-center gap-2 flex-wrap">
-          {/* View Mode Switcher */}
-          <div className="flex items-center p-1 rounded-2xl bg-neutral-100 dark:bg-white/[0.05] border border-black/[0.04] dark:border-white/[0.06]">
+        {/* Timeframe Filter Buttons: 1D, 1W, 1M, 1Y, ALL */}
+        <div className="flex items-center gap-1 p-1 rounded-2xl bg-neutral-100 dark:bg-white/[0.05] border border-black/[0.04] dark:border-white/[0.06]">
+          {TIMEFRAMES.map((tf) => (
             <button
+              key={tf.key}
               type="button"
-              onClick={() => setViewMode("trades")}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
-                viewMode === "trades"
-                  ? "bg-white dark:bg-[#1c2233] text-emerald-600 dark:text-emerald-400 shadow-sm border border-black/[0.04] dark:border-white/[0.08]"
+              onClick={() => setTimeframe(tf.key)}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                timeframe === tf.key
+                  ? "bg-emerald-500 text-white shadow-sm shadow-emerald-500/25"
                   : "text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
               }`}
             >
-              <Layers className="w-3.5 h-3.5" />
-              <span>By Trade</span>
+              {tf.label}
             </button>
-            <button
-              type="button"
-              onClick={() => setViewMode("timeline")}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
-                viewMode === "timeline"
-                  ? "bg-white dark:bg-[#1c2233] text-emerald-600 dark:text-emerald-400 shadow-sm border border-black/[0.04] dark:border-white/[0.08]"
-                  : "text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
-              }`}
-            >
-              <Calendar className="w-3.5 h-3.5" />
-              <span>Timeline</span>
-            </button>
-          </div>
-
-          {/* Timeframe Filter Buttons: 1D, 1W, 1M, 1Y, ALL */}
-          <div className="flex items-center gap-1 p-1 rounded-2xl bg-neutral-100 dark:bg-white/[0.05] border border-black/[0.04] dark:border-white/[0.06]">
-            {TIMEFRAMES.map((tf) => (
-              <button
-                key={tf.key}
-                type="button"
-                onClick={() => setTimeframe(tf.key)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                  timeframe === tf.key
-                    ? "bg-emerald-500 text-white shadow-sm shadow-emerald-500/25"
-                    : "text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
-                }`}
-              >
-                {tf.label}
-              </button>
-            ))}
-          </div>
+          ))}
         </div>
       </div>
 
@@ -457,7 +409,7 @@ export default function PerformanceEquityCurve({ trades = [] }) {
                 </linearGradient>
               </defs>
 
-              {/* Zero baseline (Breakeven reference line if minVal < 0) */}
+              {/* Zero baseline (Breakeven reference line when dip below 0 occurs) */}
               {svgData.minVal < 0 && (
                 <g>
                   <line
@@ -467,7 +419,7 @@ export default function PerformanceEquityCurve({ trades = [] }) {
                     y2={svgData.zeroY}
                     stroke="currentColor"
                     strokeDasharray="4 4"
-                    className="text-black/10 dark:text-white/10"
+                    className="text-black/15 dark:text-white/15"
                     strokeWidth="1"
                   />
                   <text
@@ -481,20 +433,18 @@ export default function PerformanceEquityCurve({ trades = [] }) {
               )}
 
               {/* Area under curve */}
-              {svgData.svgPoints.length > 0 && (
+              {svgData.areaPolygonPoints && (
                 <polygon
                   fill="url(#curveGradient)"
-                  points={`${svgData.svgPoints[0].x},${chartHeight - paddingY} ${svgData.polylinePoints} ${
-                    svgData.svgPoints[svgData.svgPoints.length - 1].x
-                  },${chartHeight - paddingY}`}
+                  points={svgData.areaPolygonPoints}
                 />
               )}
 
-              {/* Equity Curve Polyline (Authentic Up & Down trajectory) */}
+              {/* Stepped Equity Curve (Authentic Up & Down trajectory) */}
               <polyline
                 fill="none"
                 stroke={strokeColor}
-                strokeWidth="3"
+                strokeWidth="2.8"
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 points={svgData.polylinePoints}
@@ -532,8 +482,8 @@ export default function PerformanceEquityCurve({ trades = [] }) {
               )}
             </svg>
 
-            {/* ── TIMELINE / TRADE DATES AT DOWN ROW ── */}
-            <div className="absolute bottom-1 left-0 right-0 pointer-events-none text-[11px] font-semibold text-neutral-500 dark:text-neutral-400">
+            {/* ── TIMELINE CALENDAR DATES AT BOTTOM ROW (NO T1/T2, NO DUPLICATE DATES) ── */}
+            <div className="absolute bottom-1 left-0 right-0 pointer-events-none text-[11px] font-medium text-neutral-500 dark:text-neutral-400">
               {svgData.ticks.map((tick, idx) => {
                 const isFirst = idx === 0;
                 const isLast = idx === svgData.ticks.length - 1;
@@ -551,16 +501,11 @@ export default function PerformanceEquityCurve({ trades = [] }) {
                       left: `${tick.x}px`,
                       transform,
                     }}
-                    className="flex flex-col items-center select-none text-center"
+                    className="select-none text-center"
                   >
                     <span className="whitespace-nowrap font-medium text-neutral-500 dark:text-neutral-400">
                       {tick.label}
                     </span>
-                    {tick.subLabel && (
-                      <span className="text-[9px] font-mono font-bold text-neutral-400 dark:text-neutral-500">
-                        {tick.subLabel}
-                      </span>
-                    )}
                   </div>
                 );
               })}
