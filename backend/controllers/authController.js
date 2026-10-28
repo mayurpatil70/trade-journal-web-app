@@ -96,7 +96,28 @@ export const verifyLogin = async (req, res) => {
     const userEmail = String(user.email || "").trim().toLowerCase();
     const isAdmin = ADMIN_EMAILS.includes(userEmail);
 
-    // 2. Check if they have a paid subscription
+    // 2. Check profiles table for active subscription or trial
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("trial_ends_at, subscription_ends_at, account_status")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    const now = new Date();
+    let hasActiveProfile = false;
+    if (profile) {
+      const subEnds = profile.subscription_ends_at ? new Date(profile.subscription_ends_at) : null;
+      const trialEnds = profile.trial_ends_at ? new Date(profile.trial_ends_at) : null;
+      if (
+        (subEnds && subEnds > now) ||
+        (trialEnds && trialEnds > now) ||
+        profile.account_status === "active"
+      ) {
+        hasActiveProfile = true;
+      }
+    }
+
+    // 3. Check journal_subscriptions table
     const { data: subData } = await supabase
       .from("journal_subscriptions")
       .select("status")
@@ -104,8 +125,8 @@ export const verifyLogin = async (req, res) => {
       .eq("status", "paid")
       .maybeSingle();
 
-    // 3. ADMIN BYPASS: If they are admin OR have paid, grant access
-    const hasPaid = isAdmin || !!subData;
+    // 4. Combined access check
+    const hasPaid = isAdmin || hasActiveProfile || Boolean(subData);
 
     res.json({
       message: "Verified successfully",

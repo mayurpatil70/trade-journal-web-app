@@ -1,4 +1,13 @@
-import { Wallet, Zap, CreditCard, Trophy } from "lucide-react";
+import {
+  Wallet,
+  Zap,
+  CreditCard,
+  Trophy,
+  TrendingUp,
+  BarChart2,
+  ShieldAlert,
+  Target,
+} from "lucide-react";
 
 export default function TradeFXBookKpiCards({ stats, trades }) {
   // Compute realized vs unrealized
@@ -23,9 +32,13 @@ export default function TradeFXBookKpiCards({ stats, trades }) {
   const realizedDisplay = totalPnlDisplay;
   const unrealizedDisplay = "+$0.00";
 
+  const avgRVal = parseFloat(stats.avgR) || 0;
+  const netRVal = parseFloat(stats.totalR) || 0;
+  const maxDdVal = parseFloat(stats.maxDrawdown) || 0;
+
   return (
-    <div className="space-y-3">
-      {/* ── 4 PRIMARY CARDS (Color Theme: Emerald Green, Yellow/Amber, Red, Neutral) ── */}
+    <div className="space-y-4">
+      {/* ── 4 PRIMARY KPI CARDS (Color Theme: Emerald Green, Yellow/Amber, Red, Neutral) ── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* 1. TOTAL P&L */}
         <div className="rounded-3xl p-5 bg-white dark:bg-[#121622] border border-black/[0.06] dark:border-white/[0.08] shadow-[0_4px_20px_rgb(0,0,0,0.03)] dark:shadow-[0_4px_25px_rgba(0,0,0,0.4)] flex items-start gap-4 transition-all hover:border-emerald-500/30">
@@ -109,27 +122,86 @@ export default function TradeFXBookKpiCards({ stats, trades }) {
         </div>
       </div>
 
-      {/* ── SECONDARY STATS BAR (Preserving all metrics with responsive colors) ── */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="px-4 py-2.5 rounded-2xl bg-neutral-100/60 dark:bg-white/[0.03] border border-black/[0.04] dark:border-white/[0.05] flex items-center justify-between">
-          <span className="text-[11px] font-semibold text-neutral-500 dark:text-neutral-400">Profit Factor</span>
-          <span className="text-xs font-bold font-mono text-neutral-900 dark:text-white">{stats.profitFactor}</span>
+      {/* ── 4 SECONDARY METRIC CARDS (Exact same rich properties & dimensions as upper cards) ── */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* 1. PROFIT FACTOR */}
+        <div className="rounded-3xl p-5 bg-white dark:bg-[#121622] border border-black/[0.06] dark:border-white/[0.08] shadow-[0_4px_20px_rgb(0,0,0,0.03)] dark:shadow-[0_4px_25px_rgba(0,0,0,0.4)] flex items-start gap-4 transition-all hover:border-emerald-500/30">
+          <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 dark:bg-emerald-500/15 border border-emerald-500/20 text-emerald-500 flex items-center justify-center shrink-0">
+            <TrendingUp className="w-6 h-6" />
+          </div>
+          <div className="overflow-hidden">
+            <p className="text-[11px] font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-wider">
+              PROFIT FACTOR
+            </p>
+            <p className="text-2xl font-extrabold font-mono mt-0.5 tracking-tight text-neutral-900 dark:text-white">
+              {stats.profitFactor}
+            </p>
+            <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1 font-medium">
+              Win/Loss ratio efficiency
+            </p>
+          </div>
         </div>
-        <div className="px-4 py-2.5 rounded-2xl bg-neutral-100/60 dark:bg-white/[0.03] border border-black/[0.04] dark:border-white/[0.05] flex items-center justify-between">
-          <span className="text-[11px] font-semibold text-neutral-500 dark:text-neutral-400">Average R</span>
-          <span className={`text-xs font-bold font-mono ${parseFloat(stats.avgR) >= 0 ? "text-emerald-500" : "text-rose-500"}`}>
-            {parseFloat(stats.avgR) >= 0 ? "+" : ""}{stats.avgR}R
-          </span>
+
+        {/* 2. AVERAGE R */}
+        <div className="rounded-3xl p-5 bg-white dark:bg-[#121622] border border-black/[0.06] dark:border-white/[0.08] shadow-[0_4px_20px_rgb(0,0,0,0.03)] dark:shadow-[0_4px_25px_rgba(0,0,0,0.4)] flex items-start gap-4 transition-all hover:border-emerald-500/30">
+          <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 dark:bg-emerald-500/15 border border-emerald-500/20 text-emerald-500 flex items-center justify-center shrink-0">
+            <BarChart2 className="w-6 h-6" />
+          </div>
+          <div className="overflow-hidden">
+            <p className="text-[11px] font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-wider">
+              AVERAGE R
+            </p>
+            <p
+              className={`text-2xl font-extrabold font-mono mt-0.5 tracking-tight ${
+                avgRVal >= 0 ? "text-emerald-500 dark:text-emerald-400" : "text-rose-500 dark:text-rose-400"
+              }`}
+            >
+              {avgRVal >= 0 ? "+" : ""}{stats.avgR}R
+            </p>
+            <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1 font-medium">
+              Expectancy per closed trade
+            </p>
+          </div>
         </div>
-        <div className="px-4 py-2.5 rounded-2xl bg-neutral-100/60 dark:bg-white/[0.03] border border-black/[0.04] dark:border-white/[0.05] flex items-center justify-between">
-          <span className="text-[11px] font-semibold text-neutral-500 dark:text-neutral-400">Max Drawdown</span>
-          <span className="text-xs font-bold font-mono text-rose-500">-{stats.maxDrawdown}R</span>
+
+        {/* 3. MAX DRAWDOWN */}
+        <div className="rounded-3xl p-5 bg-white dark:bg-[#121622] border border-black/[0.06] dark:border-white/[0.08] shadow-[0_4px_20px_rgb(0,0,0,0.03)] dark:shadow-[0_4px_25px_rgba(0,0,0,0.4)] flex items-start gap-4 transition-all hover:border-rose-500/30">
+          <div className="w-12 h-12 rounded-2xl bg-rose-500/10 dark:bg-rose-500/15 border border-rose-500/20 text-rose-500 flex items-center justify-center shrink-0">
+            <ShieldAlert className="w-6 h-6" />
+          </div>
+          <div className="overflow-hidden">
+            <p className="text-[11px] font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-wider">
+              MAX DRAWDOWN
+            </p>
+            <p className="text-2xl font-extrabold font-mono mt-0.5 tracking-tight text-rose-500 dark:text-rose-400">
+              -{stats.maxDrawdown}R
+            </p>
+            <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1 font-medium">
+              Peak equity drop risk
+            </p>
+          </div>
         </div>
-        <div className="px-4 py-2.5 rounded-2xl bg-neutral-100/60 dark:bg-white/[0.03] border border-black/[0.04] dark:border-white/[0.05] flex items-center justify-between">
-          <span className="text-[11px] font-semibold text-neutral-500 dark:text-neutral-400">Net R-Multiple</span>
-          <span className={`text-xs font-bold font-mono ${parseFloat(stats.totalR) >= 0 ? "text-emerald-500" : "text-rose-500"}`}>
-            {parseFloat(stats.totalR) >= 0 ? "+" : ""}{stats.totalR}R
-          </span>
+
+        {/* 4. NET R-MULTIPLE */}
+        <div className="rounded-3xl p-5 bg-white dark:bg-[#121622] border border-black/[0.06] dark:border-white/[0.08] shadow-[0_4px_20px_rgb(0,0,0,0.03)] dark:shadow-[0_4px_25px_rgba(0,0,0,0.4)] flex items-start gap-4 transition-all hover:border-emerald-500/30">
+          <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 dark:bg-emerald-500/15 border border-emerald-500/20 text-emerald-500 flex items-center justify-center shrink-0">
+            <Target className="w-6 h-6" />
+          </div>
+          <div className="overflow-hidden">
+            <p className="text-[11px] font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-wider">
+              NET R-MULTIPLE
+            </p>
+            <p
+              className={`text-2xl font-extrabold font-mono mt-0.5 tracking-tight ${
+                netRVal >= 0 ? "text-emerald-500 dark:text-emerald-400" : "text-rose-500 dark:text-rose-400"
+              }`}
+            >
+              {netRVal >= 0 ? "+" : ""}{stats.totalR}R
+            </p>
+            <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1 font-medium">
+              Cumulative risk multiple gain
+            </p>
+          </div>
         </div>
       </div>
     </div>

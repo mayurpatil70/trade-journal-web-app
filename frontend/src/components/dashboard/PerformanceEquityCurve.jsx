@@ -99,11 +99,11 @@ export default function PerformanceEquityCurve({ trades = [] }) {
     return `${equityPoints.finalR >= 0 ? "+" : ""}${equityPoints.finalR.toFixed(2)}R`;
   }, [filteredTrades, equityPoints]);
 
-  // SVG dimensions for smooth scrollable canvas
-  const chartWidth = Math.max(760, equityPoints.points.length * 45);
-  const chartHeight = 220;
+  // SVG dimensions for smooth scrollable canvas - expanded to utilize full card height
+  const chartWidth = Math.max(760, equityPoints.points.length * 48);
+  const chartHeight = 350;
   const paddingX = 40;
-  const paddingY = 30;
+  const paddingY = 35;
 
   const dataValues = equityPoints.points.map((p) => (equityPoints.hasPnl ? p.pnl : p.r));
   const minVal = Math.min(0, ...dataValues);
@@ -124,9 +124,9 @@ export default function PerformanceEquityCurve({ trades = [] }) {
   const bottomDateLabels = svgPoints.filter((_, i) => i % dateInterval === 0 || i === svgPoints.length - 1);
 
   return (
-    <div className="rounded-3xl p-6 bg-white dark:bg-[#121622] border border-black/[0.06] dark:border-white/[0.08] shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] flex flex-col justify-between h-full relative">
+    <div className="rounded-3xl p-6 bg-white dark:bg-[#121622] border border-black/[0.06] dark:border-white/[0.08] shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] flex flex-col justify-between h-full relative overflow-hidden">
       {/* ── CARD HEADER ── */}
-      <div className="flex items-start justify-between mb-4 flex-wrap gap-3">
+      <div className="flex items-start justify-between mb-2 flex-wrap gap-3">
         <div>
           <div className="flex items-center gap-2 text-[11px] font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-widest">
             <Activity className="w-3.5 h-3.5 text-emerald-500" />
@@ -160,17 +160,17 @@ export default function PerformanceEquityCurve({ trades = [] }) {
         </div>
       </div>
 
-      {/* ── CHART SCROLLABLE CONTAINER WITH HORIZONTAL SCROLLBAR AT DOWN ── */}
-      <div className="relative w-full flex-1 min-h-[240px] flex flex-col justify-end overflow-hidden">
+      {/* ── CHART SCROLLABLE CANVAS (Fills upper space gracefully; NO vertical scrollbar) ── */}
+      <div className="relative w-full flex-1 flex flex-col justify-between overflow-hidden pt-2">
         {filteredTrades.length === 0 ? (
-          <div className="w-full h-[220px] rounded-2xl border border-dashed border-black/[0.08] dark:border-white/[0.08] flex flex-col items-center justify-center text-neutral-400 dark:text-neutral-500 bg-neutral-50/50 dark:bg-white/[0.01]">
+          <div className="w-full h-[320px] rounded-2xl border border-dashed border-black/[0.08] dark:border-white/[0.08] flex flex-col items-center justify-center text-neutral-400 dark:text-neutral-500 bg-neutral-50/50 dark:bg-white/[0.01]">
             <p className="text-sm font-medium">No trades taken</p>
           </div>
         ) : (
-          <div className="w-full overflow-x-auto scrollbar-thin scrollbar-thumb-neutral-300 dark:scrollbar-thumb-neutral-700 pb-2">
+          <div className="w-full overflow-x-auto overflow-y-hidden scrollbar-thin scrollbar-thumb-neutral-300 dark:scrollbar-thumb-neutral-700 pb-1">
             <div
               className="relative select-none"
-              style={{ width: `${chartWidth}px`, height: `${chartHeight}px` }}
+              style={{ width: `${chartWidth}px`, height: `${chartHeight + 35}px` }}
               onMouseLeave={() => setHoverData(null)}
             >
               <svg
@@ -194,13 +194,14 @@ export default function PerformanceEquityCurve({ trades = [] }) {
               >
                 <defs>
                   <linearGradient id="curveGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor={strokeColor} stopOpacity="0.2" />
+                    <stop offset="0%" stopColor={strokeColor} stopOpacity="0.25" />
+                    <stop offset="60%" stopColor={strokeColor} stopOpacity="0.08" />
                     <stop offset="100%" stopColor={strokeColor} stopOpacity="0.0" />
                   </linearGradient>
                 </defs>
 
-                {/* Horizontal Grid lines */}
-                {[0.2, 0.4, 0.6, 0.8].map((ratio, i) => {
+                {/* Horizontal Grid lines distributed across full height */}
+                {[0.1, 0.3, 0.5, 0.7, 0.9].map((ratio, i) => {
                   const y = paddingY + ratio * (chartHeight - paddingY * 2);
                   return (
                     <line
@@ -210,7 +211,7 @@ export default function PerformanceEquityCurve({ trades = [] }) {
                       y1={y}
                       y2={y}
                       stroke="currentColor"
-                      className="text-neutral-200 dark:text-neutral-800"
+                      className="text-neutral-200/80 dark:text-neutral-800/80"
                       strokeWidth="1"
                       strokeDasharray="4 4"
                     />
@@ -241,7 +242,7 @@ export default function PerformanceEquityCurve({ trades = [] }) {
                 <polyline
                   fill="none"
                   stroke={strokeColor}
-                  strokeWidth="2.5"
+                  strokeWidth="3"
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   points={polylinePoints}
@@ -253,10 +254,10 @@ export default function PerformanceEquityCurve({ trades = [] }) {
                     key={idx}
                     cx={pt.x}
                     cy={pt.y}
-                    r={hoverData === pt ? 5 : 2.5}
+                    r={hoverData === pt ? 5.5 : 2.5}
                     fill={strokeColor}
                     stroke="#ffffff"
-                    strokeWidth={hoverData === pt ? "2" : "1"}
+                    strokeWidth={hoverData === pt ? "2.5" : "1"}
                     className="transition-all"
                   />
                 ))}
@@ -276,7 +277,7 @@ export default function PerformanceEquityCurve({ trades = [] }) {
               </svg>
 
               {/* ── DATES AT DOWN (bottom along X-axis) ── */}
-              <div className="absolute bottom-0 left-0 right-0 flex justify-between px-8 text-[10px] font-medium text-neutral-400 dark:text-neutral-500">
+              <div className="absolute bottom-2 left-0 right-0 flex justify-between px-8 text-[11px] font-semibold text-neutral-500 dark:text-neutral-400">
                 {bottomDateLabels.map((lbl, idx) => (
                   <span
                     key={idx}
@@ -294,7 +295,7 @@ export default function PerformanceEquityCurve({ trades = [] }) {
                   className="absolute pointer-events-none z-30 rounded-2xl bg-white/95 dark:bg-[#121622]/95 border border-black/[0.08] dark:border-white/[0.12] p-3.5 shadow-2xl backdrop-blur-xl transition-all"
                   style={{
                     left: `${Math.min(Math.max(hoverData.x, 80), chartWidth - 110)}px`,
-                    top: `${Math.max(10, hoverData.y - 110)}px`,
+                    top: `${Math.max(10, hoverData.y - 120)}px`,
                     transform: "translateX(-50%)",
                     minWidth: "160px",
                   }}
