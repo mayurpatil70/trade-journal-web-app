@@ -475,6 +475,26 @@ export const updateTrade = async (req, res) => {
       }
     }
 
+    // Extract & sanitize profit / loss in USD ($) for update
+    const rawUpdatePnl =
+      tradeData.pnl !== undefined && tradeData.pnl !== "" && tradeData.pnl !== null
+        ? normaliseTradeNumber(tradeData.pnl)
+        : tradeData.profit !== undefined && tradeData.profit !== "" && tradeData.profit !== null
+        ? normaliseTradeNumber(tradeData.profit)
+        : null;
+
+    let finalUpdatePnl = rawUpdatePnl;
+    if (finalUpdatePnl !== null) {
+      const normRes = (result || tradeData.result || "").toLowerCase().trim();
+      if (normRes === "loss" && finalUpdatePnl > 0) {
+        finalUpdatePnl = -Math.abs(finalUpdatePnl);
+      } else if (normRes === "win" && finalUpdatePnl < 0) {
+        finalUpdatePnl = Math.abs(finalUpdatePnl);
+      } else if (normRes === "be") {
+        finalUpdatePnl = 0;
+      }
+    }
+
     const updateFields = {
       ...(tradeData.date !== undefined && { date: tradeData.date }),
       ...(tradeData.time !== undefined && { time: tradeData.time }),
@@ -510,7 +530,7 @@ export const updateTrade = async (req, res) => {
       ...(tradeData.exitTime !== undefined && { exit_time: tradeData.exitTime }),
       ...(tradeData.exit_price !== undefined && { exit_price: normaliseTradeNumber(tradeData.exit_price) }),
       ...(tradeData.exitPrice !== undefined && { exit_price: normaliseTradeNumber(tradeData.exitPrice) }),
-      ...(tradeData.pnl !== undefined && { pnl: normaliseTradeNumber(tradeData.pnl) }),
+      ...(finalUpdatePnl !== null && { pnl: finalUpdatePnl }),
       ...(tradeData.commissions !== undefined && { commissions: normaliseTradeNumber(tradeData.commissions) }),
       ...(tradeData.swap !== undefined && { swap: normaliseTradeNumber(tradeData.swap) }),
       ...(tradeData.status !== undefined && { status: tradeData.status }),
