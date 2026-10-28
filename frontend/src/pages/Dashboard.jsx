@@ -46,10 +46,45 @@ function calcStats(trades) {
   let bestTrade = 0, worstTrade = 0;
   const equityData = [0];
 
+  let totalDollarPnl = 0;
+  let nonZeroDollarCount = 0;
+  let totalRRR = 0;
+  let rrrCount = 0;
+  let currentDollarEquity = 0;
+  let maxDollarPeak = 0;
+  let maxDollarDD = 0;
+
   trades.forEach((t) => {
     const res = (t.result || "").toLowerCase().trim();
     const r = normalizeTradeR(t);
     totalR += r;
+
+    // Dollar PnL accumulation
+    if (t.pnl !== null && t.pnl !== undefined && !isNaN(Number(t.pnl))) {
+      const p = Number(t.pnl);
+      totalDollarPnl += p;
+      if (p !== 0) nonZeroDollarCount++;
+      currentDollarEquity += p;
+      if (currentDollarEquity > maxDollarPeak) maxDollarPeak = currentDollarEquity;
+      const dollarDD = maxDollarPeak - currentDollarEquity;
+      if (dollarDD > maxDollarDD) maxDollarDD = dollarDD;
+    }
+
+    // Average RRR calculation (Planned / Target R:R)
+    if (t.entry && t.sl && t.tp) {
+      const entry = Number(t.entry);
+      const sl = Number(t.sl);
+      const tp = Number(t.tp);
+      const riskDist = Math.abs(entry - sl);
+      const rewardDist = Math.abs(tp - entry);
+      if (riskDist > 0 && rewardDist > 0) {
+        totalRRR += rewardDist / riskDist;
+        rrrCount++;
+      }
+    } else if (r > 0) {
+      totalRRR += r;
+      rrrCount++;
+    }
 
     if (r > bestTrade) bestTrade = r;
     if (r < worstTrade) worstTrade = r;
@@ -81,17 +116,25 @@ function calcStats(trades) {
     if (dd > maxDD) maxDD = dd;
   });
 
+  const avgRRR = rrrCount > 0 ? (totalRRR / rrrCount).toFixed(2) : "2.00";
+
   return {
     totalR: totalR.toFixed(2),
     winRate: winRate.toFixed(1),
     avgR: avgR.toFixed(2),
+    avgRRR,
     avgWin: avgWin.toFixed(2),
     avgLoss: avgLoss.toFixed(2),
     bestTrade: bestTrade.toFixed(2),
     worstTrade: worstTrade.toFixed(2),
     profitFactor: profitFactor.toFixed(2),
     maxDrawdown: maxDD.toFixed(2),
+    maxDollarDD: maxDollarDD.toFixed(2),
+    totalDollarPnl: totalDollarPnl.toFixed(2),
+    hasDollarPnl: nonZeroDollarCount > 0,
     totalTrades: trades.length,
+    wins,
+    losses: lossCount,
     equityData,
   };
 }
