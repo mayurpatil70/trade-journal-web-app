@@ -223,7 +223,6 @@ export default function MainLayout() {
       label: "System",
       items: [
         { to: "/accounts", icon: Users, label: "Prop firm" },
-        { to: "/settings", icon: Settings, label: "Settings" },
         { to: "/support", icon: Headphones, label: "Support" },
         { to: "/affiliate", icon: Wallet, label: "Affiliate" },
       ],

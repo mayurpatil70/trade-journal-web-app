@@ -343,7 +343,7 @@ function App() {
                   <Route path="psychology" element={<Psychology />} />
                   <Route path="mistakes" element={<Mistakes />} />
                   <Route path="accounts" element={<PropAccounts />} />
-                  <Route path="settings" element={<Settings />} />
+                  <Route path="settings" element={<Navigate to="/profile?tab=settings" replace />} />
                   <Route path="profile" element={<Profile />} />
                   <Route path="support" element={<Support />} />
                   <Route path="affiliate" element={<AffiliateDashboard />} />
