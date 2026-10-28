@@ -22,9 +22,9 @@ export const normalizeTradeR = (t) => {
   const res = (t.result || "").toLowerCase().trim();
   let r = parseFloat(t.r_multiple);
   if (Number.isNaN(r)) r = 0;
-  if (res === "loss" && r > 0) return -1;
+  if (res === "loss") return r !== 0 ? -Math.abs(r) : -1;
   if (res === "be") return 0;
-  if (res === "win" && r < 0) return Math.abs(r);
+  if (res === "win") return r !== 0 ? Math.abs(r) : 1;
   return r;
 };
 
@@ -120,7 +120,21 @@ export default function Dashboard() {
       const userId = localStorage.getItem("userId") || localStorage.getItem("userEmail");
       if (!userId) return navigate("/login");
       const res = await api.get(`/api/trades?userId=${userId}`);
-      const sorted = [...(res.data?.data || [])].sort((a, b) => new Date(a.date) - new Date(b.date));
+      const getTradeTime = (t) => {
+        if (!t) return 0;
+        const d = t.date || (t.created_at ? t.created_at.slice(0, 10) : "");
+        const tm = t.entry_time || t.time || "12:00";
+        if (d) {
+          const ts = new Date(`${d}T${tm.length === 5 ? tm + ":00" : tm}`).getTime();
+          if (!isNaN(ts)) return ts;
+        }
+        return t.created_at ? new Date(t.created_at).getTime() : 0;
+      };
+      const sorted = [...(res.data?.data || [])].sort((a, b) => {
+        const diff = getTradeTime(a) - getTradeTime(b);
+        if (diff !== 0) return diff;
+        return new Date(a.created_at || 0) - new Date(b.created_at || 0);
+      });
       cachedDashboardTrades = sorted;
       setAllTrades(sorted);
     } catch (err) {
