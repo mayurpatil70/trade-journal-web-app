@@ -57,7 +57,7 @@ export default function Onboarding() {
       localStorage.setItem("onboarding_completed", "true");
 
       if (!isSkipped) {
-        // 2. Persist profile
+        // 2. Persist profile locally
         const profileData = {
           displayName,
           username: username.replace(/^@/, ""),
@@ -65,6 +65,13 @@ export default function Onboarding() {
           avatarUrl,
         };
         localStorage.setItem(`trader_profile_${completedUserId}`, JSON.stringify(profileData));
+        if (avatarUrl) {
+          localStorage.setItem(`user_avatar_${completedUserId}`, avatarUrl);
+          localStorage.setItem("userAvatar", avatarUrl);
+        }
+        if (displayName) {
+          localStorage.setItem("userName", displayName);
+        }
 
         // 3. Persist discipline rules
         const disciplineData = {
@@ -86,6 +93,36 @@ export default function Onboarding() {
         localStorage.setItem(`trader_preferences_${completedUserId}`, JSON.stringify(preferencesData));
         localStorage.setItem("display_currency", currency);
         localStorage.setItem("timezone", timezone);
+
+        // 5. Persist to Supabase Database (profiles & users tables)
+        try {
+          await fetch("/api/auth/onboarding-profile", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("authToken") || ""}`,
+            },
+            body: JSON.stringify({
+              userId: completedUserId,
+              email: userEmail,
+              displayName,
+              username: username.replace(/^@/, ""),
+              bio,
+              avatarUrl,
+              currency,
+              timezone,
+              maxRiskPerTrade,
+              dailyLossCap,
+              maxTradesPerDay,
+              lossStreakBreak,
+              targetRR,
+              preferredSessions,
+              favoritePairs,
+            }),
+          });
+        } catch (apiErr) {
+          console.warn("[Onboarding] Backend save profile notice:", apiErr);
+        }
       }
     } catch (err) {
       console.warn("Error saving onboarding details:", err);

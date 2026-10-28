@@ -2,6 +2,7 @@ import { Resend } from "resend";
 import crypto from "crypto";
 import { signAuthToken } from "../utils/authToken.js";
 import { supabase } from "../config/supabase.js";
+import { uploadToCloudinary } from "../utils/cloudinary.js";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -139,5 +140,120 @@ export const verifyLogin = async (req, res) => {
   } catch (error) {
     console.error("Verify Error:", error.message);
     res.status(500).json({ error: "Failed to verify login link. Please try again." });
+  }
+};
+
+export const uploadAvatar = async (req, res) => {
+  try {
+    if (!req.file || !req.file.buffer) {
+      return res.status(400).json({ success: false, error: "No image file provided." });
+    }
+
+    const avatarUrl = await uploadToCloudinary(req.file.buffer, "user_avatars");
+    const userId = req.body?.userId || req.headers["x-user-id"];
+    const email = req.body?.email;
+
+    // Persist avatar URL into profiles & users tables in Supabase
+    if (userId) {
+      try {
+        await supabase
+          .from("profiles")
+          .upsert({ id: userId, avatar_url: avatarUrl, updated_at: new Date().toISOString() }, { onConflict: "id" });
+      } catch (profileErr) {
+        console.warn("[Auth] Avatar update profiles table notice:", profileErr.message);
+      }
+
+      try {
+        await supabase
+          .from("users")
+          .update({ avatar_url: avatarUrl })
+          .eq("id", userId);
+      } catch (userErr) {
+        console.warn("[Auth] Avatar update users table notice:", userErr.message);
+      }
+    } else if (email) {
+      try {
+        await supabase
+          .from("users")
+          .update({ avatar_url: avatarUrl })
+          .eq("email", email);
+      } catch (userErr) {
+        console.warn("[Auth] Avatar update user by email notice:", userErr.message);
+      }
+    }
+
+    res.json({ success: true, avatarUrl });
+  } catch (error) {
+    console.error("[Auth] Avatar upload error:", error);
+    res.status(500).json({ success: false, error: "Failed to upload avatar to cloud storage." });
+  }
+};
+
+export const saveOnboardingProfile = async (req, res) => {
+  try {
+    const {
+      userId,
+      email,
+      displayName,
+      username,
+      bio,
+      avatarUrl,
+      currency,
+      timezone,
+      maxRiskPerTrade,
+      dailyLossCap,
+      maxTradesPerDay,
+      lossStreakBreak,
+      targetRR,
+      preferredSessions,
+      favoritePairs,
+    } = req.body;
+
+    if (!userId && !email) {
+      return res.status(400).json({ success: false, error: "userId or email required" });
+    }
+
+    if (userId) {
+      try {
+        await supabase.from("profiles").upsert(
+          {
+            id: userId,
+            display_name: displayName,
+            username: username?.replace(/^@/, ""),
+            bio: bio || "",
+            avatar_url: avatarUrl || null,
+            currency: currency || "USD",
+            timezone: timezone || "UTC",
+            discipline_rules: {
+              maxRiskPerTrade,
+              dailyLossCap,
+              maxTradesPerDay,
+              lossStreakBreak,
+              targetRR,
+              preferredSessions,
+              favoritePairs,
+            },
+            updated_at: new Date().toISOString(),
+          },
+          { onConflict: "id" }
+        );
+      } catch (profErr) {
+        console.warn("[Auth] Save onboarding profile table notice:", profErr.message);
+      }
+
+      try {
+        await supabase.from("users").update({
+          display_name: displayName,
+          avatar_url: avatarUrl || null,
+        }).eq("id", userId);
+      } catch (userErr) {
+        console.warn("[Auth] Save onboarding users table notice:", userErr.message);
+      }
+    }
+
+    res.json({ success: true, message: "Onboarding profile saved successfully." });
+  } catch (error) {
+    console.error("[Auth] Save onboarding profile error:", error);
+    res.status(500).json({ success: false, error: "Failed to save profile." });
   }
 };

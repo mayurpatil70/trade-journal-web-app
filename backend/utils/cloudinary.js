@@ -6,10 +6,10 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-export const uploadToCloudinary = (buffer) => {
+export const uploadToCloudinary = (buffer, folder = "forex_notes_trades") => {
   return new Promise((resolve, reject) => {
     const stream = cloudinary.uploader.upload_stream(
-      { folder: "forex_notes_trades" },
+      { folder },
       (error, result) => {
         if (error) reject(error);
         else resolve(result.secure_url);

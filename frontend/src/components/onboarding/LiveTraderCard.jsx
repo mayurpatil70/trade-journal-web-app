@@ -10,11 +10,9 @@ export default function LiveTraderCard({
 
   return (
     <div className="relative w-full max-w-[420px] mx-auto rounded-3xl bg-white/95 dark:bg-[#0c1017]/95 border border-black/[0.08] dark:border-white/[0.1] shadow-[0_20px_50px_rgba(0,0,0,0.08)] dark:shadow-[0_25px_60px_rgba(0,0,0,0.6)] backdrop-blur-2xl p-6 overflow-hidden select-none">
-      {/* Background glow and subtle brand watermark */}
+      {/* Background ambient radial glow */}
       <div className="absolute -top-16 -right-16 w-48 h-48 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-black/[0.02] dark:text-white/[0.02] text-8xl font-black pointer-events-none select-none tracking-tighter">
-        FOREX
-      </div>
+      <div className="absolute -bottom-16 -left-16 w-48 h-48 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
 
       {/* Header Pill */}
       <div className="flex items-center justify-between mb-6">
@@ -26,7 +24,7 @@ export default function LiveTraderCard({
         </span>
       </div>
 
-      {/* Avatar & Identifiers */}
+      {/* Avatar & Identifiers (Instant render of uploaded image) */}
       <div className="flex items-center gap-4 mb-5">
         <div className="relative w-16 h-16 rounded-2xl overflow-hidden border border-black/10 dark:border-white/10 bg-gradient-to-tr from-emerald-600 to-teal-500 flex items-center justify-center shrink-0 shadow-lg shadow-emerald-500/15">
           {avatarUrl ? (

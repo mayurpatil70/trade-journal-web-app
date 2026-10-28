@@ -85,50 +85,49 @@ export default function Step3Discipline({
   const riskLabel = getRiskLabel(maxRiskPerTrade);
 
   return (
-    <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start py-4 lg:py-8">
-      {/* ── LEFT COLUMN: Chart & Backtesting Visual Preview (Sticky on desktop) ── */}
-      <div className="lg:col-span-5 flex flex-col items-center justify-center lg:sticky lg:top-8 animate-in fade-in duration-300">
+    <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start py-4">
+      {/* ── COLUMN 1 (Left, lg:col-span-4): Realistic TradingView Backtesting Preview Card ── */}
+      <div className="lg:col-span-4 flex flex-col items-center justify-center lg:sticky lg:top-8 animate-in fade-in duration-300">
         <LiveChartMockup targetRR={targetRR} />
       </div>
 
-      {/* ── RIGHT COLUMN: Discipline Controls (Scrollable) ── */}
-      <div className="lg:col-span-7 space-y-7 max-w-2xl animate-in fade-in duration-300">
+      {/* ── COLUMN 2 (Center, lg:col-span-4): First Half of Discipline Rules ── */}
+      <div className="lg:col-span-4 space-y-4 animate-in fade-in duration-300">
         <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 dark:bg-emerald-500/15 border border-emerald-500/25 text-xs font-mono font-bold uppercase tracking-widest text-emerald-600 dark:text-emerald-400 mb-3 shadow-sm">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 dark:bg-emerald-500/15 border border-emerald-500/25 text-xs font-mono font-bold uppercase tracking-widest text-emerald-600 dark:text-emerald-400 mb-2 shadow-sm">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             <span>Step 03 • Discipline</span>
           </div>
 
-          <h2 className="text-3xl sm:text-4xl font-black text-neutral-900 dark:text-white tracking-tight">
+          <h2 className="text-2xl sm:text-3xl font-black text-neutral-900 dark:text-white tracking-tight">
             Set the guardrails.
           </h2>
 
-          <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300 font-medium leading-relaxed">
-            These are your rails — the boundaries that keep one bad day from turning into a bad month. The risk dial recolors as the stakes climb.
+          <p className="mt-1 text-xs text-neutral-600 dark:text-neutral-300 font-medium leading-relaxed">
+            Boundaries to prevent one bad day from turning into a bad month.
           </p>
         </div>
 
         {/* 1. Max risk per trade */}
-        <div className="p-5 rounded-3xl bg-white/95 dark:bg-[#121622]/95 border border-black/[0.08] dark:border-white/[0.1] shadow-sm hover:border-emerald-500/40 transition-all space-y-3.5">
+        <div className="p-4 sm:p-4.5 rounded-3xl bg-white/95 dark:bg-[#121622]/95 border border-black/[0.08] dark:border-white/[0.1] shadow-sm hover:border-emerald-500/40 transition-all space-y-2.5">
           <div className="flex items-center justify-between">
             <div>
               <div className="flex items-center gap-1.5">
                 <span className="text-xs font-extrabold text-neutral-900 dark:text-white uppercase tracking-wider">
-                  Max risk per trade
+                  Max risk / trade
                 </span>
                 <Info className="w-3.5 h-3.5 text-neutral-400" />
               </div>
-              <p className="text-xs text-neutral-500 dark:text-neutral-400 font-medium mt-0.5">
-                Per-position risk ceiling •{" "}
+              <p className="text-[11px] text-neutral-500 dark:text-neutral-400 font-medium mt-0.5">
+                Per-position ceiling •{" "}
                 <span className={`font-bold ${riskLabel.color}`}>{riskLabel.text}</span>
               </p>
             </div>
-            <div className="px-3.5 py-1.5 rounded-xl bg-black/[0.04] dark:bg-white/[0.08] border border-black/[0.08] dark:border-white/[0.12] font-mono font-black text-sm text-neutral-900 dark:text-white shadow-xs">
+            <div className="px-3 py-1 rounded-xl bg-black/[0.04] dark:bg-white/[0.08] border border-black/[0.08] dark:border-white/[0.12] font-mono font-black text-xs text-neutral-900 dark:text-white shadow-xs">
               {maxRiskPerTrade}%
             </div>
           </div>
 
-          {/* Slider */}
           <input
             type="range"
             min="0.25"
@@ -136,17 +135,16 @@ export default function Step3Discipline({
             step="0.25"
             value={maxRiskPerTrade}
             onChange={(e) => setMaxRiskPerTrade(Number(e.target.value))}
-            className="w-full accent-emerald-500 h-2 bg-neutral-200 dark:bg-white/10 rounded-lg cursor-pointer"
+            className="w-full accent-emerald-500 h-1.5 bg-neutral-200 dark:bg-white/10 rounded-lg cursor-pointer"
           />
 
-          {/* Preset Pills */}
-          <div className="flex items-center gap-2 pt-1 flex-wrap">
+          <div className="flex items-center gap-1.5 pt-0.5 flex-wrap">
             {[0.5, 1, 2, 3, 5].map((val) => (
               <button
                 key={val}
                 type="button"
                 onClick={() => setMaxRiskPerTrade(val)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer ${
+                className={`px-2.5 py-1 rounded-xl text-[11px] font-mono font-bold transition-all cursor-pointer ${
                   maxRiskPerTrade === val
                     ? "bg-emerald-500 text-white shadow-md shadow-emerald-500/30"
                     : "bg-neutral-100 hover:bg-neutral-200 dark:bg-white/[0.05] dark:hover:bg-white/[0.1] text-neutral-700 dark:text-neutral-300 border border-black/[0.05] dark:border-white/[0.08]"
@@ -159,7 +157,7 @@ export default function Step3Discipline({
         </div>
 
         {/* 2. Daily loss cap */}
-        <div className="p-5 rounded-3xl bg-white/95 dark:bg-[#121622]/95 border border-black/[0.08] dark:border-white/[0.1] shadow-sm hover:border-emerald-500/40 transition-all space-y-3.5">
+        <div className="p-4 sm:p-4.5 rounded-3xl bg-white/95 dark:bg-[#121622]/95 border border-black/[0.08] dark:border-white/[0.1] shadow-sm hover:border-emerald-500/40 transition-all space-y-2.5">
           <div className="flex items-center justify-between">
             <div>
               <div className="flex items-center gap-1.5">
@@ -168,9 +166,9 @@ export default function Step3Discipline({
                 </span>
                 <Info className="w-3.5 h-3.5 text-neutral-400" />
               </div>
-              <p className="text-xs text-neutral-500 dark:text-neutral-400 font-medium mt-0.5">Stop-trading threshold</p>
+              <p className="text-[11px] text-neutral-500 dark:text-neutral-400 font-medium mt-0.5">Stop-trading threshold</p>
             </div>
-            <div className="px-3.5 py-1.5 rounded-xl bg-black/[0.04] dark:bg-white/[0.08] border border-black/[0.08] dark:border-white/[0.12] font-mono font-black text-sm text-neutral-900 dark:text-white shadow-xs">
+            <div className="px-3 py-1 rounded-xl bg-black/[0.04] dark:bg-white/[0.08] border border-black/[0.08] dark:border-white/[0.12] font-mono font-black text-xs text-neutral-900 dark:text-white shadow-xs">
               {dailyLossCap}%
             </div>
           </div>
@@ -182,16 +180,16 @@ export default function Step3Discipline({
             step="0.5"
             value={dailyLossCap}
             onChange={(e) => setDailyLossCap(Number(e.target.value))}
-            className="w-full accent-emerald-500 h-2 bg-neutral-200 dark:bg-white/10 rounded-lg cursor-pointer"
+            className="w-full accent-emerald-500 h-1.5 bg-neutral-200 dark:bg-white/10 rounded-lg cursor-pointer"
           />
 
-          <div className="flex items-center gap-2 pt-1 flex-wrap">
+          <div className="flex items-center gap-1.5 pt-0.5 flex-wrap">
             {[3, 5, 10, 15].map((val) => (
               <button
                 key={val}
                 type="button"
                 onClick={() => setDailyLossCap(val)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer ${
+                className={`px-2.5 py-1 rounded-xl text-[11px] font-mono font-bold transition-all cursor-pointer ${
                   dailyLossCap === val
                     ? "bg-emerald-500 text-white shadow-md shadow-emerald-500/30"
                     : "bg-neutral-100 hover:bg-neutral-200 dark:bg-white/[0.05] dark:hover:bg-white/[0.1] text-neutral-700 dark:text-neutral-300 border border-black/[0.05] dark:border-white/[0.08]"
@@ -204,7 +202,7 @@ export default function Step3Discipline({
         </div>
 
         {/* 3. Max trades / day */}
-        <div className="p-5 rounded-3xl bg-white/95 dark:bg-[#121622]/95 border border-black/[0.08] dark:border-white/[0.1] shadow-sm hover:border-emerald-500/40 transition-all space-y-3.5">
+        <div className="p-4 sm:p-4.5 rounded-3xl bg-white/95 dark:bg-[#121622]/95 border border-black/[0.08] dark:border-white/[0.1] shadow-sm hover:border-emerald-500/40 transition-all space-y-2.5">
           <div className="flex items-center justify-between">
             <div>
               <div className="flex items-center gap-1.5">
@@ -213,9 +211,9 @@ export default function Step3Discipline({
                 </span>
                 <Info className="w-3.5 h-3.5 text-neutral-400" />
               </div>
-              <p className="text-xs text-neutral-500 dark:text-neutral-400 font-medium mt-0.5">Daily trade ceiling</p>
+              <p className="text-[11px] text-neutral-500 dark:text-neutral-400 font-medium mt-0.5">Daily trade ceiling</p>
             </div>
-            <div className="px-3.5 py-1.5 rounded-xl bg-black/[0.04] dark:bg-white/[0.08] border border-black/[0.08] dark:border-white/[0.12] font-mono font-black text-sm text-neutral-900 dark:text-white shadow-xs">
+            <div className="px-3 py-1 rounded-xl bg-black/[0.04] dark:bg-white/[0.08] border border-black/[0.08] dark:border-white/[0.12] font-mono font-black text-xs text-neutral-900 dark:text-white shadow-xs">
               {maxTradesPerDay} trades
             </div>
           </div>
@@ -227,16 +225,16 @@ export default function Step3Discipline({
             step="1"
             value={maxTradesPerDay}
             onChange={(e) => setMaxTradesPerDay(Number(e.target.value))}
-            className="w-full accent-emerald-500 h-2 bg-neutral-200 dark:bg-white/10 rounded-lg cursor-pointer"
+            className="w-full accent-emerald-500 h-1.5 bg-neutral-200 dark:bg-white/10 rounded-lg cursor-pointer"
           />
 
-          <div className="flex items-center gap-2 pt-1 flex-wrap">
+          <div className="flex items-center gap-1.5 pt-0.5 flex-wrap">
             {[1, 2, 3, 5, 8].map((val) => (
               <button
                 key={val}
                 type="button"
                 onClick={() => setMaxTradesPerDay(val)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer ${
+                className={`px-2.5 py-1 rounded-xl text-[11px] font-mono font-bold transition-all cursor-pointer ${
                   maxTradesPerDay === val
                     ? "bg-emerald-500 text-white shadow-md shadow-emerald-500/30"
                     : "bg-neutral-100 hover:bg-neutral-200 dark:bg-white/[0.05] dark:hover:bg-white/[0.1] text-neutral-700 dark:text-neutral-300 border border-black/[0.05] dark:border-white/[0.08]"
@@ -249,7 +247,7 @@ export default function Step3Discipline({
         </div>
 
         {/* 4. Loss-streak break */}
-        <div className="p-5 rounded-3xl bg-white/95 dark:bg-[#121622]/95 border border-black/[0.08] dark:border-white/[0.1] shadow-sm hover:border-emerald-500/40 transition-all space-y-3.5">
+        <div className="p-4 sm:p-4.5 rounded-3xl bg-white/95 dark:bg-[#121622]/95 border border-black/[0.08] dark:border-white/[0.1] shadow-sm hover:border-emerald-500/40 transition-all space-y-2.5">
           <div className="flex items-center justify-between">
             <div>
               <div className="flex items-center gap-1.5">
@@ -258,9 +256,9 @@ export default function Step3Discipline({
                 </span>
                 <Info className="w-3.5 h-3.5 text-neutral-400" />
               </div>
-              <p className="text-xs text-neutral-500 dark:text-neutral-400 font-medium mt-0.5">Step away after consecutive losses</p>
+              <p className="text-[11px] text-neutral-500 dark:text-neutral-400 font-medium mt-0.5">Step away threshold</p>
             </div>
-            <div className="px-3.5 py-1.5 rounded-xl bg-black/[0.04] dark:bg-white/[0.08] border border-black/[0.08] dark:border-white/[0.12] font-mono font-black text-sm text-neutral-900 dark:text-white shadow-xs">
+            <div className="px-3 py-1 rounded-xl bg-black/[0.04] dark:bg-white/[0.08] border border-black/[0.08] dark:border-white/[0.12] font-mono font-black text-xs text-neutral-900 dark:text-white shadow-xs">
               {lossStreakBreak} losses
             </div>
           </div>
@@ -272,16 +270,16 @@ export default function Step3Discipline({
             step="1"
             value={lossStreakBreak}
             onChange={(e) => setLossStreakBreak(Number(e.target.value))}
-            className="w-full accent-emerald-500 h-2 bg-neutral-200 dark:bg-white/10 rounded-lg cursor-pointer"
+            className="w-full accent-emerald-500 h-1.5 bg-neutral-200 dark:bg-white/10 rounded-lg cursor-pointer"
           />
 
-          <div className="flex items-center gap-2 pt-1 flex-wrap">
+          <div className="flex items-center gap-1.5 pt-0.5 flex-wrap">
             {[2, 3, 4, 5, 6].map((val) => (
               <button
                 key={val}
                 type="button"
                 onClick={() => setLossStreakBreak(val)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer ${
+                className={`px-2.5 py-1 rounded-xl text-[11px] font-mono font-bold transition-all cursor-pointer ${
                   lossStreakBreak === val
                     ? "bg-emerald-500 text-white shadow-md shadow-emerald-500/30"
                     : "bg-neutral-100 hover:bg-neutral-200 dark:bg-white/[0.05] dark:hover:bg-white/[0.1] text-neutral-700 dark:text-neutral-300 border border-black/[0.05] dark:border-white/[0.08]"
@@ -292,9 +290,12 @@ export default function Step3Discipline({
             ))}
           </div>
         </div>
+      </div>
 
+      {/* ── COLUMN 3 (Right, lg:col-span-4): Second Half of Discipline Rules ── */}
+      <div className="lg:col-span-4 space-y-4 animate-in fade-in duration-300">
         {/* 5. Target Risk : Reward */}
-        <div className="space-y-3">
+        <div className="space-y-2">
           <div className="flex items-center gap-1.5">
             <span className="text-xs font-extrabold text-neutral-900 dark:text-white uppercase tracking-wider">
               Target Risk : Reward
@@ -302,7 +303,7 @@ export default function Step3Discipline({
             <Info className="w-3.5 h-3.5 text-neutral-400" />
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
             {RR_OPTIONS.map((opt) => {
               const isSelected = targetRR === opt.id;
               return (
@@ -310,14 +311,14 @@ export default function Step3Discipline({
                   key={opt.id}
                   type="button"
                   onClick={() => setTargetRR(opt.id)}
-                  className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer shadow-xs ${
+                  className={`p-3 rounded-2xl border text-left transition-all cursor-pointer shadow-xs ${
                     isSelected
                       ? "bg-emerald-500/10 dark:bg-emerald-500/15 border-2 border-emerald-500 text-emerald-700 dark:text-emerald-300 shadow-md shadow-emerald-500/20"
                       : "bg-white dark:bg-[#121622] border-black/[0.08] dark:border-white/[0.08] text-neutral-700 dark:text-neutral-300 hover:border-emerald-500/40"
                   }`}
                 >
-                  <div className="font-mono font-black text-sm text-neutral-900 dark:text-white">{opt.label}</div>
-                  <div className="text-[11px] text-neutral-500 dark:text-neutral-400 font-medium mt-0.5">{opt.desc}</div>
+                  <div className="font-mono font-black text-xs text-neutral-900 dark:text-white">{opt.label}</div>
+                  <div className="text-[10px] text-neutral-500 dark:text-neutral-400 font-medium mt-0.5">{opt.desc}</div>
                 </button>
               );
             })}
@@ -325,12 +326,12 @@ export default function Step3Discipline({
         </div>
 
         {/* 6. Preferred Sessions */}
-        <div className="space-y-3">
+        <div className="space-y-2">
           <span className="text-xs font-extrabold text-neutral-900 dark:text-white uppercase tracking-wider block">
             Preferred Sessions
           </span>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div className="space-y-2">
             {SESSIONS.map((sess) => {
               const isSelected = preferredSessions.includes(sess.id);
               return (
@@ -338,17 +339,17 @@ export default function Step3Discipline({
                   key={sess.id}
                   type="button"
                   onClick={() => toggleSession(sess.id)}
-                  className={`p-4 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between shadow-xs ${
+                  className={`w-full p-3 rounded-2xl border text-left transition-all cursor-pointer flex items-center justify-between shadow-xs ${
                     isSelected
                       ? "bg-emerald-500/10 dark:bg-emerald-500/15 border-2 border-emerald-500 text-emerald-700 dark:text-emerald-300 shadow-md shadow-emerald-500/20"
                       : "bg-white dark:bg-[#121622] border-black/[0.08] dark:border-white/[0.08] text-neutral-700 dark:text-neutral-300 hover:border-emerald-500/40"
                   }`}
                 >
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="font-extrabold text-sm text-neutral-900 dark:text-white">{sess.name}</span>
-                    {isSelected && <Check className="w-4 h-4 text-emerald-500 stroke-[2.5]" />}
+                  <div>
+                    <span className="font-extrabold text-xs text-neutral-900 dark:text-white block">{sess.name}</span>
+                    <span className="text-[10px] font-mono text-neutral-500 dark:text-neutral-400 font-medium">{sess.time}</span>
                   </div>
-                  <span className="text-[11px] font-mono text-neutral-500 dark:text-neutral-400 font-medium">{sess.time}</span>
+                  {isSelected && <Check className="w-4 h-4 text-emerald-500 stroke-[2.5]" />}
                 </button>
               );
             })}
@@ -356,17 +357,17 @@ export default function Step3Discipline({
         </div>
 
         {/* 7. Favorite Pairs (Pick 1-5) */}
-        <div className="space-y-3">
+        <div className="space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-xs font-extrabold text-neutral-900 dark:text-white uppercase tracking-wider">
               Favorite Pairs
             </span>
-            <span className="text-xs font-mono font-bold text-emerald-600 dark:text-emerald-400">
+            <span className="text-[11px] font-mono font-bold text-emerald-600 dark:text-emerald-400">
               {favoritePairs.length}/5 selected
             </span>
           </div>
 
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-1.5 max-h-[140px] overflow-y-auto pr-1 scrollbar-thin">
             {POPULAR_PAIRS.map((pair) => {
               const isSelected = favoritePairs.includes(pair);
               return (
@@ -374,13 +375,13 @@ export default function Step3Discipline({
                   key={pair}
                   type="button"
                   onClick={() => togglePair(pair)}
-                  className={`px-3.5 py-2 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-xs ${
+                  className={`px-2.5 py-1.5 rounded-xl text-[11px] font-mono font-bold transition-all cursor-pointer flex items-center gap-1 shadow-xs ${
                     isSelected
                       ? "bg-emerald-500 text-white shadow-md shadow-emerald-500/30"
                       : "bg-white dark:bg-[#121622] border border-black/[0.08] dark:border-white/[0.08] text-neutral-800 dark:text-neutral-200 hover:border-emerald-500/40 hover:text-emerald-600 dark:hover:text-emerald-400"
                   }`}
                 >
-                  {isSelected && <Check className="w-3.5 h-3.5 stroke-[2.5]" />}
+                  {isSelected && <Check className="w-3 h-3 stroke-[2.5]" />}
                   <span>{pair}</span>
                 </button>
               );

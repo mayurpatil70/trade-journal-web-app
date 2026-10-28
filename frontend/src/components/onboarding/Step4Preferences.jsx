@@ -1,17 +1,18 @@
 import { DollarSign, Clock } from "lucide-react";
 import MarketClock from "./MarketClock";
+import AppleSelect from "../ui/AppleSelect";
 
 const CURRENCIES = [
-  { code: "USD", symbol: "$", label: "US Dollar ($)" },
-  { code: "EUR", symbol: "€", label: "Euro (€)" },
-  { code: "GBP", symbol: "£", label: "British Pound (£)" },
-  { code: "JPY", symbol: "¥", label: "Japanese Yen (¥)" },
-  { code: "AUD", symbol: "A$", label: "Australian Dollar (A$)" },
-  { code: "CAD", symbol: "C$", label: "Canadian Dollar (C$)" },
-  { code: "CHF", symbol: "CHF", label: "Swiss Franc (CHF)" },
-  { code: "INR", symbol: "₹", label: "Indian Rupee (₹)" },
-  { code: "AED", symbol: "AED", label: "UAE Dirham (AED)" },
-  { code: "SGD", symbol: "S$", label: "Singapore Dollar (S$)" },
+  { value: "USD", label: "US Dollar ($)" },
+  { value: "EUR", label: "Euro (€)" },
+  { value: "GBP", label: "British Pound (£)" },
+  { value: "JPY", label: "Japanese Yen (¥)" },
+  { value: "AUD", label: "Australian Dollar (A$)" },
+  { value: "CAD", label: "Canadian Dollar (C$)" },
+  { value: "CHF", label: "Swiss Franc (CHF)" },
+  { value: "INR", label: "Indian Rupee (₹)" },
+  { value: "AED", label: "UAE Dirham (AED)" },
+  { value: "SGD", label: "Singapore Dollar (S$)" },
 ];
 
 const TIMEZONES = [
@@ -56,61 +57,41 @@ export default function Step4Preferences({
           </p>
         </div>
 
-        {/* 1. Display Currency Selector */}
+        {/* 1. Display Currency Selector (Apple macOS / iOS Frosted Dropdown) */}
         <div className="space-y-2">
           <label className="flex items-center gap-2 text-xs font-extrabold text-neutral-800 dark:text-neutral-200 uppercase tracking-wider">
             <DollarSign className="w-4 h-4 text-emerald-600 dark:text-emerald-400 stroke-[2.5]" />
             <span>Display currency</span>
           </label>
-          <div className="relative">
-            <select
-              value={currency}
-              onChange={(e) => setCurrency(e.target.value)}
-              className="w-full h-13 px-4 rounded-2xl border border-black/[0.1] dark:border-white/[0.12] bg-white dark:bg-[#121622] text-neutral-900 dark:text-white text-sm font-bold outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all cursor-pointer appearance-none shadow-sm"
-            >
-              {CURRENCIES.map((c) => (
-                <option key={c.code} value={c.code} className="bg-white dark:bg-[#121622] text-neutral-900 dark:text-white">
-                  {c.label}
-                </option>
-              ))}
-            </select>
-            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-neutral-500 dark:text-neutral-400 text-xs font-bold">
-              ▼
-            </div>
-          </div>
+          <AppleSelect
+            value={currency}
+            onChange={(e) => setCurrency(e.target.value)}
+            options={CURRENCIES}
+            placeholder="Select display currency"
+          />
           <p className="text-[11px] text-neutral-500 dark:text-neutral-400 font-medium">
             P&L, balances, and statistics will display in this currency.
           </p>
         </div>
 
-        {/* 2. Timezone Selector */}
+        {/* 2. Timezone Selector (Apple macOS / iOS Frosted Dropdown) */}
         <div className="space-y-2">
           <label className="flex items-center gap-2 text-xs font-extrabold text-neutral-800 dark:text-neutral-200 uppercase tracking-wider">
             <Clock className="w-4 h-4 text-emerald-600 dark:text-emerald-400 stroke-[2.5]" />
             <span>Timezone</span>
           </label>
-          <div className="relative">
-            <select
-              value={timezone}
-              onChange={(e) => setTimezone(e.target.value)}
-              className="w-full h-13 px-4 rounded-2xl border border-black/[0.1] dark:border-white/[0.12] bg-white dark:bg-[#121622] text-neutral-900 dark:text-white text-sm font-bold outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all cursor-pointer appearance-none shadow-sm"
-            >
-              {TIMEZONES.map((tz) => (
-                <option key={tz.value} value={tz.value} className="bg-white dark:bg-[#121622] text-neutral-900 dark:text-white">
-                  {tz.label}
-                </option>
-              ))}
-            </select>
-            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-neutral-500 dark:text-neutral-400 text-xs font-bold">
-              ▼
-            </div>
-          </div>
+          <AppleSelect
+            value={timezone}
+            onChange={(e) => setTimezone(e.target.value)}
+            options={TIMEZONES}
+            placeholder="Select timezone"
+          />
           <p className="text-[11px] text-neutral-500 dark:text-neutral-400 font-medium">
             Trade timestamps and the economic calendar are anchored to this zone.
           </p>
         </div>
 
-        {/* Summary Card */}
+        {/* Setup Summary Card */}
         <div className="p-5 rounded-3xl bg-white/95 dark:bg-[#121622]/95 border border-black/[0.08] dark:border-white/[0.1] shadow-sm space-y-2.5">
           <span className="text-[10px] font-mono uppercase tracking-wider text-emerald-600 dark:text-emerald-400 font-black block">
             Setup Summary

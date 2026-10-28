@@ -1,5 +1,5 @@
-import { useRef } from "react";
-import { Check } from "lucide-react";
+import { useRef, useState } from "react";
+import { Check, Camera, Loader2 } from "lucide-react";
 import LiveTraderCard from "./LiveTraderCard";
 
 export default function Step2Identity({
@@ -14,19 +14,54 @@ export default function Step2Identity({
   targetRR,
 }) {
   const fileInputRef = useRef(null);
+  const [isUploading, setIsUploading] = useState(false);
 
-  const handleFileChange = (e) => {
+  const userId = localStorage.getItem("userId") || "";
+  const userEmail = localStorage.getItem("userEmail") || "";
+
+  const handleFileChange = async (e) => {
     const file = e.target.files?.[0];
-    if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        alert("File size must be under 5MB.");
-        return;
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert("File size must be under 5MB.");
+      return;
+    }
+
+    // 1. INSTANT LOCAL PREVIEW in both cards with 0ms visual latency
+    const reader = new FileReader();
+    reader.onload = () => {
+      setAvatarUrl(reader.result);
+    };
+    reader.readAsDataURL(file);
+
+    // 2. Upload to Cloudinary & persist in database
+    try {
+      setIsUploading(true);
+      const formData = new FormData();
+      formData.append("avatar", file);
+      if (userId) formData.append("userId", userId);
+      if (userEmail) formData.append("email", userEmail);
+
+      const res = await fetch("/api/auth/avatar", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("authToken") || ""}`,
+        },
+        body: formData,
+      });
+
+      const data = await res.json();
+      if (data.success && data.avatarUrl) {
+        // Replace with permanent Cloudinary URL
+        setAvatarUrl(data.avatarUrl);
+        localStorage.setItem(`user_avatar_${userId}`, data.avatarUrl);
+        localStorage.setItem("userAvatar", data.avatarUrl);
       }
-      const reader = new FileReader();
-      reader.onload = () => {
-        setAvatarUrl(reader.result);
-      };
-      reader.readAsDataURL(file);
+    } catch (uploadErr) {
+      console.warn("[Onboarding] Cloudinary avatar upload notice:", uploadErr);
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -34,7 +69,7 @@ export default function Step2Identity({
 
   return (
     <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center py-4 lg:py-8">
-      {/* ── LEFT COLUMN: Interactive Live Preview Card ── */}
+      {/* ── LEFT COLUMN: Interactive Live Preview Card (Instant render) ── */}
       <div className="lg:col-span-5 flex flex-col items-center justify-center animate-in fade-in duration-300">
         <LiveTraderCard
           displayName={displayName}
@@ -62,7 +97,7 @@ export default function Step2Identity({
           </p>
         </div>
 
-        {/* Profile Photo Upload Row */}
+        {/* Profile Photo Upload Row - macOS / iOS Frosted Glass UI */}
         <div className="p-4 sm:p-5 rounded-3xl bg-white/95 dark:bg-[#121622]/95 border border-black/[0.08] dark:border-white/[0.1] shadow-sm flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="relative w-14 h-14 rounded-2xl overflow-hidden bg-gradient-to-tr from-emerald-600 to-teal-500 border border-black/10 dark:border-white/10 flex items-center justify-center text-white font-bold shrink-0 shadow-md shadow-emerald-500/20">
@@ -85,12 +120,25 @@ export default function Step2Identity({
             onChange={handleFileChange}
             className="hidden"
           />
+
+          {/* macOS / iOS Refined Change Button */}
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="px-4 py-2 rounded-xl text-xs font-bold bg-neutral-900 hover:bg-neutral-800 text-white dark:bg-white/[0.1] dark:hover:bg-white/[0.18] dark:text-white transition-all cursor-pointer shadow-sm active:scale-95"
+            disabled={isUploading}
+            className="px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer shadow-xs active:scale-95 flex items-center gap-1.5 border bg-white dark:bg-white/[0.08] hover:bg-neutral-50 dark:hover:bg-white/[0.14] text-neutral-800 dark:text-neutral-100 border-black/[0.12] dark:border-white/[0.15] hover:border-emerald-500/50 dark:hover:border-emerald-500/50 hover:text-emerald-600 dark:hover:text-emerald-400"
           >
-            Change
+            {isUploading ? (
+              <>
+                <Loader2 className="w-3.5 h-3.5 animate-spin text-emerald-500" />
+                <span>Uploading...</span>
+              </>
+            ) : (
+              <>
+                <Camera className="w-3.5 h-3.5" />
+                <span>Change</span>
+              </>
+            )}
           </button>
         </div>
 
@@ -138,20 +186,20 @@ export default function Step2Identity({
           {/* Bio */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <label className="text-xs font-extrabold text-neutral-800 dark:text-neutral-200 uppercase tracking-wider">
-                Bio <span className="text-neutral-500 font-normal lowercase">(optional)</span>
+              <label className="block text-xs font-extrabold text-neutral-800 dark:text-neutral-200 uppercase tracking-wider">
+                Bio
               </label>
-              <span className="text-[11px] font-mono font-bold text-neutral-500 dark:text-neutral-400">
-                {bio.length}/160
+              <span className="text-[11px] font-mono font-semibold text-neutral-400">
+                {bio.length}/180
               </span>
             </div>
             <textarea
               rows={3}
-              maxLength={160}
+              maxLength={180}
               value={bio}
               onChange={(e) => setBio(e.target.value)}
               placeholder="A few words on your trading style, edge, or story..."
-              className="w-full p-4 rounded-2xl border border-black/[0.1] dark:border-white/[0.12] bg-white dark:bg-[#121622] text-neutral-900 dark:text-white text-sm font-medium placeholder-neutral-400 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 shadow-sm transition-all resize-none"
+              className="w-full p-4 rounded-2xl border border-black/[0.1] dark:border-white/[0.12] bg-white dark:bg-[#121622] text-neutral-900 dark:text-white text-sm font-medium placeholder-neutral-400 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 shadow-sm transition-all resize-none leading-relaxed"
             />
           </div>
         </div>

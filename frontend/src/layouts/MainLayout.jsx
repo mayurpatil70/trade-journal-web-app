@@ -109,6 +109,8 @@ export default function MainLayout() {
 
   const userId = localStorage.getItem("userId") || localStorage.getItem("userEmail");
   const userEmail = localStorage.getItem("userEmail") || "Trader";
+  const userName = localStorage.getItem("userName") || userEmail;
+  const userAvatar = localStorage.getItem("userAvatar") || localStorage.getItem(`user_avatar_${userId}`);
   const isAdmin = userId === "noballondesk@gmail.com" || userId === "akpatil51340@gmail.com";
 
   // System broadcast announcement
@@ -415,13 +417,17 @@ export default function MainLayout() {
             <div className="flex items-center gap-3 overflow-hidden">
               <div className="relative">
                 <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 text-emerald-700 dark:text-emerald-400 flex items-center justify-center font-bold text-xs shrink-0 border border-emerald-500/30 shadow-inner">
-                  {userEmail.charAt(0).toUpperCase()}
+                  {userAvatar ? (
+                    <img src={userAvatar} alt="Avatar" className="w-full h-full object-cover" />
+                  ) : (
+                    userEmail.charAt(0).toUpperCase()
+                  )}
                 </div>
                 <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-500 border-2 border-white dark:border-[#10131b] rounded-full" />
               </div>
               <div className="overflow-hidden flex flex-col items-start">
                 <p className="text-[13px] font-semibold text-neutral-800 dark:text-neutral-200 leading-tight truncate max-w-[110px]">
-                  {userEmail}
+                  {userName || userEmail}
                 </p>
                 <span className="text-[10px] font-medium text-emerald-600 dark:text-emerald-400 mt-0.5">
                   Pro Workspace
