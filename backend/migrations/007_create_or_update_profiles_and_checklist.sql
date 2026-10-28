@@ -64,3 +64,4 @@ ADD COLUMN IF NOT EXISTS account_status VARCHAR(20) DEFAULT 'active';
 -- 3. Create indexes for high-speed lookups
 CREATE INDEX IF NOT EXISTS idx_profiles_username ON profiles(username);
 CREATE INDEX IF NOT EXISTS idx_profiles_email ON profiles(email);
+

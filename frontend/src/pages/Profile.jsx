@@ -34,6 +34,24 @@ const DEFAULT_CHECKLIST = [
   { id: "5", text: "Economic calendar checked", checked: true, order: 5 },
 ];
 
+function formatLossStreak(val) {
+  if (val === undefined || val === null || val === "") return "3 in a row";
+  const s = String(val).trim();
+  return s.toLowerCase().includes("row") ? s : `${s} in a row`;
+}
+
+function safeArray(val, fallback = []) {
+  if (Array.isArray(val)) return val;
+  if (typeof val === "string" && val.trim()) {
+    try {
+      const parsed = JSON.parse(val);
+      if (Array.isArray(parsed)) return parsed;
+    } catch {}
+    return val.split(",").map((s) => s.trim()).filter(Boolean);
+  }
+  return fallback;
+}
+
 export default function Profile() {
   const navigate = useNavigate();
   const avatarInputRef = useRef(null);
@@ -306,7 +324,8 @@ export default function Profile() {
     }
   };
 
-  const checkedCount = checklist.filter((item) => item.checked).length;
+  const safeChecklist = safeArray(checklist, DEFAULT_CHECKLIST);
+  const checkedCount = safeChecklist.filter((item) => item?.checked).length;
   const initialLetter = (profile.displayName || userEmail || "T").charAt(0).toUpperCase();
 
   return (
@@ -495,9 +514,7 @@ export default function Profile() {
               </p>
             </div>
             <p className="text-xl font-extrabold font-mono text-neutral-900 dark:text-white mt-1.5">
-              {disciplineRules.lossStreakBreak.includes("row")
-                ? disciplineRules.lossStreakBreak
-                : `${disciplineRules.lossStreakBreak} in a row`}
+              {formatLossStreak(disciplineRules.lossStreakBreak)}
             </p>
           </div>
 
@@ -542,7 +559,7 @@ export default function Profile() {
                 <span>SESSIONS</span>
               </div>
               <div className="flex items-center gap-2 flex-wrap">
-                {disciplineRules.preferredSessions?.map((s) => (
+                {safeArray(disciplineRules.preferredSessions, ["London", "New York"]).map((s) => (
                   <span
                     key={s}
                     className="px-3 py-1.5 rounded-xl text-xs font-bold border border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5 shadow-2xs"
@@ -561,7 +578,7 @@ export default function Profile() {
                 <span>FAVORITE PAIRS</span>
               </div>
               <div className="flex items-center gap-2 flex-wrap">
-                {disciplineRules.favoritePairs?.map((pair) => (
+                {safeArray(disciplineRules.favoritePairs, ["EUR/USD", "GBP/USD", "XAU/USD"]).map((pair) => (
                   <span
                     key={pair}
                     className="px-3 py-1.5 rounded-xl text-xs font-bold border border-black/[0.06] dark:border-white/[0.08] bg-neutral-50 dark:bg-white/[0.03] text-neutral-800 dark:text-neutral-200"
@@ -650,7 +667,7 @@ export default function Profile() {
 
           <div className="flex items-center gap-3">
             <span className="text-xs font-bold px-2.5 py-1 rounded-xl bg-neutral-100 dark:bg-white/[0.06] text-neutral-700 dark:text-neutral-300">
-              {checkedCount}/{checklist.length} items
+              {checkedCount}/{safeChecklist.length} items
             </span>
             <button
               type="button"
@@ -666,7 +683,7 @@ export default function Profile() {
 
         {/* Checklist Rows */}
         <div className="space-y-2">
-          {checklist.map((item, idx) => (
+          {safeChecklist.map((item, idx) => (
             <div
               key={item.id}
               className="p-3.5 rounded-2xl bg-neutral-50/70 dark:bg-white/[0.025] border border-black/[0.06] dark:border-white/[0.07] hover:border-emerald-500/30 flex items-center justify-between gap-3 transition-all group"
