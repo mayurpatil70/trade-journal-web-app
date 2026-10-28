@@ -13,6 +13,7 @@ import {
   Square,
   Check,
   Plus,
+  Minus,
   Trash2,
   ChevronUp,
   ChevronDown,
@@ -215,6 +216,12 @@ export default function Profile({ defaultTab }) {
   // Modal States
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
   const [isEditRulesOpen, setIsEditRulesOpen] = useState(false);
+  const [isEditPreferencesOpen, setIsEditPreferencesOpen] = useState(false);
+  const [editPreferencesForm, setEditPreferencesForm] = useState({
+    preferredSessions: ["London", "New York"],
+    favoritePairs: ["EUR/USD", "GBP/USD", "XAU/USD"],
+  });
+  const [newCustomPair, setNewCustomPair] = useState("");
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [newChecklistText, setNewChecklistText] = useState("");
   const [isAddingChecklistItem, setIsAddingChecklistItem] = useState(false);
@@ -452,6 +459,93 @@ export default function Profile({ defaultTab }) {
       });
     } catch (err) {
       console.warn("[Profile] Profile save notice:", err.message);
+    }
+  };
+
+  // ── RULE ADJUSTMENT HELPERS (Stepper + Dropdowns) ──
+  const adjustRisk = (delta) => {
+    const current = parseFloat(String(editRulesForm.maxRiskPerTrade || "2").replace("%", "")) || 2;
+    const next = Math.max(0.1, Math.min(20, +(current + delta).toFixed(2)));
+    setEditRulesForm({ ...editRulesForm, maxRiskPerTrade: `${next}%` });
+  };
+
+  const adjustMaxTrades = (delta) => {
+    const current = parseInt(String(editRulesForm.maxTradesPerDay || "5").replace(/\D/g, ""), 10) || 5;
+    const next = Math.max(1, Math.min(50, current + delta));
+    setEditRulesForm({ ...editRulesForm, maxTradesPerDay: String(next) });
+  };
+
+  const adjustLossCap = (delta) => {
+    const current = parseFloat(String(editRulesForm.dailyLossCap || "5").replace("%", "")) || 5;
+    const next = Math.max(0.5, Math.min(50, +(current + delta).toFixed(1)));
+    setEditRulesForm({ ...editRulesForm, dailyLossCap: `${next}%` });
+  };
+
+  const adjustLossStreak = (delta) => {
+    const current = parseInt(String(editRulesForm.lossStreakBreak || "3").replace(/\D/g, ""), 10) || 3;
+    const next = Math.max(1, Math.min(10, current + delta));
+    setEditRulesForm({ ...editRulesForm, lossStreakBreak: `${next} in a row` });
+  };
+
+  const adjustRR = (delta) => {
+    const match = String(editRulesForm.targetRR || "1:2").match(/1:([\d.]+)/);
+    const current = match ? parseFloat(match[1]) : 2;
+    const next = Math.max(1, Math.min(20, +(current + delta).toFixed(1)));
+    setEditRulesForm({ ...editRulesForm, targetRR: `1:${next}` });
+  };
+
+  // ── PREFERENCE ADJUSTMENT HELPERS ──
+  const handleToggleSession = (session) => {
+    const sessions = editPreferencesForm.preferredSessions || [];
+    const exists = sessions.includes(session);
+    const updated = exists ? sessions.filter((s) => s !== session) : [...sessions, session];
+    setEditPreferencesForm({ ...editPreferencesForm, preferredSessions: updated });
+  };
+
+  const handleTogglePair = (pair) => {
+    const pairs = editPreferencesForm.favoritePairs || [];
+    const exists = pairs.includes(pair);
+    const updated = exists ? pairs.filter((p) => p !== pair) : [...pairs, pair];
+    setEditPreferencesForm({ ...editPreferencesForm, favoritePairs: updated });
+  };
+
+  const handleAddCustomPair = (e) => {
+    if (e) e.preventDefault();
+    const clean = (newCustomPair || "").trim().toUpperCase();
+    if (!clean) return;
+    const pairs = editPreferencesForm.favoritePairs || [];
+    if (!pairs.includes(clean)) {
+      setEditPreferencesForm({ ...editPreferencesForm, favoritePairs: [...pairs, clean] });
+    }
+    setNewCustomPair("");
+  };
+
+  const handleRemovePair = (pair) => {
+    const pairs = editPreferencesForm.favoritePairs || [];
+    setEditPreferencesForm({
+      ...editPreferencesForm,
+      favoritePairs: pairs.filter((p) => p !== pair),
+    });
+  };
+
+  const handleSavePreferences = async (e) => {
+    if (e) e.preventDefault();
+    const updatedRules = {
+      ...disciplineRules,
+      preferredSessions: editPreferencesForm.preferredSessions,
+      favoritePairs: editPreferencesForm.favoritePairs,
+    };
+    setDisciplineRules(updatedRules);
+    localStorage.setItem(`trader_discipline_${userId}`, JSON.stringify(updatedRules));
+    setIsEditPreferencesOpen(false);
+
+    try {
+      await api.put("/api/auth/profile", {
+        userId,
+        disciplineRules: updatedRules,
+      });
+    } catch (err) {
+      console.warn("[Profile] Preferences save notice:", err.message);
     }
   };
 
@@ -766,18 +860,35 @@ export default function Profile({ defaultTab }) {
             {/* Trading Preferences */}
             <div className="rounded-3xl p-6 bg-white dark:bg-[#121622] border border-black/[0.06] dark:border-white/[0.08] shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] flex flex-col justify-between space-y-5">
               <div>
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-8 h-8 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/20 flex items-center justify-center">
-                    <Globe className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                <div className="flex items-center justify-between flex-wrap gap-2 mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/20 flex items-center justify-center">
+                      <Globe className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-bold text-neutral-900 dark:text-white">
+                        Trading Preferences
+                      </h3>
+                      <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                        Sessions and pairs you focus on
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="text-sm font-bold text-neutral-900 dark:text-white">
-                      Trading Preferences
-                    </h3>
-                    <p className="text-xs text-neutral-500 dark:text-neutral-400">
-                      Sessions and pairs you focus on
-                    </p>
-                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEditPreferencesForm({
+                        preferredSessions: safeArray(disciplineRules.preferredSessions, ["London", "New York"]),
+                        favoritePairs: safeArray(disciplineRules.favoritePairs, ["EUR/USD", "GBP/USD", "XAU/USD"]),
+                      });
+                      setIsEditPreferencesOpen(true);
+                    }}
+                    className="px-3 py-1.5 rounded-xl border border-black/[0.08] dark:border-white/[0.1] bg-neutral-50 dark:bg-white/[0.04] hover:bg-neutral-100 dark:hover:bg-white/[0.08] text-xs font-semibold text-neutral-800 dark:text-neutral-200 flex items-center gap-1.5 transition-all cursor-pointer shadow-xs active:scale-95"
+                  >
+                    <Pencil className="w-3.5 h-3.5" />
+                    <span>Edit</span>
+                  </button>
                 </div>
 
                 <div className="space-y-4">
@@ -1664,8 +1775,8 @@ export default function Profile({ defaultTab }) {
           document.body
         )}
 
-      {/* ══════════════════════════════════════════════════════════════
-          REACT PORTAL: EDIT TRADING RULES MODAL
+            {/* ══════════════════════════════════════════════════════════════
+          REACT PORTAL: EDIT TRADING RULES MODAL (DROPDOWNS + STEPPERS + TYPE)
       ══════════════════════════════════════════════════════════════ */}
       {isEditRulesOpen &&
         createPortal(
@@ -1673,111 +1784,516 @@ export default function Profile({ defaultTab }) {
             <div className="absolute inset-0" onClick={() => setIsEditRulesOpen(false)} />
             <form
               onSubmit={handleSaveRules}
-              className="relative w-full max-w-lg bg-white/95 dark:bg-[#121622]/95 border border-black/[0.08] dark:border-white/[0.12] rounded-3xl shadow-[0_25px_70px_rgba(0,0,0,0.2)] dark:shadow-[0_30px_80px_rgba(0,0,0,0.7)] p-6 space-y-4 backdrop-blur-2xl animate-in zoom-in-95 duration-200"
+              className="relative w-full max-w-lg bg-white/95 dark:bg-[#121622]/95 border border-black/[0.08] dark:border-white/[0.12] rounded-3xl shadow-[0_25px_70px_rgba(0,0,0,0.2)] dark:shadow-[0_30px_80px_rgba(0,0,0,0.7)] p-6 space-y-5 backdrop-blur-2xl animate-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto"
             >
+              {/* Header */}
               <div className="flex items-center justify-between pb-3 border-b border-black/[0.06] dark:border-white/[0.08]">
-                <h3 className="text-base font-bold text-neutral-900 dark:text-white">
-                  Edit Trading Guardrails
-                </h3>
+                <div>
+                  <h3 className="text-base font-bold text-neutral-900 dark:text-white">
+                    Edit Trading Guardrails
+                  </h3>
+                  <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                    Select standard presets, use up/down steppers, or type custom values
+                  </p>
+                </div>
                 <button
                   type="button"
                   onClick={() => setIsEditRulesOpen(false)}
-                  className="p-1.5 rounded-xl hover:bg-black/[0.05] dark:hover:bg-white/[0.08] text-neutral-400 transition-colors"
+                  className="p-1.5 rounded-xl hover:bg-black/[0.05] dark:hover:bg-white/[0.08] text-neutral-400 transition-colors cursor-pointer"
                 >
                   <X className="w-4 h-4" />
                 </button>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-[11px] font-semibold text-neutral-600 dark:text-neutral-300 mb-1">
-                    Max Risk / Trade
-                  </label>
-                  <input
-                    type="text"
-                    value={editRulesForm.maxRiskPerTrade}
-                    onChange={(e) =>
-                      setEditRulesForm({ ...editRulesForm, maxRiskPerTrade: e.target.value })
-                    }
-                    className="w-full px-3 py-2 rounded-xl bg-neutral-100 dark:bg-white/[0.05] border border-black/[0.08] dark:border-white/[0.1] text-xs font-semibold text-neutral-900 dark:text-white focus:outline-none focus:border-emerald-500"
-                    placeholder="e.g. 1% or 2%"
-                  />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* 1. Max Risk / Trade */}
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <label className="text-[11px] font-bold text-neutral-700 dark:text-neutral-300">
+                      Max Risk / Trade
+                    </label>
+                    <select
+                      value={["0.25%", "0.5%", "1%", "1.5%", "2%", "2.5%", "3%", "5%"].includes(editRulesForm.maxRiskPerTrade) ? editRulesForm.maxRiskPerTrade : "custom"}
+                      onChange={(e) => {
+                        if (e.target.value !== "custom") {
+                          setEditRulesForm({ ...editRulesForm, maxRiskPerTrade: e.target.value });
+                        }
+                      }}
+                      className="text-[10px] font-semibold bg-neutral-100 dark:bg-white/[0.06] border border-black/[0.08] dark:border-white/[0.1] rounded-lg px-2 py-0.5 text-neutral-700 dark:text-neutral-300 focus:outline-none focus:border-emerald-500 cursor-pointer"
+                    >
+                      <option value="0.25%">0.25% (Micro)</option>
+                      <option value="0.5%">0.5% (Conservative)</option>
+                      <option value="1%">1.0% (Standard)</option>
+                      <option value="1.5%">1.5% (Moderate)</option>
+                      <option value="2%">2.0% (Aggressive)</option>
+                      <option value="2.5%">2.5%</option>
+                      <option value="3%">3.0%</option>
+                      <option value="5%">5.0% (Prop Ceiling)</option>
+                      <option value="custom">Custom Type</option>
+                    </select>
+                  </div>
+
+                  <div className="flex items-center rounded-xl bg-neutral-100 dark:bg-white/[0.05] border border-black/[0.08] dark:border-white/[0.1] p-1 focus-within:border-emerald-500 transition-colors">
+                    <button
+                      type="button"
+                      onClick={() => adjustRisk(-0.25)}
+                      className="w-7 h-7 rounded-lg bg-white dark:bg-white/[0.08] hover:bg-neutral-200 dark:hover:bg-white/[0.15] text-neutral-700 dark:text-neutral-200 flex items-center justify-center transition-all shadow-xs cursor-pointer active:scale-95"
+                      title="Decrease risk"
+                    >
+                      <Minus className="w-3.5 h-3.5" />
+                    </button>
+                    <input
+                      type="text"
+                      value={editRulesForm.maxRiskPerTrade || "2%"}
+                      onChange={(e) =>
+                        setEditRulesForm({ ...editRulesForm, maxRiskPerTrade: e.target.value })
+                      }
+                      className="w-full text-center text-xs font-bold font-mono text-neutral-900 dark:text-white bg-transparent focus:outline-none"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => adjustRisk(+0.25)}
+                      className="w-7 h-7 rounded-lg bg-white dark:bg-white/[0.08] hover:bg-neutral-200 dark:hover:bg-white/[0.15] text-neutral-700 dark:text-neutral-200 flex items-center justify-center transition-all shadow-xs cursor-pointer active:scale-95"
+                      title="Increase risk"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
 
-                <div>
-                  <label className="block text-[11px] font-semibold text-neutral-600 dark:text-neutral-300 mb-1">
-                    Max Trades / Day
-                  </label>
-                  <input
-                    type="text"
-                    value={editRulesForm.maxTradesPerDay}
-                    onChange={(e) =>
-                      setEditRulesForm({ ...editRulesForm, maxTradesPerDay: e.target.value })
-                    }
-                    className="w-full px-3 py-2 rounded-xl bg-neutral-100 dark:bg-white/[0.05] border border-black/[0.08] dark:border-white/[0.1] text-xs font-semibold text-neutral-900 dark:text-white focus:outline-none focus:border-emerald-500"
-                    placeholder="e.g. 3 or 5"
-                  />
+                {/* 2. Max Trades / Day */}
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <label className="text-[11px] font-bold text-neutral-700 dark:text-neutral-300">
+                      Max Trades / Day
+                    </label>
+                    <select
+                      value={["1", "2", "3", "4", "5", "8", "10", "15"].includes(String(editRulesForm.maxTradesPerDay)) ? String(editRulesForm.maxTradesPerDay) : "custom"}
+                      onChange={(e) => {
+                        if (e.target.value !== "custom") {
+                          setEditRulesForm({ ...editRulesForm, maxTradesPerDay: e.target.value });
+                        }
+                      }}
+                      className="text-[10px] font-semibold bg-neutral-100 dark:bg-white/[0.06] border border-black/[0.08] dark:border-white/[0.1] rounded-lg px-2 py-0.5 text-neutral-700 dark:text-neutral-300 focus:outline-none focus:border-emerald-500 cursor-pointer"
+                    >
+                      <option value="1">1 Trade / Day</option>
+                      <option value="2">2 Trades / Day</option>
+                      <option value="3">3 Trades / Day</option>
+                      <option value="4">4 Trades / Day</option>
+                      <option value="5">5 Trades / Day</option>
+                      <option value="8">8 Trades / Day</option>
+                      <option value="10">10 Trades / Day</option>
+                      <option value="custom">Custom Type</option>
+                    </select>
+                  </div>
+
+                  <div className="flex items-center rounded-xl bg-neutral-100 dark:bg-white/[0.05] border border-black/[0.08] dark:border-white/[0.1] p-1 focus-within:border-emerald-500 transition-colors">
+                    <button
+                      type="button"
+                      onClick={() => adjustMaxTrades(-1)}
+                      className="w-7 h-7 rounded-lg bg-white dark:bg-white/[0.08] hover:bg-neutral-200 dark:hover:bg-white/[0.15] text-neutral-700 dark:text-neutral-200 flex items-center justify-center transition-all shadow-xs cursor-pointer active:scale-95"
+                      title="Decrease trades"
+                    >
+                      <Minus className="w-3.5 h-3.5" />
+                    </button>
+                    <input
+                      type="number"
+                      min="1"
+                      max="50"
+                      value={editRulesForm.maxTradesPerDay || "5"}
+                      onChange={(e) =>
+                        setEditRulesForm({ ...editRulesForm, maxTradesPerDay: e.target.value })
+                      }
+                      className="w-full text-center text-xs font-bold font-mono text-neutral-900 dark:text-white bg-transparent focus:outline-none"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => adjustMaxTrades(+1)}
+                      className="w-7 h-7 rounded-lg bg-white dark:bg-white/[0.08] hover:bg-neutral-200 dark:hover:bg-white/[0.15] text-neutral-700 dark:text-neutral-200 flex items-center justify-center transition-all shadow-xs cursor-pointer active:scale-95"
+                      title="Increase trades"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
 
-                <div>
-                  <label className="block text-[11px] font-semibold text-neutral-600 dark:text-neutral-300 mb-1">
-                    Daily Loss Cap
-                  </label>
-                  <input
-                    type="text"
-                    value={editRulesForm.dailyLossCap}
-                    onChange={(e) =>
-                      setEditRulesForm({ ...editRulesForm, dailyLossCap: e.target.value })
-                    }
-                    className="w-full px-3 py-2 rounded-xl bg-neutral-100 dark:bg-white/[0.05] border border-black/[0.08] dark:border-white/[0.1] text-xs font-semibold text-neutral-900 dark:text-white focus:outline-none focus:border-emerald-500"
-                    placeholder="e.g. 3% or 5%"
-                  />
+                {/* 3. Daily Loss Cap */}
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <label className="text-[11px] font-bold text-neutral-700 dark:text-neutral-300">
+                      Daily Loss Cap
+                    </label>
+                    <select
+                      value={["1%", "2%", "3%", "4%", "5%", "6%", "8%", "10%"].includes(editRulesForm.dailyLossCap) ? editRulesForm.dailyLossCap : "custom"}
+                      onChange={(e) => {
+                        if (e.target.value !== "custom") {
+                          setEditRulesForm({ ...editRulesForm, dailyLossCap: e.target.value });
+                        }
+                      }}
+                      className="text-[10px] font-semibold bg-neutral-100 dark:bg-white/[0.06] border border-black/[0.08] dark:border-white/[0.1] rounded-lg px-2 py-0.5 text-neutral-700 dark:text-neutral-300 focus:outline-none focus:border-emerald-500 cursor-pointer"
+                    >
+                      <option value="1%">1.0% (Tight)</option>
+                      <option value="2%">2.0%</option>
+                      <option value="3%">3.0%</option>
+                      <option value="4%">4.0%</option>
+                      <option value="5%">5.0% (Standard Prop)</option>
+                      <option value="6%">6.0%</option>
+                      <option value="8%">8.0%</option>
+                      <option value="10%">10.0% (Max)</option>
+                      <option value="custom">Custom Type</option>
+                    </select>
+                  </div>
+
+                  <div className="flex items-center rounded-xl bg-neutral-100 dark:bg-white/[0.05] border border-black/[0.08] dark:border-white/[0.1] p-1 focus-within:border-emerald-500 transition-colors">
+                    <button
+                      type="button"
+                      onClick={() => adjustLossCap(-0.5)}
+                      className="w-7 h-7 rounded-lg bg-white dark:bg-white/[0.08] hover:bg-neutral-200 dark:hover:bg-white/[0.15] text-neutral-700 dark:text-neutral-200 flex items-center justify-center transition-all shadow-xs cursor-pointer active:scale-95"
+                      title="Decrease loss cap"
+                    >
+                      <Minus className="w-3.5 h-3.5" />
+                    </button>
+                    <input
+                      type="text"
+                      value={editRulesForm.dailyLossCap || "5%"}
+                      onChange={(e) =>
+                        setEditRulesForm({ ...editRulesForm, dailyLossCap: e.target.value })
+                      }
+                      className="w-full text-center text-xs font-bold font-mono text-neutral-900 dark:text-white bg-transparent focus:outline-none"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => adjustLossCap(+0.5)}
+                      className="w-7 h-7 rounded-lg bg-white dark:bg-white/[0.08] hover:bg-neutral-200 dark:hover:bg-white/[0.15] text-neutral-700 dark:text-neutral-200 flex items-center justify-center transition-all shadow-xs cursor-pointer active:scale-95"
+                      title="Increase loss cap"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
 
-                <div>
-                  <label className="block text-[11px] font-semibold text-neutral-600 dark:text-neutral-300 mb-1">
-                    Loss Streak Break
-                  </label>
-                  <input
-                    type="text"
-                    value={editRulesForm.lossStreakBreak}
-                    onChange={(e) =>
-                      setEditRulesForm({ ...editRulesForm, lossStreakBreak: e.target.value })
-                    }
-                    className="w-full px-3 py-2 rounded-xl bg-neutral-100 dark:bg-white/[0.05] border border-black/[0.08] dark:border-white/[0.1] text-xs font-semibold text-neutral-900 dark:text-white focus:outline-none focus:border-emerald-500"
-                    placeholder="e.g. 3 in a row"
-                  />
+                {/* 4. Loss Streak Break */}
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <label className="text-[11px] font-bold text-neutral-700 dark:text-neutral-300">
+                      Loss Streak Break
+                    </label>
+                    <select
+                      value={["2 in a row", "3 in a row", "4 in a row", "5 in a row", "Disabled"].includes(editRulesForm.lossStreakBreak) ? editRulesForm.lossStreakBreak : "custom"}
+                      onChange={(e) => {
+                        if (e.target.value !== "custom") {
+                          setEditRulesForm({ ...editRulesForm, lossStreakBreak: e.target.value });
+                        }
+                      }}
+                      className="text-[10px] font-semibold bg-neutral-100 dark:bg-white/[0.06] border border-black/[0.08] dark:border-white/[0.1] rounded-lg px-2 py-0.5 text-neutral-700 dark:text-neutral-300 focus:outline-none focus:border-emerald-500 cursor-pointer"
+                    >
+                      <option value="2 in a row">2 in a row</option>
+                      <option value="3 in a row">3 in a row</option>
+                      <option value="4 in a row">4 in a row</option>
+                      <option value="5 in a row">5 in a row</option>
+                      <option value="Disabled">Disabled</option>
+                      <option value="custom">Custom Type</option>
+                    </select>
+                  </div>
+
+                  <div className="flex items-center rounded-xl bg-neutral-100 dark:bg-white/[0.05] border border-black/[0.08] dark:border-white/[0.1] p-1 focus-within:border-emerald-500 transition-colors">
+                    <button
+                      type="button"
+                      onClick={() => adjustLossStreak(-1)}
+                      className="w-7 h-7 rounded-lg bg-white dark:bg-white/[0.08] hover:bg-neutral-200 dark:hover:bg-white/[0.15] text-neutral-700 dark:text-neutral-200 flex items-center justify-center transition-all shadow-xs cursor-pointer active:scale-95"
+                      title="Decrease streak break"
+                    >
+                      <Minus className="w-3.5 h-3.5" />
+                    </button>
+                    <input
+                      type="text"
+                      value={editRulesForm.lossStreakBreak || "3 in a row"}
+                      onChange={(e) =>
+                        setEditRulesForm({ ...editRulesForm, lossStreakBreak: e.target.value })
+                      }
+                      className="w-full text-center text-xs font-bold font-mono text-neutral-900 dark:text-white bg-transparent focus:outline-none"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => adjustLossStreak(+1)}
+                      className="w-7 h-7 rounded-lg bg-white dark:bg-white/[0.08] hover:bg-neutral-200 dark:hover:bg-white/[0.15] text-neutral-700 dark:text-neutral-200 flex items-center justify-center transition-all shadow-xs cursor-pointer active:scale-95"
+                      title="Increase streak break"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
 
-                <div className="col-span-2">
-                  <label className="block text-[11px] font-semibold text-neutral-600 dark:text-neutral-300 mb-1">
-                    Target Risk / Reward
-                  </label>
-                  <input
-                    type="text"
-                    value={editRulesForm.targetRR}
-                    onChange={(e) =>
-                      setEditRulesForm({ ...editRulesForm, targetRR: e.target.value })
-                    }
-                    className="w-full px-3 py-2 rounded-xl bg-neutral-100 dark:bg-white/[0.05] border border-black/[0.08] dark:border-white/[0.1] text-xs font-semibold text-neutral-900 dark:text-white focus:outline-none focus:border-emerald-500"
-                    placeholder="e.g. 1:2 or 1:3"
-                  />
+                {/* 5. Target Risk / Reward (Full width) */}
+                <div className="col-span-1 sm:col-span-2 space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <label className="text-[11px] font-bold text-neutral-700 dark:text-neutral-300">
+                      Target Risk / Reward Ratio
+                    </label>
+                    <select
+                      value={["1:1", "1:1.5", "1:2", "1:2.5", "1:3", "1:4", "1:5"].includes(editRulesForm.targetRR) ? editRulesForm.targetRR : "custom"}
+                      onChange={(e) => {
+                        if (e.target.value !== "custom") {
+                          setEditRulesForm({ ...editRulesForm, targetRR: e.target.value });
+                        }
+                      }}
+                      className="text-[10px] font-semibold bg-neutral-100 dark:bg-white/[0.06] border border-black/[0.08] dark:border-white/[0.1] rounded-lg px-2 py-0.5 text-neutral-700 dark:text-neutral-300 focus:outline-none focus:border-emerald-500 cursor-pointer"
+                    >
+                      <option value="1:1">1:1.0 (Even Money)</option>
+                      <option value="1:1.5">1:1.5 (Quick Scalp)</option>
+                      <option value="1:2">1:2.0 (Standard Swing)</option>
+                      <option value="1:2.5">1:2.5 (Trend Follower)</option>
+                      <option value="1:3">1:3.0 (High Asymmetry)</option>
+                      <option value="1:4">1:4.0 (Runner)</option>
+                      <option value="1:5">1:5.0 (Institutional)</option>
+                      <option value="custom">Custom Type</option>
+                    </select>
+                  </div>
+
+                  <div className="flex items-center rounded-xl bg-neutral-100 dark:bg-white/[0.05] border border-black/[0.08] dark:border-white/[0.1] p-1 focus-within:border-emerald-500 transition-colors">
+                    <button
+                      type="button"
+                      onClick={() => adjustRR(-0.5)}
+                      className="w-7 h-7 rounded-lg bg-white dark:bg-white/[0.08] hover:bg-neutral-200 dark:hover:bg-white/[0.15] text-neutral-700 dark:text-neutral-200 flex items-center justify-center transition-all shadow-xs cursor-pointer active:scale-95"
+                      title="Decrease RR"
+                    >
+                      <Minus className="w-3.5 h-3.5" />
+                    </button>
+                    <input
+                      type="text"
+                      value={editRulesForm.targetRR || "1:2"}
+                      onChange={(e) =>
+                        setEditRulesForm({ ...editRulesForm, targetRR: e.target.value })
+                      }
+                      className="w-full text-center text-xs font-bold font-mono text-neutral-900 dark:text-white bg-transparent focus:outline-none"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => adjustRR(+0.5)}
+                      className="w-7 h-7 rounded-lg bg-white dark:bg-white/[0.08] hover:bg-neutral-200 dark:hover:bg-white/[0.15] text-neutral-700 dark:text-neutral-200 flex items-center justify-center transition-all shadow-xs cursor-pointer active:scale-95"
+                      title="Increase RR"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
               </div>
 
+              {/* Action Buttons */}
               <div className="flex items-center justify-end gap-2 pt-3 border-t border-black/[0.06] dark:border-white/[0.08]">
                 <button
                   type="button"
                   onClick={() => setIsEditRulesOpen(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-bold text-neutral-600 dark:text-neutral-400 hover:bg-black/[0.04] dark:hover:bg-white/[0.06] transition-colors"
+                  className="px-4 py-2 rounded-xl text-xs font-bold text-neutral-600 dark:text-neutral-400 hover:bg-black/[0.04] dark:hover:bg-white/[0.06] transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold transition-all shadow-sm shadow-emerald-500/20 active:scale-95"
+                  className="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold transition-all shadow-sm shadow-emerald-500/25 active:scale-95 cursor-pointer"
                 >
                   Save Rules
+                </button>
+              </div>
+            </form>
+          </div>,
+          document.body
+        )}
+
+      {/* ══════════════════════════════════════════════════════════════
+          REACT PORTAL: EDIT TRADING PREFERENCES MODAL (SESSIONS & PAIRS)
+      ══════════════════════════════════════════════════════════════ */}
+      {isEditPreferencesOpen &&
+        createPortal(
+          <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-black/40 dark:bg-black/75 backdrop-blur-md animate-in fade-in duration-200">
+            <div className="absolute inset-0" onClick={() => setIsEditPreferencesOpen(false)} />
+            <form
+              onSubmit={handleSavePreferences}
+              className="relative w-full max-w-xl bg-white/95 dark:bg-[#121622]/95 border border-black/[0.08] dark:border-white/[0.12] rounded-3xl shadow-[0_25px_70px_rgba(0,0,0,0.2)] dark:shadow-[0_30px_80px_rgba(0,0,0,0.7)] p-6 space-y-5 backdrop-blur-2xl animate-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto"
+            >
+              {/* Header */}
+              <div className="flex items-center justify-between pb-3 border-b border-black/[0.06] dark:border-white/[0.08]">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/20 flex items-center justify-center">
+                    <Globe className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-bold text-neutral-900 dark:text-white">
+                      Edit Trading Preferences
+                    </h3>
+                    <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                      Configure your active sessions and favorite watchlisted pairs
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsEditPreferencesOpen(false)}
+                  className="p-1.5 rounded-xl hover:bg-black/[0.05] dark:hover:bg-white/[0.08] text-neutral-400 transition-colors cursor-pointer"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* 1. Active Trading Sessions */}
+              <div className="space-y-2">
+                <p className="text-[11px] font-extrabold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 flex items-center gap-1.5">
+                  <Clock className="w-3.5 h-3.5 text-emerald-500" />
+                  ACTIVE TRADING SESSIONS
+                </p>
+                <div className="grid grid-cols-2 gap-2">
+                  {[
+                    { id: "London", name: "London Session", hours: "08:00 - 16:30 GMT" },
+                    { id: "New York", name: "New York Session", hours: "13:00 - 21:00 GMT" },
+                    { id: "Tokyo", name: "Tokyo / Asian", hours: "00:00 - 09:00 GMT" },
+                    { id: "Sydney", name: "Sydney Session", hours: "22:00 - 07:00 GMT" },
+                  ].map((sess) => {
+                    const isSelected = (editPreferencesForm.preferredSessions || []).includes(sess.id);
+                    return (
+                      <button
+                        key={sess.id}
+                        type="button"
+                        onClick={() => handleToggleSession(sess.id)}
+                        className={`p-3 rounded-2xl border text-left transition-all cursor-pointer ${
+                          isSelected
+                            ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-700 dark:text-emerald-300 shadow-xs shadow-emerald-500/10"
+                            : "bg-neutral-100/70 dark:bg-white/[0.03] border-black/[0.06] dark:border-white/[0.08] text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200/60 dark:hover:bg-white/[0.06]"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-bold">{sess.name}</span>
+                          <span
+                            className={`w-2 h-2 rounded-full ${
+                              isSelected ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]" : "bg-neutral-300 dark:bg-white/20"
+                            }`}
+                          />
+                        </div>
+                        <p className="text-[10px] text-neutral-400 dark:text-neutral-500 mt-0.5">
+                          {sess.hours}
+                        </p>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* 2. Favorite Pairs */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <p className="text-[11px] font-extrabold uppercase tracking-wider text-neutral-400 dark:text-neutral-500">
+                    FAVORITE PAIRS WATCHLIST
+                  </p>
+                  <span className="text-[10px] font-semibold text-neutral-400">
+                    {(editPreferencesForm.favoritePairs || []).length} active
+                  </span>
+                </div>
+
+                {/* Selected Pairs Cloud */}
+                <div className="flex flex-wrap gap-2 p-3 rounded-2xl bg-neutral-100/60 dark:bg-white/[0.03] border border-black/[0.06] dark:border-white/[0.08] min-h-[50px] items-center">
+                  {(editPreferencesForm.favoritePairs || []).length === 0 ? (
+                    <span className="text-xs text-neutral-400 italic">No favorite pairs selected yet. Pick from below or add custom.</span>
+                  ) : (
+                    (editPreferencesForm.favoritePairs || []).map((pair) => (
+                      <span
+                        key={pair}
+                        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold font-mono bg-white dark:bg-white/[0.09] text-neutral-900 dark:text-white border border-black/[0.08] dark:border-white/[0.12] shadow-xs group"
+                      >
+                        <span>{pair}</span>
+                        <button
+                          type="button"
+                          onClick={() => handleRemovePair(pair)}
+                          className="w-4 h-4 rounded-full hover:bg-rose-500/10 hover:text-rose-500 text-neutral-400 flex items-center justify-center transition-colors cursor-pointer"
+                          title="Remove pair"
+                        >
+                          <X className="w-2.5 h-2.5" />
+                        </button>
+                      </span>
+                    ))
+                  )}
+                </div>
+
+                {/* Add Custom Symbol */}
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    value={newCustomPair}
+                    onChange={(e) => setNewCustomPair(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        handleAddCustomPair();
+                      }
+                    }}
+                    placeholder="Enter symbol (e.g. BTC/USD, GBPNZD, US500)..."
+                    className="flex-1 px-3.5 py-2 rounded-xl bg-neutral-100 dark:bg-white/[0.05] border border-black/[0.08] dark:border-white/[0.1] text-xs font-mono font-bold text-neutral-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleAddCustomPair}
+                    className="px-4 py-2 rounded-xl bg-neutral-200 dark:bg-white/[0.08] hover:bg-emerald-500 hover:text-white text-neutral-800 dark:text-neutral-200 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>Add</span>
+                  </button>
+                </div>
+
+                {/* Quick Add Popular Preset Assets */}
+                <div className="space-y-1.5 pt-1">
+                  <p className="text-[10px] font-bold text-neutral-400 dark:text-neutral-500">
+                    Quick Add Popular Markets:
+                  </p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {[
+                      "EUR/USD",
+                      "GBP/USD",
+                      "USD/JPY",
+                      "AUD/USD",
+                      "USD/CAD",
+                      "GBP/JPY",
+                      "XAU/USD",
+                      "XAG/USD",
+                      "USOIL",
+                      "NAS100",
+                      "US30",
+                      "SPX500",
+                      "BTC/USD",
+                      "ETH/USD",
+                    ].map((sym) => {
+                      const isAdded = (editPreferencesForm.favoritePairs || []).includes(sym);
+                      return (
+                        <button
+                          key={sym}
+                          type="button"
+                          onClick={() => handleTogglePair(sym)}
+                          className={`px-2.5 py-1 rounded-lg text-[11px] font-mono font-bold transition-all cursor-pointer ${
+                            isAdded
+                              ? "bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/35"
+                              : "bg-neutral-100 dark:bg-white/[0.04] text-neutral-600 dark:text-neutral-400 border border-black/[0.05] dark:border-white/[0.06] hover:bg-neutral-200 dark:hover:bg-white/[0.08]"
+                          }`}
+                        >
+                          {isAdded ? "✓ " : "+ "}
+                          {sym}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-black/[0.06] dark:border-white/[0.08]">
+                <button
+                  type="button"
+                  onClick={() => setIsEditPreferencesOpen(false)}
+                  className="px-4 py-2 rounded-xl text-xs font-bold text-neutral-600 dark:text-neutral-400 hover:bg-black/[0.04] dark:hover:bg-white/[0.06] transition-colors cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold transition-all shadow-sm shadow-emerald-500/25 active:scale-95 cursor-pointer"
+                >
+                  Save Preferences
                 </button>
               </div>
             </form>

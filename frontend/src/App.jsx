@@ -10,7 +10,10 @@ import {
 } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import api, { isSessionValid, clearSession } from "./api/axios";
-import { getCachedAccessStatus, getImmediateCachedStatus } from "./utils/subscriptionCache";
+import {
+  getCachedAccessStatus,
+  getImmediateCachedStatus,
+} from "./utils/subscriptionCache";
 import { markInAppNavigation } from "./utils/navigationState";
 import { safeLazy, registerRoutePrefetch } from "./utils/routePrefetch";
 import NavigationProgressBar from "./components/NavigationProgressBar";
@@ -26,68 +29,167 @@ import LandingPage from "./pages/LandingPage.jsx";
 import PrivacyPolicy from "./pages/PrivacyPolicy.jsx";
 import NotFound from "./pages/NotFound.jsx";
 import { SEO_PAGES } from "./data/seoPages";
-const CompetitorVsPage = safeLazy(() => import("./pages/CompetitorVsPage.jsx"), "competitor-vs");
-const SeoLandingPage = safeLazy(() => import("./pages/SeoLandingPage.jsx"), "seo-landing");
+const CompetitorVsPage = safeLazy(
+  () => import("./pages/CompetitorVsPage.jsx"),
+  "competitor-vs",
+);
+const SeoLandingPage = safeLazy(
+  () => import("./pages/SeoLandingPage.jsx"),
+  "seo-landing",
+);
 
 // Protected Core Workspace Pages (Grouped into 'workspace-core' bundle for 0ms instant tab switches)
-const MainLayout = safeLazy(() => import("./layouts/MainLayout.jsx"), "main-layout");
+const MainLayout = safeLazy(
+  () => import("./layouts/MainLayout.jsx"),
+  "main-layout",
+);
 const Dashboard = safeLazy(() => import("./pages/Dashboard.jsx"), "dashboard");
 const AddTrade = safeLazy(() => import("./pages/AddTrade.jsx"), "add-trade");
-const PastTrades = safeLazy(() => import("./pages/PastTrades.jsx"), "past-trades");
-const PerformanceCalendar = safeLazy(() => import("./pages/PerformanceCalendar.jsx"), "calendar");
-const PerformanceAnalytics = safeLazy(() => import("./pages/PerformanceAnalytics.jsx"), "performance-analytics");
-const TradeAnalysis = safeLazy(() => import("./pages/TradeAnalysis.jsx"), "trade-analysis");
+const PastTrades = safeLazy(
+  () => import("./pages/PastTrades.jsx"),
+  "past-trades",
+);
+const PerformanceCalendar = safeLazy(
+  () => import("./pages/PerformanceCalendar.jsx"),
+  "calendar",
+);
+const PerformanceAnalytics = safeLazy(
+  () => import("./pages/PerformanceAnalytics.jsx"),
+  "performance-analytics",
+);
+const TradeAnalysis = safeLazy(
+  () => import("./pages/TradeAnalysis.jsx"),
+  "trade-analysis",
+);
 const Analytics = safeLazy(() => import("./pages/Analytics.jsx"), "analytics");
-const Psychology = safeLazy(() => import("./pages/Psychology.jsx"), "psychology");
+const Psychology = safeLazy(
+  () => import("./pages/Psychology.jsx"),
+  "psychology",
+);
 const Mistakes = safeLazy(() => import("./pages/Mistakes.jsx"), "mistakes");
-const EconomicCalendar = safeLazy(() => import("./pages/EconomicCalendar.jsx"), "news");
-const PropAccounts = safeLazy(() => import("./pages/PropAccounts.jsx"), "accounts");
+const EconomicCalendar = safeLazy(
+  () => import("./pages/EconomicCalendar.jsx"),
+  "news",
+);
+const PropAccounts = safeLazy(
+  () => import("./pages/PropAccounts.jsx"),
+  "accounts",
+);
 const Settings = safeLazy(() => import("./pages/Settings.jsx"), "settings");
 const Profile = safeLazy(() => import("./pages/Profile.jsx"), "profile");
 const Support = safeLazy(() => import("./pages/Support.jsx"), "support");
-const AffiliateDashboard = safeLazy(() => import("./pages/AffiliateDashboard.jsx"), "affiliate");
-const CalculatorLayout = safeLazy(() => import("./pages/TraderProblems/Layout.jsx"), "calculator-layout");
-const PropFirm = safeLazy(() => import("./pages/TraderProblems/PropFirm.jsx"), "prop-firm");
-const LotSizeCalculator = safeLazy(() => import("./pages/TraderProblems/LotSizeCalculator.jsx"), "lot-size");
+const AffiliateDashboard = safeLazy(
+  () => import("./pages/AffiliateDashboard.jsx"),
+  "affiliate",
+);
+const CalculatorLayout = safeLazy(
+  () => import("./pages/TraderProblems/Layout.jsx"),
+  "calculator-layout",
+);
+const PropFirm = safeLazy(
+  () => import("./pages/TraderProblems/PropFirm.jsx"),
+  "prop-firm",
+);
+const LotSizeCalculator = safeLazy(
+  () => import("./pages/TraderProblems/LotSizeCalculator.jsx"),
+  "lot-size",
+);
 
 // Heavy / Secondary Pages (Prefetched on hover and idle)
 const Charts = safeLazy(() => import("./pages/Charts.jsx"), "charts");
 const Sessions = safeLazy(() => import("./pages/Sessions.jsx"), "sessions");
 const Backtest = safeLazy(() => import("./pages/Backtest.jsx"), "backtest");
-const TradingBotDashboard = safeLazy(() => import("./features/trading-bot/pages/TradingBotDashboard.jsx"), "trading-bot");
-const BotSetupPage = safeLazy(() => import("./features/trading-bot/pages/BotSetupPage.jsx"), "bot-setup");
-const BotHubPage = safeLazy(() => import("./features/bot-hub/pages/BotHubPage.jsx"), "bot-hub");
-const ConnectionsPage = safeLazy(() => import("./features/bot-hub/pages/ConnectionsPage.jsx"), "connections");
-const Mt5BotPage = safeLazy(() => import("./features/bot-hub/pages/Mt5BotPage.jsx"), "mt5-bot");
-const AdminDashboard = safeLazy(() => import("./pages/AdminDashboard.jsx"), "admin");
+const TradingBotDashboard = safeLazy(
+  () => import("./features/trading-bot/pages/TradingBotDashboard.jsx"),
+  "trading-bot",
+);
+const BotSetupPage = safeLazy(
+  () => import("./features/trading-bot/pages/BotSetupPage.jsx"),
+  "bot-setup",
+);
+const BotHubPage = safeLazy(
+  () => import("./features/bot-hub/pages/BotHubPage.jsx"),
+  "bot-hub",
+);
+const ConnectionsPage = safeLazy(
+  () => import("./features/bot-hub/pages/ConnectionsPage.jsx"),
+  "connections",
+);
+const Mt5BotPage = safeLazy(
+  () => import("./features/bot-hub/pages/Mt5BotPage.jsx"),
+  "mt5-bot",
+);
+const AdminDashboard = safeLazy(
+  () => import("./pages/AdminDashboard.jsx"),
+  "admin",
+);
 
 // Auth and Gate Pages
 const Login = safeLazy(() => import("./pages/Login.jsx"), "login");
 const Verify = safeLazy(() => import("./pages/Verify.jsx"), "verify");
-const DiscordGate = safeLazy(() => import("./pages/DiscordGate.jsx"), "discord-gate");
-const DiscordCallback = safeLazy(() => import("./pages/DiscordCallback.jsx"), "discord-callback");
+const DiscordGate = safeLazy(
+  () => import("./pages/DiscordGate.jsx"),
+  "discord-gate",
+);
+const DiscordCallback = safeLazy(
+  () => import("./pages/DiscordCallback.jsx"),
+  "discord-callback",
+);
 const Paywall = safeLazy(() => import("./pages/Paywall.jsx"), "paywall");
-const Onboarding = safeLazy(() => import("./pages/Onboarding.jsx"), "onboarding");
+const Onboarding = safeLazy(
+  () => import("./pages/Onboarding.jsx"),
+  "onboarding",
+);
 
 // Register prefetch handlers for instant hover / idle prefetching
-registerRoutePrefetch("/analysis/performance", () => import("./pages/PerformanceAnalytics.jsx"));
-registerRoutePrefetch("/analysis/trades", () => import("./pages/TradeAnalysis.jsx"));
+registerRoutePrefetch(
+  "/analysis/performance",
+  () => import("./pages/PerformanceAnalytics.jsx"),
+);
+registerRoutePrefetch(
+  "/analysis/trades",
+  () => import("./pages/TradeAnalysis.jsx"),
+);
 registerRoutePrefetch("/onboarding", () => import("./pages/Onboarding.jsx"));
 registerRoutePrefetch("/charts", () => import("./pages/Charts.jsx"));
 registerRoutePrefetch("/sessions", () => import("./pages/Sessions.jsx"));
 registerRoutePrefetch("/backtest", () => import("./pages/Backtest.jsx"));
-registerRoutePrefetch("/bot-hub", () => import("./features/bot-hub/pages/BotHubPage.jsx"));
-registerRoutePrefetch("/bot-hub/connections", () => import("./features/bot-hub/pages/ConnectionsPage.jsx"));
-registerRoutePrefetch("/bot-hub/mt5", () => import("./features/bot-hub/pages/Mt5BotPage.jsx"));
+registerRoutePrefetch(
+  "/bot-hub",
+  () => import("./features/bot-hub/pages/BotHubPage.jsx"),
+);
+registerRoutePrefetch(
+  "/bot-hub/connections",
+  () => import("./features/bot-hub/pages/ConnectionsPage.jsx"),
+);
+registerRoutePrefetch(
+  "/bot-hub/mt5",
+  () => import("./features/bot-hub/pages/Mt5BotPage.jsx"),
+);
 registerRoutePrefetch("/admin", () => import("./pages/AdminDashboard.jsx"));
-registerRoutePrefetch("/admin/trading-bot", () => import("./features/trading-bot/pages/TradingBotDashboard.jsx"));
-registerRoutePrefetch("/admin/setup", () => import("./features/trading-bot/pages/BotSetupPage.jsx"));
-registerRoutePrefetch("/calculator/lot-size", () => import("./pages/TraderProblems/LotSizeCalculator.jsx"));
-registerRoutePrefetch("/calculator/prop-firm", () => import("./pages/TraderProblems/PropFirm.jsx"));
+registerRoutePrefetch(
+  "/admin/trading-bot",
+  () => import("./features/trading-bot/pages/TradingBotDashboard.jsx"),
+);
+registerRoutePrefetch(
+  "/admin/setup",
+  () => import("./features/trading-bot/pages/BotSetupPage.jsx"),
+);
+registerRoutePrefetch(
+  "/calculator/lot-size",
+  () => import("./pages/TraderProblems/LotSizeCalculator.jsx"),
+);
+registerRoutePrefetch(
+  "/calculator/prop-firm",
+  () => import("./pages/TraderProblems/PropFirm.jsx"),
+);
 registerRoutePrefetch("/profile", () => import("./pages/Profile.jsx"));
 
 const INDEXABLE_PATHS = ["/", "/privacy"];
-const isIndexable = (path) => INDEXABLE_PATHS.includes(path) || path.startsWith("/vs/") || SEO_PAGES.some((p) => p.path === path.replace(/\/$/, ""));
+const isIndexable = (path) =>
+  INDEXABLE_PATHS.includes(path) ||
+  path.startsWith("/vs/") ||
+  SEO_PAGES.some((p) => p.path === path.replace(/\/$/, ""));
 
 const RouteSeo = () => {
   const { pathname, search } = useLocation();
@@ -127,9 +229,15 @@ const WorkspaceLoader = () => (
   <div className="min-h-screen bg-[#0a0a0a] flex flex-col items-center justify-center p-6">
     <div className="relative flex items-center justify-center mb-3">
       <div className="w-10 h-10 rounded-full border-2 border-emerald-500/20 border-t-emerald-500 animate-spin" />
-      <img src="/logo3d.png" alt="Loading" className="w-4 h-4 object-contain absolute opacity-80" />
+      <img
+        src="/logo3d.png"
+        alt="Loading"
+        className="w-4 h-4 object-contain absolute opacity-80"
+      />
     </div>
-    <p className="text-xs text-gray-400 font-medium tracking-wide">Connecting workspace...</p>
+    <p className="text-xs text-gray-400 font-medium tracking-wide">
+      Connecting workspace...
+    </p>
   </div>
 );
 
@@ -183,7 +291,11 @@ const PaywallGuard = () => {
 const AdminGuard = () => {
   const id = (localStorage.getItem("userId") || "").toLowerCase().trim();
   const email = (localStorage.getItem("userEmail") || "").toLowerCase().trim();
-  const adminEmails = ["noballondesk@gmail.com", "noballondesk@gamil.com", "akpatil51340@gmail.com"];
+  const adminEmails = [
+    "noballondesk@gmail.com",
+    "noballondesk@gamil.com",
+    "akpatil51340@gmail.com",
+  ];
   if (adminEmails.includes(id) || adminEmails.includes(email)) {
     return <Outlet />;
   }
@@ -195,9 +307,15 @@ const RouteTransitionFallback = () => (
   <div className="min-h-[70vh] flex flex-col items-center justify-center p-8 bg-[#0a0a0a]">
     <div className="relative flex items-center justify-center mb-3">
       <div className="w-9 h-9 rounded-full border-2 border-emerald-500/20 border-t-emerald-500 animate-spin" />
-      <img src="/logo3d.png" alt="ForexNotes" className="w-4 h-4 object-contain absolute opacity-80" />
+      <img
+        src="/logo3d.png"
+        alt="ForexNotes"
+        className="w-4 h-4 object-contain absolute opacity-80"
+      />
     </div>
-    <p className="text-xs text-gray-400 font-medium tracking-wide">Loading workspace view...</p>
+    <p className="text-xs text-gray-400 font-medium tracking-wide">
+      Loading workspace view...
+    </p>
   </div>
 );
 
@@ -209,11 +327,11 @@ const ScrollToTop = () => {
     if (hash) {
       const el = document.querySelector(hash);
       if (el) {
-        el.scrollIntoView({ behavior: 'smooth' });
+        el.scrollIntoView({ behavior: "smooth" });
         return;
       }
     }
-    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
   }, [pathname, hash]);
@@ -293,7 +411,9 @@ function App() {
             <Route path="/" element={<LandingPage />} />
             <Route path="/privacy" element={<PrivacyPolicy />} />
             <Route path="/vs/:competitorSlug" element={<CompetitorVsPage />} />
-            {SEO_PAGES.map((p) => <Route key={p.path} path={p.path} element={<SeoLandingPage />} />)}
+            {SEO_PAGES.map((p) => (
+              <Route key={p.path} path={p.path} element={<SeoLandingPage />} />
+            ))}
             <Route path="/login" element={<Login />} />
             <Route path="/verify" element={<Verify />} />
             <Route path="/paywall" element={<PaywallRoute />} />
@@ -305,23 +425,38 @@ function App() {
 
               {/* Guard 2: Must be logged in AND Paid (or Active Trial / Admin) */}
               <Route element={<PaywallGuard />}>
-                  <Route path="/onboarding" element={<Onboarding />} />
-                  <Route path="/backtest/:id" element={<Backtest />} />
-                  <Route path="/backtest" element={<Navigate to="/sessions" replace />} />
-                  <Route path="/" element={<MainLayout />}>
+                <Route path="/onboarding" element={<Onboarding />} />
+                <Route path="/backtest/:id" element={<Backtest />} />
+                <Route
+                  path="/backtest"
+                  element={<Navigate to="/sessions" replace />}
+                />
+                <Route path="/" element={<MainLayout />}>
                   <Route path="dashboard" element={<Dashboard />} />
                   <Route path="add-trade" element={<AddTrade />} />
                   <Route path="news" element={<EconomicCalendar />} />
                   <Route path="trades" element={<PastTrades />} />
                   <Route path="calendar" element={<PerformanceCalendar />} />
-                  <Route path="analysis" element={<Navigate to="/analysis/performance" replace />} />
-                  <Route path="analysis/performance" element={<PerformanceAnalytics />} />
+                  <Route
+                    path="analysis"
+                    element={<Navigate to="/analysis/performance" replace />}
+                  />
+                  <Route
+                    path="analysis/performance"
+                    element={<PerformanceAnalytics />}
+                  />
                   <Route path="analysis/trades" element={<TradeAnalysis />} />
-                  <Route path="analytics" element={<Navigate to="/analysis/performance" replace />} />
+                  <Route
+                    path="analytics"
+                    element={<Navigate to="/analysis/performance" replace />}
+                  />
                   <Route path="psychology" element={<Psychology />} />
                   <Route path="mistakes" element={<Mistakes />} />
                   <Route path="accounts" element={<PropAccounts />} />
-                  <Route path="settings" element={<Navigate to="/profile?tab=settings" replace />} />
+                  <Route
+                    path="settings"
+                    element={<Navigate to="/profile?tab=settings" replace />}
+                  />
                   <Route path="profile" element={<Profile />} />
                   <Route path="support" element={<Support />} />
                   <Route path="affiliate" element={<AffiliateDashboard />} />
@@ -331,14 +466,20 @@ function App() {
                   {/* Admin Only Routes */}
                   <Route element={<AdminGuard />}>
                     <Route path="admin" element={<AdminDashboard />} />
-                    <Route path="admin/trading-bot" element={<TradingBotDashboard />} />
+                    <Route
+                      path="admin/trading-bot"
+                      element={<TradingBotDashboard />}
+                    />
                     <Route path="admin/setup" element={<BotSetupPage />} />
                   </Route>
 
                   <Route path="bot-hub" element={<BotHubPage />} />
-                  <Route path="bot-hub/connections" element={<ConnectionsPage />} />
+                  <Route
+                    path="bot-hub/connections"
+                    element={<ConnectionsPage />}
+                  />
                   <Route path="bot-hub/mt5" element={<Mt5BotPage />} />
-                  
+
                   <Route path="calculator" element={<CalculatorLayout />}>
                     <Route index element={<Navigate to="lot-size" replace />} />
                     <Route path="lot-size" element={<LotSizeCalculator />} />
