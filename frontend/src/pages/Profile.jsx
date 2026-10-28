@@ -1,5 +1,5 @@
 // frontend/src/pages/Profile.jsx
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, lazy, Suspense } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { createPortal } from "react-dom";
 import {
@@ -42,7 +42,8 @@ import {
   ExternalLink,
 } from "lucide-react";
 import AppleSelect from "../components/ui/AppleSelect";
-import PaywallPricingGrid from "../components/paywall/PaywallPricingGrid";
+const PaywallPricingGrid = lazy(() => import("../components/paywall/PaywallPricingGrid"));
+import { getPlanBadge } from "../utils/planBadge";
 import api from "../api/axios";
 
 const DEFAULT_CHECKLIST = [
@@ -159,6 +160,13 @@ export default function Profile({ defaultTab }) {
       avatarUrl: cached.avatarUrl || localStorage.getItem(`user_avatar_${userId}`) || localStorage.getItem("userAvatar") || "",
       plan: cached.plan || "FREE",
       joinedYear: cached.joinedYear || "2026",
+      current_plan: cached.current_plan || "none",
+      account_status: cached.account_status || "trial",
+      trial_ends_at: cached.trial_ends_at || null,
+      subscription_ends_at: cached.subscription_ends_at || null,
+      createdAt: cached.createdAt || null,
+      email: userEmail,
+      isAdmin: cached.isAdmin || false,
     };
   });
 
@@ -194,6 +202,7 @@ export default function Profile({ defaultTab }) {
   });
 
   const [prefSaveNotice, setPrefSaveNotice] = useState("");
+  const planBadge = getPlanBadge(profile);
 
   const [checklist, setChecklist] = useState(() => {
     try {
@@ -228,21 +237,26 @@ export default function Profile({ defaultTab }) {
         const res = await api.get(`/api/auth/profile?userId=${encodeURIComponent(userId)}&email=${encodeURIComponent(userEmail)}`);
         if (res.data?.success && res.data.profile) {
           const p = res.data.profile;
-          if (p.display_name || p.username || p.avatar_url) {
-            setProfile((prev) => {
-              const updated = {
-                ...prev,
-                displayName: p.display_name || prev.displayName,
-                username: p.username || prev.username,
-                bio: p.bio !== undefined ? p.bio : prev.bio,
-                avatarUrl: p.avatar_url || prev.avatarUrl,
-                plan: (p.current_plan || prev.plan).toUpperCase(),
-                joinedYear: p.created_at ? new Date(p.created_at).getFullYear() : prev.joinedYear,
-              };
-              localStorage.setItem(`trader_profile_${userId}`, JSON.stringify(updated));
-              return updated;
-            });
-          }
+          setProfile((prev) => {
+            const updated = {
+              ...prev,
+              displayName: p.display_name || prev.displayName,
+              username: p.username || prev.username,
+              bio: p.bio !== undefined ? p.bio : prev.bio,
+              avatarUrl: p.avatar_url || prev.avatarUrl,
+              plan: (p.current_plan || prev.plan || "free").toUpperCase(),
+              joinedYear: p.created_at ? new Date(p.created_at).getFullYear() : prev.joinedYear,
+              current_plan: p.current_plan || prev.current_plan,
+              account_status: p.account_status || prev.account_status,
+              trial_ends_at: p.trial_ends_at || prev.trial_ends_at,
+              subscription_ends_at: p.subscription_ends_at || prev.subscription_ends_at,
+              createdAt: p.created_at || prev.createdAt,
+              isAdmin: Boolean(p.isAdmin || prev.isAdmin),
+              email: p.email || prev.email || userEmail,
+            };
+            localStorage.setItem(`trader_profile_${userId}`, JSON.stringify(updated));
+            return updated;
+          });
 
           if (p.discipline_rules) {
             setDisciplineRules((prev) => {
@@ -589,8 +603,9 @@ export default function Profile({ defaultTab }) {
               <h1 className="text-xl sm:text-2xl font-black text-neutral-900 dark:text-white tracking-tight">
                 {profile.displayName}
               </h1>
-              <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-md bg-neutral-100 dark:bg-white/[0.08] text-neutral-600 dark:text-neutral-300 border border-black/[0.06] dark:border-white/[0.08] tracking-wider">
-                {profile.plan}
+              <span className={`inline-flex items-center gap-1.5 text-[11px] font-extrabold uppercase px-2.5 py-0.5 rounded-lg border tracking-wider transition-all ${planBadge.badgeClass}`}>
+                <span className={`w-1.5 h-1.5 rounded-full ${planBadge.dotClass}`} />
+                <span>{planBadge.label}</span>
               </span>
             </div>
             <div className="flex items-center gap-2 mt-1 text-xs font-semibold text-neutral-500 dark:text-neutral-400">
@@ -1290,14 +1305,29 @@ export default function Profile({ defaultTab }) {
                 </div>
               </div>
 
-              <span className="text-xs font-extrabold uppercase px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                {profile.plan} PLAN ACTIVE
-              </span>
+              {/* Dynamic User Plan Badge from Supabase (24 Hour Trial, 7 Days Trial, 1 Month Pro Plan, 1 Year Pro Plan) */}
+              <div className="flex items-center gap-2">
+                <span className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-black tracking-wide uppercase transition-all ${planBadge.badgeClass}`}>
+                  <span className={`w-2 h-2 rounded-full ${planBadge.dotClass}`} />
+                  <span>{planBadge.label}</span>
+                </span>
+              </div>
             </div>
 
             {/* Reusable Paywall Cards: Monthly/Yearly toggle, Beginner Trial, Pro Trader & Web3 WalletConnect */}
             <div className="pt-2">
-              <PaywallPricingGrid isEmbedded={true} />
+              <Suspense
+                fallback={
+                  <div className="py-12 flex flex-col items-center justify-center min-h-[300px]">
+                    <div className="w-8 h-8 rounded-full border-2 border-emerald-500/20 border-t-emerald-500 animate-spin mb-3" />
+                    <p className="text-xs text-neutral-500 dark:text-neutral-400 font-medium tracking-wide">
+                      Loading membership & billing options...
+                    </p>
+                  </div>
+                }
+              >
+                <PaywallPricingGrid isEmbedded={true} />
+              </Suspense>
             </div>
           </div>
         </div>

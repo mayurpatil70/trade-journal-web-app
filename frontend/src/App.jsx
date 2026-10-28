@@ -84,6 +84,7 @@ registerRoutePrefetch("/admin/trading-bot", () => import("./features/trading-bot
 registerRoutePrefetch("/admin/setup", () => import("./features/trading-bot/pages/BotSetupPage.jsx"));
 registerRoutePrefetch("/calculator/lot-size", () => import("./pages/TraderProblems/LotSizeCalculator.jsx"));
 registerRoutePrefetch("/calculator/prop-firm", () => import("./pages/TraderProblems/PropFirm.jsx"));
+registerRoutePrefetch("/profile", () => import("./pages/Profile.jsx"));
 
 const INDEXABLE_PATHS = ["/", "/privacy"];
 const isIndexable = (path) => INDEXABLE_PATHS.includes(path) || path.startsWith("/vs/") || SEO_PAGES.some((p) => p.path === path.replace(/\/$/, ""));

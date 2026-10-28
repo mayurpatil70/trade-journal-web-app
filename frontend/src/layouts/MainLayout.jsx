@@ -576,14 +576,14 @@ export default function MainLayout() {
               <button
                 onClick={() => {
                   setIsProfileOpen(false);
-                  navigate("/paywall");
+                  navigate("/profile?tab=billing");
                 }}
-                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-neutral-700 dark:text-neutral-200 hover:bg-black/[0.04] dark:hover:bg-white/[0.08] transition-colors text-left"
+                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-neutral-700 dark:text-neutral-200 hover:bg-black/[0.04] dark:hover:bg-white/[0.08] transition-colors text-left cursor-pointer"
               >
                 <div className="w-6 h-6 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
                   <CreditCard className="w-3.5 h-3.5" />
                 </div>
-                Subscription Plan
+                Membership & Billing
               </button>
               <div className="my-1 border-t border-black/[0.05] dark:border-white/[0.06]" />
               <button

@@ -920,11 +920,22 @@ class PaywallErrorBoundary extends React.Component {
 export default function PaywallPricingGrid(props) {
   return (
     <PaywallErrorBoundary>
-      <WagmiProvider config={wagmiConfig}>
-        <QueryClientProvider client={sharedQueryClient}>
-          <PaywallPricingContent {...props} />
-        </QueryClientProvider>
-      </WagmiProvider>
+      <React.Suspense
+        fallback={
+          <div className="py-12 flex flex-col items-center justify-center min-h-[300px]">
+            <div className="w-8 h-8 rounded-full border-2 border-emerald-500/20 border-t-emerald-500 animate-spin mb-3" />
+            <p className="text-xs text-neutral-500 dark:text-neutral-400 font-medium">
+              Connecting billing options...
+            </p>
+          </div>
+        }
+      >
+        <WagmiProvider config={wagmiConfig} reconnectOnMount={false}>
+          <QueryClientProvider client={sharedQueryClient}>
+            <PaywallPricingContent {...props} />
+          </QueryClientProvider>
+        </WagmiProvider>
+      </React.Suspense>
     </PaywallErrorBoundary>
   );
 }

@@ -356,6 +356,16 @@ router.post("/start-trial", requireAuth, async (req, res) => {
       return res.status(403).json({ error: "Your free trial has already expired." });
     }
 
+    if (!profile.trial_ends_at && profile.account_status !== "expired") {
+      const trialEnd = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+      await supabase.from("profiles").update({
+        account_status: "trial",
+        trial_ends_at: trialEnd,
+      }).eq("id", userId);
+      profile.account_status = "trial";
+      profile.trial_ends_at = trialEnd;
+    }
+
     if (profile.trial_ends_at) {
       const endsAt = new Date(profile.trial_ends_at).getTime();
       if (endsAt < Date.now()) {

@@ -312,6 +312,44 @@ export const getProfile = async (req, res) => {
       }
     }
 
+    if (profileData) {
+      const targetUserId = profileData.id || userId;
+      if (targetUserId) {
+        // Query journal_subscriptions for latest paid subscription
+        const { data: latestSub } = await supabase
+          .from("journal_subscriptions")
+          .select("*")
+          .eq("user_id", targetUserId)
+          .eq("status", "paid")
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        if (latestSub) {
+          const isYearly = Number(latestSub.amount_usdt) >= 100;
+          if (!profileData.current_plan || profileData.current_plan === "none" || profileData.current_plan === "free") {
+            profileData.current_plan = isYearly ? "yearly" : "monthly";
+          }
+          if (profileData.account_status !== "active") {
+            profileData.account_status = "active";
+          }
+        }
+      }
+
+      // Check admin status
+      const adminEmails = [
+        ...(process.env.ADMIN_EMAIL || "").split(","),
+        "noballondesk@gmail.com",
+        "noballondesk@gamil.com",
+        "akpatil51340@gmail.com",
+      ].map((e) => e.trim().toLowerCase()).filter(Boolean);
+
+      const userEmail = (profileData.email || email || "").trim().toLowerCase();
+      if (userEmail && adminEmails.includes(userEmail)) {
+        profileData.isAdmin = true;
+      }
+    }
+
     res.json({
       success: true,
       profile: profileData || {},
