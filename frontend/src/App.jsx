@@ -216,39 +216,8 @@ const ScrollToTop = () => {
   return null;
 };
 
-// Paywall Route: Only for users who have NOT yet paid. Paid users are redirected to dashboard.
+// Paywall Route: Accessible by new visitors & subscribed users managing plans
 const PaywallRoute = () => {
-  const [isPaid, setIsPaid] = useState(() => {
-    const cached = getImmediateCachedStatus();
-    if (cached && (cached.hasPaid || cached.isAdmin)) {
-      return true;
-    }
-    return false;
-  });
-
-  useEffect(() => {
-    let active = true;
-    getCachedAccessStatus()
-      .then((data) => {
-        if (!active) return;
-        if (data?.hasPaid || data?.isAdmin) {
-          setIsPaid(true);
-        }
-      })
-      .catch(() => {});
-    return () => {
-      active = false;
-    };
-  }, []);
-
-  if (isPaid) {
-    const userId = localStorage.getItem("userId") || localStorage.getItem("userEmail") || "";
-    const onboardingCompleted =
-      localStorage.getItem(`onboarding_completed_${userId}`) === "true" ||
-      localStorage.getItem("onboarding_completed") === "true";
-    return <Navigate to={onboardingCompleted ? "/dashboard" : "/onboarding"} replace />;
-  }
-
   return <Paywall />;
 };
 

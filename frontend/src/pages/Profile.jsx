@@ -40,9 +40,9 @@ import {
   Image as ImageIcon,
   CheckCircle2,
   ExternalLink,
-  Sparkles,
 } from "lucide-react";
 import AppleSelect from "../components/ui/AppleSelect";
+import PaywallPricingGrid from "../components/paywall/PaywallPricingGrid";
 import api from "../api/axios";
 
 const DEFAULT_CHECKLIST = [
@@ -1295,24 +1295,9 @@ export default function Profile({ defaultTab }) {
               </span>
             </div>
 
-            <div className="rounded-2xl p-5 bg-neutral-50 dark:bg-white/[0.025] border border-black/[0.06] dark:border-white/[0.07] flex items-center justify-between flex-wrap gap-4">
-              <div>
-                <h3 className="text-sm font-bold text-neutral-900 dark:text-white flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-emerald-500" /> Professional Trading Suite
-                </h3>
-                <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1 max-w-xl">
-                  Full access to unlimited trade journaling, multi-timeframe TradingView sync, automated discipline rules, psychology tracking, and multi-format document exports.
-                </p>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => navigate("/paywall")}
-                className="px-5 py-2.5 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold transition-all shadow-sm shadow-emerald-500/25 active:scale-95 cursor-pointer flex items-center gap-2"
-              >
-                <span>Manage Plan / Upgrade</span>
-                <ExternalLink className="w-3.5 h-3.5" />
-              </button>
+            {/* Reusable Paywall Cards: Monthly/Yearly toggle, Beginner Trial, Pro Trader & Web3 WalletConnect */}
+            <div className="pt-2">
+              <PaywallPricingGrid isEmbedded={true} />
             </div>
           </div>
         </div>
