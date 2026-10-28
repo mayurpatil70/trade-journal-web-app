@@ -64,6 +64,31 @@ export function formatTradeDate(trade, includeTime = false) {
   });
 }
 
+/**
+ * Generates a smooth, organic cubic Bézier curve passing through data points
+ * (Zero-overshoot monotonic interpolation matching professional FinTech charts)
+ */
+function getSmoothCurvePath(points) {
+  if (!points || points.length === 0) return "";
+  if (points.length === 1) return `M ${points[0].x.toFixed(1)},${points[0].y.toFixed(1)}`;
+  if (points.length === 2) {
+    return `M ${points[0].x.toFixed(1)},${points[0].y.toFixed(1)} L ${points[1].x.toFixed(1)},${points[1].y.toFixed(1)}`;
+  }
+
+  let d = `M ${points[0].x.toFixed(1)},${points[0].y.toFixed(1)}`;
+  for (let i = 0; i < points.length - 1; i++) {
+    const p1 = points[i];
+    const p2 = points[i + 1];
+    const dx = (p2.x - p1.x) * 0.42;
+    const cp1x = p1.x + dx;
+    const cp1y = p1.y;
+    const cp2x = p2.x - dx;
+    const cp2y = p2.y;
+    d += ` C ${cp1x.toFixed(1)},${cp1y.toFixed(1)} ${cp2x.toFixed(1)},${cp2y.toFixed(1)} ${p2.x.toFixed(1)},${p2.y.toFixed(1)}`;
+  }
+  return d;
+}
+
 export default function PerformanceEquityCurve({ trades = [] }) {
   const [timeframe, setTimeframe] = useState("1M");
   const [viewMode, setViewMode] = useState("trades"); // "trades" (By Trade sequence) | "timeline" (Calendar Timeline)
@@ -151,7 +176,7 @@ export default function PerformanceEquityCurve({ trades = [] }) {
     let cumPnl = 0;
     let hasPnl = false;
 
-    // Start baseline at 0
+    // Start baseline point at 0
     const points = [
       {
         r: 0,
@@ -208,7 +233,7 @@ export default function PerformanceEquityCurve({ trades = [] }) {
   // SVG dimensions
   const chartWidth = Math.max(containerWidth, 600);
   const chartHeight = 310;
-  const paddingX = 22;
+  const paddingX = 24;
   const paddingY = 28;
 
   // Compute SVG Points & Axis Ticks
@@ -217,8 +242,8 @@ export default function PerformanceEquityCurve({ trades = [] }) {
     if (points.length <= 1) {
       return {
         svgPoints: [],
-        polylinePoints: "",
-        areaPolygonPoints: "",
+        smoothPathD: "",
+        areaPathD: "",
         tradePoints: [],
         ticks: [],
         minVal: 0,
@@ -232,7 +257,8 @@ export default function PerformanceEquityCurve({ trades = [] }) {
     const minVal = Math.min(...allVals);
     const maxVal = Math.max(...allVals);
     const rawRange = maxVal - minVal || 1;
-    const paddingVal = rawRange * 0.08;
+    // 10% breathing room top & bottom so peaks and troughs never clip
+    const paddingVal = rawRange * 0.1;
     const chartMin = Math.min(0, minVal - paddingVal);
     const chartMax = maxVal + paddingVal;
     const range = chartMax - chartMin || 1;
@@ -241,63 +267,62 @@ export default function PerformanceEquityCurve({ trades = [] }) {
       chartHeight - paddingY - ((val - chartMin) / range) * (chartHeight - paddingY * 2);
     const zeroY = getY(0);
 
-    let tradeSvgPoints = [];
-    let steppedPoints = [];
+    let curveNodes = [];
     let ticks = [];
-
     const usableWidth = chartWidth - paddingX * 2;
 
     if (viewMode === "trades") {
-      // ──────── MODE 1: BY TRADE SEQUENCE (EACH TRADE GETS CLEAR STEP & T1, T2 TAGS) ────────
-      const totalPoints = points.length; // points[0] is baseline, points[1..N] are trades
+      // ──────── MODE 1: BY TRADE SEQUENCE (AUTHENTIC TRADING EQUITY CURVE) ────────
+      const totalPoints = points.length;
 
-      // Map trade points along the width with equal horizontal steps
-      tradeSvgPoints = points.map((p, idx) => {
+      // Equal horizontal spacing per trade so every execution has room to breathe
+      curveNodes = points.map((p, idx) => {
         const val = hasPnl ? p.pnl : p.r;
         const x = paddingX + (idx / Math.max(1, totalPoints - 1)) * usableWidth;
         const y = getY(val);
         return { x, y, point: p };
       });
 
-      // Stepped curve generation: horizontal hold then vertical step
-      steppedPoints.push(`${tradeSvgPoints[0].x},${tradeSvgPoints[0].y}`);
-      for (let i = 1; i < tradeSvgPoints.length; i++) {
-        const prev = tradeSvgPoints[i - 1];
-        const curr = tradeSvgPoints[i];
-        // Horizontal hold from prev.x to curr.x at prev.y
-        steppedPoints.push(`${curr.x},${prev.y}`);
-        // Vertical step to curr.y at curr.x
-        steppedPoints.push(`${curr.x},${curr.y}`);
-      }
-
-      // Generate ticks with clean Date and T1, T2 badges
+      // Generate 5-7 clean ticks across trade sequence without repeating identical dates
       const tradeCount = totalPoints - 1;
       const maxTicks = Math.min(7, tradeCount);
+      let prevDateStr = "";
+
       for (let i = 0; i < maxTicks; i++) {
         const tradeIdx = 1 + Math.round((i / Math.max(1, maxTicks - 1)) * (tradeCount - 1));
-        const pt = tradeSvgPoints[tradeIdx];
-        if (!pt) continue;
+        const pt = curveNodes[tradeIdx];
+        if (!pt || !pt.point) continue;
+
+        const dateStr = pt.point.trade ? pt.point.dateLabel : "Start";
+        let label = dateStr;
+
+        // If this trade is on the same calendar day as the previous tick, show time instead of repeating date!
+        if (dateStr === prevDateStr && pt.point.trade && (pt.point.trade.entry_time || pt.point.trade.time)) {
+          const rawTime = (pt.point.trade.entry_time || pt.point.trade.time).slice(0, 5);
+          label = rawTime || dateStr;
+        } else {
+          prevDateStr = dateStr;
+        }
 
         ticks.push({
-          label: pt.point.trade ? pt.point.dateLabel : "Start",
+          label,
           subLabel: pt.point.trade ? `T${pt.point.tradeIndex}` : "",
           x: pt.x,
           ratio: tradeIdx / Math.max(1, totalPoints - 1),
         });
       }
     } else {
-      // ──────── MODE 2: TIMELINE (SMART STEPPED EQUITY WITH CALENDAR TIME TICKS) ────────
+      // ──────── MODE 2: TIMELINE (SMART FORWARD TIMELINE PROGRESSION) ────────
       const timeSpan = Math.max(1000, endTime - startTime);
-      const minStepPx = Math.min(18, usableWidth / (points.length * 1.5 || 1));
+      const minStepPx = Math.min(22, usableWidth / (points.length * 1.5 || 1));
 
       let lastX = paddingX;
-      tradeSvgPoints = points.map((p, idx) => {
+      curveNodes = points.map((p, idx) => {
         const val = hasPnl ? p.pnl : p.r;
         let naturalRatio = (p.timestamp - startTime) / timeSpan;
         naturalRatio = Math.max(0, Math.min(1, naturalRatio));
         let x = paddingX + naturalRatio * usableWidth;
 
-        // Ensure strictly forward x progression so same-day trades never stack vertically
         if (idx > 0) {
           x = Math.max(lastX + minStepPx, x);
         }
@@ -307,21 +332,6 @@ export default function PerformanceEquityCurve({ trades = [] }) {
         const y = getY(val);
         return { x, y, point: p };
       });
-
-      // Stepped curve generation: horizontal hold then vertical step
-      steppedPoints.push(`${tradeSvgPoints[0].x},${tradeSvgPoints[0].y}`);
-      for (let i = 1; i < tradeSvgPoints.length; i++) {
-        const prev = tradeSvgPoints[i - 1];
-        const curr = tradeSvgPoints[i];
-        steppedPoints.push(`${curr.x},${prev.y}`);
-        steppedPoints.push(`${curr.x},${curr.y}`);
-      }
-
-      // Hold flat up to the end of the timeline
-      const endX = chartWidth - paddingX;
-      if (endX > lastX) {
-        steppedPoints.push(`${endX},${tradeSvgPoints[tradeSvgPoints.length - 1].y}`);
-      }
 
       // Calendar timeline ticks
       const tickCount = timeframe === "1D" ? 6 : 7;
@@ -348,22 +358,23 @@ export default function PerformanceEquityCurve({ trades = [] }) {
       }
     }
 
-    const polylinePoints = steppedPoints.join(" ");
+    // Generate smooth, continuous trading equity curve path
+    const smoothPathD = getSmoothCurvePath(curveNodes);
 
-    // Filled area polygon underneath the curve
+    // Area fill path beneath the curve
     const fillBottomY = chartHeight - paddingY;
-    const firstPt = steppedPoints[0].split(",");
-    const lastPt = steppedPoints[steppedPoints.length - 1].split(",");
-    const areaPolygonPoints = `${firstPt[0]},${fillBottomY} ${polylinePoints} ${lastPt[0]},${fillBottomY}`;
+    const firstX = curveNodes[0].x.toFixed(1);
+    const lastX = curveNodes[curveNodes.length - 1].x.toFixed(1);
+    const areaPathD = `${smoothPathD} L ${lastX},${fillBottomY} L ${firstX},${fillBottomY} Z`;
 
-    // Filter actual trade points (excluding the baseline point at index 0)
-    const activeTradePoints = tradeSvgPoints.filter((pt) => pt.point.trade);
+    // Filter actual trade points for interactive hover and circle markers
+    const tradePoints = curveNodes.filter((pt) => pt.point.trade);
 
     return {
-      svgPoints: tradeSvgPoints,
-      polylinePoints,
-      areaPolygonPoints,
-      tradePoints: activeTradePoints,
+      svgPoints: curveNodes,
+      smoothPathD,
+      areaPathD,
+      tradePoints,
       ticks,
       minVal,
       maxVal,
@@ -472,7 +483,7 @@ export default function PerformanceEquityCurve({ trades = [] }) {
             style={{
               width: `${chartWidth}px`,
               minWidth: "100%",
-              height: `${chartHeight + 56}px`, // Generous 56px height below SVG so T1, T2 badges are 100% visible
+              height: `${chartHeight + 56}px`, // 56px height below SVG so T1, T2 badges are 100% visible
             }}
             onMouseLeave={() => setHoverData(null)}
           >
@@ -499,12 +510,12 @@ export default function PerformanceEquityCurve({ trades = [] }) {
               <defs>
                 <linearGradient id="curveGradient" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor={strokeColor} stopOpacity="0.22" />
-                  <stop offset="65%" stopColor={strokeColor} stopOpacity="0.06" />
+                  <stop offset="65%" stopColor={strokeColor} stopOpacity="0.05" />
                   <stop offset="100%" stopColor={strokeColor} stopOpacity="0.0" />
                 </linearGradient>
               </defs>
 
-              {/* Zero baseline (Breakeven reference line when dip below 0 occurs) */}
+              {/* Zero baseline (Breakeven reference line with right-anchored badge so it never collides with line) */}
               {svgData.minVal < 0 && (
                 <g>
                   <line
@@ -517,10 +528,19 @@ export default function PerformanceEquityCurve({ trades = [] }) {
                     className="text-black/15 dark:text-white/15"
                     strokeWidth="1"
                   />
+                  <rect
+                    x={chartWidth - paddingX - 70}
+                    y={svgData.zeroY - 18}
+                    width="70"
+                    height="16"
+                    rx="4"
+                    className="fill-neutral-100 dark:fill-white/[0.08]"
+                  />
                   <text
-                    x={paddingX + 4}
-                    y={svgData.zeroY - 4}
-                    className="text-[9px] fill-neutral-400 font-mono font-bold"
+                    x={chartWidth - paddingX - 35}
+                    y={svgData.zeroY - 6}
+                    textAnchor="middle"
+                    className="text-[9.5px] fill-neutral-500 dark:fill-neutral-400 font-mono font-bold select-none"
                   >
                     0.00R (BE)
                   </text>
@@ -528,38 +548,51 @@ export default function PerformanceEquityCurve({ trades = [] }) {
               )}
 
               {/* Area under curve */}
-              {svgData.areaPolygonPoints && (
-                <polygon
+              {svgData.areaPathD && (
+                <path
+                  d={svgData.areaPathD}
                   fill="url(#curveGradient)"
-                  points={svgData.areaPolygonPoints}
                 />
               )}
 
-              {/* Stepped Equity Curve (Authentic Up & Down trajectory) */}
-              <polyline
-                fill="none"
-                stroke={strokeColor}
-                strokeWidth="2.8"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                points={svgData.polylinePoints}
-              />
+              {/* Smooth Trading Equity Curve Line */}
+              {svgData.smoothPathD && (
+                <path
+                  d={svgData.smoothPathD}
+                  fill="none"
+                  stroke={strokeColor}
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              )}
 
-              {/* Data Points on completed trades */}
+              {/* Trade Data Points */}
               {svgData.tradePoints.map((pt, idx) => {
                 const isSelected = hoverData === pt;
                 const isWin = (pt.point.tradeR || 0) >= 0;
                 return (
-                  <circle
-                    key={idx}
-                    cx={pt.x}
-                    cy={pt.y}
-                    r={isSelected ? 6 : 3}
-                    fill={isWin ? "#10b981" : "#ef4444"}
-                    stroke="#ffffff"
-                    strokeWidth={isSelected ? "2.5" : "1"}
-                    className="transition-all cursor-pointer"
-                  />
+                  <g key={idx} className="cursor-pointer">
+                    {isSelected && (
+                      <circle
+                        cx={pt.x}
+                        cy={pt.y}
+                        r="12"
+                        fill={isWin ? "#10b981" : "#ef4444"}
+                        fillOpacity="0.2"
+                        className="animate-pulse"
+                      />
+                    )}
+                    <circle
+                      cx={pt.x}
+                      cy={pt.y}
+                      r={isSelected ? 6 : 3.5}
+                      fill={isWin ? "#10b981" : "#ef4444"}
+                      stroke="#ffffff"
+                      strokeWidth={isSelected ? 2.5 : 1.5}
+                      className="transition-all duration-150"
+                    />
+                  </g>
                 );
               })}
 
