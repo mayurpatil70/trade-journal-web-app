@@ -38,14 +38,28 @@ router.get("/config", (req, res) => {
   });
 });
 
-// 2. Check User Subscription Status (Used by PaywallGuard)
+// 2. Check User Subscription Status (Used by PaywallGuard & client cache)
 router.get("/status/:userId", async (req, res) => {
   try {
-    const { data: user } = await supabase
-      .from("users")
-      .select("email, discord_verified")
-      .eq("id", req.params.userId)
-      .maybeSingle();
+    const rawParam = String(req.params.userId || "").trim();
+    const isEmail = rawParam.includes("@");
+
+    let user = null;
+    if (isEmail) {
+      const { data } = await supabase
+        .from("users")
+        .select("id, email, discord_verified")
+        .ilike("email", rawParam)
+        .maybeSingle();
+      user = data;
+    } else {
+      const { data } = await supabase
+        .from("users")
+        .select("id, email, discord_verified")
+        .eq("id", rawParam)
+        .maybeSingle();
+      user = data;
+    }
 
     const adminEmails = [
       ...(process.env.ADMIN_EMAIL || "").split(","),
@@ -56,32 +70,73 @@ router.get("/status/:userId", async (req, res) => {
       .map((e) => e.trim().toLowerCase())
       .filter(Boolean);
 
-    const userEmail = (user?.email || "").trim().toLowerCase();
-    if (user && adminEmails.includes(userEmail)) {
+    const userEmail = (user?.email || (isEmail ? rawParam : "")).trim().toLowerCase();
+    if (userEmail && adminEmails.includes(userEmail)) {
       return res.json({ success: true, hasPaid: true, discordVerified: true, isAdmin: true });
     }
 
-    const { data: profile, error } = await supabase
-      .from("profiles")
-      .select("trial_ends_at, subscription_ends_at")
-      .eq("id", req.params.userId)
-      .single();
+    // Lookup profile by user.id or by email or rawParam
+    let profile = null;
+    if (user?.id) {
+      const { data } = await supabase
+        .from("profiles")
+        .select("trial_ends_at, subscription_ends_at, account_status")
+        .eq("id", user.id)
+        .maybeSingle();
+      profile = data;
+    }
+    if (!profile && userEmail) {
+      const { data } = await supabase
+        .from("profiles")
+        .select("trial_ends_at, subscription_ends_at, account_status")
+        .ilike("email", userEmail)
+        .maybeSingle();
+      profile = data;
+    }
+    if (!profile && !isEmail) {
+      const { data } = await supabase
+        .from("profiles")
+        .select("trial_ends_at, subscription_ends_at, account_status")
+        .eq("id", rawParam)
+        .maybeSingle();
+      profile = data;
+    }
 
-    if (error && error.code !== "PGRST116") throw error;
+    // Also check journal_subscriptions
+    let hasJournalSub = false;
+    const targetUserId = user?.id || (!isEmail ? rawParam : null);
+    if (targetUserId) {
+      const { data: sub } = await supabase
+        .from("journal_subscriptions")
+        .select("id")
+        .eq("user_id", targetUserId)
+        .eq("status", "paid")
+        .maybeSingle();
+      if (sub) hasJournalSub = true;
+    }
 
     let hasPaid = false;
     const now = new Date();
-    
+
     if (profile) {
       const trialEnds = profile.trial_ends_at ? new Date(profile.trial_ends_at) : null;
       const subEnds = profile.subscription_ends_at ? new Date(profile.subscription_ends_at) : null;
-      
-      if ((subEnds && subEnds > now) || (trialEnds && trialEnds > now)) {
+
+      if ((subEnds && subEnds > now) || (trialEnds && trialEnds > now) || profile.account_status === "active") {
         hasPaid = true;
       }
     }
 
-    res.json({ success: true, hasPaid, discordVerified: user?.discord_verified || false });
+    if (hasJournalSub) {
+      hasPaid = true;
+    }
+
+    res.json({
+      success: true,
+      hasPaid,
+      discordVerified: user?.discord_verified || false,
+      isAdmin: false,
+    });
   } catch (error) {
     console.error("Status check error:", error);
     res

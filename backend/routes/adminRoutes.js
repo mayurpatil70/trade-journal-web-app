@@ -307,6 +307,17 @@ router.post("/user/:userId/grant-access", async (req, res) => {
     const { error } = await supabase.from("profiles").upsert(updatePayload, { onConflict: "id" });
     if (error) throw error;
 
+    if (type === "paid") {
+      await supabase.from("journal_subscriptions").insert({
+        user_id: userId,
+        status: "paid",
+        amount_usdt: Number(days) >= 365 ? 114 : 14,
+        chain: "ADMIN",
+        tx_hash: `admin-grant-${Date.now()}`,
+        paid_at: new Date().toISOString(),
+      });
+    }
+
     res.json({ success: true, message: `Successfully granted ${days} days ${type} access.` });
   } catch (error) {
     console.error("Grant access error:", error);
@@ -381,8 +392,9 @@ router.put("/withdrawal/:id", async (req, res) => {
 router.post("/user/create", async (req, res) => {
   try {
     const { email, type = "paid", days = 30 } = req.body;
-    if (!email || !email.includes("@")) {
-      return res.status(400).json({ success: false, error: "A valid email address is required." });
+    const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/;
+    if (!email || !EMAIL_RE.test(String(email).trim())) {
+      return res.status(400).json({ success: false, error: "A valid email address is required (e.g. user@example.com)." });
     }
 
     const cleanEmail = email.toLowerCase().trim();
@@ -416,6 +428,18 @@ router.post("/user/create", async (req, res) => {
       .upsert(updatePayload, { onConflict: "id" });
 
     if (profileError) throw profileError;
+
+    // 3. If paid, also sync to journal_subscriptions table
+    if (type === "paid") {
+      await supabase.from("journal_subscriptions").insert({
+        user_id: userId,
+        status: "paid",
+        amount_usdt: Number(days) >= 365 ? 114 : 14,
+        chain: "ADMIN",
+        tx_hash: `admin-grant-${Date.now()}`,
+        paid_at: new Date().toISOString(),
+      });
+    }
 
     res.json({
       success: true,
