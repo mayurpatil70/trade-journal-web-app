@@ -147,10 +147,22 @@ export const createTrade = async (req, res) => {
         ? normaliseTradeNumber(tradeData.risk)
         : null;
 
+    const exitPrice = normaliseTradeNumber(
+      tradeData.exit_price !== undefined && tradeData.exit_price !== "" && tradeData.exit_price !== null
+        ? tradeData.exit_price
+        : tradeData.exitPrice !== undefined && tradeData.exitPrice !== "" && tradeData.exitPrice !== null
+        ? tradeData.exitPrice
+        : null
+    );
+    const exitDate = tradeData.exit_date || tradeData.exitDate || null;
+    const exitTime = tradeData.exit_time || tradeData.exitTime || null;
+    const entryDate = tradeData.entry_date || tradeData.entryDate || tradeData.date || null;
+    const entryTime = tradeData.entry_time || tradeData.entryTime || tradeData.time || null;
+
     const insertData = {
       user_id: userId,
-      date: tradeData.date,
-      time: tradeData.time,
+      date: tradeData.date || entryDate,
+      time: tradeData.time || entryTime,
       asset: tradeData.asset,
       direction: tradeData.direction,
       session: tradeData.session,
@@ -173,6 +185,11 @@ export const createTrade = async (req, res) => {
       after_image: imageUrls[1] || null,
       executions: parsedExecutions,
       ...(rawLotSize !== null && { lot_size: rawLotSize }),
+      ...(entryDate && { entry_date: entryDate }),
+      ...(entryTime && { entry_time: entryTime }),
+      ...(exitDate && { exit_date: exitDate }),
+      ...(exitTime && { exit_time: exitTime }),
+      ...(exitPrice !== null && { exit_price: exitPrice }),
     };
 
     let { data, error } = await supabase
@@ -180,14 +197,23 @@ export const createTrade = async (req, res) => {
       .insert([insertData])
       .select();
 
-    if (error && error.message && error.message.includes("lot_size")) {
-      delete insertData.lot_size;
-      const retry = await supabase
-        .from("trades")
-        .insert([insertData])
-        .select();
-      data = retry.data;
-      error = retry.error;
+    if (error && error.message) {
+      let retried = false;
+      const columnsToCheck = ["lot_size", "exit_date", "exit_time", "exit_price", "entry_date", "entry_time"];
+      for (const col of columnsToCheck) {
+        if (error.message.includes(col) && insertData[col] !== undefined) {
+          delete insertData[col];
+          retried = true;
+        }
+      }
+      if (retried) {
+        const retry = await supabase
+          .from("trades")
+          .insert([insertData])
+          .select();
+        data = retry.data;
+        error = retry.error;
+      }
     }
 
     if (error) throw error;
@@ -417,6 +443,16 @@ export const updateTrade = async (req, res) => {
       after_image: imageUrls[1] || null,
       ...(parsedExecutions !== undefined && { executions: parsedExecutions }),
       ...(rawLotSize !== undefined && { lot_size: rawLotSize }),
+      ...(tradeData.entry_date !== undefined && { entry_date: tradeData.entry_date }),
+      ...(tradeData.entryDate !== undefined && { entry_date: tradeData.entryDate }),
+      ...(tradeData.entry_time !== undefined && { entry_time: tradeData.entry_time }),
+      ...(tradeData.entryTime !== undefined && { entry_time: tradeData.entryTime }),
+      ...(tradeData.exit_date !== undefined && { exit_date: tradeData.exit_date }),
+      ...(tradeData.exitDate !== undefined && { exit_date: tradeData.exitDate }),
+      ...(tradeData.exit_time !== undefined && { exit_time: tradeData.exit_time }),
+      ...(tradeData.exitTime !== undefined && { exit_time: tradeData.exitTime }),
+      ...(tradeData.exit_price !== undefined && { exit_price: normaliseTradeNumber(tradeData.exit_price) }),
+      ...(tradeData.exitPrice !== undefined && { exit_price: normaliseTradeNumber(tradeData.exitPrice) }),
     };
 
     let { data, error } = await supabase
@@ -426,16 +462,25 @@ export const updateTrade = async (req, res) => {
       .eq("user_id", userId)
       .select();
 
-    if (error && error.message && error.message.includes("lot_size")) {
-      delete updateFields.lot_size;
-      const retry = await supabase
-        .from("trades")
-        .update(updateFields)
-        .eq("id", id)
-        .eq("user_id", userId)
-        .select();
-      data = retry.data;
-      error = retry.error;
+    if (error && error.message) {
+      let retried = false;
+      const columnsToCheck = ["lot_size", "exit_date", "exit_time", "exit_price", "entry_date", "entry_time"];
+      for (const col of columnsToCheck) {
+        if (error.message.includes(col) && updateFields[col] !== undefined) {
+          delete updateFields[col];
+          retried = true;
+        }
+      }
+      if (retried) {
+        const retry = await supabase
+          .from("trades")
+          .update(updateFields)
+          .eq("id", id)
+          .eq("user_id", userId)
+          .select();
+        data = retry.data;
+        error = retry.error;
+      }
     }
 
     if (error) throw error;

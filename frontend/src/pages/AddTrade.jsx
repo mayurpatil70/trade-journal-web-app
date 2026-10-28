@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import api from "../api/axios";
 import AppleSelect from "../components/ui/AppleSelect";
+import DateTimePickerPopover from "../components/ui/DateTimePickerPopover";
 import {
   Save,
   X,
@@ -109,6 +110,15 @@ export default function AddTrade() {
       hour: "2-digit",
       minute: "2-digit",
     }),
+    entry_date: new Date().toISOString().slice(0, 10),
+    entry_time: new Date().toLocaleTimeString("en-US", {
+      hour12: false,
+      hour: "2-digit",
+      minute: "2-digit",
+    }),
+    exit_date: "",
+    exit_time: "",
+    exit_price: "",
     asset: location?.state?.asset || "XAUUSD",
     direction: location?.state?.direction || "LONG",
     session: "London",
@@ -1097,15 +1107,26 @@ export default function AddTrade() {
                 <div className="space-y-6">
                   <div>
                     <label className={labelClass}>
-                      Date <span className="text-red-400">*</span>
+                      Entry Date & Time (GMT+0:00) <span className="text-red-400">*</span>
                     </label>
-                    <input
-                      type="date"
-                      name="date"
-                      value={formData.date}
-                      onChange={handleChange}
-                      className={`${inputClass} dark:[color-scheme:dark] [color-scheme:light] ${fieldErrors.date ? "border-red-500 focus:ring-red-500 ring-1 ring-red-500" : ""}`}
-                      required
+                    <DateTimePickerPopover
+                      value={formData.date ? new Date(`${formData.date}T${formData.time || "12:00"}`) : new Date()}
+                      onChange={(newD) => {
+                        if (!newD) {
+                          setFormData((p) => ({ ...p, date: "", time: "", entry_date: "", entry_time: "" }));
+                          return;
+                        }
+                        const dateStr = newD.toISOString().slice(0, 10);
+                        const timeStr = newD.toLocaleTimeString("en-US", { hour12: false, hour: "2-digit", minute: "2-digit" });
+                        setFormData((p) => ({
+                          ...p,
+                          date: dateStr,
+                          time: timeStr,
+                          entry_date: dateStr,
+                          entry_time: timeStr,
+                        }));
+                      }}
+                      placeholder="Select Entry Date & Time"
                     />
                     {fieldErrors.date && (
                       <p className="text-red-400 text-xs mt-1">
@@ -1114,14 +1135,23 @@ export default function AddTrade() {
                     )}
                   </div>
                   <div>
-                    <label className={labelClass}>Time</label>
-                    <input
-                      type="time"
-                      name="time"
-                      value={formData.time}
-                      onChange={handleChange}
-                      className={`${inputClass} dark:[color-scheme:dark] [color-scheme:light]`}
-                      required
+                    <label className={labelClass}>Exit Date & Time (GMT+0:00) <span className="text-neutral-400 text-xs font-normal">(Optional)</span></label>
+                    <DateTimePickerPopover
+                      value={formData.exit_date ? new Date(`${formData.exit_date}T${formData.exit_time || "12:00"}`) : null}
+                      onChange={(newD) => {
+                        if (!newD) {
+                          setFormData((p) => ({ ...p, exit_date: "", exit_time: "" }));
+                          return;
+                        }
+                        const dateStr = newD.toISOString().slice(0, 10);
+                        const timeStr = newD.toLocaleTimeString("en-US", { hour12: false, hour: "2-digit", minute: "2-digit" });
+                        setFormData((p) => ({
+                          ...p,
+                          exit_date: dateStr,
+                          exit_time: timeStr,
+                        }));
+                      }}
+                      placeholder="Optional"
                     />
                   </div>
                 </div>

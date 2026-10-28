@@ -1,7 +1,21 @@
 import axios from "axios";
 
+const getBaseUrl = () => {
+  if (typeof window !== "undefined") {
+    const host = window.location.hostname;
+    if (host && host !== "localhost" && host !== "127.0.0.1") {
+      const envUrl = import.meta.env.VITE_API_URL;
+      if (envUrl && !envUrl.includes("localhost") && !envUrl.includes("127.0.0.1")) {
+        return envUrl;
+      }
+      return "https://forexnotes-web-app.onrender.com";
+    }
+  }
+  return import.meta.env.VITE_API_URL || "http://localhost:3000";
+};
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "http://localhost:3000",
+  baseURL: getBaseUrl(),
   withCredentials: true,
   timeout: 30000,
   headers: {

@@ -1,6 +1,11 @@
 import { useEffect, useState, useMemo } from "react";
 import { EdgeBreakdown, TradingHealth, BacktestSummary } from "../components/dashboard/PerformanceHub";
 import AccountFilter from "../components/AccountFilter";
+import TradeFXBookTopBar from "../components/dashboard/TradeFXBookTopBar";
+import TradeFXBookKpiCards from "../components/dashboard/TradeFXBookKpiCards";
+import PerformanceEquityCurve from "../components/dashboard/PerformanceEquityCurve";
+import MonthlyPnlCalendar from "../components/dashboard/MonthlyPnlCalendar";
+import TradeFXBookAddTradeModal from "../components/dashboard/TradeFXBookAddTradeModal";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
 import { mark3DLoaderShown } from "../utils/navigationState";
@@ -16,120 +21,8 @@ import {
   ShieldCheck,
   ChevronRight,
   Globe,
+  Inbox,
 } from "lucide-react";
-
-const getGreeting = () => {
-  const hour = new Date().getHours();
-  if (hour < 12) return "Good morning";
-  if (hour < 18) return "Good afternoon";
-  return "Good evening";
-};
-
-// Mini SVG Equity Curve
-const EquityCurve = ({ data, trades = [] }) => {
-  const [hover, setHover] = useState(null);
-  if (!data || data.length < 2) {
-    return (
-      <div className="w-full h-full flex flex-col items-center justify-center text-gray-600">
-        <Activity className="w-8 h-8 mb-2 opacity-20" />
-        <p className="text-xs">Log more trades to generate equity curve</p>
-      </div>
-    );
-  }
-
-  const min = Math.min(...data);
-  const max = Math.max(...data);
-  const range = max - min || 1;
-  const width = 800;
-  const height = 200;
-
-  const points = data.map((d, i) => {
-    const x = (i / (data.length - 1)) * width;
-    const y = height - ((d - min) / range) * height;
-    return `${x},${y}`;
-  });
-
-  const isProfitable = data[data.length - 1] >= data[0];
-  const strokeColor = isProfitable ? "#34d399" : "#f87171";
-  const fillColor = isProfitable ? "url(#emeraldGradient)" : "url(#redGradient)";
-
-  const onMove = (e) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const ratio = Math.min(Math.max((e.clientX - rect.left) / rect.width, 0), 1);
-    setHover({ i: Math.round(ratio * (data.length - 1)), ratio });
-  };
-
-  const hi = hover?.i;
-  const ht = hi > 0 ? trades[hi - 1] : null;
-  const hx = hi != null ? (hi / (data.length - 1)) * width : 0;
-  const hy = hi != null ? height - ((data[hi] - min) / range) * height : 0;
-
-  return (
-    <div className="relative w-full h-full" onMouseMove={onMove} onMouseLeave={() => setHover(null)}>
-      <svg viewBox={`0 -10 ${width} ${height + 20}`} className="w-full h-full overflow-visible">
-        <defs>
-          <linearGradient id="emeraldGradient" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#34d399" stopOpacity="0.2" />
-            <stop offset="100%" stopColor="#34d399" stopOpacity="0" />
-          </linearGradient>
-          <linearGradient id="redGradient" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#f87171" stopOpacity="0.2" />
-            <stop offset="100%" stopColor="#f87171" stopOpacity="0" />
-          </linearGradient>
-        </defs>
-        <polyline fill="none" stroke={strokeColor} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" points={points.join(" ")} className="drop-shadow-lg" />
-        <polygon fill={fillColor} points={`${0},${height} ${points.join(" ")} ${width},${height}`} />
-        {hi != null && (
-          <>
-            <line x1={hx} x2={hx} y1={-10} y2={height + 10} stroke="#ffffff" strokeOpacity="0.15" strokeDasharray="4 4" />
-            <circle cx={hx} cy={hy} r="6" fill={strokeColor} stroke="#101216" strokeWidth="2" />
-          </>
-        )}
-      </svg>
-      {hi != null && (
-        <div
-          className="absolute top-0 z-10 w-52 pointer-events-none rounded-xl border border-white/10 bg-[#0b0d10]/95 p-3 text-[11px] shadow-2xl backdrop-blur"
-          style={{ left: `${hover.ratio * 100}%`, transform: `translateX(${hover.ratio > 0.6 ? "-105%" : "5%"})` }}
-        >
-          {ht ? (
-            <>
-              <div className="flex justify-between text-gray-400"><span>{ht.date}</span><span>#{hi}</span></div>
-              <div className="mt-1 font-semibold text-white flex items-center gap-1.5">
-                <span>{ht.asset}</span>
-                <span
-                  className={`inline-flex items-center gap-0.5 text-[9px] font-bold px-1.5 py-0.5 rounded border ${
-                    ht.direction === "LONG"
-                      ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/25"
-                      : "bg-red-500/15 text-red-400 border-red-500/25"
-                  }`}
-                >
-                  {ht.direction === "LONG" ? (
-                    <ArrowUp className="w-2.5 h-2.5" />
-                  ) : (
-                    <ArrowDown className="w-2.5 h-2.5" />
-                  )}
-                  {ht.direction}
-                </span>
-              </div>
-              <div className={`font-mono font-bold ${(parseFloat(ht.r_multiple) || 0) >= 0 ? "text-emerald-400" : "text-red-400"}`}>
-                {(parseFloat(ht.r_multiple) || 0) >= 0 ? "+" : ""}{(parseFloat(ht.r_multiple) || 0).toFixed(2)}R
-              </div>
-              <div className="mt-1.5 space-y-0.5 text-gray-400">
-                {ht.setup && <div>Setup: <span className="text-gray-200">{ht.setup}</span></div>}
-                {ht.session && <div>Session: <span className="text-gray-200">{ht.session}</span></div>}
-              </div>
-            </>
-          ) : (
-            <div className="text-gray-400">Start</div>
-          )}
-          <div className="mt-2 border-t border-white/10 pt-1.5 text-gray-400">
-            Equity: <span className="font-mono text-white">{data[hi].toFixed(2)}R</span>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-};
 
 export const normalizeTradeR = (t) => {
   if (!t) return 0;
@@ -153,43 +46,67 @@ export const isTradeWin = (t) => {
 // Pure stat calculator
 function calcStats(trades) {
   let wins = 0, totalR = 0, grossProfit = 0, grossLoss = 0, currentEquity = 0;
+  let winSum = 0, lossSum = 0, winCount = 0, lossCount = 0;
+  let bestTrade = 0, worstTrade = 0;
   const equityData = [0];
+
   trades.forEach((t) => {
     const res = (t.result || "").toLowerCase().trim();
     const r = normalizeTradeR(t);
     totalR += r;
+
+    if (r > bestTrade) bestTrade = r;
+    if (r < worstTrade) worstTrade = r;
+
     if (res === "win" || (res !== "loss" && res !== "be" && r > 0)) {
       wins++;
+      winCount++;
+      winSum += r;
       grossProfit += r;
     } else if (res === "loss" || r < 0) {
+      lossCount++;
+      lossSum += Math.abs(r);
       grossLoss += Math.abs(r);
     }
     currentEquity += r;
     equityData.push(currentEquity);
   });
+
   const winRate = trades.length ? (wins / trades.length) * 100 : 0;
   const avgR = trades.length ? totalR / trades.length : 0;
+  const avgWin = winCount ? winSum / winCount : 0;
+  const avgLoss = lossCount ? lossSum / lossCount : 0;
   const profitFactor = grossLoss > 0 ? grossProfit / grossLoss : grossProfit > 0 ? 99 : 0;
+
   let maxPeak = 0, maxDD = 0;
   equityData.forEach((eq) => {
     if (eq > maxPeak) maxPeak = eq;
     const dd = maxPeak - eq;
     if (dd > maxDD) maxDD = dd;
   });
+
   return {
-    totalR: totalR.toFixed(2), winRate: winRate.toFixed(1), avgR: avgR.toFixed(2),
-    profitFactor: profitFactor.toFixed(2), maxDrawdown: maxDD.toFixed(2),
-    totalTrades: trades.length, equityData,
+    totalR: totalR.toFixed(2),
+    winRate: winRate.toFixed(1),
+    avgR: avgR.toFixed(2),
+    avgWin: avgWin.toFixed(2),
+    avgLoss: avgLoss.toFixed(2),
+    bestTrade: bestTrade.toFixed(2),
+    worstTrade: worstTrade.toFixed(2),
+    profitFactor: profitFactor.toFixed(2),
+    maxDrawdown: maxDD.toFixed(2),
+    totalTrades: trades.length,
+    equityData,
   };
 }
 
-// Module-scoped cache for trades
 let cachedDashboardTrades = null;
 
 export default function Dashboard() {
   const [allTrades, setAllTrades] = useState(() => cachedDashboardTrades || []);
   const [isLoading, setIsLoading] = useState(() => !cachedDashboardTrades);
   const [selectedAccount, setSelectedAccount] = useState("");
+  const [isAddTradeModalOpen, setIsAddTradeModalOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -212,7 +129,14 @@ export default function Dashboard() {
     }
   };
 
-  // ── ALL useMemo HOOKS MUST BE BEFORE ANY EARLY RETURN ──
+  const accountNames = useMemo(() => {
+    const names = new Set();
+    allTrades.forEach((t) => {
+      if (t.account_name && t.account_name.trim()) names.add(t.account_name.trim());
+    });
+    return Array.from(names).sort();
+  }, [allTrades]);
+
   const trades = useMemo(() => {
     if (!selectedAccount) return allTrades;
     return allTrades.filter((t) => t.account_name === selectedAccount);
@@ -220,9 +144,19 @@ export default function Dashboard() {
 
   const stats = useMemo(() => calcStats(trades), [trades]);
 
+  const openPositions = useMemo(() => {
+    return trades.filter((t) => t.result === "open");
+  }, [trades]);
+
+  const recentActivityTrades = useMemo(() => {
+    return [...trades]
+      .sort((a, b) => new Date(b.created_at || b.date) - new Date(a.created_at || a.date))
+      .slice(0, 5);
+  }, [trades]);
+
   const analyticsSetups = useMemo(() => {
     const setups = {};
-    trades.forEach(t => {
+    trades.forEach((t) => {
       if (!t.setup) return;
       if (!setups[t.setup]) setups[t.setup] = { total: 0, wins: 0, r: 0 };
       setups[t.setup].total++;
@@ -231,12 +165,13 @@ export default function Dashboard() {
     });
     return Object.entries(setups)
       .map(([name, d]) => ({ name, netR: d.r, total: d.total, winRate: (d.wins / d.total) * 100 }))
-      .sort((a, b) => b.netR - a.netR).slice(0, 3);
+      .sort((a, b) => b.netR - a.netR)
+      .slice(0, 3);
   }, [trades]);
 
   const topEmotion = useMemo(() => {
     const map = {};
-    trades.forEach(t => {
+    trades.forEach((t) => {
       if (!t.emotion_before) return;
       if (!map[t.emotion_before]) map[t.emotion_before] = { r: 0, count: 0 };
       map[t.emotion_before].r += normalizeTradeR(t);
@@ -244,254 +179,327 @@ export default function Dashboard() {
     });
     return Object.entries(map)
       .map(([name, d]) => ({ name, netR: d.r, count: d.count }))
-      .sort((a, b) => b.netR - a.netR).slice(0, 3);
+      .sort((a, b) => b.netR - a.netR)
+      .slice(0, 3);
   }, [trades]);
 
   const mistakesData = useMemo(() => {
-    const unforced = trades.filter(t => (t.result || "").toLowerCase() === "loss" && t.rule_break === "yes");
+    const unforced = trades.filter((t) => (t.result || "").toLowerCase() === "loss" && t.rule_break === "yes");
     const cost = unforced.reduce((acc, t) => acc + normalizeTradeR(t), 0);
     return { count: unforced.length, cost };
   }, [trades]);
 
-  const insight = useMemo(() => {
-    if (trades.length < 5) return { text: "Log more trades to unlock behavioral insights.", type: "neutral" };
-    if (parseFloat(stats.profitFactor) < 1.0) return { text: "Your profit factor has dropped below 1.0. Review your recent losing trades to plug the leak.", type: "warning" };
-    if (parseFloat(stats.winRate) > 60 && parseFloat(stats.avgR) > 0) return { text: "Strong performance pattern detected. Your edge is currently playing out well.", type: "success" };
-    return { text: "Your average R-multiple is stable, but consistency could improve.", type: "neutral" };
-  }, [trades, stats]);
-
-  // ── SKELETON WHILE BACKGROUND DATA INITIALIZES ──
   if (isLoading) {
     return (
-      <div className="p-6 md:p-10 max-w-7xl mx-auto space-y-8 pb-20 animate-pulse">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-          <div className="space-y-2">
-            <div className="h-8 w-64 bg-black/5 dark:bg-white/5 rounded-2xl" />
-            <div className="h-4 w-48 bg-black/5 dark:bg-white/5 rounded-xl" />
-          </div>
-          <div className="flex items-center gap-3 md:pr-24">
-            <div className="h-10 w-36 bg-black/5 dark:bg-white/5 rounded-2xl" />
-            <div className="h-10 w-28 bg-emerald-500/20 rounded-2xl" />
-          </div>
-        </div>
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-          {[...Array(5)].map((_, i) => (
-            <div key={i} className="h-24 rounded-3xl bg-black/5 dark:bg-white/5 border border-black/[0.04] dark:border-white/[0.06]" />
+      <div className="w-full px-4 sm:px-6 lg:px-8 py-6 space-y-6 pb-20 animate-pulse">
+        <div className="h-14 rounded-2xl bg-black/5 dark:bg-white/5" />
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="h-28 rounded-3xl bg-black/5 dark:bg-white/5" />
           ))}
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 h-72 rounded-3xl bg-black/5 dark:bg-white/5 border border-black/[0.04] dark:border-white/[0.06]" />
-          <div className="h-72 rounded-3xl bg-black/5 dark:bg-white/5 border border-black/[0.04] dark:border-white/[0.06]" />
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
+          <div className="xl:col-span-7 h-80 rounded-3xl bg-black/5 dark:bg-white/5" />
+          <div className="xl:col-span-5 h-80 rounded-3xl bg-black/5 dark:bg-white/5" />
         </div>
       </div>
     );
   }
 
   return (
-    <div className="p-6 md:p-10 max-w-7xl mx-auto space-y-8 pb-20">
+    <div className="w-full px-4 sm:px-6 lg:px-8 py-6 space-y-6 pb-20">
+      {/* ── 1. TRADEFXBOOK TOP HORIZONTAL BAR (Screenshots 1 & 2) ── */}
+      <TradeFXBookTopBar
+        onOpenAddTradeModal={() => setIsAddTradeModalOpen(true)}
+        onOpenSearch={() => {
+          window.dispatchEvent(new KeyboardEvent("keydown", { key: "k", metaKey: true }));
+        }}
+      />
 
-      {/* 1. HERO HEADER */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-        <div>
-          <h1 className="font-serif text-3xl font-medium text-neutral-800 dark:text-neutral-100">
-            {getGreeting()},{" "}
-            <span className="text-neutral-900 dark:text-white font-semibold">
-              {localStorage.getItem("userEmail")?.split("@")[0] || "Trader"}
-            </span>
-          </h1>
-          <p className="text-neutral-500 dark:text-neutral-400 mt-1 text-[13px]">
-            Your trading performance at a glance.
-          </p>
-        </div>
-        <div className="flex items-center gap-3 flex-wrap md:pr-28">
-          <AccountFilter trades={allTrades} selectedAccount={selectedAccount} onChange={setSelectedAccount} />
+      {/* ── ACCOUNT TABS & ACCOUNT-WISE FILTER (All Accounts / Specific Accounts) ── */}
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        {/* Horizontal scrollable Apple Segmented Tabs for 1-click account switching */}
+        <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-neutral-100 dark:bg-white/[0.05] border border-black/[0.04] dark:border-white/[0.06] overflow-x-auto scrollbar-none max-w-full">
           <button
-            onClick={() => navigate("/add-trade")}
-            className="flex items-center gap-2 px-6 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-white font-semibold rounded-2xl transition-all text-[13px] shadow-lg shadow-emerald-500/25 active:scale-95 cursor-pointer"
+            type="button"
+            onClick={() => setSelectedAccount("")}
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
+              !selectedAccount
+                ? "bg-white dark:bg-[#1c2233] text-blue-600 dark:text-blue-400 shadow-sm border border-black/[0.05] dark:border-white/[0.1]"
+                : "text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
+            }`}
           >
-            <PlusCircle className="w-4 h-4" /> Log Trade
+            <span>All Accounts</span>
+            <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-black/[0.05] dark:bg-white/[0.08] font-mono">
+              {allTrades.length}
+            </span>
+          </button>
+
+          {accountNames.map((acc) => {
+            const count = allTrades.filter((t) => t.account_name === acc).length;
+            return (
+              <button
+                key={acc}
+                type="button"
+                onClick={() => setSelectedAccount(acc)}
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
+                  selectedAccount === acc
+                    ? "bg-white dark:bg-[#1c2233] text-blue-600 dark:text-blue-400 shadow-sm border border-black/[0.05] dark:border-white/[0.1]"
+                    : "text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
+                }`}
+              >
+                <span>{acc}</span>
+                <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-black/[0.05] dark:bg-white/[0.08] font-mono">
+                  {count}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="flex items-center gap-3">
+          <AccountFilter trades={allTrades} selectedAccount={selectedAccount} onChange={setSelectedAccount} />
+          <span className="text-xs text-neutral-500 dark:text-neutral-400 font-medium hidden md:inline">
+            {selectedAccount ? `Filtered: ${selectedAccount}` : "All Accounts"}
+          </span>
+        </div>
+      </div>
+
+      {/* ── 2. TRADEFXBOOK 4 KPI CARDS (Screenshot 1) ── */}
+      <TradeFXBookKpiCards stats={stats} trades={trades} />
+
+      {/* ── 3. PERFORMANCE EQUITY CURVE & MONTHLY P&L (Screenshots 1 & 3) ── */}
+      {/* Left: Responsive Equity Curve (dates at down, scrollbar, 1d/1w/1m/1y) | Right: Monthly P&L Calendar */}
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
+        <div className="xl:col-span-7">
+          <PerformanceEquityCurve trades={trades} />
+        </div>
+        <div className="xl:col-span-5">
+          <MonthlyPnlCalendar
+            trades={trades}
+            onTradeClick={(t) => {
+              navigate("/trades");
+            }}
+          />
+        </div>
+      </div>
+
+      {/* ── 4. OPEN POSITIONS & RECENT ACTIVITY (Screenshots 1 & 2) ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Open Positions Card */}
+        <div className="rounded-3xl p-6 bg-white dark:bg-[#121622] border border-black/[0.06] dark:border-white/[0.08] shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] flex flex-col justify-between">
+          <div>
+            <h3 className="text-sm font-bold text-neutral-900 dark:text-white mb-4">
+              Open Positions
+            </h3>
+            {openPositions.length === 0 ? (
+              <div className="py-12 flex flex-col items-center justify-center text-neutral-400 dark:text-neutral-500">
+                <Inbox className="w-8 h-8 mb-2 opacity-30" />
+                <p className="text-xs font-medium">No open positions</p>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {openPositions.slice(0, 3).map((t, idx) => (
+                  <div
+                    key={idx}
+                    className="p-3 rounded-2xl bg-neutral-50 dark:bg-white/[0.03] border border-black/[0.04] dark:border-white/[0.06] flex items-center justify-between"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <span className="font-bold text-xs text-neutral-900 dark:text-white">{t.asset}</span>
+                      <span className="text-[10px] uppercase font-bold text-blue-500">{t.direction}</span>
+                    </div>
+                    <span className="text-xs font-mono font-semibold text-amber-500">In Play</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+          <button
+            onClick={() => navigate("/trades")}
+            className="mt-4 pt-3 border-t border-black/[0.05] dark:border-white/[0.06] text-xs font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 flex items-center gap-1 group cursor-pointer"
+          >
+            <span>View All Positions</span>
+            <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+          </button>
+        </div>
+
+        {/* Recent Activity Card */}
+        <div className="rounded-3xl p-6 bg-white dark:bg-[#121622] border border-black/[0.06] dark:border-white/[0.08] shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-sm font-bold text-neutral-900 dark:text-white">
+                Recent Activity
+              </h3>
+              <span className="text-xs text-neutral-400">{recentActivityTrades.length} trades</span>
+            </div>
+            {recentActivityTrades.length === 0 ? (
+              <div className="py-12 flex flex-col items-center justify-center text-neutral-400 dark:text-neutral-500">
+                <Clock className="w-8 h-8 mb-2 opacity-30" />
+                <p className="text-xs font-medium">No recent activity</p>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {recentActivityTrades.map((t, idx) => {
+                  const r = normalizeTradeR(t);
+                  const isWin = isTradeWin(t);
+                  return (
+                    <div
+                      key={idx}
+                      onClick={() => navigate("/trades")}
+                      className="p-2.5 rounded-2xl bg-neutral-50 dark:bg-white/[0.03] border border-black/[0.04] dark:border-white/[0.06] flex items-center justify-between hover:border-blue-500/25 transition-all cursor-pointer"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <span className={`w-2 h-2 rounded-full ${t.direction === "LONG" ? "bg-blue-500" : "bg-rose-500"}`} />
+                        <div>
+                          <p className="text-xs font-bold text-neutral-900 dark:text-white">{t.asset}</p>
+                          <p className="text-[10px] text-neutral-400">{t.date}</p>
+                        </div>
+                      </div>
+                      <span
+                        className={`text-xs font-bold font-mono px-2 py-0.5 rounded-lg ${
+                          isWin ? "text-blue-600 dark:text-blue-400 bg-blue-500/10" : "text-rose-600 dark:text-rose-400 bg-rose-500/10"
+                        }`}
+                      >
+                        {r >= 0 ? "+" : ""}{r.toFixed(2)}R
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+          <button
+            onClick={() => navigate("/trades")}
+            className="mt-4 pt-3 border-t border-black/[0.05] dark:border-white/[0.06] text-xs font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 flex items-center gap-1 group cursor-pointer"
+          >
+            <span>View All Activity</span>
+            <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
           </button>
         </div>
       </div>
 
-      {/* 2. KPI ROW (Apple macOS Bento Box Row) */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-        {[
-          {
-            label: "Net R-Multiple",
-            value: `${stats.totalR >= 0 ? "+" : ""}${stats.totalR}R`,
-            color: parseFloat(stats.totalR) >= 0 ? "text-emerald-500 dark:text-emerald-400" : "text-rose-500 dark:text-rose-400",
-          },
-          { label: "Win Rate", value: `${stats.winRate}%`, color: "text-neutral-900 dark:text-white" },
-          { label: "Profit Factor", value: stats.profitFactor, color: "text-neutral-900 dark:text-white" },
-          {
-            label: "Average R",
-            value: `${parseFloat(stats.avgR) >= 0 ? "+" : ""}${stats.avgR}R`,
-            color: "text-neutral-700 dark:text-neutral-300",
-          },
-          { label: "Max Drawdown", value: `-${stats.maxDrawdown}R`, color: "text-rose-500 dark:text-rose-400" },
-        ].map((kpi, i) => (
-          <div key={i} className="mac-bento-card rounded-3xl p-5">
-            <p className="text-[11px] font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-widest mb-2">
-              {kpi.label}
-            </p>
-            <p className={`ledger-figure text-3xl font-bold ${kpi.color}`}>{kpi.value}</p>
-          </div>
-        ))}
-      </div>
-
-      {/* 3. MAIN PERFORMANCE AREA */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 mac-bento-card rounded-3xl p-6 flex flex-col">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h2 className="text-[15px] font-bold text-neutral-900 dark:text-white">Equity Progression (R)</h2>
-              <p className="text-[12px] text-neutral-500 dark:text-neutral-400 mt-1">
-                Cumulative R-Multiple across {selectedAccount ? `"${selectedAccount}"` : "all trades"}
-              </p>
+      {/* ── 5. TOP PERFORMERS & QUICK STATS (Screenshot 2) ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Top Performers */}
+        <div className="rounded-3xl p-6 bg-white dark:bg-[#121622] border border-black/[0.06] dark:border-white/[0.08] shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)]">
+          <h3 className="text-sm font-bold text-neutral-900 dark:text-white mb-4">
+            Top Performers
+          </h3>
+          {analyticsSetups.length === 0 ? (
+            <p className="text-xs text-neutral-400 py-6 text-center">No trading data yet</p>
+          ) : (
+            <div className="space-y-3">
+              {analyticsSetups.map((s, i) => (
+                <div key={i} className="flex items-center justify-between p-3 rounded-2xl bg-neutral-50 dark:bg-white/[0.03]">
+                  <div>
+                    <span className="text-xs font-bold text-neutral-900 dark:text-white">{s.name}</span>
+                    <p className="text-[10px] text-neutral-400">{s.total} trades • {s.winRate.toFixed(0)}% Win Rate</p>
+                  </div>
+                  <span className="text-xs font-bold font-mono text-blue-600 dark:text-blue-400">
+                    +{s.netR.toFixed(2)}R
+                  </span>
+                </div>
+              ))}
             </div>
-            <div className="flex items-center gap-2 text-xs font-medium text-neutral-500 dark:text-neutral-400">
-              <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 dark:bg-emerald-500/15 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[11px] font-semibold">
-                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> New Highs
-              </span>
-            </div>
-          </div>
-          <div className="flex-1 min-h-[250px] relative">
-            <EquityCurve data={stats.equityData} trades={trades} />
-          </div>
+          )}
         </div>
 
-        <div className="flex flex-col gap-6">
-          <div className="relative overflow-hidden flex flex-col justify-between rounded-3xl p-6 bg-white/70 dark:bg-[#10131b]/70 backdrop-blur-2xl border border-black/[0.06] dark:border-white/[0.08] shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] hover:border-emerald-500/30 dark:hover:border-emerald-500/30 transition-all duration-300 group">
-            {/* Ambient emerald edge glow */}
-            <div className="pointer-events-none absolute -top-12 -right-12 w-36 h-36 rounded-full bg-emerald-500/[0.07] dark:bg-emerald-500/[0.12] blur-2xl" />
-
-            <div className="relative z-10">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest flex items-center gap-1.5">
-                  <Globe className="w-3.5 h-3.5" /> Economic Calendar
-                </h3>
-                <span className="text-[10px] font-semibold text-neutral-500 dark:text-neutral-400 bg-black/[0.04] dark:bg-white/[0.06] border border-black/[0.04] dark:border-white/[0.08] px-2 py-0.5 rounded-full">
-                  Live Feed
-                </span>
-              </div>
-              <p className="text-neutral-600 dark:text-neutral-300 text-[13px] leading-relaxed mb-4 font-normal">
-                Stay ahead of the markets. Track upcoming high-impact economic events before you execute your trades.
+        {/* Quick Stats Grid */}
+        <div className="rounded-3xl p-6 bg-white dark:bg-[#121622] border border-black/[0.06] dark:border-white/[0.08] shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)]">
+          <h3 className="text-sm font-bold text-neutral-900 dark:text-white mb-4">
+            Quick Stats
+          </h3>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="p-3.5 rounded-2xl bg-neutral-50 dark:bg-white/[0.03] border border-black/[0.04] dark:border-white/[0.05]">
+              <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider">Avg Win</p>
+              <p className="text-lg font-bold font-mono text-blue-600 dark:text-blue-400 mt-1">
+                +{stats.avgWin}R
               </p>
             </div>
-
-            <div className="relative z-10 mt-2 pt-4 border-t border-black/[0.06] dark:border-white/[0.08] flex items-center justify-between gap-3">
-              <button
-                onClick={() => navigate("/affiliate")}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 dark:border-emerald-500/30 transition-all active:scale-95 cursor-pointer"
-              >
-                <img src="/logo3d.png" alt="ForexNotes" className="w-3.5 h-3.5 object-contain inline-block shrink-0" />
-                <span>Get 10% Off with Affiliate</span>
-              </button>
-              <button
-                onClick={() => navigate("/news")}
-                className="text-[12px] font-semibold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 flex items-center gap-1 transition-colors group/link cursor-pointer"
-              >
-                <span>View Calendar</span>
-                <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover/link:translate-x-0.5" />
-              </button>
+            <div className="p-3.5 rounded-2xl bg-neutral-50 dark:bg-white/[0.03] border border-black/[0.04] dark:border-white/[0.05]">
+              <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider">Avg Loss</p>
+              <p className="text-lg font-bold font-mono text-rose-500 mt-1">
+                -{stats.avgLoss}R
+              </p>
+            </div>
+            <div className="p-3.5 rounded-2xl bg-neutral-50 dark:bg-white/[0.03] border border-black/[0.04] dark:border-white/[0.05]">
+              <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider">Best Trade</p>
+              <p className="text-lg font-bold font-mono text-blue-600 dark:text-blue-400 mt-1">
+                +{stats.bestTrade}R
+              </p>
+            </div>
+            <div className="p-3.5 rounded-2xl bg-neutral-50 dark:bg-white/[0.03] border border-black/[0.04] dark:border-white/[0.05]">
+              <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider">Worst Trade</p>
+              <p className="text-lg font-bold font-mono text-rose-500 mt-1">
+                {stats.worstTrade}R
+              </p>
             </div>
           </div>
-          <TradingHealth trades={trades} />
         </div>
       </div>
 
+      {/* ── 6. ECONOMIC CALENDAR & TRADING HEALTH ── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2"><EdgeBreakdown trades={trades} /></div>
+        <div className="lg:col-span-2 relative overflow-hidden flex flex-col justify-between rounded-3xl p-6 bg-white dark:bg-[#121622] border border-black/[0.06] dark:border-white/[0.08] shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)]">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest flex items-center gap-1.5">
+              <Globe className="w-3.5 h-3.5" /> Economic Calendar Feed
+            </h3>
+            <span className="text-[10px] font-semibold text-neutral-500 dark:text-neutral-400 bg-neutral-100 dark:bg-white/[0.06] px-2 py-0.5 rounded-full">
+              Live Macro
+            </span>
+          </div>
+          <p className="text-neutral-600 dark:text-neutral-300 text-sm leading-relaxed mb-4">
+            Track upcoming high-impact central bank announcements, CPI releases, and interest rate decisions before executing.
+          </p>
+          <div className="mt-2 pt-4 border-t border-black/[0.06] dark:border-white/[0.08] flex items-center justify-between">
+            <span className="text-xs text-neutral-400">Never get caught off guard by volatility spikes</span>
+            <button
+              onClick={() => navigate("/news")}
+              className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 cursor-pointer"
+            >
+              <span>View Full Calendar</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
+
+        <TradingHealth trades={trades} />
+      </div>
+
+      {/* ── 7. EDGE BREAKDOWN & BACKTEST SUMMARY ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
+          <EdgeBreakdown trades={trades} />
+        </div>
         <BacktestSummary live={stats.totalTrades ? stats : null} />
       </div>
 
-      {/* 4. RECENT TRADES */}
-      <div>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-[15px] font-bold text-neutral-900 dark:text-white">Recent Executions</h2>
-          <button
-            onClick={() => navigate("/trades")}
-            className="text-[12px] font-semibold text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-colors"
-          >
-            View All History
-          </button>
-        </div>
-        {trades.length === 0 ? (
-          <div className="mac-bento-card rounded-3xl p-10 text-center border border-dashed border-black/[0.08] dark:border-white/10">
-            <List className="w-8 h-8 text-neutral-400 dark:text-neutral-600 mx-auto mb-3" />
-            <h3 className="text-neutral-800 dark:text-neutral-200 font-semibold mb-1">Your trading history starts here.</h3>
-            <p className="text-xs text-neutral-500 dark:text-neutral-400 mb-5">
-              Log your first trade to begin discovering your performance patterns.
-            </p>
-            <button
-              onClick={() => navigate("/add-trade")}
-              className="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white text-[13px] font-semibold rounded-xl transition-all shadow-md shadow-emerald-500/25 active:scale-95"
-            >
-              Add First Trade
-            </button>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[...trades].sort((a, b) => new Date(b.created_at || b.date) - new Date(a.created_at || a.date)).slice(0, 3).map((t, i) => {
-              const r = normalizeTradeR(t);
-              const isWin = isTradeWin(t);
-              return (
-                <div key={i} onClick={() => navigate("/trades")} className="mac-bento-card rounded-3xl p-5 hover:border-emerald-500/25 transition-all cursor-pointer group flex flex-col justify-between h-full">
-                  <div className="flex items-start justify-between mb-4">
-                    <div>
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className={`w-2 h-2 rounded-full shrink-0 ${t.direction === "LONG" ? "bg-emerald-500" : "bg-red-500"}`} />
-                        <h4 className="font-semibold text-[14px] text-neutral-900 dark:text-neutral-100">{t.asset}</h4>
-                        <span
-                          className={`inline-flex items-center gap-0.5 text-[9px] uppercase font-bold px-1.5 py-0.5 rounded-md border ${
-                            t.direction === "LONG"
-                              ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20"
-                              : "bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20"
-                          }`}
-                        >
-                          {t.direction === "LONG" ? (
-                            <ArrowUp className="w-2.5 h-2.5" />
-                          ) : (
-                            <ArrowDown className="w-2.5 h-2.5" />
-                          )}
-                          {t.direction}
-                        </span>
-                      </div>
-                      <p className="text-[11px] text-neutral-500 dark:text-neutral-400 flex items-center gap-1.5"><Clock className="w-3 h-3" /> {t.date}</p>
-                    </div>
-                    <div className={`px-2 py-0.5 rounded-lg border text-[11px] font-bold shrink-0 ${isWin ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20" : "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20"}`}>
-                      {r >= 0 ? "+" : ""}{r.toFixed(2)}R
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between text-[11px] text-neutral-500 dark:text-neutral-400 border-t border-black/[0.05] dark:border-white/5 pt-3 mt-auto">
-                    <span className="truncate max-w-[120px]">{t.setup || "No setup logged"}</span>
-                    <span className="font-medium group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">Details &rarr;</span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
-
-      {/* 5. DEEP ANALYSIS MINI-SECTIONS */}
+      {/* ── 8. DEEP ANALYSIS (Strategy Analytics, Psychology Lab, Mistake Lab) ── */}
       <div>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-[15px] font-bold text-neutral-900 dark:text-white">Deep Analysis</h2>
-          <span className="text-[11px] text-neutral-500 dark:text-neutral-400">{selectedAccount ? `Showing: ${selectedAccount}` : "All Accounts"}</span>
+          <span className="text-[11px] text-neutral-500 dark:text-neutral-400">
+            {selectedAccount ? `Showing: ${selectedAccount}` : "All Accounts"}
+          </span>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-
-          {/* Strategy Analytics Mini */}
-          <div onClick={() => navigate("/analytics")} className="mac-bento-card rounded-3xl p-5 hover:border-emerald-500/25 cursor-pointer group transition-all flex flex-col justify-between h-full">
+          {/* Strategy Analytics */}
+          <div
+            onClick={() => navigate("/analytics")}
+            className="rounded-3xl p-5 bg-white dark:bg-[#121622] border border-black/[0.06] dark:border-white/[0.08] hover:border-blue-500/25 cursor-pointer group transition-all flex flex-col justify-between h-full"
+          >
             <div>
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
-                  <div className="p-2 bg-emerald-500/10 rounded-xl"><Activity className="w-4 h-4 text-emerald-600 dark:text-emerald-400" /></div>
-                  <span className="text-[13px] font-semibold text-neutral-900 dark:text-white">Strategy Analytics</span>
+                  <div className="p-2 bg-blue-500/10 rounded-xl">
+                    <Activity className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                  </div>
+                  <span className="text-[13px] font-semibold text-neutral-900 dark:text-white">
+                    Strategy Analytics
+                  </span>
                 </div>
-                <ChevronRight className="w-4 h-4 text-neutral-400 group-hover:text-emerald-500 transition-colors" />
+                <ChevronRight className="w-4 h-4 text-neutral-400 group-hover:text-blue-500 transition-colors" />
               </div>
               {analyticsSetups.length === 0 ? (
                 <p className="text-[12px] text-neutral-500 dark:text-neutral-400">No setup data yet.</p>
@@ -499,25 +507,38 @@ export default function Dashboard() {
                 <div className="space-y-2.5">
                   {analyticsSetups.map((s, i) => (
                     <div key={i} className="flex items-center justify-between">
-                      <span className="text-[12px] text-neutral-700 dark:text-neutral-300 truncate max-w-[130px]">{s.name}</span>
-                      <span className={`text-[12px] font-bold ${s.netR >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"}`}>{s.netR >= 0 ? "+" : ""}{s.netR.toFixed(2)}R</span>
+                      <span className="text-[12px] text-neutral-700 dark:text-neutral-300 truncate max-w-[130px]">
+                        {s.name}
+                      </span>
+                      <span className={`text-[12px] font-bold ${s.netR >= 0 ? "text-blue-600 dark:text-blue-400" : "text-rose-600"}`}>
+                        {s.netR >= 0 ? "+" : ""}{s.netR.toFixed(2)}R
+                      </span>
                     </div>
                   ))}
                 </div>
               )}
             </div>
-            <div className="mt-4 pt-3 border-t border-black/[0.05] dark:border-white/5 text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">Full Analysis <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" /></div>
+            <div className="mt-4 pt-3 border-t border-black/[0.05] dark:border-white/5 text-[11px] text-blue-600 dark:text-blue-400 font-semibold flex items-center gap-1">
+              Full Analysis <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
+            </div>
           </div>
 
-          {/* Psychology Lab Mini */}
-          <div onClick={() => navigate("/psychology")} className="mac-bento-card rounded-3xl p-5 hover:border-emerald-500/25 cursor-pointer group transition-all flex flex-col justify-between h-full">
+          {/* Psychology Lab */}
+          <div
+            onClick={() => navigate("/psychology")}
+            className="rounded-3xl p-5 bg-white dark:bg-[#121622] border border-black/[0.06] dark:border-white/[0.08] hover:border-blue-500/25 cursor-pointer group transition-all flex flex-col justify-between h-full"
+          >
             <div>
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
-                  <div className="p-2 bg-emerald-500/10 rounded-xl"><Brain className="w-4 h-4 text-emerald-600 dark:text-emerald-400" /></div>
-                  <span className="text-[13px] font-semibold text-neutral-900 dark:text-white">Psychology Lab</span>
+                  <div className="p-2 bg-indigo-500/10 rounded-xl">
+                    <Brain className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                  </div>
+                  <span className="text-[13px] font-semibold text-neutral-900 dark:text-white">
+                    Psychology Lab
+                  </span>
                 </div>
-                <ChevronRight className="w-4 h-4 text-neutral-400 group-hover:text-emerald-500 transition-colors" />
+                <ChevronRight className="w-4 h-4 text-neutral-400 group-hover:text-indigo-500 transition-colors" />
               </div>
               {topEmotion.length === 0 ? (
                 <p className="text-[12px] text-neutral-500 dark:text-neutral-400">No psychology data yet.</p>
@@ -525,23 +546,36 @@ export default function Dashboard() {
                 <div className="space-y-2.5">
                   {topEmotion.map((e, i) => (
                     <div key={i} className="flex items-center justify-between">
-                      <span className="text-[12px] text-neutral-700 dark:text-neutral-300 truncate max-w-[130px]">{e.name}</span>
-                      <span className={`text-[12px] font-bold ${e.netR >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"}`}>{e.netR >= 0 ? "+" : ""}{e.netR.toFixed(2)}R</span>
+                      <span className="text-[12px] text-neutral-700 dark:text-neutral-300 truncate max-w-[130px]">
+                        {e.name}
+                      </span>
+                      <span className={`text-[12px] font-bold ${e.netR >= 0 ? "text-blue-600 dark:text-blue-400" : "text-rose-600"}`}>
+                        {e.netR >= 0 ? "+" : ""}{e.netR.toFixed(2)}R
+                      </span>
                     </div>
                   ))}
                 </div>
               )}
             </div>
-            <div className="mt-4 pt-3 border-t border-black/[0.05] dark:border-white/5 text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">Full Analysis <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" /></div>
+            <div className="mt-4 pt-3 border-t border-black/[0.05] dark:border-white/5 text-[11px] text-indigo-600 dark:text-indigo-400 font-semibold flex items-center gap-1">
+              Full Analysis <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
+            </div>
           </div>
 
-          {/* Mistake Lab Mini */}
-          <div onClick={() => navigate("/mistakes")} className="mac-bento-card rounded-3xl p-5 hover:border-rose-500/25 cursor-pointer group transition-all flex flex-col justify-between h-full">
+          {/* Mistake Lab */}
+          <div
+            onClick={() => navigate("/mistakes")}
+            className="rounded-3xl p-5 bg-white dark:bg-[#121622] border border-black/[0.06] dark:border-white/[0.08] hover:border-rose-500/25 cursor-pointer group transition-all flex flex-col justify-between h-full"
+          >
             <div>
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
-                  <div className="p-2 bg-rose-500/10 rounded-xl"><ShieldCheck className="w-4 h-4 text-rose-600 dark:text-rose-400" /></div>
-                  <span className="text-[13px] font-semibold text-neutral-900 dark:text-white">Mistake Lab</span>
+                  <div className="p-2 bg-rose-500/10 rounded-xl">
+                    <ShieldCheck className="w-4 h-4 text-rose-600 dark:text-rose-400" />
+                  </div>
+                  <span className="text-[13px] font-semibold text-neutral-900 dark:text-white">
+                    Mistake Lab
+                  </span>
                 </div>
                 <ChevronRight className="w-4 h-4 text-neutral-400 group-hover:text-rose-500 transition-colors" />
               </div>
@@ -552,7 +586,9 @@ export default function Dashboard() {
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-[12px] text-neutral-500 dark:text-neutral-400">Cost of Mistakes</span>
-                  <span className={`text-[13px] font-bold ${mistakesData.cost < 0 ? "text-rose-600 dark:text-rose-400" : "text-neutral-600 dark:text-neutral-400"}`}>{mistakesData.cost.toFixed(2)}R</span>
+                  <span className={`text-[13px] font-bold ${mistakesData.cost < 0 ? "text-rose-600 dark:text-rose-400" : "text-neutral-600"}`}>
+                    {mistakesData.cost.toFixed(2)}R
+                  </span>
                 </div>
                 {trades.length > 0 && (
                   <div>
@@ -561,18 +597,30 @@ export default function Dashboard() {
                       <span>{(((trades.length - mistakesData.count) / trades.length) * 100).toFixed(0)}%</span>
                     </div>
                     <div className="w-full h-1.5 bg-black/5 dark:bg-white/5 rounded-full overflow-hidden">
-                      <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${((trades.length - mistakesData.count) / trades.length) * 100}%` }} />
+                      <div
+                        className="h-full bg-blue-600 dark:bg-blue-500 rounded-full"
+                        style={{ width: `${((trades.length - mistakesData.count) / trades.length) * 100}%` }}
+                      />
                     </div>
                   </div>
                 )}
               </div>
             </div>
-            <div className="mt-4 pt-3 border-t border-black/[0.05] dark:border-white/5 text-[11px] text-rose-600 dark:text-rose-400 font-semibold flex items-center gap-1">Full Analysis <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" /></div>
+            <div className="mt-4 pt-3 border-t border-black/[0.05] dark:border-white/5 text-[11px] text-rose-600 dark:text-rose-400 font-semibold flex items-center gap-1">
+              Full Analysis <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
+            </div>
           </div>
-
         </div>
       </div>
 
+      {/* ── 9. TRADEFXBOOK ADD TRADE MODAL (Screenshots 4 & 5) ── */}
+      <TradeFXBookAddTradeModal
+        isOpen={isAddTradeModalOpen}
+        onClose={() => setIsAddTradeModalOpen(false)}
+        onTradeAdded={() => {
+          fetchTrades();
+        }}
+      />
     </div>
   );
 }
