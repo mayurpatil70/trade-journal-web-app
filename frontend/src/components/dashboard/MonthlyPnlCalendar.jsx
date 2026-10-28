@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { ChevronLeft, ChevronRight, X, ArrowUpRight, ArrowDownRight, Clock, Calendar } from "lucide-react";
+import { ChevronLeft, ChevronRight, X, Calendar, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight } from "lucide-react";
 import { normalizeTradeR, isTradeWin } from "../../pages/Dashboard.jsx";
 
 const monthNames = [
@@ -89,6 +89,13 @@ export default function MonthlyPnlCalendar({ trades = [], onTradeClick }) {
     setCurrentDate(new Date(indianTodayObj.year, indianTodayObj.month, 1));
   };
 
+  const handleYearChange = (e) => {
+    const selectedYear = parseInt(e.target.value, 10);
+    if (!isNaN(selectedYear)) {
+      setCurrentDate(new Date(selectedYear, month, 1));
+    }
+  };
+
   // Group trades accurately by Indian Date Key "YYYY-MM-DD"
   const tradesByDate = useMemo(() => {
     const map = {};
@@ -103,7 +110,23 @@ export default function MonthlyPnlCalendar({ trades = [], onTradeClick }) {
     return map;
   }, [trades]);
 
-  // Compute monthly P&L for currently viewed month
+  // Extract all unique trade years for multi-year navigation synchronization
+  const availableYears = useMemo(() => {
+    const set = new Set();
+    const currentY = indianTodayObj.year;
+    // Base standard window
+    for (let y = currentY - 3; y <= currentY + 3; y++) {
+      set.add(y);
+    }
+    // Also include any years from actual logged trades
+    Object.keys(tradesByDate).forEach((key) => {
+      const y = parseInt(key.slice(0, 4), 10);
+      if (!isNaN(y)) set.add(y);
+    });
+    return Array.from(set).sort((a, b) => a - b);
+  }, [tradesByDate, indianTodayObj.year]);
+
+  // Compute monthly P&L for currently viewed month across all years
   const monthlyStats = useMemo(() => {
     let netR = 0;
     let netPnl = 0;
@@ -132,10 +155,12 @@ export default function MonthlyPnlCalendar({ trades = [], onTradeClick }) {
     return { netR, netPnl, displayVal, tradedDays };
   }, [tradesByDate, year, month]);
 
-  // Build calendar weeks (8 columns: M, T, W, T, F, S, S, Weekly)
+  // Build calendar weeks using real Indian standard (Sunday = 0, Saturday = 6)
+  // Headers: Sun, Mon, Tue, Wed, Thu, Fri, Sat, Weekly
   const calendarWeeks = useMemo(() => {
     const firstDay = new Date(year, month, 1);
-    const dayOfWeek = (firstDay.getDay() + 6) % 7; // Monday = 0
+    // Indian calendar standard: Week starts on SUNDAY (0 = Sun, 1 = Mon, ..., 6 = Sat)
+    const dayOfWeek = firstDay.getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
 
     const weeks = [];
@@ -143,15 +168,40 @@ export default function MonthlyPnlCalendar({ trades = [], onTradeClick }) {
 
     // Pad previous month days in first week
     const prevMonthDays = new Date(year, month, 0).getDate();
+    const prevYear = month === 0 ? year - 1 : year;
+    const prevMonthNum = month === 0 ? 12 : month;
+
     for (let i = dayOfWeek - 1; i >= 0; i--) {
+      const pDay = prevMonthDays - i;
+      const dateKey = `${prevYear}-${String(prevMonthNum).padStart(2, "0")}-${String(pDay).padStart(2, "0")}`;
+      const dayTrades = tradesByDate[dateKey] || [];
+
+      let dayR = 0;
+      let dayPnl = 0;
+      let hasPnl = false;
+      dayTrades.forEach((t) => {
+        dayR += normalizeTradeR(t);
+        if (t.pnl !== null && t.pnl !== undefined) {
+          dayPnl += Number(t.pnl);
+          hasPnl = true;
+        }
+      });
+
       currentWeek.push({
-        dayNumber: prevMonthDays - i,
+        dayNumber: pDay,
         isCurrentMonth: false,
-        dateKey: null,
+        dateKey,
+        trades: dayTrades,
+        netR: dayR,
+        netPnl: dayPnl,
+        hasPnl,
+        hasTrades: dayTrades.length > 0,
+        isProfit: hasPnl ? dayPnl > 0 : dayR > 0,
+        isLoss: hasPnl ? dayPnl < 0 : dayR < 0,
       });
     }
 
-    // Days in current month
+    // Days in current month (October 31, 2026 lands accurately on Saturday / Sat column)
     for (let day = 1; day <= daysInMonth; day++) {
       const dateKey = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
       const dayTrades = tradesByDate[dateKey] || [];
@@ -186,14 +236,38 @@ export default function MonthlyPnlCalendar({ trades = [], onTradeClick }) {
       }
     }
 
-    // Pad last week if incomplete
+    // Pad last week with next month days if incomplete
     if (currentWeek.length > 0) {
       let nextDay = 1;
+      const nextYear = month === 11 ? year + 1 : year;
+      const nextMonthNum = month === 11 ? 1 : month + 2;
+
       while (currentWeek.length < 7) {
+        const dateKey = `${nextYear}-${String(nextMonthNum).padStart(2, "0")}-${String(nextDay).padStart(2, "0")}`;
+        const dayTrades = tradesByDate[dateKey] || [];
+
+        let dayR = 0;
+        let dayPnl = 0;
+        let hasPnl = false;
+        dayTrades.forEach((t) => {
+          dayR += normalizeTradeR(t);
+          if (t.pnl !== null && t.pnl !== undefined) {
+            dayPnl += Number(t.pnl);
+            hasPnl = true;
+          }
+        });
+
         currentWeek.push({
           dayNumber: nextDay++,
           isCurrentMonth: false,
-          dateKey: null,
+          dateKey,
+          trades: dayTrades,
+          netR: dayR,
+          netPnl: dayPnl,
+          hasPnl,
+          hasTrades: dayTrades.length > 0,
+          isProfit: hasPnl ? dayPnl > 0 : dayR > 0,
+          isLoss: hasPnl ? dayPnl < 0 : dayR < 0,
         });
       }
       weeks.push(currentWeek);
@@ -237,10 +311,15 @@ export default function MonthlyPnlCalendar({ trades = [], onTradeClick }) {
   return (
     <div className="rounded-3xl p-6 bg-white dark:bg-[#121622] border border-black/[0.06] dark:border-white/[0.08] shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] flex flex-col justify-between h-full relative">
       {/* ── CARD HEADER ── */}
-      <div className="flex items-center justify-between mb-5 flex-wrap gap-2">
-        <h2 className="text-[15px] font-bold text-neutral-900 dark:text-white">
-          Monthly P&L
-        </h2>
+      <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+        <div>
+          <h2 className="text-[15px] font-bold text-neutral-900 dark:text-white">
+            Monthly P&L
+          </h2>
+          <span className="text-[11px] font-medium text-neutral-400 dark:text-neutral-500">
+            Indian Standard Calendar
+          </span>
+        </div>
 
         <div className="flex items-center gap-2">
           {/* Monthly Value Badge */}
@@ -261,14 +340,14 @@ export default function MonthlyPnlCalendar({ trades = [], onTradeClick }) {
           <button
             type="button"
             onClick={handleJumpToToday}
-            className="px-2.5 py-1 text-xs font-bold rounded-xl border border-black/[0.06] dark:border-white/[0.08] bg-neutral-50 dark:bg-white/[0.03] hover:bg-emerald-500 hover:text-white dark:hover:bg-emerald-500 text-neutral-600 dark:text-neutral-300 transition-all cursor-pointer flex items-center gap-1 shadow-xs"
-            title="Jump to Current Indian Month"
+            className="px-2.5 py-1 text-xs font-bold rounded-xl border border-black/[0.06] dark:border-white/[0.08] bg-neutral-50 dark:bg-white/[0.03] hover:bg-emerald-500 hover:text-white dark:hover:bg-emerald-500 text-neutral-600 dark:text-neutral-300 transition-all cursor-pointer flex items-center gap-1 shadow-xs active:scale-95"
+            title="Jump to Current Indian Month & Date"
           >
             <Calendar className="w-3.5 h-3.5" />
             <span>Today</span>
           </button>
 
-          {/* Month Navigation: < Month Year > */}
+          {/* Month & Year Navigation with Year Selector */}
           <div className="flex items-center rounded-xl border border-black/[0.06] dark:border-white/[0.08] bg-neutral-50 dark:bg-white/[0.03] p-0.5">
             <button
               onClick={handlePrevMonth}
@@ -277,9 +356,21 @@ export default function MonthlyPnlCalendar({ trades = [], onTradeClick }) {
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
-            <span className="text-xs font-bold text-neutral-800 dark:text-neutral-200 px-2 min-w-[95px] text-center select-none">
-              {monthNames[month]} {year}
+            <span className="text-xs font-bold text-neutral-800 dark:text-neutral-200 px-1 min-w-[75px] text-center select-none">
+              {monthNames[month]}
             </span>
+            {/* Year Selector Dropdown for all years */}
+            <select
+              value={year}
+              onChange={handleYearChange}
+              className="bg-transparent text-xs font-bold text-neutral-800 dark:text-neutral-200 pr-1 cursor-pointer focus:outline-none"
+            >
+              {availableYears.map((y) => (
+                <option key={y} value={y} className="bg-white dark:bg-[#121622] text-neutral-900 dark:text-white">
+                  {y}
+                </option>
+              ))}
+            </select>
             <button
               onClick={handleNextMonth}
               className="p-1 rounded-lg text-neutral-500 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-200/60 dark:hover:bg-white/[0.08] transition-colors cursor-pointer"
@@ -291,43 +382,48 @@ export default function MonthlyPnlCalendar({ trades = [], onTradeClick }) {
         </div>
       </div>
 
-      {/* ── 8-COLUMN CALENDAR GRID ── */}
+      {/* ── 8-COLUMN CALENDAR GRID (Real Indian Standard: Sun to Sat + Weekly) ── */}
       <div className="space-y-1.5 flex-1">
-        {/* Column Headers (M T W T F S S Weekly) */}
+        {/* Column Headers: Sun, Mon, Tue, Wed, Thu, Fri, Sat, Weekly */}
         <div className="grid grid-cols-8 gap-1.5 text-center mb-1">
-          {["M", "T", "W", "T", "F", "S", "S"].map((col, idx) => (
-            <div key={idx} className="text-[11px] font-bold text-neutral-400 dark:text-neutral-500 py-1">
+          {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((col, idx) => (
+            <div
+              key={idx}
+              className={`text-[11px] font-bold py-1 select-none ${
+                idx === 0 || idx === 6
+                  ? "text-neutral-400 dark:text-neutral-400 font-extrabold"
+                  : "text-neutral-500 dark:text-neutral-400"
+              }`}
+            >
               {col}
             </div>
           ))}
-          <div className="text-[10px] font-bold text-neutral-400 dark:text-neutral-500 py-1">
+          <div className="text-[10px] font-bold text-neutral-400 dark:text-neutral-500 py-1 select-none">
             Weekly
           </div>
         </div>
 
-        {/* Rows of Weeks */}
+        {/* Rows of Weeks with elevated hover effects matching top cards */}
         {calendarWeeks.map((weekObj, wIdx) => (
           <div key={wIdx} className="grid grid-cols-8 gap-1.5">
-            {/* 7 Days with rich interactive hover effects */}
+            {/* 7 Days: each card equipped with tactile hover elevation */}
             {weekObj.days.map((d, dIdx) => {
               const isTodayCell = d.dateKey === indianTodayObj.dateKey;
 
               return (
                 <div
                   key={dIdx}
-                  onClick={() => {
-                    if (d.isCurrentMonth) {
-                      setSelectedDayInfo(d);
-                    }
-                  }}
-                  className={`min-h-[46px] rounded-xl p-1.5 flex flex-col justify-between transition-all duration-200 select-none ${
+                  onClick={() => setSelectedDayInfo(d)}
+                  className={`min-h-[48px] rounded-2xl p-1.5 flex flex-col justify-between transition-all duration-200 select-none cursor-pointer ${
                     d.isCurrentMonth
                       ? isTodayCell
-                        ? "ring-2 ring-emerald-500 dark:ring-emerald-400 bg-emerald-500/[0.08] dark:bg-emerald-500/[0.12] border border-emerald-500/40 shadow-sm hover:scale-[1.04] hover:shadow-md cursor-pointer"
+                        ? "ring-2 ring-emerald-500 dark:ring-emerald-400 bg-emerald-500/[0.12] dark:bg-emerald-500/[0.18] border border-emerald-500/50 shadow-md shadow-emerald-500/15 hover:border-emerald-500 hover:shadow-xl hover:shadow-emerald-500/25 hover:scale-[1.07] active:scale-95"
                         : d.hasTrades
-                        ? "bg-neutral-100/90 dark:bg-white/[0.06] border border-black/[0.08] dark:border-white/[0.1] hover:border-emerald-500/50 hover:bg-neutral-200/60 dark:hover:bg-white/[0.1] hover:shadow-md hover:scale-[1.04] cursor-pointer"
-                        : "bg-neutral-50/70 dark:bg-white/[0.02] border border-black/[0.03] dark:border-white/[0.04] hover:border-emerald-500/40 hover:bg-neutral-100 dark:hover:bg-white/[0.06] hover:shadow-sm hover:scale-[1.03] cursor-pointer"
-                      : "opacity-25 bg-transparent border border-transparent hover:opacity-50 transition-opacity"
+                        ? d.isProfit
+                          ? "bg-emerald-500/[0.08] dark:bg-emerald-500/[0.14] border border-emerald-500/35 hover:border-emerald-500 hover:bg-emerald-500/[0.16] dark:hover:bg-emerald-500/[0.22] hover:shadow-lg hover:shadow-emerald-500/20 hover:scale-[1.06] active:scale-95"
+                          : "bg-rose-500/[0.08] dark:bg-rose-500/[0.14] border border-rose-500/35 hover:border-rose-500 hover:bg-rose-500/[0.16] dark:hover:bg-rose-500/[0.22] hover:shadow-lg hover:shadow-rose-500/20 hover:scale-[1.06] active:scale-95"
+                        : "bg-neutral-50/80 dark:bg-white/[0.03] border border-black/[0.06] dark:border-white/[0.08] shadow-[0_2px_8px_rgba(0,0,0,0.02)] hover:border-emerald-500/60 dark:hover:border-emerald-400/60 hover:bg-white dark:hover:bg-white/[0.08] hover:shadow-lg hover:shadow-emerald-500/10 hover:scale-[1.05] active:scale-95"
+                      : "bg-neutral-50/30 dark:bg-white/[0.015] border border-black/[0.04] dark:border-white/[0.04] text-neutral-400 dark:text-neutral-600 hover:border-emerald-500/30 dark:hover:border-emerald-400/30 hover:bg-neutral-100/70 dark:hover:bg-white/[0.05] hover:scale-[1.03] active:scale-95"
                   }`}
                 >
                   {/* Day Number + Today Micro-badge */}
@@ -337,7 +433,7 @@ export default function MonthlyPnlCalendar({ trades = [], onTradeClick }) {
                         isTodayCell
                           ? "text-emerald-600 dark:text-emerald-400 font-extrabold"
                           : d.isCurrentMonth
-                          ? "text-neutral-700 dark:text-neutral-300"
+                          ? "text-neutral-800 dark:text-neutral-200"
                           : "text-neutral-400 dark:text-neutral-600"
                       }`}
                     >
@@ -369,7 +465,8 @@ export default function MonthlyPnlCalendar({ trades = [], onTradeClick }) {
                               : "text-rose-600 dark:text-rose-400"
                           }`}
                         >
-                          {d.netR >= 0 ? "+" : ""}{d.netR.toFixed(1)}R
+                          {d.netR >= 0 ? "+" : ""}
+                          {d.netR.toFixed(1)}R
                         </span>
                       </div>
                     ) : isTodayCell ? (
@@ -380,8 +477,8 @@ export default function MonthlyPnlCalendar({ trades = [], onTradeClick }) {
               );
             })}
 
-            {/* 8th Column: Weekly Summary Card with hover effects */}
-            <div className="min-h-[46px] rounded-xl p-1.5 bg-neutral-100/60 dark:bg-white/[0.03] border border-black/[0.04] dark:border-white/[0.05] flex flex-col justify-center items-center text-center transition-all duration-200 hover:border-emerald-500/40 hover:bg-neutral-200/50 dark:hover:bg-white/[0.06] hover:shadow-sm hover:scale-[1.02] cursor-default">
+            {/* 8th Column: Weekly Summary Card with matching top-card elevated hover */}
+            <div className="min-h-[48px] rounded-2xl p-1.5 bg-neutral-100/70 dark:bg-white/[0.04] border border-black/[0.06] dark:border-white/[0.08] shadow-xs flex flex-col justify-center items-center text-center transition-all duration-200 hover:border-emerald-500/60 dark:hover:border-emerald-400/60 hover:bg-white dark:hover:bg-white/[0.08] hover:shadow-lg hover:shadow-emerald-500/10 hover:scale-[1.05] active:scale-95 cursor-default">
               <span className="text-[9px] font-extrabold uppercase tracking-tight text-neutral-400 dark:text-neutral-500">
                 Weekly
               </span>
@@ -397,7 +494,7 @@ export default function MonthlyPnlCalendar({ trades = [], onTradeClick }) {
                 {weekObj.weeklyStat.display}
               </span>
               <span className="text-[9px] text-neutral-400 dark:text-neutral-500 leading-none">
-                Traded Days {weekObj.weeklyStat.tradedDays}
+                {weekObj.weeklyStat.tradedDays} {weekObj.weeklyStat.tradedDays === 1 ? "day" : "days"}
               </span>
             </div>
           </div>
@@ -426,8 +523,17 @@ export default function MonthlyPnlCalendar({ trades = [], onTradeClick }) {
               </h3>
               <p className="text-[11px] text-neutral-500 dark:text-neutral-400">
                 Net Day Performance:{" "}
-                <span className={selectedDayInfo.isProfit ? "text-emerald-500 font-bold font-mono" : selectedDayInfo.isLoss ? "text-rose-500 font-bold font-mono" : "text-neutral-500 font-bold font-mono"}>
-                  {selectedDayInfo.netR >= 0 ? "+" : ""}{selectedDayInfo.netR.toFixed(2)}R
+                <span
+                  className={
+                    selectedDayInfo.isProfit
+                      ? "text-emerald-500 font-bold font-mono"
+                      : selectedDayInfo.isLoss
+                      ? "text-rose-500 font-bold font-mono"
+                      : "text-neutral-500 font-bold font-mono"
+                  }
+                >
+                  {selectedDayInfo.netR >= 0 ? "+" : ""}
+                  {selectedDayInfo.netR.toFixed(2)}R
                 </span>
               </p>
             </div>
@@ -440,7 +546,7 @@ export default function MonthlyPnlCalendar({ trades = [], onTradeClick }) {
           </div>
 
           <div className="flex-1 overflow-y-auto py-3 space-y-2 scrollbar-thin">
-            {(!selectedDayInfo.trades || selectedDayInfo.trades.length === 0) ? (
+            {!selectedDayInfo.trades || selectedDayInfo.trades.length === 0 ? (
               <div className="py-8 text-center text-neutral-400 dark:text-neutral-500">
                 <Calendar className="w-8 h-8 mx-auto mb-2 opacity-40 text-emerald-500" />
                 <p className="text-sm font-semibold text-neutral-700 dark:text-neutral-300">
@@ -451,60 +557,60 @@ export default function MonthlyPnlCalendar({ trades = [], onTradeClick }) {
                 </p>
               </div>
             ) : (
-              selectedDayInfo.trades.map((t, idx) => {
+              selectedDayInfo.trades.map((t, i) => {
                 const r = normalizeTradeR(t);
                 const isWin = isTradeWin(t);
-
                 return (
                   <div
-                    key={idx}
+                    key={i}
                     onClick={() => {
                       if (onTradeClick) onTradeClick(t);
                     }}
-                    className="p-3 rounded-2xl border border-black/[0.06] dark:border-white/[0.08] bg-neutral-50 dark:bg-white/[0.03] hover:border-emerald-500/30 transition-all flex items-center justify-between cursor-pointer"
+                    className="p-3 rounded-2xl bg-neutral-50 dark:bg-white/[0.03] border border-black/[0.04] dark:border-white/[0.06] flex items-center justify-between hover:border-emerald-500/30 hover:scale-[1.01] transition-all cursor-pointer shadow-xs"
                   >
                     <div className="flex items-center gap-3">
-                      <div
-                        className={`p-2 rounded-xl ${
-                          t.direction === "LONG"
-                            ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-                            : "bg-rose-500/10 text-rose-500 dark:text-rose-400"
+                      <span
+                        className={`w-2 h-2 rounded-full ${
+                          t.direction === "LONG" ? "bg-emerald-500" : "bg-rose-500"
                         }`}
-                      >
-                        {t.direction === "LONG" ? (
-                          <ArrowUpRight className="w-4 h-4" />
-                        ) : (
-                          <ArrowDownRight className="w-4 h-4" />
-                        )}
-                      </div>
+                      />
                       <div>
                         <div className="flex items-center gap-2">
-                          <span className="font-bold text-xs text-neutral-900 dark:text-white">
-                            {t.asset}
+                          <span className="text-xs font-bold text-neutral-900 dark:text-white">
+                            {t.asset || "Trade"}
                           </span>
-                          <span className="text-[10px] uppercase font-semibold text-neutral-500">
+                          <span
+                            className={`text-[9px] font-extrabold px-1.5 py-0.2 rounded border ${
+                              t.direction === "LONG"
+                                ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20"
+                                : "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20"
+                            }`}
+                          >
                             {t.direction}
                           </span>
                         </div>
-                        <div className="flex items-center gap-2 text-[10px] text-neutral-400 mt-0.5">
-                          <span className="flex items-center gap-1">
-                            <Clock className="w-3 h-3" /> {t.time || t.entry_time || "12:00"}
-                          </span>
-                          {t.setup && <span>• {t.setup}</span>}
-                        </div>
+                        <p className="text-[10px] text-neutral-400">
+                          {t.entry_time || t.time || "Trade execution"}
+                          {t.setup ? ` · ${t.setup}` : ""}
+                        </p>
                       </div>
                     </div>
-
                     <div className="text-right">
                       <span
                         className={`text-xs font-bold font-mono px-2 py-0.5 rounded-lg ${
                           isWin
-                            ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-                            : "bg-rose-500/10 text-rose-600 dark:text-rose-400"
+                            ? "text-emerald-600 dark:text-emerald-400 bg-emerald-500/10"
+                            : "text-rose-600 dark:text-rose-400 bg-rose-500/10"
                         }`}
                       >
-                        {r >= 0 ? "+" : ""}{r.toFixed(2)}R
+                        {r >= 0 ? "+" : ""}
+                        {r.toFixed(2)}R
                       </span>
+                      {t.pnl !== null && t.pnl !== undefined && (
+                        <p className="text-[10px] font-mono text-neutral-400 mt-0.5">
+                          {Number(t.pnl) >= 0 ? "+" : ""}${Number(t.pnl).toFixed(2)}
+                        </p>
+                      )}
                     </div>
                   </div>
                 );
