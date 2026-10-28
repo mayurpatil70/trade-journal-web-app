@@ -1,5 +1,5 @@
 // frontend/src/components/NotificationBell.jsx
-import { useEffect, useMemo, useRef, useState, useCallback } from "react";
+import { useEffect, useMemo, useRef, useState, useCallback, Fragment } from "react";
 import { createPortal } from "react-dom";
 import {
   Bell,
@@ -827,7 +827,7 @@ export default function NotificationBell({ className }) {
 
                         <tbody className="divide-y divide-black/[0.04] dark:divide-white/[0.05]">
                           {Object.entries(groupedEventsByDate).map(([dateLabel, dateEvs]) => (
-                            <tbody key={dateLabel} className="divide-y divide-black/[0.04] dark:divide-white/[0.05]">
+                            <Fragment key={dateLabel}>
                               {/* STICKY DATE GROUP DIVIDER ROW */}
                               <tr className="sticky top-[37px] z-10 bg-neutral-200/95 dark:bg-[#1c2230]/95 backdrop-blur-md border-y border-black/[0.08] dark:border-white/[0.1]">
                                 <td colSpan={9} className="py-2 px-3">
@@ -852,9 +852,8 @@ export default function NotificationBell({ className }) {
                                 const isSelected = selectedEvent?.title === ev.title && selectedEvent?.ts === ev.ts;
 
                                 return (
-                                  <>
+                                  <Fragment key={rowKey}>
                                     <tr
-                                      key={rowKey}
                                       onClick={() => {
                                         setSelectedEvent(ev);
                                       }}
@@ -1050,10 +1049,10 @@ export default function NotificationBell({ className }) {
                                         </td>
                                       </tr>
                                     )}
-                                  </>
+                                  </Fragment>
                                 );
                               })}
-                            </tbody>
+                            </Fragment>
                           ))}
                         </tbody>
                       </table>

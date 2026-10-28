@@ -2116,12 +2116,12 @@ export default function AddTrade() {
           )}
 
           {/* NAVIGATION FOOTER */}
-          <div className="mt-10 pt-6 border-t border-white/5 flex items-center justify-between">
+          <div className="mt-10 pt-6 border-t border-white/5 flex flex-wrap sm:flex-nowrap items-center justify-between gap-3">
             <button
               type="button"
               onClick={prevStep}
-              disabled={step === 1}
-              className="px-6 py-3 rounded-xl font-semibold text-sm text-gray-400 hover:text-white hover:bg-white/5 disabled:opacity-0 transition-all flex items-center gap-2"
+              disabled={step === 1 || isSubmitting}
+              className="px-5 sm:px-6 py-3 rounded-xl font-semibold text-sm text-gray-400 hover:text-white hover:bg-white/5 disabled:opacity-0 transition-all flex items-center gap-2 cursor-pointer shrink-0"
             >
               <ArrowLeft className="w-4 h-4" /> Back
             </button>
@@ -2143,7 +2143,7 @@ export default function AddTrade() {
                 {isSubmitting ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin shrink-0" />
-                    <span className="whitespace-nowrap">{isEditing ? "Updating Trade..." : "Saving Trade..."}</span>
+                    <span className="whitespace-nowrap">{isEditing ? "Updating..." : "Saving..."}</span>
                   </>
                 ) : (
                   <>
