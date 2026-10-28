@@ -1,4 +1,4 @@
-﻿// frontend/src/pages/TraderProblems/LotSizeCalculator.jsx
+// frontend/src/pages/TraderProblems/LotSizeCalculator.jsx
 import { useState, useMemo } from "react";
 import {
   Calculator,
@@ -149,20 +149,20 @@ export default function LotSizeCalculator() {
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-2xl font-black text-gray-900 dark:text-white tracking-tight">
+                <h2 className="text-2xl font-black text-neutral-900 dark:text-white tracking-tight">
                   Precision Lot Size Calculator
                 </h2>
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-emerald-500/15 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border border-emerald-500/25 dark:border-emerald-500/30">
                   Zero Overleverage
                 </span>
               </div>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+              <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
                 Never blow your account on position sizing. Calculate the exact standard lot size for your exact dollar risk.
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white/40 dark:bg-white/5 border border-white/20 dark:border-white/10 text-xs font-semibold text-gray-600 dark:text-gray-300">
+          <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white/70 dark:bg-white/5 border border-black/[0.06] dark:border-white/10 text-xs font-semibold text-neutral-700 dark:text-neutral-300 shadow-xs">
             <img src="/logo3d.png" alt="ForexNotes" className="w-4 h-4 object-contain shrink-0" />
             <span>Multi-Asset Pip Engine</span>
           </div>
@@ -232,7 +232,7 @@ export default function LotSizeCalculator() {
                   className={`px-3 py-1 rounded-md transition-all ${
                     riskMode === "percent"
                       ? "bg-emerald-500 text-white shadow-sm"
-                      : "text-gray-500 hover:text-white"
+                      : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
                   }`}
                 >
                   Percentage (%)
@@ -243,7 +243,7 @@ export default function LotSizeCalculator() {
                   className={`px-3 py-1 rounded-md transition-all ${
                     riskMode === "cash"
                       ? "bg-emerald-500 text-white shadow-sm"
-                      : "text-gray-500 hover:text-white"
+                      : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
                   }`}
                 >
                   Fixed Cash ($)
@@ -338,7 +338,7 @@ export default function LotSizeCalculator() {
                   className={`px-3 py-1 rounded-md transition-all ${
                     inputMode === "prices"
                       ? "bg-emerald-500 text-white shadow-sm"
-                      : "text-gray-500 hover:text-white"
+                      : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
                   }`}
                 >
                   Entry & SL Price
@@ -349,7 +349,7 @@ export default function LotSizeCalculator() {
                   className={`px-3 py-1 rounded-md transition-all ${
                     inputMode === "pips"
                       ? "bg-emerald-500 text-white shadow-sm"
-                      : "text-gray-500 hover:text-white"
+                      : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
                   }`}
                 >
                   Direct Pips / Points

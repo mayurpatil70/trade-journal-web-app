@@ -1,4 +1,4 @@
-﻿// frontend/src/pages/TraderProblems/PropFirm.jsx
+// frontend/src/pages/TraderProblems/PropFirm.jsx
 import { useState, useMemo } from "react";
 import {
   ShieldAlert,
@@ -136,14 +136,14 @@ export default function PropFirm() {
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-2xl font-black text-gray-900 dark:text-white tracking-tight">
+                <h2 className="text-2xl font-black text-neutral-900 dark:text-white tracking-tight">
                   Prop Firm Drawdown Guardian
                 </h2>
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-red-500/20 text-red-400 border border-red-500/30">
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-red-500/15 dark:bg-red-500/20 text-red-700 dark:text-red-400 border border-red-500/25 dark:border-red-500/30">
                   Account Lifesaver
                 </span>
               </div>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+              <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
                 Protect your funded accounts and challenge evaluations. Monitor exact daily loss limits & trailing high-watermark buffers.
               </p>
             </div>

@@ -185,6 +185,11 @@ export const createTrade = async (req, res) => {
       after_image: imageUrls[1] || null,
       executions: parsedExecutions,
       ...(rawLotSize !== null && { lot_size: rawLotSize }),
+      ...(tradeData.pnl !== undefined && tradeData.pnl !== "" && { pnl: normaliseTradeNumber(tradeData.pnl) }),
+      ...(tradeData.commissions !== undefined && tradeData.commissions !== "" && { commissions: normaliseTradeNumber(tradeData.commissions) }),
+      ...(tradeData.swap !== undefined && tradeData.swap !== "" && { swap: normaliseTradeNumber(tradeData.swap) }),
+      ...(tradeData.status && { status: tradeData.status }),
+      ...(tradeData.hold_duration_minutes !== undefined && tradeData.hold_duration_minutes !== "" && { hold_duration_minutes: normaliseTradeNumber(tradeData.hold_duration_minutes) }),
       ...(entryDate && { entry_date: entryDate }),
       ...(entryTime && { entry_time: entryTime }),
       ...(exitDate && { exit_date: exitDate }),
@@ -199,7 +204,7 @@ export const createTrade = async (req, res) => {
 
     if (error && error.message) {
       let retried = false;
-      const columnsToCheck = ["lot_size", "exit_date", "exit_time", "exit_price", "entry_date", "entry_time"];
+      const columnsToCheck = ["lot_size", "exit_date", "exit_time", "exit_price", "entry_date", "entry_time", "pnl", "commissions", "swap", "status", "hold_duration_minutes"];
       for (const col of columnsToCheck) {
         if (error.message.includes(col) && insertData[col] !== undefined) {
           delete insertData[col];
@@ -453,6 +458,11 @@ export const updateTrade = async (req, res) => {
       ...(tradeData.exitTime !== undefined && { exit_time: tradeData.exitTime }),
       ...(tradeData.exit_price !== undefined && { exit_price: normaliseTradeNumber(tradeData.exit_price) }),
       ...(tradeData.exitPrice !== undefined && { exit_price: normaliseTradeNumber(tradeData.exitPrice) }),
+      ...(tradeData.pnl !== undefined && { pnl: normaliseTradeNumber(tradeData.pnl) }),
+      ...(tradeData.commissions !== undefined && { commissions: normaliseTradeNumber(tradeData.commissions) }),
+      ...(tradeData.swap !== undefined && { swap: normaliseTradeNumber(tradeData.swap) }),
+      ...(tradeData.status !== undefined && { status: tradeData.status }),
+      ...(tradeData.hold_duration_minutes !== undefined && { hold_duration_minutes: normaliseTradeNumber(tradeData.hold_duration_minutes) }),
     };
 
     let { data, error } = await supabase
@@ -464,7 +474,7 @@ export const updateTrade = async (req, res) => {
 
     if (error && error.message) {
       let retried = false;
-      const columnsToCheck = ["lot_size", "exit_date", "exit_time", "exit_price", "entry_date", "entry_time"];
+      const columnsToCheck = ["lot_size", "exit_date", "exit_time", "exit_price", "entry_date", "entry_time", "pnl", "commissions", "swap", "status", "hold_duration_minutes"];
       for (const col of columnsToCheck) {
         if (error.message.includes(col) && updateFields[col] !== undefined) {
           delete updateFields[col];

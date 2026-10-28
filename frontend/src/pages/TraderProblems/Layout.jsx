@@ -30,16 +30,16 @@ export default function CalculatorLayout() {
           <Calculator className="w-5 h-5 md:w-6 md:h-6 text-[#10b981]" />
         </div>
         <div>
-          <h1 className="text-xl md:text-3xl font-bold text-gray-900 dark:text-white tracking-tight mb-1">
+          <h1 className="text-xl md:text-3xl font-bold text-neutral-900 dark:text-white tracking-tight mb-1">
             Calculators & Tools
           </h1>
-          <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400">
+          <p className="text-xs md:text-sm text-neutral-600 dark:text-neutral-400">
             Manage your risk and track prop firm limits.
           </p>
         </div>
       </div>
 
-      <div className="flex overflow-x-auto scrollbar-hide mb-8 border-b border-gray-200 dark:border-white/5">
+      <div className="flex overflow-x-auto scrollbar-hide mb-8 border-b border-black/[0.08] dark:border-white/5">
         {tabs.map((tab) => (
           <NavLink
             key={tab.id}
@@ -47,8 +47,8 @@ export default function CalculatorLayout() {
             className={({ isActive }) =>
               `flex items-center gap-2 px-4 py-3 text-sm font-bold whitespace-nowrap border-b-2 transition-colors ${
                 isActive || location.pathname.includes(tab.path)
-                  ? "border-[#10b981] text-[#10b981]"
-                  : "border-transparent text-gray-500 hover:text-gray-300"
+                  ? "border-[#10b981] text-emerald-600 dark:text-emerald-400"
+                  : "border-transparent text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100"
               }`
             }
           >

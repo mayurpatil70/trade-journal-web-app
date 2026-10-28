@@ -991,10 +991,9 @@ html.light body:not(.terminal) .dark-luxury-card * {
 }
 
 html.light body:not(.terminal) .dark-luxury-card .text-white,
-html.light body:not(.terminal) .dark-luxury-card [class*="text-white"],
+html.light body:not(.terminal) .dark-luxury-card [class~="text-white"],
 .dark-luxury-card .text-white,
-html.light body:not(.terminal) [class*="bg-gradient"] .text-white,
-html.light body:not(.terminal) [class*="bg-gradient"] [class*="text-white"] {
+.dark-luxury-card [class~="text-white"] {
   color: #ffffff !important;
 }
 
