@@ -19,6 +19,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import api from "../api/axios";
+import WinProPartnershipCard from "../components/partnership/WinProPartnershipCard";
 
 export default function AffiliateDashboard() {
   const [profile, setProfile] = useState(null);
@@ -330,6 +331,16 @@ export default function AffiliateDashboard() {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* ── STRATEGIC BROKER PARTNERSHIP SECTION (WinProFX × Rayan FX) ── */}
+      <div className="space-y-3 pt-2">
+        <div className="flex items-center gap-2 px-1">
+          <span className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 dark:text-neutral-500">
+            Official Broker Partnership
+          </span>
+        </div>
+        <WinProPartnershipCard isEmbedded={true} />
       </div>
 
       {/* ── 3-STEP BENTO EXPLANATION ROW ── */}
