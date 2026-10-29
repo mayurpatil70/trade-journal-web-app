@@ -200,6 +200,7 @@ export default function MainLayout() {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [profileCoords, setProfileCoords] = useState({ bottom: 0, left: 0, width: 236 });
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const [showLockPopup, setShowLockPopup] = useState(false);
   const userCardRef = useRef(null);
   const location = useLocation();
@@ -238,12 +239,12 @@ export default function MainLayout() {
     };
   }, []);
 
-  // Command palette shortcut (⌘K or Ctrl+K)
+  // Command palette shortcut (⌘K or Ctrl+K or custom event)
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+      if ((e.metaKey || e.ctrlKey) && (e.key === "k" || e.key === "K")) {
         e.preventDefault();
-        setIsSearchOpen(true);
+        setIsSearchOpen((prev) => !prev);
       }
       if (e.key === "Escape") {
         setIsSearchOpen(false);
@@ -251,8 +252,15 @@ export default function MainLayout() {
         setShowLockPopup(false);
       }
     };
+    const handleOpenSearch = () => {
+      setIsSearchOpen(true);
+    };
     window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    window.addEventListener("open-spotlight-search", handleOpenSearch);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("open-spotlight-search", handleOpenSearch);
+    };
   }, []);
 
   // Update position of user profile dropdown popover
@@ -360,6 +368,82 @@ export default function MainLayout() {
     return "Forex Notes";
   })();
 
+  const spotlightActions = [
+    {
+      to: "/add-trade",
+      label: "Log a new trade",
+      sub: "Enter entry, exit, PnL and trade setup",
+      icon: PlusCircle,
+      iconColor: "text-emerald-500",
+      bgColor: "bg-emerald-500/10",
+      keywords: ["add", "trade", "log", "new", "entry", "pnl", "manual"],
+    },
+    {
+      to: "/calculator/lot-size",
+      label: "Lot Size Calculator",
+      sub: "Calculate exact standard lot sizes for your risk",
+      icon: CalculatorIcon,
+      iconColor: "text-emerald-500",
+      bgColor: "bg-emerald-500/10",
+      keywords: ["lot", "size", "calculator", "calc", "pip", "risk", "position"],
+    },
+    {
+      to: "/charts",
+      label: "Live Charts",
+      sub: "TradingView real-time technical analysis & charting",
+      icon: Activity,
+      iconColor: "text-cyan-500",
+      bgColor: "bg-cyan-500/10",
+      keywords: ["chart", "live", "charts", "tradingview", "technical", "candle", "crypto", "forex"],
+    },
+    {
+      to: "/sessions",
+      label: "Setup Backtesting",
+      sub: "Replay sessions, test setups & backtest execution",
+      icon: Zap,
+      iconColor: "text-amber-500",
+      bgColor: "bg-amber-500/10",
+      keywords: ["backtest", "backtesting", "setup", "session", "replay", "bar", "history"],
+    },
+    {
+      to: "/analysis/performance",
+      label: "Strategy Analytics",
+      sub: "Win rate, profit factor, drawdown & edge metrics",
+      icon: TrendingUp,
+      iconColor: "text-blue-500",
+      bgColor: "bg-blue-500/10",
+      keywords: ["analytics", "performance", "win", "rate", "profit", "drawdown", "edge"],
+    },
+    {
+      to: "/trades",
+      label: "Past Trades Journal",
+      sub: "Search and inspect historical trade records",
+      icon: List,
+      iconColor: "text-purple-500",
+      bgColor: "bg-purple-500/10",
+      keywords: ["past", "trades", "journal", "history", "table", "records"],
+    },
+    {
+      to: "/news",
+      label: "Economic Calendar",
+      sub: "Upcoming high-impact macroeconomic events",
+      icon: Globe,
+      iconColor: "text-rose-500",
+      bgColor: "bg-rose-500/10",
+      keywords: ["news", "calendar", "economic", "cpi", "fomc", "nfp", "events"],
+    },
+  ];
+
+  const filteredSpotlightActions = spotlightActions.filter((action) => {
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.toLowerCase().trim();
+    return (
+      action.label.toLowerCase().includes(q) ||
+      action.sub.toLowerCase().includes(q) ||
+      action.keywords.some((kw) => kw.includes(q))
+    );
+  });
+
   return (
     <div
       className="flex h-screen w-full bg-[#f8f9fc] dark:bg-[#0a0c10] text-neutral-900 dark:text-neutral-100 transition-colors duration-300 overflow-hidden font-sans relative"
@@ -433,7 +517,7 @@ export default function MainLayout() {
         } md:relative md:translate-x-0`}
       >
         {/* macOS Window Top Chrome */}
-        <div className="h-16 flex items-center justify-between px-5 shrink-0 hidden md:flex border-b border-black/[0.05] dark:border-white/[0.06]">
+        <div className="h-16 flex items-center px-5 shrink-0 hidden md:flex border-b border-black/[0.05] dark:border-white/[0.06]">
           <div className="flex items-center gap-3">
             {/* Apple Window Traffic Light Dots */}
             <div className="flex items-center gap-1.5 mr-1 group/traffic cursor-default">
@@ -443,14 +527,6 @@ export default function MainLayout() {
             </div>
             <BrandLogo className="h-8 w-auto object-contain" />
           </div>
-
-          <button
-            onClick={() => setIsSearchOpen(true)}
-            className="flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-medium bg-black/[0.04] dark:bg-white/[0.06] hover:bg-black/[0.08] dark:hover:bg-white/[0.1] text-neutral-500 dark:text-neutral-400 transition-colors border border-black/[0.04] dark:border-white/[0.06]"
-            title="Spotlight Search (⌘K)"
-          >
-            <span className="font-mono text-[10px]">⌘K</span>
-          </button>
         </div>
 
         {/* Navigation Item Tree */}
@@ -640,81 +716,87 @@ export default function MainLayout() {
       {isSearchOpen &&
         createPortal(
           <div
-            className="fixed inset-0 z-[10000] flex items-start justify-center pt-[14vh] p-4 bg-black/35 dark:bg-black/65 backdrop-blur-md animate-in fade-in duration-150"
-            onClick={() => setIsSearchOpen(false)}
+            className="fixed inset-0 z-[10000] flex items-start justify-center pt-[14vh] p-4 bg-black/40 dark:bg-black/70 backdrop-blur-md animate-in fade-in duration-150"
+            onClick={() => {
+              setIsSearchOpen(false);
+              setSearchQuery("");
+            }}
           >
             <div
-              className="w-full max-w-xl bg-white/90 dark:bg-[#121622]/90 border border-black/[0.08] dark:border-white/[0.12] rounded-3xl shadow-[0_30px_70px_rgba(0,0,0,0.2)] dark:shadow-[0_35px_80px_rgba(0,0,0,0.7)] backdrop-blur-2xl overflow-hidden animate-in zoom-in-95 duration-150"
+              className="w-full max-w-xl bg-white/95 dark:bg-[#121622]/95 border border-black/[0.08] dark:border-white/[0.12] rounded-3xl shadow-[0_30px_70px_rgba(0,0,0,0.2)] dark:shadow-[0_35px_80px_rgba(0,0,0,0.7)] backdrop-blur-2xl overflow-hidden animate-in zoom-in-95 duration-150"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center px-4 py-3.5 border-b border-black/[0.06] dark:border-white/[0.08]">
                 <Search className="w-5 h-5 text-emerald-500 mr-3 shrink-0" />
                 <input
                   type="text"
-                  placeholder="Search trades, analytics, calculators, or actions..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && filteredSpotlightActions.length > 0) {
+                      navigate(filteredSpotlightActions[0].to);
+                      setIsSearchOpen(false);
+                      setSearchQuery("");
+                    }
+                  }}
+                  placeholder="Search tools, calculators, live charts, backtesting..."
                   autoFocus
                   className="flex-1 bg-transparent border-none outline-none text-neutral-900 dark:text-white placeholder-neutral-400 text-sm font-medium"
                 />
                 <button
-                  onClick={() => setIsSearchOpen(false)}
-                  className="px-2 py-0.5 bg-black/[0.05] dark:bg-white/10 text-neutral-500 dark:text-neutral-400 text-[11px] font-mono rounded-md hover:bg-black/10 dark:hover:bg-white/15"
+                  onClick={() => {
+                    setIsSearchOpen(false);
+                    setSearchQuery("");
+                  }}
+                  className="px-2 py-0.5 bg-black/[0.05] dark:bg-white/10 text-neutral-500 dark:text-neutral-400 text-[11px] font-mono rounded-md hover:bg-black/10 dark:hover:bg-white/15 cursor-pointer"
                 >
                   ESC
                 </button>
               </div>
 
-              <div className="p-2 space-y-1">
+              <div className="p-2 space-y-1 max-h-[380px] overflow-y-auto scrollbar-hide">
                 <p className="px-3 py-1.5 text-[10px] font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-widest">
-                  Quick Actions
+                  {searchQuery.trim() ? "Search Results" : "Quick Actions"}
                 </p>
-                <button
-                  onClick={() => {
-                    navigate("/add-trade");
-                    setIsSearchOpen(false);
-                  }}
-                  className="w-full flex items-center gap-3 px-3 py-2.5 text-xs font-medium text-neutral-700 dark:text-neutral-200 hover:bg-black/[0.04] dark:hover:bg-white/[0.06] rounded-xl transition-colors text-left group"
-                >
-                  <div className="w-6 h-6 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center group-hover:scale-105 transition-transform">
-                    <PlusCircle className="w-4 h-4" />
+                {filteredSpotlightActions.length === 0 ? (
+                  <div className="px-4 py-8 text-center text-xs text-neutral-400">
+                    No matching actions found for &ldquo;{searchQuery}&rdquo;.
                   </div>
-                  Log a new trade
-                </button>
-                <button
-                  onClick={() => {
-                    navigate("/dashboard");
-                    setIsSearchOpen(false);
-                  }}
-                  className="w-full flex items-center gap-3 px-3 py-2.5 text-xs font-medium text-neutral-700 dark:text-neutral-200 hover:bg-black/[0.04] dark:hover:bg-white/[0.06] rounded-xl transition-colors text-left group"
-                >
-                  <div className="w-6 h-6 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center group-hover:scale-105 transition-transform">
-                    <LayoutDashboard className="w-4 h-4" />
-                  </div>
-                  Go to Dashboard
-                </button>
-                <button
-                  onClick={() => {
-                    navigate("/analytics");
-                    setIsSearchOpen(false);
-                  }}
-                  className="w-full flex items-center gap-3 px-3 py-2.5 text-xs font-medium text-neutral-700 dark:text-neutral-200 hover:bg-black/[0.04] dark:hover:bg-white/[0.06] rounded-xl transition-colors text-left group"
-                >
-                  <div className="w-6 h-6 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center group-hover:scale-105 transition-transform">
-                    <Activity className="w-4 h-4" />
-                  </div>
-                  Strategy Analytics
-                </button>
-                <button
-                  onClick={() => {
-                    navigate("/news");
-                    setIsSearchOpen(false);
-                  }}
-                  className="w-full flex items-center gap-3 px-3 py-2.5 text-xs font-medium text-neutral-700 dark:text-neutral-200 hover:bg-black/[0.04] dark:hover:bg-white/[0.06] rounded-xl transition-colors text-left group"
-                >
-                  <div className="w-6 h-6 rounded-lg bg-rose-500/10 text-rose-600 dark:text-rose-400 flex items-center justify-center group-hover:scale-105 transition-transform">
-                    <Globe className="w-4 h-4" />
-                  </div>
-                  Economic Calendar
-                </button>
+                ) : (
+                  filteredSpotlightActions.map((action) => {
+                    const ActionIcon = action.icon;
+                    return (
+                      <button
+                        key={action.to + action.label}
+                        onClick={() => {
+                          navigate(action.to);
+                          setIsSearchOpen(false);
+                          setSearchQuery("");
+                        }}
+                        className="w-full flex items-center justify-between px-3 py-2.5 text-xs font-medium text-neutral-700 dark:text-neutral-200 hover:bg-black/[0.04] dark:hover:bg-white/[0.06] rounded-xl transition-colors text-left group cursor-pointer"
+                      >
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div
+                            className={`w-7 h-7 rounded-lg ${action.bgColor} ${action.iconColor} flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform`}
+                          >
+                            <ActionIcon className="w-4 h-4" />
+                          </div>
+                          <div className="truncate">
+                            <p className="font-semibold text-neutral-900 dark:text-white leading-tight">
+                              {action.label}
+                            </p>
+                            <p className="text-[11px] text-neutral-500 dark:text-neutral-400 truncate mt-0.5">
+                              {action.sub}
+                            </p>
+                          </div>
+                        </div>
+                        <span className="text-[10px] font-mono font-medium text-emerald-600 dark:text-emerald-400 opacity-0 group-hover:opacity-100 transition-opacity ml-2 shrink-0">
+                          Jump →
+                        </span>
+                      </button>
+                    );
+                  })
+                )}
               </div>
             </div>
           </div>,

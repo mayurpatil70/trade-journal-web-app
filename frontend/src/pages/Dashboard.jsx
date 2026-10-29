@@ -265,6 +265,7 @@ export default function Dashboard() {
         onSelectAccount={setSelectedAccount}
         onOpenAddTradeModal={() => setIsAddTradeModalOpen(true)}
         onOpenSearch={() => {
+          window.dispatchEvent(new CustomEvent("open-spotlight-search"));
           window.dispatchEvent(new KeyboardEvent("keydown", { key: "k", metaKey: true }));
         }}
       />

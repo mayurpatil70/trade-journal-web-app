@@ -91,7 +91,7 @@ export default function TradeFXBookTopBar({
       </div>
 
       {/* ── CENTER: Search Bar with Ctrl+K ── */}
-      <div className="flex-1 max-w-sm mx-auto hidden 2xl:block">
+      <div className="flex-1 max-w-sm mx-auto hidden xl:block">
         <button
           type="button"
           onClick={onOpenSearch}
@@ -99,7 +99,7 @@ export default function TradeFXBookTopBar({
         >
           <div className="flex items-center gap-2.5">
             <Search className="w-4 h-4 text-neutral-400" />
-            <span className="text-xs font-medium">Search...</span>
+            <span className="text-xs font-medium">Search tools, charts, backtesting...</span>
           </div>
           <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-md bg-neutral-100 dark:bg-white/[0.08] text-neutral-500 dark:text-neutral-400 border border-black/[0.04] dark:border-white/[0.06]">
             Ctrl+K
@@ -113,7 +113,7 @@ export default function TradeFXBookTopBar({
         <button
           type="button"
           onClick={onOpenSearch}
-          className="2xl:hidden h-10 w-10 flex items-center justify-center rounded-2xl border border-black/[0.06] dark:border-white/[0.08] bg-white dark:bg-[#121622] text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-white/[0.06]"
+          className="xl:hidden h-10 w-10 flex items-center justify-center rounded-2xl border border-black/[0.06] dark:border-white/[0.08] bg-white dark:bg-[#121622] text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-white/[0.06]"
         >
           <Search className="w-4 h-4" />
         </button>
