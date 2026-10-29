@@ -19,7 +19,10 @@ const ADMIN_EMAILS = [
  * Checks if a user is an admin by userId or email
  */
 export async function isUserAdmin(userId, userEmail = null) {
-  if (userEmail && ADMIN_EMAILS.includes(String(userEmail).toLowerCase().trim())) {
+  if (
+    userEmail &&
+    ADMIN_EMAILS.includes(String(userEmail).toLowerCase().trim())
+  ) {
     return true;
   }
   if (!userId) return false;
@@ -30,7 +33,10 @@ export async function isUserAdmin(userId, userEmail = null) {
       .eq("id", userId)
       .maybeSingle();
 
-    if (user?.email && ADMIN_EMAILS.includes(String(user.email).toLowerCase().trim())) {
+    if (
+      user?.email &&
+      ADMIN_EMAILS.includes(String(user.email).toLowerCase().trim())
+    ) {
       return true;
     }
   } catch (err) {
@@ -54,7 +60,9 @@ export async function createSession({
   }
 
   const now = new Date();
-  const expiresAt = new Date(now.getTime() + ttlDays * 24 * 60 * 60 * 1000).toISOString();
+  const expiresAt = new Date(
+    now.getTime() + ttlDays * 24 * 60 * 60 * 1000,
+  ).toISOString();
 
   try {
     // Check if an existing session for this user and device already exists
@@ -67,7 +75,9 @@ export async function createSession({
 
     if (checkErr && checkErr.code === "42P01") {
       // Table doesn't exist yet in Supabase
-      console.warn("[Session] user_sessions table not found. Please run Migration 010.");
+      console.warn(
+        "[Session] user_sessions table not found. Please run Migration 010.",
+      );
       const fallbackId = `fb_${crypto.randomUUID()}`;
       return { id: fallbackId, device_id: deviceId, device_name: deviceName };
     }
@@ -146,7 +156,7 @@ export async function validateSession(sessionId, userId) {
   const cached = sessionCache.get(sessionId);
 
   // 1. Check in-memory hot cache
-  if (cached && (nowMs - cached.cachedAt < CACHE_TTL_MS)) {
+  if (cached && nowMs - cached.cachedAt < CACHE_TTL_MS) {
     return { valid: true, session: cached };
   }
 
@@ -197,8 +207,12 @@ export async function validateSession(sessionId, userId) {
         .maybeSingle();
 
       const nowDate = new Date();
-      const subEnds = profile?.subscription_ends_at ? new Date(profile.subscription_ends_at) : null;
-      const trialEnds = profile?.trial_ends_at ? new Date(profile.trial_ends_at) : null;
+      const subEnds = profile?.subscription_ends_at
+        ? new Date(profile.subscription_ends_at)
+        : null;
+      const trialEnds = profile?.trial_ends_at
+        ? new Date(profile.trial_ends_at)
+        : null;
       const isActiveStatus = profile?.account_status === "active";
       const hasActiveSub = Boolean(subData);
 
@@ -210,7 +224,9 @@ export async function validateSession(sessionId, userId) {
 
       if (!hasAccess) {
         // Auto-logout: Subscription or trial has expired
-        console.warn(`[Session] User ${uid} trial/subscription expired. Invalidating session ${sessionId}.`);
+        console.warn(
+          `[Session] User ${uid} trial/subscription expired. Invalidating session ${sessionId}.`,
+        );
         await supabase.from("user_sessions").delete().eq("id", sessionId);
         sessionCache.delete(sessionId);
         return { valid: false, reason: "SUBSCRIPTION_EXPIRED" };
@@ -306,7 +322,9 @@ export async function getUserSessions(userId, currentSessionId) {
   try {
     const { data: sessions, error } = await supabase
       .from("user_sessions")
-      .select("id, device_id, device_name, ip_address, last_active_at, created_at, expires_at")
+      .select(
+        "id, device_id, device_name, ip_address, last_active_at, created_at, expires_at",
+      )
       .eq("user_id", userId)
       .gte("expires_at", new Date().toISOString())
       .order("last_active_at", { ascending: false });
@@ -330,4 +348,3 @@ export async function getUserSessions(userId, currentSessionId) {
     return [];
   }
 }
-

@@ -842,7 +842,7 @@ html.light body:not(.terminal) [class~="text-gray-100"] {
 
 html.light
   body:not(.terminal)
-  .text-white:not([class~="bg-emerald-500"]):not([class~="bg-emerald-600"]):not(
+  .text-white:not([class*="bg-[#0066"]):not([class*="btn-primary-blue"]):not([class~="bg-emerald-500"]):not([class~="bg-emerald-600"]):not(
     [class~="bg-emerald-400"]
   ):not([class~="bg-green-500"]):not([class~="bg-green-600"]):not(
     [class~="bg-red-500"]
@@ -1556,6 +1556,18 @@ video::-moz-media-controls {
 
 
 /* Primary Blue Button & Action Buttons Protection (Light & Dark Mode) */
+html.light body:not(.terminal) button[class*="bg-[#0066"],
+html.light body:not(.terminal) button[class*="bg-[#0066"] *,
+html.light body:not(.terminal) button[class*="bg-[#0052"],
+html.light body:not(.terminal) button[class*="bg-[#0052"] *,
+html.light body:not(.terminal) button[class*="bg-blue-600"],
+html.light body:not(.terminal) button[class*="bg-blue-600"] *,
+html.light body:not(.terminal) button.btn-primary-blue,
+html.light body:not(.terminal) button.btn-primary-blue *,
+html.light body:not(.terminal) .btn-primary-blue,
+html.light body:not(.terminal) .btn-primary-blue *,
+html.light body:not(.terminal) [class*="bg-[#0066FF]"],
+html.light body:not(.terminal) [class*="bg-[#0066FF]"] *,
 button[class*="bg-[#0066"],
 button[class*="bg-[#0052"],
 button[class*="bg-blue-600"],

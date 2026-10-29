@@ -7,6 +7,7 @@ import {
   createSession,
   revokeSession,
   revokeAllOtherSessions,
+  revokeAllSessions,
   getUserSessions,
 } from "../services/sessionService.js";
 import { parseDeviceName, getClientIp } from "../utils/deviceHelper.js";
@@ -624,7 +625,7 @@ export const logoutUser = async (req, res) => {
 };
 
 /**
- * Get all active sessions for current user (Settings UI)
+ * Get all active sessions for current user (Settings/Profile UI)
  */
 export const getActiveSessions = async (req, res) => {
   try {
@@ -635,7 +636,26 @@ export const getActiveSessions = async (req, res) => {
       return res.status(401).json({ success: false, error: "Unauthorized" });
     }
 
-    const sessions = await getUserSessions(userId, currentSessionId);
+    let sessions = await getUserSessions(userId, currentSessionId);
+
+    // If no session row exists yet (e.g. user logged in before migration), auto-create one for this device
+    if (sessions.length === 0) {
+      const deviceId = req.deviceId || req.headers["x-device-id"] || crypto.randomUUID();
+      const deviceName = parseDeviceName(req.headers["user-agent"]);
+      const ipAddress = getClientIp(req);
+
+      const created = await createSession({
+        userId,
+        deviceId,
+        deviceName,
+        ipAddress,
+      });
+
+      if (created?.id) {
+        sessions = await getUserSessions(userId, created.id);
+      }
+    }
+
     res.json({ success: true, sessions });
   } catch (error) {
     console.error("[Auth] getActiveSessions error:", error);
@@ -680,6 +700,25 @@ export const revokeOtherSessions = async (req, res) => {
   } catch (error) {
     console.error("[Auth] revokeOtherSessions error:", error);
     res.status(500).json({ success: false, error: "Failed to revoke other devices." });
+  }
+};
+
+/**
+ * Revoke ALL sessions for the user across all devices
+ */
+export const revokeAllSessionsForUser = async (req, res) => {
+  try {
+    const userId = req.userId;
+
+    if (!userId) {
+      return res.status(401).json({ success: false, error: "Unauthorized" });
+    }
+
+    await revokeAllSessions(userId);
+    res.json({ success: true, message: "All devices logged out successfully." });
+  } catch (error) {
+    console.error("[Auth] revokeAllSessionsForUser error:", error);
+    res.status(500).json({ success: false, error: "Failed to log out all devices." });
   }
 };
 

@@ -13,6 +13,7 @@ import {
   getActiveSessions,
   revokeSessionById,
   revokeOtherSessions,
+  revokeAllSessionsForUser,
 } from "../controllers/authController.js";
 import { rateLimit } from "../middlewares/rateLimit.js";
 import { requireAuth } from "../middlewares/requireAuth.js";
@@ -37,5 +38,6 @@ router.post("/logout", requireAuth, logoutUser);
 router.get("/sessions", requireAuth, getActiveSessions);
 router.delete("/sessions/:sessionId", requireAuth, revokeSessionById);
 router.post("/sessions/revoke-others", requireAuth, revokeOtherSessions);
+router.post("/sessions/revoke-all", requireAuth, revokeAllSessionsForUser);
 
 export default router;

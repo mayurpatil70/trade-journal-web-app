@@ -51,7 +51,7 @@ import {
 import AppleSelect from "../components/ui/AppleSelect";
 const PaywallPricingGrid = lazy(() => import("../components/paywall/PaywallPricingGrid"));
 import { getPlanBadge } from "../utils/planBadge";
-import api from "../api/axios";
+import api, { logoutSession, clearSession } from "../api/axios";
 
 const DEFAULT_CHECKLIST = [
   { id: "1", text: "Checked higher timeframe", checked: true, order: 1 },
@@ -461,6 +461,31 @@ export default function Profile({ defaultTab }) {
     }
   };
 
+  const handleLogoutCurrentDevice = async () => {
+    try {
+      await logoutSession();
+    } catch {
+      clearSession();
+    } finally {
+      navigate("/login");
+    }
+  };
+
+  const handleLogoutAllDevices = async () => {
+    if (!window.confirm("Are you sure you want to log out of all active devices? You will be signed out everywhere.")) {
+      return;
+    }
+    setRevokingAll(true);
+    try {
+      await api.post("/api/auth/sessions/revoke-all");
+    } catch (err) {
+      console.warn("[Profile] Revoke all sessions notice:", err.message);
+    } finally {
+      clearSession();
+      navigate("/login");
+    }
+  };
+
   // ── ACTIVE DEVICES & SESSIONS COMPONENT (Rendered on Profile & Settings) ──
   const renderActiveDevicesCard = () => {
     const clientSessionId = typeof window !== "undefined" ? localStorage.getItem("sessionId") : null;
@@ -499,21 +524,39 @@ export default function Profile({ defaultTab }) {
             </div>
           </div>
 
-          {hasOtherSessions && (
+          <div className="flex items-center gap-2 flex-wrap">
+            {hasOtherSessions && (
+              <button
+                type="button"
+                onClick={handleRevokeOtherSessions}
+                disabled={revokingAll}
+                className="px-3.5 py-2 rounded-xl border border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-50 active:scale-95 shadow-2xs"
+                title="Log out all other devices except this current device"
+              >
+                {revokingAll ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                ) : (
+                  <LogOut className="w-3.5 h-3.5" />
+                )}
+                <span>Log Out Other Devices</span>
+              </button>
+            )}
+
             <button
               type="button"
-              onClick={handleRevokeOtherSessions}
+              onClick={handleLogoutAllDevices}
               disabled={revokingAll}
-              className="px-3 py-1.5 rounded-xl border border-rose-500/30 bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-50"
+              className="px-3.5 py-2 rounded-xl border border-rose-500/30 bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-50 active:scale-95 shadow-2xs"
+              title="Log out everywhere across all devices"
             >
               {revokingAll ? (
                 <Loader2 className="w-3.5 h-3.5 animate-spin" />
               ) : (
                 <LogOut className="w-3.5 h-3.5" />
               )}
-              <span>Log Out All Other Devices</span>
+              <span>Log Out All Devices</span>
             </button>
-          )}
+          </div>
         </div>
 
         {loadingSessions ? (
@@ -538,12 +581,25 @@ export default function Profile({ defaultTab }) {
                     </span>
                   </div>
                   <div className="flex items-center gap-2 text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
-                    <span>Current active session</span>
+                    <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-medium">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                      Active now
+                    </span>
                     <span>•</span>
-                    <span>Active now</span>
+                    <span>Current active session</span>
                   </div>
                 </div>
               </div>
+
+              <button
+                type="button"
+                onClick={handleLogoutCurrentDevice}
+                className="px-3.5 py-2 rounded-xl border border-rose-500/25 bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs hover:scale-[1.02] active:scale-95"
+                title="Log out from this current device"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+                <span>Log Out This Device</span>
+              </button>
             </div>
           </div>
         ) : (
@@ -598,20 +654,37 @@ export default function Profile({ defaultTab }) {
                         )}
                       </div>
                       <div className="flex items-center gap-2 text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
-                        {s.ipAddress && <span>IP: {s.ipAddress}</span>}
+                        {isCurrent ? (
+                          <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-medium">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                            Active now
+                          </span>
+                        ) : (
+                          <span>Last active: {formattedDate}</span>
+                        )}
                         {s.ipAddress && <span>•</span>}
-                        <span>Last active: {isCurrent ? "Active now" : formattedDate}</span>
+                        {s.ipAddress && <span>IP: {s.ipAddress}</span>}
                       </div>
                     </div>
                   </div>
 
-                  {!isCurrent && (
+                  {isCurrent ? (
+                    <button
+                      type="button"
+                      onClick={handleLogoutCurrentDevice}
+                      className="px-3.5 py-2 rounded-xl border border-rose-500/25 bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs hover:scale-[1.02] active:scale-95"
+                      title="Log out from this current device"
+                    >
+                      <LogOut className="w-3.5 h-3.5" />
+                      <span>Log Out This Device</span>
+                    </button>
+                  ) : (
                     <button
                       type="button"
                       onClick={() => handleRevokeSession(s.id)}
                       disabled={revokingId === s.id}
-                      className="px-3 py-1.5 rounded-xl border border-black/[0.08] dark:border-white/[0.1] bg-white dark:bg-white/[0.04] hover:bg-rose-500/10 hover:border-rose-500/30 hover:text-rose-500 text-xs font-semibold text-neutral-700 dark:text-neutral-300 transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
-                      title="Revoke and log out this device"
+                      className="px-3.5 py-2 rounded-xl border border-black/[0.08] dark:border-white/[0.1] bg-white dark:bg-white/[0.04] hover:bg-rose-500/10 hover:border-rose-500/30 hover:text-rose-500 text-xs font-semibold text-neutral-700 dark:text-neutral-300 transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50 active:scale-95 shadow-2xs"
+                      title="Revoke and log out this device remotely"
                     >
                       {revokingId === s.id ? (
                         <Loader2 className="w-3.5 h-3.5 animate-spin" />

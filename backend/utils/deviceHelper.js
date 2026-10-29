@@ -52,6 +52,10 @@ export function getClientIp(req) {
   if (forwarded && typeof forwarded === "string") {
     return forwarded.split(",")[0].trim();
   }
-  return req.headers?.["x-real-ip"] || req.socket?.remoteAddress || req.ip || "127.0.0.1";
+  return (
+    req.headers?.["x-real-ip"] ||
+    req.socket?.remoteAddress ||
+    req.ip ||
+    "127.0.0.1"
+  );
 }
-

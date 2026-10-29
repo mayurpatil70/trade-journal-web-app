@@ -17,25 +17,25 @@ export default function WinProPartnershipCard({ onClose, isEmbedded = false }) {
   return (
     <div
       style={{
-        backgroundColor: "#071530",
-        borderColor: "rgba(255, 255, 255, 0.15)",
+        background: "linear-gradient(145deg, #0b1528 0%, #060a14 100%)",
+        borderColor: "rgba(255, 255, 255, 0.12)",
         color: "#ffffff",
       }}
       className={`winpro-partnership-card relative w-full ${
         isEmbedded ? "max-w-2xl mx-auto" : "max-w-[420px]"
-      } rounded-3xl overflow-hidden border shadow-[0_30px_90px_rgba(0,0,0,0.7),0_0_40px_rgba(212,255,0,0.08)] p-6 sm:p-7 flex flex-col justify-between font-sans select-none text-left`}
+      } rounded-3xl overflow-hidden border shadow-[0_25px_60px_-15px_rgba(0,0,0,0.75)] p-6 sm:p-7 flex flex-col justify-between font-sans select-none text-left`}
     >
-      {/* Subtle Ambient Radial Glow (Behind content) */}
+      {/* Clean iOS Ambient Blue Ambient Accent */}
       <div
         style={{
           position: "absolute",
-          top: "-5rem",
-          right: "-5rem",
-          width: "14rem",
-          height: "14rem",
-          backgroundColor: "rgba(212, 255, 0, 0.08)",
+          top: "-4rem",
+          right: "-4rem",
+          width: "12rem",
+          height: "12rem",
+          backgroundColor: "rgba(0, 102, 255, 0.12)",
           borderRadius: "9999px",
-          filter: "blur(48px)",
+          filter: "blur(40px)",
           pointerEvents: "none",
         }}
       />
@@ -67,11 +67,11 @@ export default function WinProPartnershipCard({ onClose, isEmbedded = false }) {
         <div className="flex items-center gap-2">
           <span
             style={{
-              borderColor: "rgba(255, 255, 255, 0.35)",
+              borderColor: "rgba(255, 255, 255, 0.18)",
               color: "#ffffff",
-              backgroundColor: "rgba(255, 255, 255, 0.14)",
+              backgroundColor: "rgba(255, 255, 255, 0.08)",
             }}
-            className="text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full border shadow-xs backdrop-blur-md select-none"
+            className="text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full border backdrop-blur-md select-none"
           >
             IB PARTNER
           </span>
@@ -81,14 +81,14 @@ export default function WinProPartnershipCard({ onClose, isEmbedded = false }) {
               type="button"
               onClick={onClose}
               style={{
-                backgroundColor: "rgba(255, 255, 255, 0.22)",
-                borderColor: "rgba(255, 255, 255, 0.35)",
+                backgroundColor: "rgba(255, 255, 255, 0.10)",
+                borderColor: "rgba(255, 255, 255, 0.16)",
                 color: "#ffffff",
               }}
-              className="w-8 h-8 rounded-full border hover:bg-white/35 active:scale-95 flex items-center justify-center transition-all cursor-pointer shadow-md backdrop-blur-md"
+              className="w-7 h-7 rounded-full border hover:bg-white/20 active:scale-90 flex items-center justify-center transition-all cursor-pointer backdrop-blur-md"
               aria-label="Close"
             >
-              <X className="w-4 h-4 text-white stroke-[2.5]" style={{ color: "#ffffff", stroke: "#ffffff" }} />
+              <X className="w-3.5 h-3.5 text-white/90 stroke-[2.2]" style={{ color: "#ffffff", stroke: "#ffffff" }} />
             </button>
           )}
         </div>

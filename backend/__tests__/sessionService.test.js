@@ -1,6 +1,10 @@
 import { jest } from "@jest/globals";
 import { parseDeviceName, getClientIp } from "../utils/deviceHelper.js";
-import { signAuthToken, verifyAuthTokenFull, verifyAuthToken } from "../utils/authToken.js";
+import {
+  signAuthToken,
+  verifyAuthTokenFull,
+  verifyAuthToken,
+} from "../utils/authToken.js";
 import {
   createSession,
   validateSession,
@@ -13,17 +17,20 @@ const secret = "test-session-secret-key-123";
 
 describe("deviceHelper", () => {
   it("correctly identifies Windows and Chrome", () => {
-    const ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
+    const ua =
+      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
     expect(parseDeviceName(ua)).toBe("Windows · Chrome");
   });
 
   it("correctly identifies iPhone and Safari", () => {
-    const ua = "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1";
+    const ua =
+      "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1";
     expect(parseDeviceName(ua)).toBe("iPhone · Safari");
   });
 
   it("correctly identifies Android and Chrome", () => {
-    const ua = "Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.6099.43 Mobile Safari/537.36";
+    const ua =
+      "Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.6099.43 Mobile Safari/537.36";
     expect(parseDeviceName(ua)).toBe("Android Phone · Chrome");
   });
 
@@ -33,9 +40,17 @@ describe("deviceHelper", () => {
   });
 
   it("extracts real client IP", () => {
-    expect(getClientIp({ headers: { "x-forwarded-for": "203.0.113.195, 70.41.3.18" } })).toBe("203.0.113.195");
-    expect(getClientIp({ headers: { "x-real-ip": "198.51.100.1" } })).toBe("198.51.100.1");
-    expect(getClientIp({ socket: { remoteAddress: "192.168.1.1" } })).toBe("192.168.1.1");
+    expect(
+      getClientIp({
+        headers: { "x-forwarded-for": "203.0.113.195, 70.41.3.18" },
+      }),
+    ).toBe("203.0.113.195");
+    expect(getClientIp({ headers: { "x-real-ip": "198.51.100.1" } })).toBe(
+      "198.51.100.1",
+    );
+    expect(getClientIp({ socket: { remoteAddress: "192.168.1.1" } })).toBe(
+      "192.168.1.1",
+    );
   });
 });
 
@@ -73,7 +88,10 @@ describe("sessionService", () => {
 
   it("validates a session correctly and allows fallback sessions", async () => {
     const fallbackId = "fb_12345678-1234-1234-1234-123456789abc";
-    const status = await validateSession(fallbackId, "00000000-0000-0000-0000-000000000001");
+    const status = await validateSession(
+      fallbackId,
+      "00000000-0000-0000-0000-000000000001",
+    );
     expect(status.valid).toBe(true);
   });
 
@@ -94,8 +112,10 @@ describe("sessionService", () => {
   });
 
   it("fetches user sessions list safely", async () => {
-    const list = await getUserSessions("00000000-0000-0000-0000-000000000001", "curr_1");
+    const list = await getUserSessions(
+      "00000000-0000-0000-0000-000000000001",
+      "curr_1",
+    );
     expect(Array.isArray(list)).toBe(true);
   });
 });
-
