@@ -43,7 +43,7 @@ export default function Mistakes() {
   if (loading) {
     return (
       <div className="flex h-full items-center justify-center p-12">
-        <Loader2 className="w-8 h-8 text-amber-400 animate-spin" />
+        <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
       </div>
     );
   }
@@ -88,11 +88,11 @@ export default function Mistakes() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
         <div>
           <h1 className="text-2xl font-semibold text-white flex items-center gap-3">
-            <ShieldCheck className="w-6 h-6 text-amber-400" /> Mistake Lab
+            <ShieldAlert className="w-6 h-6 text-rose-500" /> Mistake Lab
           </h1>
           <p className="text-gray-500 mt-1 text-[13px]">
             Identify what is draining your account and costing you R.
-            {selectedAccount && <span className="ml-2 text-amber-400 font-medium">· {selectedAccount}</span>}
+            {selectedAccount && <span className="ml-2 text-rose-400 font-medium">· {selectedAccount}</span>}
           </p>
         </div>
         <AccountFilter
@@ -119,14 +119,14 @@ export default function Mistakes() {
              {/* Unforced Errors */}
              <div className="bg-[#101216] border border-white/5 rounded-2xl p-6 relative overflow-hidden flex flex-col justify-between">
                 <div>
-                   <h2 className="text-sm font-semibold text-white flex items-center gap-2 mb-2"><AlertTriangle className="w-4 h-4 text-amber-400" /> Unforced Errors</h2>
+                   <h2 className="text-sm font-semibold text-white flex items-center gap-2 mb-2"><AlertTriangle className="w-4 h-4 text-rose-400" /> Unforced Errors</h2>
                    <p className="text-[11px] text-gray-400 mb-6">Losses where you explicitly broke your rules.</p>
                 </div>
                 <div>
                    <p className="text-4xl font-bold text-white mb-1">{unforcedErrors.length} <span className="text-sm text-gray-500 font-medium">trades</span></p>
-                   <p className="text-xs text-amber-400 font-semibold uppercase tracking-wider mt-4">Total Cost: {costOfMistakes.toFixed(2)}R</p>
+                   <p className="text-xs text-rose-400 font-semibold uppercase tracking-wider mt-4">Total Cost: {costOfMistakes.toFixed(2)}R</p>
                 </div>
-                <div className="absolute top-0 right-0 p-6 opacity-5"><AlertTriangle className="w-24 h-24 text-amber-400" /></div>
+                <div className="absolute top-0 right-0 p-6 opacity-5"><AlertTriangle className="w-24 h-24 text-rose-500" /></div>
              </div>
 
              {/* Losing Setups */}

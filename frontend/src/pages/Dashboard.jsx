@@ -582,12 +582,12 @@ export default function Dashboard() {
           {/* LAB 3: Mistake Lab */}
           <div
             onClick={() => navigate("/analysis/performance")}
-            className="p-5 rounded-2xl bg-neutral-50 dark:bg-white/[0.03] border border-black/[0.04] dark:border-white/[0.05] hover:border-amber-500/30 cursor-pointer group transition-all flex flex-col justify-between"
+            className="p-5 rounded-2xl bg-neutral-50 dark:bg-white/[0.03] border border-black/[0.04] dark:border-white/[0.05] hover:border-rose-500/30 cursor-pointer group transition-all flex flex-col justify-between"
           >
             <div>
               <div className="flex items-center justify-between mb-3.5 pb-2.5 border-b border-black/[0.04] dark:border-white/[0.05]">
                 <span className="text-xs font-bold text-neutral-800 dark:text-neutral-200 flex items-center gap-1.5">
-                  <ShieldCheck className="w-4 h-4 text-amber-500" /> Mistake Lab
+                  <ShieldAlert className="w-4 h-4 text-rose-500" /> Mistake Lab
                 </span>
                 <span className="text-[10px] font-bold text-rose-500">
                   {performanceMetrics.mistakes?.unforcedErrorsCount || 0} Breaches
@@ -650,7 +650,7 @@ export default function Dashboard() {
               )}
             </div>
 
-            <div className="mt-4 pt-3 border-t border-black/[0.05] dark:border-white/5 text-[11px] text-amber-600 dark:text-amber-400 font-semibold flex items-center justify-between">
+            <div className="mt-4 pt-3 border-t border-black/[0.05] dark:border-white/5 text-[11px] text-neutral-600 dark:text-neutral-300 group-hover:text-rose-500 font-semibold flex items-center justify-between">
               <span>Full Mistake Lab</span>
               <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
             </div>

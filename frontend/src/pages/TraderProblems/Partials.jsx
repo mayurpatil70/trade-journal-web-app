@@ -133,12 +133,12 @@ export default function Partials() {
                   Total Position Accounted
                 </p>
                 <p
-                  className={`text-2xl font-bold ${totalPercentage === 100 ? "text-emerald-500" : "text-yellow-500"}`}
+                  className={`text-2xl font-bold ${totalPercentage === 100 ? "text-emerald-500" : "text-amber-500 dark:text-amber-400"}`}
                 >
                   {totalPercentage}%
                 </p>
                 {totalPercentage !== 100 && (
-                  <p className="text-xs text-yellow-600 dark:text-yellow-500 mt-1 font-medium">
+                  <p className="text-xs text-amber-600 dark:text-amber-400 mt-1 font-medium">
                     Note: Position does not equal 100%.
                   </p>
                 )}

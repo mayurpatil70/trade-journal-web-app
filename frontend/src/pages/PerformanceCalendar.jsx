@@ -233,7 +233,7 @@ export default function PerformanceCalendar() {
                         <span className="hidden sm:inline text-[10px] text-neutral-400 dark:text-neutral-500 font-semibold">
                           {dayTrades.length} trade{dayTrades.length > 1 ? "s" : ""}
                         </span>
-                        {brokeRules && <Zap className="w-3 h-3 text-amber-500" />}
+                        {brokeRules && <Zap className="w-3 h-3 text-rose-500" />}
                       </div>
                       <div className="flex gap-1 h-1.5 rounded-full overflow-hidden bg-black/5 dark:bg-white/10">
                         {dayTrades.map((t, idx) => (
@@ -328,7 +328,7 @@ export default function PerformanceCalendar() {
                     </div>
                     <div className="flex items-center gap-3 justify-between md:justify-end">
                       {t.rule_break === "yes" && (
-                        <span className="text-[10px] bg-amber-500/10 text-amber-600 dark:text-amber-400 px-2 py-0.5 rounded-full border border-amber-500/25 uppercase tracking-widest font-extrabold">
+                        <span className="text-[10px] bg-rose-500/10 text-rose-600 dark:text-rose-400 px-2 py-0.5 rounded-full border border-rose-500/25 uppercase tracking-widest font-extrabold">
                           Rule Broken
                         </span>
                       )}

@@ -89,11 +89,11 @@ function DetailFolderButton({ isOpen, onClick, title }) {
       title={title || "Click to view Forex Factory event specifications & analysis"}
       className={`p-1 rounded-lg transition-all cursor-pointer ${
         isOpen
-          ? "bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/40 shadow-sm"
-          : "hover:bg-black/5 dark:hover:bg-white/10 text-neutral-400 hover:text-amber-500"
+          ? "bg-blue-500/20 text-blue-600 dark:text-blue-400 border border-blue-500/40 shadow-sm"
+          : "hover:bg-black/5 dark:hover:bg-white/10 text-neutral-400 hover:text-blue-500"
       }`}
     >
-      <svg className="w-4 h-4" viewBox="0 0 24 24" fill={isOpen ? "#f59e0b" : "#fbbf24"} stroke={isOpen ? "#d97706" : "#b45309"} strokeWidth="1.2">
+      <svg className="w-4 h-4" viewBox="0 0 24 24" fill={isOpen ? "#3b82f6" : "#60a5fa"} stroke={isOpen ? "#2563eb" : "#3b82f6"} strokeWidth="1.2">
         <path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
         <path d="M9 13h6M9 16h4" stroke="#ffffff" strokeWidth="1.5" strokeLinecap="round" />
       </svg>

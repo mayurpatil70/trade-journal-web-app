@@ -79,7 +79,7 @@ export default function Tools() {
         "Replay historical market sessions, test setup execution, and practice bar-by-bar backtesting.",
       icon: Zap,
       badge: "LIVE",
-      badgeColor: "amber",
+      badgeColor: "blue",
       isAvailable: true,
       path: "/sessions",
       category: "utility",
@@ -103,7 +103,7 @@ export default function Tools() {
         "Live macroeconomic events with high-impact volatility forecasts, previous vs actual consensus values.",
       icon: Globe,
       badge: "LIVE",
-      badgeColor: "amber",
+      badgeColor: "blue",
       isAvailable: true,
       path: "/news",
       category: "news",
@@ -115,7 +115,7 @@ export default function Tools() {
         "Automated trading bot management, webhook signal routing, and multi-asset algorithmic execution.",
       icon: Cpu,
       badge: "BETA",
-      badgeColor: "amber",
+      badgeColor: "purple",
       isLocked: true,
       requiresAdmin: true,
       path: "/bot-hub",
@@ -141,7 +141,7 @@ export default function Tools() {
         "Connect MetaTrader 5 terminal with AI deep learning models and automated rule-based order execution.",
       icon: Zap,
       badge: "BETA",
-      badgeColor: "amber",
+      badgeColor: "purple",
       isLocked: true,
       requiresAdmin: true,
       path: "/bot-hub/mt5",
@@ -314,9 +314,9 @@ export default function Tools() {
                     In Development
                   </span>
                 ) : tool.isLocked ? (
-                  <div className="flex items-center justify-between text-xs font-semibold text-neutral-500 dark:text-neutral-400 group-hover:text-amber-500 transition-colors">
+                  <div className="flex items-center justify-between text-xs font-semibold text-neutral-500 dark:text-neutral-400 group-hover:text-blue-500 transition-colors">
                     <span className="flex items-center gap-1.5">
-                      <Lock className="w-3.5 h-3.5 text-neutral-400 group-hover:text-amber-500" />
+                      <Lock className="w-3.5 h-3.5 text-neutral-400 group-hover:text-blue-500" />
                       Locked (Beta Access)
                     </span>
                     <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
@@ -344,7 +344,7 @@ export default function Tools() {
               <X className="w-5 h-5" />
             </button>
 
-            <div className="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-500 flex items-center justify-center font-bold">
+            <div className="w-12 h-12 rounded-2xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold">
               <Lock className="w-6 h-6" />
             </div>
 
@@ -353,7 +353,7 @@ export default function Tools() {
                 <h3 className="text-base font-bold text-neutral-900 dark:text-white">
                   {lockedModalItem.title} is Locked
                 </h3>
-                <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 border border-amber-500/20">
+                <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
                   Beta
                 </span>
               </div>

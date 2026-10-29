@@ -649,8 +649,8 @@ export default function TradeAnalysis() {
                   )}
 
                   {selectedTrade.lesson && (
-                    <div className="p-4 rounded-2xl bg-amber-50/50 dark:bg-amber-500/5 border border-amber-500/10">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 block mb-1">
+                    <div className="p-4 rounded-2xl bg-blue-50/50 dark:bg-blue-500/5 border border-blue-500/10">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 block mb-1">
                         Lessons Learned
                       </span>
                       <p className="text-xs text-neutral-700 dark:text-neutral-300 leading-relaxed">

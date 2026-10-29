@@ -119,8 +119,8 @@ export default function TradeFXBookKpiCards({ stats, trades = [] }) {
         </div>
 
         {/* 4. WIN RATE */}
-        <div className="rounded-3xl p-5 bg-white dark:bg-[#121622] border border-black/[0.06] dark:border-white/[0.08] shadow-[0_4px_20px_rgb(0,0,0,0.03)] dark:shadow-[0_4px_25px_rgba(0,0,0,0.4)] flex items-start gap-4 transition-all hover:border-amber-500/30">
-          <div className="w-12 h-12 rounded-2xl bg-amber-500/10 dark:bg-amber-500/15 border border-amber-500/20 text-amber-500 flex items-center justify-center shrink-0">
+        <div className="rounded-3xl p-5 bg-white dark:bg-[#121622] border border-black/[0.06] dark:border-white/[0.08] shadow-[0_4px_20px_rgb(0,0,0,0.03)] dark:shadow-[0_4px_25px_rgba(0,0,0,0.4)] flex items-start gap-4 transition-all hover:border-blue-500/30">
+          <div className="w-12 h-12 rounded-2xl bg-blue-500/10 dark:bg-blue-500/15 border border-blue-500/20 text-blue-500 flex items-center justify-center shrink-0">
             <Trophy className="w-6 h-6" />
           </div>
           <div className="overflow-hidden">

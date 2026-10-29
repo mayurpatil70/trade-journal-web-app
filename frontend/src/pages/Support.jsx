@@ -266,7 +266,7 @@ export default function Support() {
         <div className="rounded-3xl bg-white dark:bg-[#12151e]/85 backdrop-blur-xl border border-black/[0.06] dark:border-white/[0.08] shadow-[0_4px_24px_rgba(0,0,0,0.03)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.35)] p-6 flex flex-col justify-between space-y-4">
           <div>
             <div className="flex items-center gap-2.5 mb-3 pb-3 border-b border-black/[0.05] dark:border-white/[0.06]">
-              <div className="w-8 h-8 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center">
                 <ShieldCheck className="w-4 h-4" />
               </div>
               <h2 className="text-sm font-bold text-neutral-900 dark:text-white">
@@ -320,7 +320,7 @@ export default function Support() {
 
               {/* Item 4: FAQ First */}
               <div className="p-3 rounded-2xl bg-neutral-50/80 dark:bg-white/[0.02] border border-black/[0.04] dark:border-white/[0.05] flex items-start gap-3">
-                <HelpCircle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+                <HelpCircle className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" />
                 <div>
                   <h4 className="text-xs font-bold text-neutral-800 dark:text-neutral-200">
                     FAQ First
@@ -346,17 +346,21 @@ export default function Support() {
         </div>
       </div>
 
-      {/* ── FREQUENTLY ASKED QUESTIONS SECTION (Matches Screenshot 3) ── */}
-      <div className="rounded-3xl bg-white dark:bg-[#12151e]/85 backdrop-blur-xl border border-black/[0.06] dark:border-white/[0.08] shadow-[0_4px_24px_rgba(0,0,0,0.03)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.35)] p-6">
-        <div className="flex items-center gap-3.5 mb-6 pb-4 border-b border-black/[0.05] dark:border-white/[0.06]">
-          <div className="w-10 h-10 rounded-2xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold">
-            <HelpCircle className="w-5 h-5" />
+      {/* ── FREQUENTLY ASKED QUESTIONS SECTION (Matches Screenshot Exactly) ── */}
+      <div>
+        <div className="flex items-center gap-3.5 mb-6">
+          <div className="w-10 h-10 rounded-xl bg-[#F59E0B] flex items-center justify-center text-neutral-950 shadow-sm shrink-0 font-bold">
+            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="9" />
+              <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+              <path d="M12 17h.01" />
+            </svg>
           </div>
           <div>
-            <h2 className="text-base font-bold text-neutral-900 dark:text-white">
+            <h2 className="text-lg sm:text-xl font-bold text-neutral-900 dark:text-white tracking-tight">
               Frequently Asked Questions
             </h2>
-            <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
+            <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 mt-0.5">
               Quick answers to common questions
             </p>
           </div>
@@ -369,17 +373,17 @@ export default function Support() {
             return (
               <div
                 key={i}
-                className="p-4 rounded-2xl bg-neutral-50/70 dark:bg-white/[0.02] border border-black/[0.04] dark:border-white/[0.05] transition-all"
+                className="p-5 rounded-2xl bg-white dark:bg-[#12151e]/85 backdrop-blur-xl border border-black/[0.06] dark:border-white/[0.08] shadow-[0_2px_12px_rgba(0,0,0,0.02)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.25)] transition-all hover:border-black/[0.1] dark:hover:border-white/[0.15]"
               >
                 <div
                   onClick={() => setOpenFaqIndex(isOpen ? null : i)}
                   className="flex items-start justify-between gap-3 cursor-pointer select-none"
                 >
-                  <div>
-                    <span className="inline-block text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20 mb-1.5">
+                  <div className="flex-1">
+                    <span className="inline-block text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-[#FFF7ED] dark:bg-amber-500/10 text-[#D97706] dark:text-[#FBBF24] mb-2">
                       {faq.category}
                     </span>
-                    <h3 className="text-xs font-bold text-neutral-800 dark:text-neutral-200 leading-snug">
+                    <h3 className="text-sm font-semibold text-neutral-900 dark:text-neutral-100 leading-snug">
                       {faq.q}
                     </h3>
                   </div>
@@ -391,7 +395,7 @@ export default function Support() {
                 </div>
 
                 {isOpen && (
-                  <p className="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed mt-2.5 pt-2.5 border-t border-black/[0.04] dark:border-white/[0.05] animate-in fade-in duration-150">
+                  <p className="text-xs sm:text-[13px] text-neutral-600 dark:text-neutral-300 leading-relaxed mt-3 pt-3 border-t border-black/[0.05] dark:border-white/[0.06] animate-in fade-in duration-150">
                     {faq.a}
                   </p>
                 )}

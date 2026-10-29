@@ -208,7 +208,7 @@ export default function PerformanceAnalytics() {
       return {
         label: "Needs work",
         icon: AlertTriangle,
-        className: "text-amber-500 bg-amber-500/10 border-amber-500/20",
+        className: "text-rose-500 bg-rose-500/10 border-rose-500/20",
       };
     }
     if (pf >= 1 && pf < 1.5) {
@@ -1213,7 +1213,7 @@ export default function PerformanceAnalytics() {
             <div>
               <div className="flex items-center justify-between mb-3.5 pb-2.5 border-b border-black/[0.04] dark:border-white/[0.05]">
                 <span className="text-xs font-bold text-neutral-800 dark:text-neutral-200 flex items-center gap-1.5">
-                  <ShieldCheck className="w-4 h-4 text-amber-500" /> Mistake Lab
+                  <ShieldAlert className="w-4 h-4 text-rose-500" /> Mistake Lab
                 </span>
                 <span className="text-[10px] font-bold text-rose-500">
                   {metrics.mistakes.unforcedErrorsCount} Breaches
