@@ -12,6 +12,11 @@ import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
 import { mark3DLoaderShown } from "../utils/navigationState";
 import {
+  getImmediateCachedTrades,
+  getTradesWithCache,
+  setCachedTrades,
+} from "../utils/tradeCache";
+import {
   calculatePerformanceMetrics,
   formatCurrency,
 } from "../utils/performanceMetrics";
@@ -144,11 +149,9 @@ function calcStats(trades) {
   };
 }
 
-let cachedDashboardTrades = null;
-
 export default function Dashboard() {
-  const [allTrades, setAllTrades] = useState(() => cachedDashboardTrades || []);
-  const [isLoading, setIsLoading] = useState(() => !cachedDashboardTrades);
+  const [allTrades, setAllTrades] = useState(() => getImmediateCachedTrades() || []);
+  const [isLoading, setIsLoading] = useState(() => !getImmediateCachedTrades());
   const [selectedAccount, setSelectedAccount] = useState("");
   const [isAddTradeModalOpen, setIsAddTradeModalOpen] = useState(false);
   const navigate = useNavigate();
@@ -243,23 +246,7 @@ export default function Dashboard() {
     try {
       const userId = localStorage.getItem("userId") || localStorage.getItem("userEmail");
       if (!userId) return navigate("/login");
-      const res = await api.get(`/api/trades?userId=${userId}`);
-      const getTradeTime = (t) => {
-        if (!t) return 0;
-        const d = t.date || (t.created_at ? t.created_at.slice(0, 10) : "");
-        const tm = t.entry_time || t.time || "12:00";
-        if (d) {
-          const ts = new Date(`${d}T${tm.length === 5 ? tm + ":00" : tm}`).getTime();
-          if (!isNaN(ts)) return ts;
-        }
-        return t.created_at ? new Date(t.created_at).getTime() : 0;
-      };
-      const sorted = [...(res.data?.data || [])].sort((a, b) => {
-        const diff = getTradeTime(a) - getTradeTime(b);
-        if (diff !== 0) return diff;
-        return new Date(a.created_at || 0) - new Date(b.created_at || 0);
-      });
-      cachedDashboardTrades = sorted;
+      const sorted = await getTradesWithCache(userId);
       setAllTrades(sorted);
     } catch (err) {
       console.error(err);

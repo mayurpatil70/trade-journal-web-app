@@ -47,7 +47,16 @@ export function ThemeProvider({ children }) {
       } catch {
         /* storage blocked */
       }
-      setThemeState(next);
+      if (typeof document !== "undefined") {
+        const root = document.documentElement;
+        root.classList.add("theme-transitioning");
+        setThemeState(next);
+        setTimeout(() => {
+          root.classList.remove("theme-transitioning");
+        }, 300);
+      } else {
+        setThemeState(next);
+      }
     };
 
     return {

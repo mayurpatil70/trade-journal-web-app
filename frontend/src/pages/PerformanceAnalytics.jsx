@@ -8,6 +8,10 @@ import api from "../api/axios";
 import AppleSelect from "../components/ui/AppleSelect";
 import AccountFilter from "../components/AccountFilter";
 import {
+  getImmediateCachedTrades,
+  getTradesWithCache,
+} from "../utils/tradeCache";
+import {
   Activity,
   TrendingUp,
   TrendingDown,
@@ -43,8 +47,8 @@ import {
 
 export default function PerformanceAnalytics() {
   const navigate = useNavigate();
-  const [allTrades, setAllTrades] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [allTrades, setAllTrades] = useState(() => getImmediateCachedTrades() || []);
+  const [loading, setLoading] = useState(() => !getImmediateCachedTrades());
 
   // Filters
   const [timePeriod, setTimePeriod] = useState("30 Days"); // "Today", "7 Days", "30 Days", "3 Months", "1 Year", "All Time"
@@ -61,14 +65,13 @@ export default function PerformanceAnalytics() {
   const [calendarMonth, setCalendarMonth] = useState(today.getMonth()); // 0-indexed
   const [selectedDateStr, setSelectedDateStr] = useState(null);
 
-  // Fetch all trades
+  // Fetch all trades with SWR cache
   useEffect(() => {
     const fetchTrades = async () => {
       const userId = localStorage.getItem("userId") || localStorage.getItem("userEmail");
       if (!userId) return navigate("/login");
       try {
-        const response = await api.get(`/api/trades?userId=${userId}`);
-        const data = response.data?.data || [];
+        const data = await getTradesWithCache(userId);
         setAllTrades(data);
       } catch (error) {
         console.error("Failed to fetch trades for performance analytics:", error);
@@ -78,6 +81,14 @@ export default function PerformanceAnalytics() {
     };
     fetchTrades();
   }, [navigate]);
+
+  useEffect(() => {
+    const handleUpdated = (e) => {
+      if (e.detail) setAllTrades(e.detail);
+    };
+    window.addEventListener("trades_updated", handleUpdated);
+    return () => window.removeEventListener("trades_updated", handleUpdated);
+  }, []);
 
   // Filter pipeline
   const filteredTrades = useMemo(() => {

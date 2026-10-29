@@ -1,6 +1,7 @@
 // frontend/src/pages/TraderProblems/LotSizeCalculator.jsx
 import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
+import AppleSelect from "../../components/ui/AppleSelect";
 import {
   Calculator,
   DollarSign,
@@ -322,17 +323,18 @@ export default function LotSizeCalculator() {
               <label className="text-xs font-bold text-gray-500 uppercase tracking-wider block mb-2">
                 Trading Pair / Asset
               </label>
-              <select
+              <AppleSelect
                 value={selectedSymbol}
-                onChange={(e) => handleInstrumentSelect(e.target.value)}
-                className="w-full bg-gray-50 dark:bg-[#0b131d] border border-gray-200 dark:border-white/10 rounded-xl px-4 py-3.5 text-base font-bold text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all"
-              >
-                {INSTRUMENTS.map((inst) => (
-                  <option key={inst.symbol} value={inst.symbol} className="bg-white dark:bg-[#0b131d] text-emerald-600 dark:text-emerald-400 font-bold">
-                    {inst.name}
-                  </option>
-                ))}
-              </select>
+                onChange={(val) => {
+                  const sym = typeof val === "object" && val !== null ? (val.target?.value ?? val.value) : val;
+                  handleInstrumentSelect(sym);
+                }}
+                options={INSTRUMENTS.map((inst) => ({
+                  value: inst.symbol,
+                  label: inst.name,
+                }))}
+                placeholder="Select Asset"
+              />
               {selectedSymbol === "Other" && (
                 <input
                   type="text"

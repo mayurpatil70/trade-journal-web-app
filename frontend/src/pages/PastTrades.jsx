@@ -1,8 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import api from "../api/axios";
 import AccountFilter from "../components/AccountFilter";
 import AppleSelect from "../components/ui/AppleSelect";
+import {
+  getImmediateCachedTrades,
+  getTradesWithCache,
+  invalidateTradeCache,
+} from "../utils/tradeCache";
 import {
   Loader2,
   Search,
@@ -14,9 +19,7 @@ import {
   Calendar,
   TrendingUp,
   PlusCircle,
-  MoreHorizontal,
   Clock,
-  ArrowRight,
   ArrowUp,
   ArrowDown,
   Brain,
@@ -53,8 +56,13 @@ const isTradeWin = (t) => {
 export default function PastTrades() {
   const navigate = useNavigate();
   const location = useLocation();
-  const [trades, setTrades] = useState([]);
-  const [loading, setLoading] = useState(true);
+
+  // Instant 0ms cache-backed state
+  const [trades, setTrades] = useState(() => {
+    const cached = getImmediateCachedTrades();
+    return cached ? [...cached].sort((a, b) => tradeStamp(b) - tradeStamp(a)) : [];
+  });
+  const [loading, setLoading] = useState(() => !getImmediateCachedTrades());
   const [showFilters, setShowFilters] = useState(false);
   const [directionFilter, setDirectionFilter] = useState("");
   const [sessionFilter, setSessionFilter] = useState("");
@@ -64,12 +72,10 @@ export default function PastTrades() {
   const [selectedTrade, setSelectedTrade] = useState(null);
 
   const handleDeleteTrade = async (tradeId) => {
-    if (
-      !window.confirm("Delete this trade permanently? This cannot be undone.")
-    )
-      return;
+    if (!window.confirm("Delete this trade permanently? This cannot be undone.")) return;
     try {
       await api.delete(`/api/trades/${tradeId}`);
+      invalidateTradeCache();
       setTrades((prev) => prev.filter((t) => t.id !== tradeId));
       setSelectedTrade(null);
     } catch (err) {
@@ -79,19 +85,16 @@ export default function PastTrades() {
 
   useEffect(() => {
     const fetchTrades = async () => {
-      const userId =
-        localStorage.getItem("userId") || localStorage.getItem("userEmail");
+      const userId = localStorage.getItem("userId") || localStorage.getItem("userEmail");
       if (!userId) return navigate("/login");
       try {
-        const response = await api.get(`/api/trades?userId=${userId}`);
-        const allTrades = [...(response.data?.data || [])].sort(
-          (a, b) => tradeStamp(b) - tradeStamp(a),
-        );
-        setTrades(allTrades);
+        const sorted = await getTradesWithCache(userId);
+        const ordered = [...sorted].sort((a, b) => tradeStamp(b) - tradeStamp(a));
+        setTrades(ordered);
 
         // Auto open trade if requested via navigation
         if (location.state?.openTradeId) {
-          const t = allTrades.find((x) => x.id === location.state.openTradeId);
+          const t = ordered.find((x) => x.id === location.state.openTradeId);
           if (t) setSelectedTrade(t);
         }
       } catch (error) {
@@ -103,88 +106,108 @@ export default function PastTrades() {
     fetchTrades();
   }, [navigate, location.state]);
 
-  const filteredTrades = trades.filter((t) => {
-    const matchesSearch =
-      !search ||
-      `${t.asset} ${t.setup} ${t.session} ${t.account_name || ""}`
-        .toLowerCase()
-        .includes(search.toLowerCase());
-    const matchesResult =
-      !resultFilter ||
-      (t.result || "").toLowerCase() === resultFilter.toLowerCase();
-    const matchesDirection =
-      !directionFilter || t.direction === directionFilter;
-    const matchesSession = !sessionFilter || t.session === sessionFilter;
-    const matchesAccount = !accountFilter || t.account_name === accountFilter;
-    return (
-      matchesSearch &&
-      matchesResult &&
-      matchesDirection &&
-      matchesSession &&
-      matchesAccount
-    );
-  });
+  // Listen to background trade updates across tabs or routes
+  useEffect(() => {
+    const handleUpdated = (e) => {
+      if (e.detail) {
+        setTrades([...e.detail].sort((a, b) => tradeStamp(b) - tradeStamp(a)));
+      }
+    };
+    window.addEventListener("trades_updated", handleUpdated);
+    return () => window.removeEventListener("trades_updated", handleUpdated);
+  }, []);
+
+  const filteredTrades = useMemo(() => {
+    return trades.filter((t) => {
+      const matchesSearch =
+        !search ||
+        `${t.asset} ${t.setup} ${t.session} ${t.account_name || ""}`
+          .toLowerCase()
+          .includes(search.toLowerCase());
+
+      const r = normalizeTradeR(t);
+      const res = (t.result || "").toLowerCase().trim();
+      let matchesResult = true;
+      if (resultFilter === "win") matchesResult = res === "win" || r > 0;
+      if (resultFilter === "loss") matchesResult = res === "loss" || r < 0;
+      if (resultFilter === "be") matchesResult = res === "be" || r === 0;
+
+      const matchesDirection = !directionFilter || t.direction === directionFilter;
+      const matchesSession = !sessionFilter || t.session === sessionFilter;
+      const matchesAccount =
+        !accountFilter ||
+        accountFilter === "All Accounts" ||
+        t.account_name === accountFilter;
+
+      return (
+        matchesSearch &&
+        matchesResult &&
+        matchesDirection &&
+        matchesSession &&
+        matchesAccount
+      );
+    });
+  }, [trades, search, resultFilter, directionFilter, sessionFilter, accountFilter]);
 
   // Pagination logic
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  // Reset to first page when filters change
   useEffect(() => {
     setCurrentPage(1);
   }, [search, resultFilter, directionFilter, sessionFilter, accountFilter]);
 
   const indexOfLastTrade = currentPage * itemsPerPage;
   const indexOfFirstTrade = indexOfLastTrade - itemsPerPage;
-  const currentTrades = filteredTrades.slice(
-    indexOfFirstTrade,
-    indexOfLastTrade,
-  );
+  const currentTrades = filteredTrades.slice(indexOfFirstTrade, indexOfLastTrade);
   const totalPages = Math.ceil(filteredTrades.length / itemsPerPage);
 
   return (
-    <div className="w-full max-w-7xl mx-auto font-sans pb-24 px-4 md:px-8 mt-6">
-      {/* HEADER */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10 md:pr-28">
+    <div className="w-full max-w-7xl mx-auto font-sans pb-24 px-4 sm:px-6 lg:px-8 mt-6">
+      {/* ── HEADER ── */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8 lg:pr-36 xl:pr-40">
         <div>
-          <h1 className="text-2xl font-semibold text-white flex items-center gap-3">
-            <List className="w-6 h-6 text-emerald-400" />
+          <h1 className="text-2xl font-bold tracking-tight text-neutral-900 dark:text-white flex items-center gap-3">
+            <div className="w-9 h-9 rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center border border-emerald-500/20 shadow-xs">
+              <Calendar className="w-4 h-4" />
+            </div>
             Trade Journal
-            <span className="px-2 py-0.5 rounded border border-emerald-500/20 bg-emerald-500/10 text-emerald-400 text-[10px] font-bold uppercase tracking-wider">
+            <span className="px-2.5 py-0.5 rounded-full border border-emerald-500/25 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 text-[10px] font-extrabold uppercase tracking-wider">
               {filteredTrades.length} Logs
             </span>
           </h1>
-          <p className="text-gray-500 mt-1 text-[13px]">
-            Your central execution workspace. Filter, search, and review past
-            data.
+          <p className="text-neutral-500 dark:text-neutral-400 mt-1 text-xs sm:text-[13px]">
+            Your central execution workspace. Filter, search, and review past trade data.
           </p>
         </div>
         <button
+          type="button"
           onClick={() => navigate("/add-trade")}
-          className="flex items-center gap-2 px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-medium rounded-lg transition-colors text-[13px] shadow-lg shadow-emerald-500/20"
+          className="flex items-center gap-2 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-2xl transition-all duration-200 text-xs shadow-md shadow-emerald-500/20 active:scale-[0.98] cursor-pointer"
         >
           <PlusCircle className="w-4 h-4" /> Log Trade
         </button>
       </div>
 
-      {/* FILTER BAR */}
-      <div className="flex flex-col sm:flex-row gap-4 mb-6">
+      {/* ── FILTER BAR ── */}
+      <div className="flex flex-col sm:flex-row gap-3 mb-6">
         <div className="relative flex-1">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400 dark:text-neutral-500" />
           <input
             type="text"
-            placeholder="Search symbol, setup, or tags..."
+            placeholder="Search symbol, setup, or account..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-[#101216] border border-white/5 rounded-xl py-3 pl-11 pr-4 text-white text-[13px] focus:border-emerald-500/50 outline-none transition-all placeholder-gray-600"
+            className="w-full bg-white dark:bg-[#111522] border border-black/[0.08] dark:border-white/10 rounded-2xl py-2.5 pl-11 pr-4 text-neutral-900 dark:text-white text-xs sm:text-sm focus:border-emerald-500/60 focus:ring-2 focus:ring-emerald-500/10 outline-none transition-all placeholder-neutral-400 dark:placeholder-neutral-500 shadow-xs"
           />
         </div>
 
-        <div className="flex gap-2 items-center">
+        <div className="flex gap-2.5 items-center flex-wrap sm:flex-nowrap">
           <AppleSelect
             value={resultFilter}
             onChange={(e) => setResultFilter(e.target.value)}
-            className="min-w-[145px]"
+            className="min-w-[140px]"
+            compact
             options={[
               { value: "", label: "All Results" },
               { value: "win", label: "Win ✓" },
@@ -204,23 +227,24 @@ export default function PastTrades() {
             type="button"
             onClick={() => setShowFilters((v) => !v)}
             aria-expanded={showFilters}
-            className={`px-4 py-2.5 rounded-2xl transition-all duration-200 flex items-center gap-2 text-[13px] font-medium backdrop-blur-xl cursor-pointer ${
+            className={`px-3.5 py-2 rounded-2xl transition-all duration-200 flex items-center gap-2 text-xs font-semibold backdrop-blur-xl cursor-pointer ${
               showFilters || directionFilter || sessionFilter || accountFilter
-                ? "bg-emerald-500/15 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400"
-                : "bg-white/70 dark:bg-white/[0.05] border border-black/10 dark:border-white/10 text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
+                ? "bg-emerald-500/15 border border-emerald-500/30 text-emerald-700 dark:text-emerald-400 shadow-xs"
+                : "bg-white/80 dark:bg-white/[0.05] border border-black/10 dark:border-white/10 text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
             }`}
           >
-            <Filter className="w-4 h-4" /> More Filters
+            <Filter className="w-3.5 h-3.5" /> More Filters
           </button>
         </div>
       </div>
 
       {showFilters && (
-        <div className="flex flex-wrap items-center gap-3 mb-6">
+        <div className="flex flex-wrap items-center gap-3 mb-6 p-4 rounded-2xl bg-white/70 dark:bg-[#111522]/80 border border-black/[0.06] dark:border-white/[0.08] backdrop-blur-xl">
           <AppleSelect
             value={directionFilter}
             onChange={(e) => setDirectionFilter(e.target.value)}
-            className="min-w-[145px]"
+            className="min-w-[140px]"
+            compact
             options={[
               { value: "", label: "All Directions" },
               { value: "LONG", label: "Long" },
@@ -231,7 +255,8 @@ export default function PastTrades() {
           <AppleSelect
             value={sessionFilter}
             onChange={(e) => setSessionFilter(e.target.value)}
-            className="min-w-[145px]"
+            className="min-w-[140px]"
+            compact
             options={[
               { value: "", label: "All Sessions" },
               ...[...new Set(trades.map((t) => t.session).filter(Boolean))].map((x) => ({
@@ -249,31 +274,31 @@ export default function PastTrades() {
                 setSessionFilter("");
                 setAccountFilter("");
               }}
-              className="text-[13px] text-gray-400 hover:text-white"
+              className="px-3 py-1.5 text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-500/10 rounded-xl transition-colors cursor-pointer"
             >
-              Clear
+              Clear filters
             </button>
           )}
         </div>
       )}
 
-      {/* TRADE LIST */}
+      {/* ── TRADE LIST ── */}
       <div className="space-y-3">
         {loading ? (
-          <div className="flex flex-col items-center justify-center h-64 bg-[#101216] border border-white/5 rounded-2xl">
-            <Loader2 className="w-8 h-8 text-emerald-400 animate-spin mb-3" />
-            <p className="text-gray-500 text-sm">
+          <div className="flex flex-col items-center justify-center h-64 bg-white/70 dark:bg-[#111522]/80 border border-black/[0.06] dark:border-white/[0.08] rounded-3xl backdrop-blur-xl">
+            <Loader2 className="w-7 h-7 text-emerald-500 animate-spin mb-3" />
+            <p className="text-neutral-500 dark:text-neutral-400 text-xs font-medium">
               Loading execution history...
             </p>
           </div>
         ) : filteredTrades.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-64 bg-[#101216] border border-white/5 rounded-2xl text-center px-4">
-            <Target className="w-10 h-10 text-gray-600 mb-4" />
-            <h3 className="text-base font-semibold text-gray-300 mb-1">
+          <div className="flex flex-col items-center justify-center h-64 bg-white/70 dark:bg-[#111522]/80 border border-black/[0.06] dark:border-white/[0.08] rounded-3xl text-center px-4 backdrop-blur-xl">
+            <Target className="w-10 h-10 text-neutral-400 dark:text-neutral-600 mb-3" />
+            <h3 className="text-sm font-bold text-neutral-800 dark:text-neutral-200 mb-1">
               No trades match criteria
             </h3>
-            <p className="text-gray-500 text-sm">
-              Adjust your filters or log a new trade.
+            <p className="text-neutral-500 dark:text-neutral-400 text-xs">
+              Adjust your filters or log a new trade to see it here.
             </p>
           </div>
         ) : (
@@ -285,74 +310,80 @@ export default function PastTrades() {
 
               return (
                 <div
-                  key={idx}
+                  key={t.id || idx}
                   onClick={() => setSelectedTrade(t)}
-                  className="bg-[#101216] border border-white/5 rounded-xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:border-white/10 hover:bg-[#15181D] transition-all cursor-pointer group"
+                  className="bg-white dark:bg-[#111522] border border-black/[0.06] dark:border-white/[0.08] rounded-2xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:border-emerald-500/40 dark:hover:border-emerald-500/40 hover:shadow-[0_4px_20px_rgba(0,0,0,0.04)] dark:hover:shadow-[0_4px_24px_rgba(0,0,0,0.5)] transition-all duration-200 cursor-pointer group"
                 >
                   {/* Left: Asset & Time */}
-                  <div className="flex items-center gap-4 md:w-[25%]">
+                  <div className="flex items-center gap-3.5 md:w-[25%]">
                     <div
-                      className={`w-10 h-10 rounded-lg flex items-center justify-center font-bold text-xs border ${
+                      className={`w-10 h-10 rounded-2xl flex items-center justify-center font-bold text-xs border ${
                         t.direction === "LONG"
-                          ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
-                          : "bg-red-500/10 text-red-400 border-red-500/20"
+                          ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20"
+                          : "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20"
                       }`}
                       title={t.direction}
                     >
                       {t.direction === "LONG" ? (
-                        <ArrowUp className="w-5 h-5 text-emerald-400" />
+                        <ArrowUp className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                       ) : (
-                        <ArrowDown className="w-5 h-5 text-red-400" />
+                        <ArrowDown className="w-4 h-4 text-rose-600 dark:text-rose-400" />
                       )}
                     </div>
                     <div>
-                      <h3 className="font-semibold text-white text-[15px]">
+                      <h3 className="font-bold text-neutral-900 dark:text-white text-sm tracking-tight">
                         {t.asset}
                       </h3>
-                      <p className="text-[11px] text-gray-500 flex items-center gap-1.5 mt-0.5">
-                        <Clock className="w-3 h-3" /> {t.date}{" "}
-                        {t.time && `� ${t.time}`}
+                      <p className="text-[11px] text-neutral-500 dark:text-neutral-400 flex items-center gap-1.5 mt-0.5">
+                        <Clock className="w-3 h-3 text-neutral-400" /> {t.date}{" "}
+                        {t.time && `• ${t.time}`}
                       </p>
                     </div>
                   </div>
 
                   {/* Middle: Setup & Session */}
-                  <div className="flex-1 grid grid-cols-2 gap-4 border-t md:border-t-0 md:border-l border-white/5 pt-3 md:pt-0 md:pl-6">
+                  <div className="flex-1 grid grid-cols-2 gap-4 border-t md:border-t-0 md:border-l border-black/[0.05] dark:border-white/[0.06] pt-3 md:pt-0 md:pl-6">
                     <div>
-                      <p className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">
+                      <p className="text-[10px] text-neutral-400 dark:text-neutral-500 font-bold uppercase tracking-widest mb-0.5">
                         Setup
                       </p>
-                      <p className="text-[13px] text-gray-300 font-medium">
-                        {t.setup || "�"}
+                      <p className="text-xs text-neutral-800 dark:text-neutral-200 font-semibold truncate">
+                        {t.setup || "—"}
                       </p>
                     </div>
                     <div>
-                      <p className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">
+                      <p className="text-[10px] text-neutral-400 dark:text-neutral-500 font-bold uppercase tracking-widest mb-0.5">
                         Session
                       </p>
-                      <p className="text-[13px] text-gray-300 font-medium">
-                        {t.session || "�"}
+                      <p className="text-xs text-neutral-800 dark:text-neutral-200 font-semibold truncate">
+                        {t.session || "—"}
                       </p>
                     </div>
                   </div>
 
                   {/* Right: R-Multiple & Media */}
-                  <div className="flex items-center justify-between md:justify-end gap-4 border-t md:border-t-0 md:border-l border-white/5 pt-3 md:pt-0 md:pl-6 md:w-[25%]">
+                  <div className="flex items-center justify-between md:justify-end gap-3.5 border-t md:border-t-0 md:border-l border-black/[0.05] dark:border-white/[0.06] pt-3 md:pt-0 md:pl-6 md:w-[25%]">
                     <div className="flex items-center gap-2">
                       {hasImages && (
-                        <ImageIcon className="w-4 h-4 text-gray-600 group-hover:text-emerald-400 transition-colors" />
+                        <ImageIcon className="w-4 h-4 text-neutral-400 group-hover:text-emerald-500 transition-colors" />
                       )}
                     </div>
                     <div
-                      className={`px-3 py-1.5 rounded-lg border text-sm font-bold flex items-center gap-1.5 ${isWin ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : "bg-red-500/10 text-red-400 border-red-500/20"}`}
+                      className={`px-3 py-1.5 rounded-xl border text-xs font-bold flex items-center gap-1.5 ${
+                        isWin
+                          ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/25"
+                          : "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/25"
+                      }`}
                     >
                       {t.pnl !== null && t.pnl !== undefined && Number(t.pnl) !== 0 && (
                         <span className="font-mono">
                           {Number(t.pnl) >= 0 ? "+" : ""}${Math.abs(Number(t.pnl)).toFixed(2)}
                         </span>
                       )}
-                      <span className="font-mono text-xs opacity-90">
-                        {t.pnl !== null && t.pnl !== undefined && Number(t.pnl) !== 0 ? `(${isWin ? "+" : ""}${r.toFixed(2)}R)` : `${isWin ? "+" : ""}${r.toFixed(2)}R`}
+                      <span className="font-mono opacity-90">
+                        {t.pnl !== null && t.pnl !== undefined && Number(t.pnl) !== 0
+                          ? `(${isWin ? "+" : ""}${r.toFixed(2)}R)`
+                          : `${isWin ? "+" : ""}${r.toFixed(2)}R`}
                       </span>
                     </div>
                     <button
@@ -361,12 +392,12 @@ export default function PastTrades() {
                         e.stopPropagation();
                         handleDeleteTrade(t.id);
                       }}
-                      className="p-1.5 opacity-0 group-hover:opacity-100 hover:bg-red-500/20 text-gray-500 hover:text-red-400 rounded-lg transition-all"
+                      className="p-1.5 opacity-0 group-hover:opacity-100 hover:bg-rose-500/15 text-neutral-400 hover:text-rose-600 dark:hover:text-rose-400 rounded-xl transition-all cursor-pointer"
                       title="Delete Trade"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
-                    <ChevronRight className="w-5 h-5 text-gray-600 group-hover:text-gray-900 dark:group-hover:text-white transition-colors hidden md:block" />
+                    <ChevronRight className="w-4 h-4 text-neutral-400 group-hover:text-neutral-800 dark:group-hover:text-white transition-colors hidden md:block" />
                   </div>
                 </div>
               );
@@ -374,26 +405,23 @@ export default function PastTrades() {
 
             {/* Pagination Controls */}
             {totalPages > 1 && (
-              <div className="flex justify-center items-center gap-4 mt-8 pt-4">
+              <div className="flex justify-center items-center gap-3 mt-8 pt-4">
                 <button
+                  type="button"
                   disabled={currentPage === 1}
-                  onClick={() =>
-                    setCurrentPage((prev) => Math.max(prev - 1, 1))
-                  }
-                  className="px-4 py-2 bg-[#101216] border border-white/5 rounded-lg text-sm text-gray-300 hover:bg-white/5 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  className="px-4 py-2 rounded-xl text-xs font-semibold bg-white dark:bg-[#111522] border border-black/[0.06] dark:border-white/[0.08] text-neutral-700 dark:text-neutral-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-black/[0.03] dark:hover:bg-white/[0.04] transition-all cursor-pointer shadow-xs"
                 >
                   Previous
                 </button>
-                <span className="text-sm text-gray-400">
-                  Page <strong className="text-white">{currentPage}</strong> of{" "}
-                  {totalPages}
+                <span className="text-xs font-mono font-bold text-neutral-500 dark:text-neutral-400 px-2">
+                  {currentPage} of {totalPages}
                 </span>
                 <button
+                  type="button"
                   disabled={currentPage === totalPages}
-                  onClick={() =>
-                    setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-                  }
-                  className="px-4 py-2 bg-[#101216] border border-white/5 rounded-lg text-sm text-gray-300 hover:bg-white/5 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                  className="px-4 py-2 rounded-xl text-xs font-semibold bg-white dark:bg-[#111522] border border-black/[0.06] dark:border-white/[0.08] text-neutral-700 dark:text-neutral-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-black/[0.03] dark:hover:bg-white/[0.04] transition-all cursor-pointer shadow-xs"
                 >
                   Next
                 </button>
@@ -403,78 +431,76 @@ export default function PastTrades() {
         )}
       </div>
 
-      {/* TRADE DETAIL MODAL / DRAWER */}
+      {/* ── SELECTED TRADE DETAIL MODAL (macOS Glass Dialog) ── */}
       {selectedTrade && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 dark:bg-black/80 backdrop-blur-md animate-in fade-in duration-150"
+          onClick={() => setSelectedTrade(null)}
+        >
           <div
-            className="absolute inset-0 bg-black/80 backdrop-blur-md"
-            onClick={() => setSelectedTrade(null)}
-          />
-
-          <div className="relative w-full max-w-4xl max-h-[90vh] bg-[#101216] border border-white/10 rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95 duration-200">
-            {/* Header */}
-            <div className="px-6 py-5 border-b border-white/5 flex items-center justify-between bg-[#0A0B0D]">
+            className="w-full max-w-4xl bg-white dark:bg-[#10141f] border border-black/[0.08] dark:border-white/[0.12] rounded-3xl shadow-[0_25px_60px_rgba(0,0,0,0.25)] dark:shadow-[0_30px_70px_rgba(0,0,0,0.7)] flex flex-col max-h-[90vh] overflow-hidden animate-in zoom-in-95 duration-150"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-5 sm:p-6 border-b border-black/[0.06] dark:border-white/[0.08]">
               <div className="flex items-center gap-3">
                 <span
-                  className={`inline-flex items-center gap-1 px-2.5 py-1 rounded text-[10px] font-bold uppercase tracking-widest border ${
+                  className={`px-3 py-1 rounded-xl text-xs font-extrabold flex items-center gap-1.5 border ${
                     selectedTrade.direction === "LONG"
-                      ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
-                      : "bg-red-500/10 text-red-400 border-red-500/20"
+                      ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/25"
+                      : "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/25"
                   }`}
                 >
                   {selectedTrade.direction === "LONG" ? (
-                    <ArrowUp className="w-3 h-3 text-emerald-400" />
+                    <ArrowUp className="w-3.5 h-3.5" />
                   ) : (
-                    <ArrowDown className="w-3 h-3 text-red-400" />
+                    <ArrowDown className="w-3.5 h-3.5" />
                   )}
                   {selectedTrade.direction}
                 </span>
-                <h2 className="text-xl font-bold text-white">
+                <h2 className="text-xl font-bold text-neutral-900 dark:text-white tracking-tight">
                   {selectedTrade.asset}
                 </h2>
-                <span className="text-gray-500 text-sm">
-                  � {selectedTrade.date}
+                <span className="text-neutral-400 text-xs sm:text-sm">
+                  • {selectedTrade.date}
                 </span>
               </div>
               <div className="flex items-center gap-2">
                 <button
-                  onClick={() =>
-                    navigate(`/add-trade?edit=${selectedTrade.id}`)
-                  }
-                  className="p-2 bg-white/5 hover:bg-white/10 rounded-lg text-emerald-400 transition-colors"
+                  type="button"
+                  onClick={() => navigate(`/add-trade?edit=${selectedTrade.id}`)}
+                  className="p-2 rounded-xl bg-black/[0.04] dark:bg-white/10 hover:bg-emerald-500/15 text-neutral-600 dark:text-neutral-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors cursor-pointer"
                   title="Edit Trade"
                 >
                   <Pencil className="w-4 h-4" />
                 </button>
                 <button
+                  type="button"
                   onClick={() => handleDeleteTrade(selectedTrade.id)}
-                  className="p-2 bg-red-500/10 hover:bg-red-500 rounded-lg text-red-400 hover:text-white transition-all"
+                  className="p-2 rounded-xl bg-rose-500/10 hover:bg-rose-500 text-rose-600 dark:text-rose-400 hover:text-white transition-all cursor-pointer"
                   title="Delete Trade"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
                 <button
+                  type="button"
                   onClick={() => setSelectedTrade(null)}
-                  className="p-2 bg-white/5 hover:bg-white/10 rounded-lg text-gray-400 transition-colors"
+                  className="p-2 rounded-xl bg-black/[0.04] dark:bg-white/10 text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-colors cursor-pointer"
                 >
                   <X className="w-4 h-4" />
                 </button>
               </div>
             </div>
 
-            {/* Body */}
-            <div className="flex-1 overflow-y-auto p-6 space-y-8">
-              {/* Top Stats */}
+            {/* Modal Body */}
+            <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-6">
+              {/* Stat Grid */}
               {(() => {
                 const selR = normalizeTradeR(selectedTrade);
-                const selIsLoss =
-                  (selectedTrade.result || "").toLowerCase() === "loss" ||
-                  selR < 0;
-                const selLot =
-                  selectedTrade.lot_size ??
-                  selectedTrade.executions?.[0]?.lot_size;
+                const selIsLoss = (selectedTrade.result || "").toLowerCase() === "loss" || selR < 0;
+                const selLot = selectedTrade.lot_size ?? selectedTrade.executions?.[0]?.lot_size;
                 return (
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                     {[
                       {
                         label: "Profit / Loss ($)",
@@ -493,38 +519,30 @@ export default function PastTrades() {
                       },
                       {
                         label: "Result",
-                        value: selectedTrade.result?.toUpperCase(),
+                        value: selectedTrade.result?.toUpperCase() || "—",
                         isResult: true,
                         isLoss: selIsLoss,
                       },
-                      { label: "Setup", value: selectedTrade.setup },
-                      { label: "Session", value: selectedTrade.session },
-                      { label: "Entry", value: selectedTrade.entry || "�" },
-                      { label: "Stop Loss", value: selectedTrade.sl || "�" },
-                      { label: "Take Profit", value: selectedTrade.tp || "�" },
-                      {
-                        label: selLot ? `Risk % (${selLot}L)` : "Risk %",
-                        value: selectedTrade.risk
-                          ? `${Number(selectedTrade.risk).toFixed(2)}%`
-                          : selLot
-                          ? `${selLot} Lots`
-                          : "�",
-                      },
+                      { label: "Setup", value: selectedTrade.setup || "—" },
+                      { label: "Session", value: selectedTrade.session || "—" },
+                      { label: "Entry", value: selectedTrade.entry || "—" },
+                      { label: "Stop Loss", value: selectedTrade.sl || "—" },
+                      { label: "Take Profit", value: selectedTrade.tp || "—" },
                     ].map((s, i) => (
                       <div
                         key={i}
-                        className="bg-[#15181D] border border-white/5 p-4 rounded-xl"
+                        className="p-3.5 rounded-2xl bg-black/[0.02] dark:bg-white/[0.03] border border-black/[0.05] dark:border-white/[0.08]"
                       >
-                        <p className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">
+                        <p className="text-[10px] text-neutral-400 dark:text-neutral-500 font-extrabold uppercase tracking-widest mb-1">
                           {s.label}
                         </p>
                         <p
-                          className={`text-[15px] font-bold ${
+                          className={`text-sm font-bold font-mono ${
                             s.isNet || s.isResult
                               ? s.isLoss
-                                ? "text-red-400"
-                                : "text-emerald-400"
-                              : "text-white"
+                                ? "text-rose-600 dark:text-rose-400"
+                                : "text-emerald-600 dark:text-emerald-400"
+                              : "text-neutral-900 dark:text-white"
                           }`}
                         >
                           {s.value}
@@ -535,71 +553,71 @@ export default function PastTrades() {
                 );
               })()}
 
-              {/* Notes & Psychology */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Analysis & Lessons Bento */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-4">
-                  <div>
-                    <h3 className="text-xs font-semibold text-emerald-400 uppercase tracking-widest mb-2 flex items-center gap-2">
-                      <Target className="w-3 h-3" /> Analysis
+                  <div className="p-4 rounded-2xl bg-black/[0.02] dark:bg-white/[0.03] border border-black/[0.05] dark:border-white/[0.08]">
+                    <h3 className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest mb-2 flex items-center gap-1.5">
+                      <Target className="w-3.5 h-3.5" /> Technical Analysis
                     </h3>
-                    <p className="text-sm text-gray-300 leading-relaxed bg-[#15181D] border border-white/5 p-4 rounded-xl min-h-[100px] whitespace-pre-wrap">
-                      {selectedTrade.reason || "No analysis recorded."}
+                    <p className="text-xs sm:text-sm text-neutral-700 dark:text-neutral-300 leading-relaxed whitespace-pre-wrap">
+                      {selectedTrade.reason || "No technical reason recorded."}
                     </p>
                   </div>
-                  <div>
-                    <h3 className="text-xs font-semibold text-emerald-400 uppercase tracking-widest mb-2 flex items-center gap-2">
-                      <TrendingUp className="w-3 h-3" /> Lesson
+                  <div className="p-4 rounded-2xl bg-black/[0.02] dark:bg-white/[0.03] border border-black/[0.05] dark:border-white/[0.08]">
+                    <h3 className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest mb-2 flex items-center gap-1.5">
+                      <TrendingUp className="w-3.5 h-3.5" /> Key Lesson
                     </h3>
-                    <p className="text-sm text-gray-300 leading-relaxed bg-[#15181D] border border-white/5 p-4 rounded-xl min-h-[100px] whitespace-pre-wrap">
+                    <p className="text-xs sm:text-sm text-neutral-700 dark:text-neutral-300 leading-relaxed whitespace-pre-wrap">
                       {selectedTrade.lesson || "No lesson recorded."}
                     </p>
                   </div>
                 </div>
 
-                <div className="bg-[#15181D] border border-white/5 p-5 rounded-xl flex flex-col">
-                  <h3 className="text-xs font-semibold text-purple-400 uppercase tracking-widest mb-4 flex items-center gap-2">
-                    <Brain className="w-3 h-3" /> Psychology
+                <div className="p-5 rounded-2xl bg-black/[0.02] dark:bg-white/[0.03] border border-black/[0.05] dark:border-white/[0.08] flex flex-col">
+                  <h3 className="text-xs font-bold text-purple-600 dark:text-purple-400 uppercase tracking-widest mb-3 flex items-center gap-1.5">
+                    <Brain className="w-3.5 h-3.5" /> Psychological State
                   </h3>
-                  <div className="flex items-center gap-4 mb-4 pb-4 border-b border-white/5">
+                  <div className="flex items-center gap-3 mb-4 pb-3 border-b border-black/[0.05] dark:border-white/[0.06]">
                     <div className="flex-1">
-                      <p className="text-[10px] text-gray-500 uppercase mb-1">
+                      <p className="text-[10px] text-neutral-400 font-bold uppercase mb-0.5">
                         Emotion Before
                       </p>
-                      <p className="text-sm font-semibold text-white">
-                        {selectedTrade.emotion_before || "�"}
+                      <p className="text-xs sm:text-sm font-semibold text-neutral-900 dark:text-white">
+                        {selectedTrade.emotion_before || "—"}
                       </p>
                     </div>
-                    <ArrowRight className="w-4 h-4 text-gray-600" />
+                    <ChevronRight className="w-4 h-4 text-neutral-400" />
                     <div className="flex-1">
-                      <p className="text-[10px] text-gray-500 uppercase mb-1">
+                      <p className="text-[10px] text-neutral-400 font-bold uppercase mb-0.5">
                         Emotion After
                       </p>
-                      <p className="text-sm font-semibold text-white">
-                        {selectedTrade.emotion_after || "�"}
+                      <p className="text-xs sm:text-sm font-semibold text-neutral-900 dark:text-white">
+                        {selectedTrade.emotion_after || "—"}
                       </p>
                     </div>
                   </div>
-                  <p className="text-[10px] text-gray-500 uppercase mb-2">
+                  <p className="text-[10px] text-neutral-400 font-bold uppercase mb-1">
                     Psychological Notes
                   </p>
-                  <p className="text-sm text-gray-300 leading-relaxed flex-1 whitespace-pre-wrap">
-                    {selectedTrade.psych_note || "No notes recorded."}
+                  <p className="text-xs sm:text-sm text-neutral-700 dark:text-neutral-300 leading-relaxed flex-1 whitespace-pre-wrap">
+                    {selectedTrade.psych_note || "No emotional notes recorded."}
                   </p>
                 </div>
               </div>
 
-              {/* Images */}
+              {/* Execution Screenshots */}
               {selectedTrade.images && selectedTrade.images.length > 0 && (
                 <div>
-                  <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-2">
-                    <ImageIcon className="w-3 h-3" /> Execution Evidence
+                  <h3 className="text-xs font-bold text-neutral-500 uppercase tracking-widest mb-3 flex items-center gap-1.5">
+                    <ImageIcon className="w-3.5 h-3.5" /> Chart Screenshots
                   </h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {selectedTrade.images.map((img, i) => (
                       <div
                         key={i}
                         onClick={() => window.open(img, "_blank")}
-                        className="relative aspect-video rounded-xl overflow-hidden border border-white/10 group cursor-pointer"
+                        className="relative aspect-video rounded-2xl overflow-hidden border border-black/[0.08] dark:border-white/10 group cursor-pointer shadow-xs"
                       >
                         <img
                           src={img}
@@ -607,7 +625,7 @@ export default function PastTrades() {
                           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                         />
                         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                          <span className="bg-black/80 text-white text-xs px-3 py-1.5 rounded-lg border border-white/20">
+                          <span className="bg-black/80 text-white text-xs font-bold px-3 py-1.5 rounded-xl border border-white/20">
                             View Full Size
                           </span>
                         </div>
@@ -623,24 +641,3 @@ export default function PastTrades() {
     </div>
   );
 }
-
-// Temporary inline component
-const List = ({ className }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-  >
-    <line x1="8" y1="6" x2="21" y2="6"></line>
-    <line x1="8" y1="12" x2="21" y2="12"></line>
-    <line x1="8" y1="18" x2="21" y2="18"></line>
-    <line x1="3" y1="6" x2="3.01" y2="6"></line>
-    <line x1="3" y1="12" x2="3.01" y2="12"></line>
-    <line x1="3" y1="18" x2="3.01" y2="18"></line>
-  </svg>
-);

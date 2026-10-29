@@ -143,6 +143,14 @@ const Onboarding = safeLazy(
 );
 
 // Register prefetch handlers for instant hover / idle prefetching
+registerRoutePrefetch("/dashboard", () => import("./pages/Dashboard.jsx"));
+registerRoutePrefetch("/add-trade", () => import("./pages/AddTrade.jsx"));
+registerRoutePrefetch("/trades", () => import("./pages/PastTrades.jsx"));
+registerRoutePrefetch("/calendar", () => import("./pages/PerformanceCalendar.jsx"));
+registerRoutePrefetch("/accounts", () => import("./pages/PropAccounts.jsx"));
+registerRoutePrefetch("/support", () => import("./pages/Support.jsx"));
+registerRoutePrefetch("/affiliate", () => import("./pages/AffiliateDashboard.jsx"));
+registerRoutePrefetch("/news", () => import("./pages/EconomicCalendar.jsx"));
 registerRoutePrefetch(
   "/analysis/performance",
   () => import("./pages/PerformanceAnalytics.jsx"),

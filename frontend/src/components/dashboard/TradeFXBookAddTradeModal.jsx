@@ -13,8 +13,10 @@ import {
   Briefcase,
 } from "lucide-react";
 import DateTimePickerPopover from "../ui/DateTimePickerPopover";
+import AppleSelect from "../ui/AppleSelect";
 import { validateTradeAgainstRules } from "../../utils/guardrailValidator";
 import RuleBreachAlert from "../guardrails/RuleBreachAlert";
+import { invalidateTradeCache } from "../../utils/tradeCache";
 import api from "../../api/axios";
 
 export default function TradeFXBookAddTradeModal({ isOpen, onClose, onTradeAdded, trades = [], activeAccount = "" }) {
@@ -183,6 +185,7 @@ export default function TradeFXBookAddTradeModal({ isOpen, onClose, onTradeAdded
 
       const res = await api.post("/api/trades", payload);
       if (res.data?.success || res.status === 201) {
+        invalidateTradeCache();
         if (onTradeAdded) onTradeAdded(res.data.data);
         onClose();
       } else {
@@ -250,17 +253,13 @@ export default function TradeFXBookAddTradeModal({ isOpen, onClose, onTradeAdded
               </label>
               <span className="text-[10px] text-neutral-400 font-mono">Boundaries tracked per account</span>
             </div>
-            <select
+            <AppleSelect
               value={accountName}
-              onChange={(e) => setAccountName(e.target.value)}
-              className="w-full h-10 px-3 rounded-xl border border-black/[0.08] dark:border-white/[0.1] bg-white dark:bg-[#161b26] text-neutral-900 dark:text-white text-xs font-semibold outline-none focus:border-emerald-500 cursor-pointer transition-all"
-            >
-              {availableAccounts.map((acc) => (
-                <option key={acc} value={acc}>
-                  {acc}
-                </option>
-              ))}
-            </select>
+              onChange={(e) => setAccountName(typeof e === "object" && e !== null ? (e.target?.value ?? e.value) : e)}
+              options={availableAccounts}
+              placeholder="Select Trading Account"
+              compact
+            />
           </div>
 
           {/* Direction Pill Selector (Screenshots 4 & 5) */}

@@ -12,6 +12,7 @@ import SystemAnnouncementBanner from "../components/SystemAnnouncementBanner.jsx
 import ProfilePhotoModal from "../components/ui/ProfilePhotoModal.jsx";
 import SupportFeedbackModal from "../components/support/SupportFeedbackModal.jsx";
 import SocialFollowPopup from "../components/support/SocialFollowPopup.jsx";
+import { prefetchRoute, prefetchAllSecondaryRoutes } from "../utils/routePrefetch";
 import api from "../api/axios";
 import {
   LayoutDashboard,
@@ -70,6 +71,9 @@ const NavItem = ({
   return (
     <Link
       to={isDisabled || isLocked ? "#" : to}
+      onMouseEnter={() => !isDisabled && !isLocked && prefetchRoute(to)}
+      onFocus={() => !isDisabled && !isLocked && prefetchRoute(to)}
+      onPointerDown={() => !isDisabled && !isLocked && prefetchRoute(to)}
       onClick={(e) => {
         if (isDisabled) e.preventDefault();
         else if (isLocked) {
@@ -183,6 +187,9 @@ const ExpandableNavItem = ({ item, currentPath, closeMenu }) => {
               <Link
                 key={sub.to}
                 to={sub.to}
+                onMouseEnter={() => prefetchRoute(sub.to)}
+                onFocus={() => prefetchRoute(sub.to)}
+                onPointerDown={() => prefetchRoute(sub.to)}
                 onClick={closeMenu}
                 className={`flex items-center gap-2.5 px-3.5 py-2 rounded-xl text-[12.5px] font-semibold transition-all ${
                   isSubActive
@@ -225,6 +232,9 @@ export default function MainLayout() {
   const [showBugCallout, setShowBugCallout] = useState(true);
 
   useEffect(() => {
+    // Prefetch all secondary routes during idle time for 0ms transitions
+    prefetchAllSecondaryRoutes();
+
     // Clear legacy suppression so page refresh always restores the support card
     sessionStorage.removeItem("fn_hide_bug_callout");
 

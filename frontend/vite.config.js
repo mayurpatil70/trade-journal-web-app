@@ -37,6 +37,9 @@ export default defineConfig({
             normalized.includes("/src/pages/AddTrade") ||
             normalized.includes("/src/pages/PastTrades") ||
             normalized.includes("/src/pages/PerformanceCalendar") ||
+            normalized.includes("/src/pages/PerformanceAnalytics") ||
+            normalized.includes("/src/pages/TradeAnalysis") ||
+            normalized.includes("/src/pages/Tools") ||
             normalized.includes("/src/pages/Analytics") ||
             normalized.includes("/src/pages/Psychology") ||
             normalized.includes("/src/pages/Mistakes") ||

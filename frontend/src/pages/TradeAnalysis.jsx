@@ -7,6 +7,10 @@ import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
 import AppleSelect from "../components/ui/AppleSelect";
 import {
+  getImmediateCachedTrades,
+  getTradesWithCache,
+} from "../utils/tradeCache";
+import {
   Activity,
   Search,
   Calendar,
@@ -41,8 +45,8 @@ import {
 
 export default function TradeAnalysis() {
   const navigate = useNavigate();
-  const [allTrades, setAllTrades] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [allTrades, setAllTrades] = useState(() => getImmediateCachedTrades() || []);
+  const [loading, setLoading] = useState(() => !getImmediateCachedTrades());
 
   // Filters matching screenshot
   const [outcomeTab, setOutcomeTab] = useState("all"); // "all" | "winners" | "losers" | "be"
@@ -56,14 +60,13 @@ export default function TradeAnalysis() {
   // Image lightbox
   const [lightboxImage, setLightboxImage] = useState(null);
 
-  // Fetch trades
+  // Fetch trades with SWR cache
   useEffect(() => {
     const fetchTrades = async () => {
       const userId = localStorage.getItem("userId") || localStorage.getItem("userEmail");
       if (!userId) return navigate("/login");
       try {
-        const response = await api.get(`/api/trades?userId=${userId}`);
-        const data = response.data?.data || [];
+        const data = await getTradesWithCache(userId);
         setAllTrades(data);
       } catch (error) {
         console.error("Failed to fetch trades for Trade Analysis:", error);
@@ -73,6 +76,14 @@ export default function TradeAnalysis() {
     };
     fetchTrades();
   }, [navigate]);
+
+  useEffect(() => {
+    const handleUpdated = (e) => {
+      if (e.detail) setAllTrades(e.detail);
+    };
+    window.addEventListener("trades_updated", handleUpdated);
+    return () => window.removeEventListener("trades_updated", handleUpdated);
+  }, []);
 
   // Current formatted date for top subtitle (matches Screenshot: "Wed, Oct 28")
   const currentDateFormatted = useMemo(() => {

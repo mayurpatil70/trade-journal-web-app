@@ -1,5 +1,6 @@
 // frontend/src/pages/TraderProblems/Hindsight.jsx
 import { useState, useEffect } from "react";
+import AppleSelect from "../../components/ui/AppleSelect";
 import {
   SlidersHorizontal,
   Info,
@@ -78,26 +79,24 @@ export default function Hindsight() {
 
           {/* Trade Selector Dropdown */}
           {!loading && trades.length > 0 && (
-            <div className="shrink-0">
-              <select
+            <div className="shrink-0 min-w-[240px]">
+              <AppleSelect
                 value={selectedTrade?.id || ""}
-                onChange={(e) => {
+                onChange={(val) => {
+                  const id = typeof val === "object" && val !== null ? (val.target?.value ?? val.value) : val;
                   const trade = trades.find(
-                    (t) =>
-                      t.id === parseInt(e.target.value) ||
-                      t.id === e.target.value,
+                    (t) => t.id === parseInt(id, 10) || t.id === id,
                   );
                   setSelectedTrade(trade);
-                  setSliderPosition(50); // Reset slider on trade change
+                  setSliderPosition(50);
                 }}
-                className="bg-gray-50 dark:bg-[#1a1d24] border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white text-sm rounded-[2px] focus:ring-[#10b981] focus:border-[#10b981] block w-full p-2.5 outline-none font-medium"
-              >
-                {trades.map((trade) => (
-                  <option key={trade.id} value={trade.id}>
-                    {trade.date} • {trade.asset} ({trade.direction})
-                  </option>
-                ))}
-              </select>
+                options={trades.map((trade) => ({
+                  value: trade.id,
+                  label: `${trade.date} • ${trade.asset} (${trade.direction})`,
+                }))}
+                placeholder="Select Trade"
+                compact
+              />
             </div>
           )}
         </div>

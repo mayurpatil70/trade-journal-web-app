@@ -5,6 +5,7 @@ import AppleSelect from "../components/ui/AppleSelect";
 import DateTimePickerPopover from "../components/ui/DateTimePickerPopover";
 import RuleBreachAlert from "../components/guardrails/RuleBreachAlert";
 import { validateTradeAgainstRules } from "../utils/guardrailValidator";
+import { invalidateTradeCache } from "../utils/tradeCache";
 import {
   Save,
   X,
@@ -845,6 +846,7 @@ export default function AddTrade() {
       } else {
         await api.post("/api/trades", submitData, uploadConfig);
       }
+      invalidateTradeCache();
       navigate("/trades");
     } catch (error) {
       console.error("Upload Error:", error);
