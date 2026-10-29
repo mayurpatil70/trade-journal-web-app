@@ -1,5 +1,6 @@
 // frontend/src/pages/TraderProblems/MarketHours.jsx
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useMemo, useRef, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { Link } from "react-router-dom";
 import {
   Clock,
@@ -189,11 +190,59 @@ export default function MarketHours() {
   const [clockTz, setClockTz] = useState("UTC");
   const [isTzDropdownOpen, setIsTzDropdownOpen] = useState(false);
   const tzDropdownRef = useRef(null);
+  const menuRef = useRef(null);
+  const [coords, setCoords] = useState({
+    top: 0,
+    left: 0,
+    width: 0,
+    placeAbove: false,
+  });
 
-  // Close timezone dropdown on outside click or Escape key
+  // Position calculation with viewport boundary safety (eliminates clipping & stacking bugs)
+  const updatePosition = useCallback(() => {
+    if (!tzDropdownRef.current) return;
+    const rect = tzDropdownRef.current.getBoundingClientRect();
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const estimatedHeight = 300;
+    const placeAbove = spaceBelow < estimatedHeight && rect.top > estimatedHeight;
+
+    const menuWidth = Math.max(rect.width, 280);
+    let leftPos = rect.right - menuWidth;
+
+    // Viewport safety boundaries
+    if (leftPos < 8) leftPos = 8;
+    if (leftPos + menuWidth > window.innerWidth - 8) {
+      leftPos = window.innerWidth - menuWidth - 8;
+    }
+
+    setCoords({
+      top: placeAbove ? rect.top - 6 : rect.bottom + 6,
+      left: leftPos,
+      width: menuWidth,
+      placeAbove,
+    });
+  }, []);
+
+  const toggleDropdown = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!isTzDropdownOpen) {
+      updatePosition();
+    }
+    setIsTzDropdownOpen((prev) => !prev);
+  };
+
+  // Close timezone dropdown on outside click, window resize/scroll, or Escape key
   useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (tzDropdownRef.current && !tzDropdownRef.current.contains(e.target)) {
+    if (!isTzDropdownOpen) return;
+
+    const handleOutsideClick = (e) => {
+      if (
+        tzDropdownRef.current &&
+        !tzDropdownRef.current.contains(e.target) &&
+        menuRef.current &&
+        !menuRef.current.contains(e.target)
+      ) {
         setIsTzDropdownOpen(false);
       }
     };
@@ -202,13 +251,22 @@ export default function MarketHours() {
         setIsTzDropdownOpen(false);
       }
     };
-    document.addEventListener("mousedown", handleClickOutside);
-    document.addEventListener("keydown", handleKeyDown);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-      document.removeEventListener("keydown", handleKeyDown);
+    const handleWindowChange = () => {
+      updatePosition();
     };
-  }, []);
+
+    document.addEventListener("mousedown", handleOutsideClick);
+    document.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("scroll", handleWindowChange, true);
+    window.addEventListener("resize", handleWindowChange);
+
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
+      document.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("scroll", handleWindowChange, true);
+      window.removeEventListener("resize", handleWindowChange);
+    };
+  }, [isTzDropdownOpen, updatePosition]);
 
   const selectedTzLabel = useMemo(() => {
     const found = TIMEZONES.find((t) => t.id === selectedTz);
@@ -366,7 +424,7 @@ export default function MarketHours() {
 
       <div className="space-y-8 animate-in fade-in duration-300">
         {/* Hero Header Banner with Apple-grade frosted glass */}
-        <div className="relative overflow-hidden rounded-3xl p-6 sm:p-8 bg-gradient-to-r from-blue-500/10 via-indigo-500/10 to-purple-500/10 border border-blue-500/20 backdrop-blur-xl shadow-[0_8px_32px_0_rgba(59,130,246,0.1)]">
+        <div className="relative rounded-3xl p-6 sm:p-8 bg-gradient-to-r from-blue-500/10 via-indigo-500/10 to-purple-500/10 border border-blue-500/20 backdrop-blur-xl shadow-[0_8px_32px_0_rgba(59,130,246,0.1)]">
           <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
             <div className="flex items-center gap-4">
               <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-[0_0_24px_rgba(59,130,246,0.4)] shrink-0">
@@ -391,7 +449,7 @@ export default function MarketHours() {
             <div className="relative w-full sm:w-auto" ref={tzDropdownRef}>
               <button
                 type="button"
-                onClick={() => setIsTzDropdownOpen((prev) => !prev)}
+                onClick={toggleDropdown}
                 className={`flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-2xl border transition-all duration-200 cursor-pointer text-left w-full sm:min-w-[240px] backdrop-blur-xl shadow-xs group select-none ${
                   isTzDropdownOpen
                     ? "bg-white dark:bg-[#161a24] border-blue-500/50 ring-2 ring-blue-500/20 shadow-md"
@@ -420,39 +478,55 @@ export default function MarketHours() {
                 />
               </button>
 
-              {/* Custom Apple-Style Frosted Glass Dropdown Panel */}
-              {isTzDropdownOpen && (
-                <div className="absolute right-0 sm:right-0 left-0 sm:left-auto top-full mt-2 w-full sm:w-72 bg-white/95 dark:bg-[#121622]/95 border border-black/[0.08] dark:border-white/[0.12] rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.18)] dark:shadow-[0_25px_60px_rgba(0,0,0,0.7)] backdrop-blur-2xl z-50 p-1.5 max-h-72 overflow-y-auto animate-in fade-in zoom-in-95 duration-150 space-y-0.5 select-none">
-                  <div className="px-3 py-1.5 text-[10px] font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-widest border-b border-black/[0.04] dark:border-white/[0.06] mb-1">
-                    Select Benchmark Timezone
-                  </div>
-                  {TIMEZONES.map((tz) => {
-                    const isSelected = selectedTz === tz.id;
-                    return (
-                      <button
-                        key={tz.id}
-                        type="button"
-                        onClick={() => {
-                          handleTzChange(tz.id);
-                          setIsTzDropdownOpen(false);
-                        }}
-                        className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs transition-colors text-left cursor-pointer ${
-                          isSelected
-                            ? "bg-blue-500/10 dark:bg-blue-500/15 text-blue-600 dark:text-blue-400 font-bold border border-blue-500/20"
-                            : "text-neutral-700 dark:text-neutral-200 hover:bg-black/[0.04] dark:hover:bg-white/[0.08]"
-                        }`}
-                        role="option"
-                        aria-selected={isSelected}
-                      >
-                        <span className="truncate">{tz.label}</span>
-                        {isSelected && (
-                          <Check className="w-3.5 h-3.5 text-blue-500 shrink-0 ml-2" />
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
+              {/* Floating Apple-Style Frosted Glass Dropdown Panel (Portaled for Z-Index Safety) */}
+              {isTzDropdownOpen &&
+                createPortal(
+                  <div
+                    ref={menuRef}
+                    style={{
+                      position: "fixed",
+                      top: coords.placeAbove ? undefined : coords.top,
+                      bottom: coords.placeAbove
+                        ? window.innerHeight - coords.top
+                        : undefined,
+                      left: coords.left,
+                      width: coords.width,
+                      zIndex: 999999,
+                    }}
+                    className="bg-white/95 dark:bg-[#121622]/95 border border-black/[0.08] dark:border-white/[0.12] rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.22)] dark:shadow-[0_25px_60px_rgba(0,0,0,0.75)] backdrop-blur-2xl p-1.5 max-h-72 overflow-y-auto animate-in fade-in zoom-in-95 duration-150 space-y-0.5 select-none"
+                    role="listbox"
+                  >
+                    <div className="px-3 py-1.5 text-[10px] font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-widest border-b border-black/[0.04] dark:border-white/[0.06] mb-1">
+                      Select Benchmark Timezone
+                    </div>
+                    {TIMEZONES.map((tz) => {
+                      const isSelected = selectedTz === tz.id;
+                      return (
+                        <button
+                          key={tz.id}
+                          type="button"
+                          onClick={() => {
+                            handleTzChange(tz.id);
+                            setIsTzDropdownOpen(false);
+                          }}
+                          className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs transition-colors text-left cursor-pointer ${
+                            isSelected
+                              ? "bg-blue-500/10 dark:bg-blue-500/15 text-blue-600 dark:text-blue-400 font-bold border border-blue-500/20"
+                              : "text-neutral-700 dark:text-neutral-200 hover:bg-black/[0.04] dark:hover:bg-white/[0.08]"
+                          }`}
+                          role="option"
+                          aria-selected={isSelected}
+                        >
+                          <span className="truncate">{tz.label}</span>
+                          {isSelected && (
+                            <Check className="w-3.5 h-3.5 text-blue-500 shrink-0 ml-2" />
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>,
+                  document.body
+                )}
             </div>
           </div>
         </div>
