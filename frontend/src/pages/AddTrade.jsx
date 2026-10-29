@@ -1694,355 +1694,420 @@ export default function AddTrade() {
                 </div>
               </div>
 
-              {/* Trade Result & R-Multiple */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
-                <div>
-                  <label className={labelClass}>
+              {/* 1. TRADE RESULT OUTCOME SELECTOR CARD */}
+              <div className="mac-bento-card rounded-2xl p-4 sm:p-5 border border-black/[0.08] dark:border-white/[0.1] bg-white/60 dark:bg-white/[0.02] backdrop-blur-md shadow-sm">
+                <div className="flex items-center justify-between mb-3">
+                  <label className={`${labelClass} mb-0`}>
                     Trade Result <span className="text-red-400">*</span>
                   </label>
-                  <div
-                    className={`flex gap-2 p-1 rounded-xl ${fieldErrors.result ? "border border-red-500 ring-1 ring-red-500" : ""}`}
-                  >
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const targetR =
-                          calcRR > 0
-                            ? Number(calcRR).toFixed(2)
-                            : formData.rMultiple && Number(formData.rMultiple) > 0
-                            ? formData.rMultiple
-                            : "1.00";
-                        setFormData((prev) => {
-                          let nextPnl = prev.pnl;
-                          if (nextPnl && Number(nextPnl) < 0) {
-                            nextPnl = String(Math.abs(Number(nextPnl)));
-                          }
-                          return {
-                            ...prev,
-                            result: "win",
-                            pnl: nextPnl,
-                            rMultiple: targetR,
-                            r_multiple: targetR,
-                          };
-                        });
-                        if (fieldErrors.result) {
-                          setFieldErrors((prev) => ({ ...prev, result: null }));
-                        }
-                      }}
-                      className={`flex-1 py-3.5 rounded-xl font-bold text-sm transition-colors border ${formData.result === "win" ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400" : "bg-[#15181D] border-white/10 text-gray-500 hover:text-white"}`}
-                    >
-                      WIN ✓
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const targetLossR =
-                          Number(calcRR) > 0
-                            ? `-${Number(calcRR).toFixed(2)}`
-                            : formData.rMultiple && Number(formData.rMultiple) < 0
-                            ? formData.rMultiple
-                            : "-1.00";
-                        setFormData((prev) => {
-                          let nextPnl = prev.pnl;
-                          if (nextPnl && Number(nextPnl) > 0) {
-                            nextPnl = `-${Math.abs(Number(nextPnl))}`;
-                          }
-                          return {
-                            ...prev,
-                            result: "loss",
-                            pnl: nextPnl,
-                            rMultiple: targetLossR,
-                            r_multiple: targetLossR,
-                          };
-                        });
-                        if (fieldErrors.result) {
-                          setFieldErrors((prev) => ({ ...prev, result: null }));
-                        }
-                      }}
-                      className={`flex-1 py-3.5 rounded-xl font-bold text-sm transition-colors border ${formData.result === "loss" ? "bg-red-500/10 border-red-500/30 text-red-400" : "bg-[#15181D] border-white/10 text-gray-500 hover:text-white"}`}
-                    >
-                      LOSS ✗
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setFormData((prev) => ({
-                          ...prev,
-                          result: "be",
-                          pnl: "0.00",
-                          rMultiple: "0.00",
-                          r_multiple: "0.00",
-                        }));
-                        if (fieldErrors.result) {
-                          setFieldErrors((prev) => ({ ...prev, result: null }));
-                        }
-                      }}
-                      className={`flex-1 py-3.5 rounded-xl font-bold text-sm transition-colors border ${formData.result === "be" ? "bg-gray-500/20 border-gray-500/50 text-gray-300" : "bg-[#15181D] border-white/10 text-gray-500 hover:text-white"}`}
-                    >
-                      BE —
-                    </button>
-                  </div>
-                  {fieldErrors.result && (
-                    <p className="text-red-400 text-xs mt-1">
-                      {fieldErrors.result}
-                    </p>
-                  )}
+                  <span className="text-xs text-neutral-500 dark:text-neutral-400 font-medium">
+                    Select final execution outcome
+                  </span>
                 </div>
+                <div
+                  className={`grid grid-cols-3 gap-3 p-1 rounded-xl ${fieldErrors.result ? "border border-red-500 ring-1 ring-red-500" : ""}`}
+                >
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const targetR =
+                        calcRR > 0
+                          ? Number(calcRR).toFixed(2)
+                          : formData.rMultiple && Number(formData.rMultiple) > 0
+                          ? formData.rMultiple
+                          : "1.00";
+                      setFormData((prev) => {
+                        let nextPnl = prev.pnl;
+                        if (nextPnl && Number(nextPnl) < 0) {
+                          nextPnl = String(Math.abs(Number(nextPnl)));
+                        }
+                        return {
+                          ...prev,
+                          result: "win",
+                          pnl: nextPnl,
+                          rMultiple: targetR,
+                          r_multiple: targetR,
+                        };
+                      });
+                      if (fieldErrors.result) {
+                        setFieldErrors((prev) => ({ ...prev, result: null }));
+                      }
+                    }}
+                    className={`py-3.5 rounded-xl font-bold text-sm transition-all border cursor-pointer ${
+                      formData.result === "win"
+                        ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-600 dark:text-emerald-400 shadow-sm shadow-emerald-500/10"
+                        : "bg-neutral-100 dark:bg-white/[0.04] border-black/[0.06] dark:border-white/10 text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
+                    }`}
+                  >
+                    WIN ✓
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const targetLossR =
+                        Number(calcRR) > 0
+                          ? `-${Number(calcRR).toFixed(2)}`
+                          : formData.rMultiple && Number(formData.rMultiple) < 0
+                          ? formData.rMultiple
+                          : "-1.00";
+                      setFormData((prev) => {
+                        let nextPnl = prev.pnl;
+                        if (nextPnl && Number(nextPnl) > 0) {
+                          nextPnl = `-${Math.abs(Number(nextPnl))}`;
+                        }
+                        return {
+                          ...prev,
+                          result: "loss",
+                          pnl: nextPnl,
+                          rMultiple: targetLossR,
+                          r_multiple: targetLossR,
+                        };
+                      });
+                      if (fieldErrors.result) {
+                        setFieldErrors((prev) => ({ ...prev, result: null }));
+                      }
+                    }}
+                    className={`py-3.5 rounded-xl font-bold text-sm transition-all border cursor-pointer ${
+                      formData.result === "loss"
+                        ? "bg-rose-500/15 border-rose-500/40 text-rose-600 dark:text-rose-400 shadow-sm shadow-rose-500/10"
+                        : "bg-neutral-100 dark:bg-white/[0.04] border-black/[0.06] dark:border-white/10 text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
+                    }`}
+                  >
+                    LOSS ✗
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFormData((prev) => ({
+                        ...prev,
+                        result: "be",
+                        pnl: "0.00",
+                        rMultiple: "0.00",
+                        r_multiple: "0.00",
+                      }));
+                      if (fieldErrors.result) {
+                        setFieldErrors((prev) => ({ ...prev, result: null }));
+                      }
+                    }}
+                    className={`py-3.5 rounded-xl font-bold text-sm transition-all border cursor-pointer ${
+                      formData.result === "be"
+                        ? "bg-neutral-200 dark:bg-white/15 border-neutral-300 dark:border-white/20 text-neutral-900 dark:text-white font-bold"
+                        : "bg-neutral-100 dark:bg-white/[0.04] border-black/[0.06] dark:border-white/10 text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
+                    }`}
+                  >
+                    BE —
+                  </button>
+                </div>
+                {fieldErrors.result && (
+                  <p className="text-red-400 text-xs mt-2">
+                    {fieldErrors.result}
+                  </p>
+                )}
+              </div>
 
-                {/* NUMERIC PROFIT / LOSS MADE IN USD ($) - REQUIRED */}
-                <div className="space-y-1.5 mac-bento-card rounded-2xl p-4 border border-black/[0.08] dark:border-white/[0.1] bg-black/[0.02] dark:bg-white/[0.02]">
-                  <div className="flex items-center justify-between">
-                    <label className={labelClass}>
-                      Profit / Loss Made ($ USD) <span className="text-red-400">*</span>
-                    </label>
-                    <span className="text-[11px] font-mono font-bold px-2 py-0.5 rounded-md bg-black/[0.05] dark:bg-white/[0.06] text-neutral-600 dark:text-neutral-300">
-                      {formData.result === "loss" ? "Loss (Negative $)" : formData.result === "win" ? "Win (Positive $)" : "Break-Even ($0.00)"}
-                    </span>
-                  </div>
+              {/* 2. DUAL BALANCED RESULT CARDS (Symmetrical, equal height, perfectly aligned) */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pt-1 items-stretch">
+                {/* LEFT CARD: NET R-MULTIPLE */}
+                <div className="mac-bento-card rounded-2xl p-4 sm:p-5 border border-black/[0.08] dark:border-white/[0.1] bg-white/60 dark:bg-white/[0.02] backdrop-blur-md shadow-sm flex flex-col justify-between space-y-4">
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <label className={`${labelClass} mb-0`}>
+                        Net R-Multiple <span className="text-red-400">*</span>
+                      </label>
+                      <span className="text-[11px] font-mono font-bold px-2 py-0.5 rounded-md bg-black/[0.05] dark:bg-white/[0.06] text-neutral-600 dark:text-neutral-300">
+                        {formData.result === "loss" &&
+                          (Number(calcRR) > 0
+                            ? `Target: -${calcRR}R`
+                            : "Loss: -1R or custom")}
+                        {formData.result === "win" &&
+                          (Number(calcRR) > 0
+                            ? `Target: +${calcRR}R`
+                            : "Win: Custom R")}
+                        {formData.result === "be" && "Break-even: 0R"}
+                      </span>
+                    </div>
 
-                  <div className="relative">
-                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-bold text-neutral-400 pointer-events-none font-mono">
-                      $
-                    </span>
                     <input
                       type="number"
                       step="any"
-                      name="pnl"
-                      required
-                      value={formData.pnl}
-                      onChange={(e) => {
-                        const val = e.target.value;
-                        setFormData((prev) => {
-                          const updated = { ...prev, pnl: val };
-                          const num = Number(val);
-                          if (!isNaN(num) && val !== "") {
-                            if (num < 0 && prev.result !== "loss") {
-                              updated.result = "loss";
-                              if (!prev.rMultiple || Number(prev.rMultiple) >= 0) {
-                                updated.rMultiple = "-1.00";
-                                updated.r_multiple = "-1.00";
-                              }
-                            } else if (num > 0 && prev.result !== "win") {
-                              updated.result = "win";
-                              if (!prev.rMultiple || Number(prev.rMultiple) <= 0) {
-                                updated.rMultiple = "1.00";
-                                updated.r_multiple = "1.00";
-                              }
-                            } else if (num === 0 && prev.result !== "be") {
-                              updated.result = "be";
-                              updated.rMultiple = "0.00";
-                              updated.r_multiple = "0.00";
-                            }
-                          }
-                          return updated;
-                        });
-                        if (fieldErrors.pnl) {
-                          setFieldErrors((prev) => ({ ...prev, pnl: null }));
-                        }
-                      }}
-                      className={`${inputClass} pl-8 font-mono ${
-                        fieldErrors.pnl ? "border-red-500 focus:ring-red-500 ring-1 ring-red-500" : ""
+                      name="rMultiple"
+                      value={formData.rMultiple}
+                      onChange={handleChange}
+                      className={`${inputClass} font-mono text-base ${
+                        fieldErrors.r_multiple ? "border-red-500 focus:ring-red-500 ring-1 ring-red-500" : ""
                       } ${
-                        Number(formData.pnl) > 0
-                          ? "text-emerald-500 dark:text-emerald-400 font-bold"
-                          : Number(formData.pnl) < 0
+                        formData.result === "loss"
                           ? "text-rose-500 dark:text-rose-400 font-bold"
-                          : "text-neutral-800 dark:text-neutral-200"
+                          : formData.result === "win"
+                          ? "text-emerald-500 dark:text-emerald-400 font-bold"
+                          : "text-neutral-700 dark:text-neutral-300 font-bold"
                       }`}
                       placeholder={
                         formData.result === "loss"
-                          ? "-150.00"
-                          : formData.result === "be"
-                          ? "0.00"
-                          : "250.00"
+                          ? Number(calcRR) > 0
+                            ? `-${calcRR}`
+                            : "-1.00"
+                          : "0.00"
                       }
                     />
                   </div>
 
-                  {/* Mandatory Psychological Reality-Check Description */}
-                  <div className="p-2.5 rounded-xl bg-amber-500/10 dark:bg-amber-500/15 border border-amber-500/25 flex items-start gap-2 mt-1.5">
-                    <span className="text-xs shrink-0">⚠️</span>
-                    <p className="text-[11.5px] font-medium text-amber-700 dark:text-amber-300 leading-snug">
-                      &ldquo;dear trader please enter exact profit made in current trade dont fool yourself by entering big profits for flex&rdquo;
+                  {/* Preset helpers container with top divider */}
+                  <div className="pt-3 border-t border-black/[0.05] dark:border-white/[0.06]">
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-neutral-400 mb-2">
+                      Quick R Presets
                     </p>
+                    <div className="flex items-center gap-1.5 flex-wrap min-h-[34px]">
+                      {formData.result === "loss" ? (
+                        <>
+                          {Number(calcRR) > 0 && (
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setFormData((p) => ({
+                                  ...p,
+                                  rMultiple: `-${calcRR}`,
+                                  r_multiple: `-${calcRR}`,
+                                }))
+                              }
+                              className={`px-2.5 py-1 text-[11px] rounded-lg font-mono transition-colors border cursor-pointer ${
+                                formData.rMultiple === `-${calcRR}`
+                                  ? "bg-rose-500/20 text-rose-500 dark:text-rose-400 border-rose-500/40 font-bold"
+                                  : "bg-black/[0.04] dark:bg-white/[0.05] text-neutral-600 dark:text-neutral-300 border-black/[0.06] dark:border-white/10 hover:bg-black/[0.08] dark:hover:bg-white/10"
+                              }`}
+                            >
+                              -{calcRR}R (Target)
+                            </button>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setFormData((p) => ({
+                                ...p,
+                                rMultiple: "-1.00",
+                                r_multiple: "-1.00",
+                              }))
+                            }
+                            className={`px-2.5 py-1 text-[11px] rounded-lg font-mono transition-colors border cursor-pointer ${
+                              formData.rMultiple === "-1.00"
+                                ? "bg-rose-500/20 text-rose-500 dark:text-rose-400 border-rose-500/40 font-bold"
+                                : "bg-black/[0.04] dark:bg-white/[0.05] text-neutral-600 dark:text-neutral-300 border-black/[0.06] dark:border-white/10 hover:bg-black/[0.08] dark:hover:bg-white/10"
+                            }`}
+                          >
+                            -1.00R (Full SL)
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setFormData((p) => ({
+                                ...p,
+                                rMultiple: "-0.50",
+                                r_multiple: "-0.50",
+                              }))
+                            }
+                            className={`px-2.5 py-1 text-[11px] rounded-lg font-mono transition-colors border cursor-pointer ${
+                              formData.rMultiple === "-0.50"
+                                ? "bg-rose-500/20 text-rose-500 dark:text-rose-400 border-rose-500/40 font-bold"
+                                : "bg-black/[0.04] dark:bg-white/[0.05] text-neutral-600 dark:text-neutral-300 border-black/[0.06] dark:border-white/10 hover:bg-black/[0.08] dark:hover:bg-white/10"
+                            }`}
+                          >
+                            -0.50R (Half)
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setFormData((p) => ({
+                                ...p,
+                                rMultiple: "-1.50",
+                                r_multiple: "-1.50",
+                              }))
+                            }
+                            className={`px-2.5 py-1 text-[11px] rounded-lg font-mono transition-colors border cursor-pointer ${
+                              formData.rMultiple === "-1.50"
+                                ? "bg-rose-500/20 text-rose-500 dark:text-rose-400 border-rose-500/40 font-bold"
+                                : "bg-black/[0.04] dark:bg-white/[0.05] text-neutral-600 dark:text-neutral-300 border-black/[0.06] dark:border-white/10 hover:bg-black/[0.08] dark:hover:bg-white/10"
+                            }`}
+                          >
+                            -1.50R (Slippage)
+                          </button>
+                        </>
+                      ) : formData.result === "win" ? (
+                        <>
+                          {Number(calcRR) > 0 && (
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setFormData((p) => ({
+                                  ...p,
+                                  rMultiple: String(calcRR),
+                                  r_multiple: String(calcRR),
+                                }))
+                              }
+                              className={`px-2.5 py-1 text-[11px] rounded-lg font-mono transition-colors border cursor-pointer ${
+                                formData.rMultiple === String(calcRR)
+                                  ? "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-500/40 font-bold"
+                                  : "bg-black/[0.04] dark:bg-white/[0.05] text-neutral-600 dark:text-neutral-300 border-black/[0.06] dark:border-white/10 hover:bg-black/[0.08] dark:hover:bg-white/10"
+                              }`}
+                            >
+                              +{calcRR}R (Target TP)
+                            </button>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setFormData((p) => ({
+                                ...p,
+                                rMultiple: "1.00",
+                                r_multiple: "1.00",
+                              }))
+                            }
+                            className={`px-2.5 py-1 text-[11px] rounded-lg font-mono transition-colors border cursor-pointer ${
+                              formData.rMultiple === "1.00"
+                                ? "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-500/40 font-bold"
+                                : "bg-black/[0.04] dark:bg-white/[0.05] text-neutral-600 dark:text-neutral-300 border-black/[0.06] dark:border-white/10 hover:bg-black/[0.08] dark:hover:bg-white/10"
+                            }`}
+                          >
+                            +1.00R
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setFormData((p) => ({
+                                ...p,
+                                rMultiple: "2.00",
+                                r_multiple: "2.00",
+                              }))
+                            }
+                            className={`px-2.5 py-1 text-[11px] rounded-lg font-mono transition-colors border cursor-pointer ${
+                              formData.rMultiple === "2.00"
+                                ? "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-500/40 font-bold"
+                                : "bg-black/[0.04] dark:bg-white/[0.05] text-neutral-600 dark:text-neutral-300 border-black/[0.06] dark:border-white/10 hover:bg-black/[0.08] dark:hover:bg-white/10"
+                            }`}
+                          >
+                            +2.00R
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setFormData((p) => ({
+                                ...p,
+                                rMultiple: "3.00",
+                                r_multiple: "3.00",
+                              }))
+                            }
+                            className={`px-2.5 py-1 text-[11px] rounded-lg font-mono transition-colors border cursor-pointer ${
+                              formData.rMultiple === "3.00"
+                                ? "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-500/40 font-bold"
+                                : "bg-black/[0.04] dark:bg-white/[0.05] text-neutral-600 dark:text-neutral-300 border-black/[0.06] dark:border-white/10 hover:bg-black/[0.08] dark:hover:bg-white/10"
+                            }`}
+                          >
+                            +3.00R
+                          </button>
+                        </>
+                      ) : (
+                        <span className="text-xs text-neutral-400 font-mono py-1">
+                          Break-even locked at 0.00R
+                        </span>
+                      )}
+                    </div>
+                    {fieldErrors.r_multiple && (
+                      <p className="text-red-400 text-xs mt-1.5 font-semibold">
+                        {fieldErrors.r_multiple}
+                      </p>
+                    )}
                   </div>
-
-                  {fieldErrors.pnl && (
-                    <p className="text-red-400 text-xs mt-1 font-semibold">
-                      {fieldErrors.pnl}
-                    </p>
-                  )}
                 </div>
 
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <label className={labelClass}>
-                      Net R-Multiple <span className="text-red-400">*</span>
-                    </label>
-                    <span className="text-[11px] text-gray-400 font-mono">
-                      {formData.result === "loss" &&
-                        (Number(calcRR) > 0
-                          ? `(Target: -${calcRR}R)`
-                          : "(Loss: -1R or custom)")}
-                      {formData.result === "win" &&
-                        Number(calcRR) > 0 &&
-                        `(Target: +${calcRR}R)`}
-                      {formData.result === "be" && "(Break-even: 0R)"}
-                    </span>
-                  </div>
-                  <input
-                    type="number"
-                    step="any"
-                    name="rMultiple"
-                    value={formData.rMultiple}
-                    onChange={handleChange}
-                    className={`${inputClass} ${fieldErrors.r_multiple ? "border-red-500 focus:ring-red-500 ring-1 ring-red-500" : ""} ${formData.result === "loss" ? "text-red-400 font-bold" : formData.result === "win" ? "text-emerald-400 font-bold" : "text-gray-300 font-bold"}`}
-                    placeholder={
-                      formData.result === "loss"
-                        ? Number(calcRR) > 0
-                          ? `-${calcRR}`
-                          : "-1.00"
-                        : "0.00"
-                    }
-                  />
-                  {/* Preset helpers */}
-                  <div className="flex items-center gap-1.5 mt-2 flex-wrap">
-                    {formData.result === "loss" ? (
-                      <>
-                        {Number(calcRR) > 0 && (
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setFormData((p) => ({
-                                ...p,
-                                rMultiple: `-${calcRR}`,
-                                r_multiple: `-${calcRR}`,
-                              }))
+                {/* RIGHT CARD: NUMERIC PROFIT / LOSS MADE IN USD ($) - REQUIRED */}
+                <div className="mac-bento-card rounded-2xl p-4 sm:p-5 border border-black/[0.08] dark:border-white/[0.1] bg-white/60 dark:bg-white/[0.02] backdrop-blur-md shadow-sm flex flex-col justify-between space-y-4">
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <label className={`${labelClass} mb-0`}>
+                        Profit / Loss Made ($ USD) <span className="text-red-400">*</span>
+                      </label>
+                      <span className="text-[11px] font-mono font-bold px-2 py-0.5 rounded-md bg-black/[0.05] dark:bg-white/[0.06] text-neutral-600 dark:text-neutral-300">
+                        {formData.result === "loss"
+                          ? "Loss (Negative $)"
+                          : formData.result === "win"
+                          ? "Win (Positive $)"
+                          : "Break-Even ($0.00)"}
+                      </span>
+                    </div>
+
+                    <div className="relative">
+                      <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-bold text-neutral-400 pointer-events-none font-mono">
+                        $
+                      </span>
+                      <input
+                        type="number"
+                        step="any"
+                        name="pnl"
+                        required
+                        value={formData.pnl}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setFormData((prev) => {
+                            const updated = { ...prev, pnl: val };
+                            const num = Number(val);
+                            if (!isNaN(num) && val !== "") {
+                              if (num < 0 && prev.result !== "loss") {
+                                updated.result = "loss";
+                                if (!prev.rMultiple || Number(prev.rMultiple) >= 0) {
+                                  updated.rMultiple = "-1.00";
+                                  updated.r_multiple = "-1.00";
+                                }
+                              } else if (num > 0 && prev.result !== "win") {
+                                updated.result = "win";
+                                if (!prev.rMultiple || Number(prev.rMultiple) <= 0) {
+                                  updated.rMultiple = "1.00";
+                                  updated.r_multiple = "1.00";
+                                }
+                              } else if (num === 0 && prev.result !== "be") {
+                                updated.result = "be";
+                                updated.rMultiple = "0.00";
+                                updated.r_multiple = "0.00";
+                              }
                             }
-                            className={`px-2.5 py-1 text-[11px] rounded font-mono transition-colors border ${
-                              formData.rMultiple === `-${calcRR}`
-                                ? "bg-red-500/20 text-red-400 border-red-500/40 font-bold"
-                                : "bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20 font-mono"
-                            }`}
-                          >
-                            -{calcRR}R (Target RRR)
-                          </button>
-                        )}
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setFormData((p) => ({
-                              ...p,
-                              rMultiple: "-1.00",
-                              r_multiple: "-1.00",
-                            }))
+                            return updated;
+                          });
+                          if (fieldErrors.pnl) {
+                            setFieldErrors((prev) => ({ ...prev, pnl: null }));
                           }
-                          className={`px-2.5 py-1 text-[11px] rounded font-mono transition-colors border ${
-                            formData.rMultiple === "-1.00"
-                              ? "bg-red-500/20 text-red-400 border-red-500/40 font-bold"
-                              : "bg-white/5 text-gray-300 border-white/10 hover:bg-white/10 font-mono"
-                          }`}
-                        >
-                          -1.00R (Full SL)
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setFormData((p) => ({
-                              ...p,
-                              rMultiple: "-0.50",
-                              r_multiple: "-0.50",
-                            }))
-                          }
-                          className={`px-2.5 py-1 text-[11px] rounded font-mono transition-colors border ${
-                            formData.rMultiple === "-0.50"
-                              ? "bg-red-500/20 text-red-400 border-red-500/40 font-bold"
-                              : "bg-white/5 text-gray-300 border-white/10 hover:bg-white/10 font-mono"
-                          }`}
-                        >
-                          -0.50R (Half)
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setFormData((p) => ({
-                              ...p,
-                              rMultiple: "-1.50",
-                              r_multiple: "-1.50",
-                            }))
-                          }
-                          className={`px-2.5 py-1 text-[11px] rounded font-mono transition-colors border ${
-                            formData.rMultiple === "-1.50"
-                              ? "bg-red-500/20 text-red-400 border-red-500/40 font-bold"
-                              : "bg-white/5 text-gray-300 border-white/10 hover:bg-white/10 font-mono"
-                          }`}
-                        >
-                          -1.50R (Slippage)
-                        </button>
-                      </>
-                    ) : formData.result === "win" ? (
-                      <>
-                        {Number(calcRR) > 0 && (
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setFormData((p) => ({
-                                ...p,
-                                rMultiple: String(calcRR),
-                                r_multiple: String(calcRR),
-                              }))
-                            }
-                            className={`px-2.5 py-1 text-[11px] rounded font-mono transition-colors border ${
-                              formData.rMultiple === String(calcRR)
-                                ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/40 font-bold"
-                                : "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 font-mono"
-                            }`}
-                          >
-                            +{calcRR}R (Target TP)
-                          </button>
-                        )}
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setFormData((p) => ({
-                              ...p,
-                              rMultiple: "1.00",
-                              r_multiple: "1.00",
-                            }))
-                          }
-                          className={`px-2.5 py-1 text-[11px] rounded font-mono transition-colors border ${
-                            formData.rMultiple === "1.00"
-                              ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/40 font-bold"
-                              : "bg-white/5 text-gray-300 border-white/10 hover:bg-white/10 font-mono"
-                          }`}
-                        >
-                          +1.00R
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setFormData((p) => ({
-                              ...p,
-                              rMultiple: "2.00",
-                              r_multiple: "2.00",
-                            }))
-                          }
-                          className={`px-2.5 py-1 text-[11px] rounded font-mono transition-colors border ${
-                            formData.rMultiple === "2.00"
-                              ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/40 font-bold"
-                              : "bg-white/5 text-gray-300 border-white/10 hover:bg-white/10 font-mono"
-                          }`}
-                        >
-                          +2.00R
-                        </button>
-                      </>
-                    ) : null}
+                        }}
+                        className={`${inputClass} pl-8 font-mono text-base ${
+                          fieldErrors.pnl ? "border-red-500 focus:ring-red-500 ring-1 ring-red-500" : ""
+                        } ${
+                          Number(formData.pnl) > 0
+                            ? "text-emerald-500 dark:text-emerald-400 font-bold"
+                            : Number(formData.pnl) < 0
+                            ? "text-rose-500 dark:text-rose-400 font-bold"
+                            : "text-neutral-800 dark:text-neutral-200 font-bold"
+                        }`}
+                        placeholder={
+                          formData.result === "loss"
+                            ? "-150.00"
+                            : formData.result === "be"
+                            ? "0.00"
+                            : "250.00"
+                        }
+                      />
+                    </div>
                   </div>
-                  {fieldErrors.r_multiple && (
-                    <p className="text-red-400 text-xs mt-1">
-                      {fieldErrors.r_multiple}
-                    </p>
-                  )}
+
+                  {/* Mandatory Psychological Reality-Check Description with top divider */}
+                  <div className="pt-3 border-t border-black/[0.05] dark:border-white/[0.06]">
+                    <div className="p-2.5 rounded-xl bg-amber-500/10 dark:bg-amber-500/15 border border-amber-500/25 flex items-start gap-2">
+                      <span className="text-xs shrink-0 mt-0.5">⚠️</span>
+                      <p className="text-[11px] font-medium text-amber-700 dark:text-amber-300 leading-snug">
+                        &ldquo;dear trader please enter exact profit made in current trade dont fool yourself by entering big profits for flex&rdquo;
+                      </p>
+                    </div>
+                    {fieldErrors.pnl && (
+                      <p className="text-red-400 text-xs mt-1.5 font-semibold">
+                        {fieldErrors.pnl}
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
