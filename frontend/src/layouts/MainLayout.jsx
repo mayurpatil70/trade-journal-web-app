@@ -866,7 +866,7 @@ export default function MainLayout() {
                     <button
                       type="button"
                       onClick={handleDismissBugCallout}
-                      className="w-5 h-5 rounded-md flex items-center justify-center text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 hover:bg-black/5 dark:hover:bg-white/10 transition-colors cursor-pointer"
+                      className="w-6 h-6 rounded-full bg-black/[0.05] dark:bg-white/[0.08] flex items-center justify-center text-neutral-500 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-white hover:bg-black/10 dark:hover:bg-white/15 transition-colors cursor-pointer"
                       aria-label="Dismiss bug prompt"
                     >
                       <X className="w-3.5 h-3.5 stroke-[2.5]" />
@@ -878,10 +878,10 @@ export default function MainLayout() {
                       setSupportModalMode("new");
                       setIsSupportModalOpen(true);
                     }}
-                    className="w-full py-2.5 px-3 rounded-xl bg-[#0066FF] hover:bg-[#0052CC] text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-[0_2px_8px_rgba(0,102,255,0.25)] active:scale-[0.98] transition-all cursor-pointer"
+                    style={{ color: "#ffffff" }} className="w-full py-2.5 px-3 rounded-xl bg-[#0066FF] hover:bg-[#0052CC] text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-[0_2px_8px_rgba(0,102,255,0.25)] active:scale-[0.98] transition-all cursor-pointer"
                   >
-                    <span>Report an issue</span>
-                    <ArrowUpRight className="w-3.5 h-3.5 stroke-[2.5]" />
+                    <span style={{ color: "#ffffff" }} className="text-white font-bold">Report an issue</span>
+                    <ArrowUpRight className="w-3.5 h-3.5 stroke-[2.5] text-white" style={{ color: "#ffffff" }} />
                   </button>
                 </div>
               )}

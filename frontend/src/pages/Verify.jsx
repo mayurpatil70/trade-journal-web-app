@@ -40,6 +40,7 @@ export default function Verify() {
 
         // Save session with timestamp for 24-hour persistence
         saveSession({ userId, token: authToken, email });
+        localStorage.setItem("fn_new_signup", "true");
 
         setStatus("success");
 

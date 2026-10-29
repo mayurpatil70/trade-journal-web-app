@@ -130,6 +130,7 @@ export default function Onboarding() {
       console.warn("Error saving onboarding details:", err);
     } finally {
       // Smooth route transition directly into the Dashboard
+      localStorage.setItem("fn_new_signup", "true");
       navigate("/dashboard", { replace: true });
     }
   };

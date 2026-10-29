@@ -1550,3 +1550,13 @@ video::-moz-media-controls {
 
 
 
+
+
+/* Ensure report an issue & primary blue buttons maintain pure white text in both light & dark themes */
+button[class*="bg-[#0066FF]"],
+button[class*="bg-[#0066FF]"] *,
+button[class*="bg-[#0052CC]"],
+button[class*="bg-[#0052CC]"] * {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+}
