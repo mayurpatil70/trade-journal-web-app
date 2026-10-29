@@ -52,11 +52,24 @@ export default function DateTimePickerPopover({
   disabled = false,
   className = "",
   error = false,
+  mode = "datetime", // "datetime" | "date" | "time"
+  accentColor = "emerald", // "emerald" | "blue"
+  returnFormat = "date", // "date" | "string" | "iso"
 }) {
   const [isOpen, setIsOpen] = useState(false);
-  const [viewMode, setViewMode] = useState("date"); // "date" | "time"
+  const [viewMode, setViewMode] = useState(() => (mode === "time" ? "time" : "date")); // "date" | "time"
   const triggerRef = useRef(null);
   const menuRef = useRef(null);
+
+  const isBlue = accentColor === "blue";
+  const accentClasses = {
+    icon: isBlue ? "text-[#0066FF]" : "text-emerald-500",
+    bgActive: isBlue ? "bg-[#0066FF] text-white shadow-md shadow-blue-500/30 font-bold" : "bg-emerald-500 text-white shadow-md shadow-emerald-500/30 font-bold",
+    todayDot: isBlue ? "bg-[#0066FF]" : "bg-emerald-500",
+    ring: isBlue ? "border-[#0066FF] ring-2 ring-[#0066FF]/20 bg-white dark:bg-[#121622]" : "border-emerald-500 ring-2 ring-emerald-500/20 bg-white dark:bg-[#121622]",
+    btnDone: isBlue ? "bg-[#0066FF] hover:bg-[#0052cc] shadow-blue-500/25" : "bg-emerald-500 hover:bg-emerald-400 shadow-emerald-500/25",
+    linkText: isBlue ? "text-[#0066FF] dark:text-blue-400" : "text-emerald-600 dark:text-emerald-400",
+  };
 
   const [coords, setCoords] = useState({
     top: 0,
@@ -84,6 +97,13 @@ export default function DateTimePickerPopover({
   const parsedDate = useMemo(() => {
     if (!value) return null;
     if (value instanceof Date) return isNaN(value.getTime()) ? null : value;
+    if (typeof value === "string") {
+      const trimmed = value.trim();
+      if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
+        const [y, m, d] = trimmed.split("-").map(Number);
+        return new Date(y, m - 1, d, 12, 0, 0);
+      }
+    }
     const d = new Date(value);
     return isNaN(d.getTime()) ? null : d;
   }, [value]);
@@ -265,12 +285,31 @@ export default function DateTimePickerPopover({
     return days;
   }, [navYear, navMonth]);
 
+  const emitChange = (d) => {
+    if (!d) {
+      onChange(null);
+      return;
+    }
+    if (returnFormat === "iso" || returnFormat === "string") {
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      onChange(`${y}-${m}-${day}`);
+    } else {
+      onChange(d);
+    }
+  };
+
   const handlePresetNow = () => {
     const now = new Date();
     setSelectedDate(now);
     setNavMonthDate(now);
-    onChange(now);
-    setViewMode("time");
+    emitChange(now);
+    if (mode === "date") {
+      setIsOpen(false);
+    } else {
+      setViewMode("time");
+    }
   };
 
   const handlePresetYesterday = () => {
@@ -278,24 +317,35 @@ export default function DateTimePickerPopover({
     yesterday.setDate(yesterday.getDate() - 1);
     setSelectedDate(yesterday);
     setNavMonthDate(yesterday);
-    onChange(yesterday);
-    setViewMode("time");
+    emitChange(yesterday);
+    if (mode === "date") {
+      setIsOpen(false);
+    } else {
+      setViewMode("time");
+    }
   };
 
   const handleClear = () => {
-    onChange(null);
+    emitChange(null);
     setIsOpen(false);
-    setViewMode("date");
+    setViewMode(mode === "time" ? "time" : "date");
   };
 
   const handleSelectDay = (dayObj) => {
     const newDate = new Date(dayObj.date);
+    if (mode === "date") {
+      newDate.setHours(12, 0, 0, 0);
+      setSelectedDate(newDate);
+      emitChange(newDate);
+      setIsOpen(false);
+      return;
+    }
     newDate.setHours(selectedDate.getHours());
     newDate.setMinutes(selectedDate.getMinutes());
     newDate.setSeconds(0);
     newDate.setMilliseconds(0);
     setSelectedDate(newDate);
-    onChange(newDate);
+    emitChange(newDate);
     setViewMode("time");
   };
 
@@ -306,7 +356,7 @@ export default function DateTimePickerPopover({
     if (h > 23) h = 0;
     updated.setHours(h);
     setSelectedDate(updated);
-    onChange(updated);
+    emitChange(updated);
   };
 
   const adjustMinute = (delta) => {
@@ -316,7 +366,7 @@ export default function DateTimePickerPopover({
     if (m > 59) m = 0;
     updated.setMinutes(m);
     setSelectedDate(updated);
-    onChange(updated);
+    emitChange(updated);
   };
 
   const toggleAmPm = () => {
@@ -328,7 +378,7 @@ export default function DateTimePickerPopover({
       updated.setHours(h + 12);
     }
     setSelectedDate(updated);
-    onChange(updated);
+    emitChange(updated);
   };
 
   const isToday = (d) => {
@@ -349,11 +399,21 @@ export default function DateTimePickerPopover({
     );
   };
 
-  const formattedDisplayText = parsedDate ? formatTradeFXDateTime(parsedDate) : "";
+  const formattedDisplayText = useMemo(() => {
+    if (!parsedDate) return "";
+    if (mode === "date") {
+      const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      return `${months[parsedDate.getMonth()]} ${parsedDate.getDate()}, ${parsedDate.getFullYear()}`;
+    }
+    return formatTradeFXDateTime(parsedDate);
+  }, [parsedDate, mode]);
+
   const headerTitle =
     label ||
     (placeholder && placeholder !== "Optional"
       ? placeholder
+      : mode === "date"
+      ? "Select Date"
       : viewMode === "date"
       ? "Select Date & Time"
       : "Set Time");
@@ -372,7 +432,7 @@ export default function DateTimePickerPopover({
       {/* Top Header with title and explicit Close (X) button */}
       <div className="flex items-center justify-between pb-2.5 mb-3 border-b border-black/[0.06] dark:border-white/[0.08]">
         <div className="flex items-center gap-2 min-w-0">
-          <CalendarIcon className="w-4 h-4 text-emerald-500 shrink-0" />
+          <CalendarIcon className={`w-4 h-4 ${accentClasses.icon} shrink-0`} />
           <span className="text-xs font-bold text-neutral-900 dark:text-white uppercase tracking-wider truncate">
             {headerTitle}
           </span>
@@ -381,7 +441,7 @@ export default function DateTimePickerPopover({
           type="button"
           onClick={() => {
             setIsOpen(false);
-            setViewMode("date");
+            setViewMode(mode === "time" ? "time" : "date");
           }}
           className="p-1 rounded-lg text-neutral-400 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-white/[0.08] transition-colors cursor-pointer shrink-0 ml-2"
           aria-label="Close"
@@ -393,19 +453,27 @@ export default function DateTimePickerPopover({
       {viewMode === "date" ? (
         /* ──────── DATE SELECTION VIEW ──────── */
         <div>
-          {/* Presets Row: Now, Yesterday, Clear */}
+          {/* Presets Row: Now/Today, Yesterday, Clear */}
           <div className="grid grid-cols-3 gap-2 mb-4">
             <button
               type="button"
               onClick={handlePresetNow}
-              className="py-1.5 px-3 rounded-xl text-xs font-semibold bg-neutral-100 dark:bg-white/[0.06] hover:bg-emerald-500/10 hover:text-emerald-600 dark:hover:bg-emerald-500/20 dark:hover:text-emerald-400 text-neutral-700 dark:text-neutral-300 transition-colors cursor-pointer text-center"
+              className={`py-1.5 px-3 rounded-xl text-xs font-semibold bg-neutral-100 dark:bg-white/[0.06] ${
+                isBlue
+                  ? "hover:bg-blue-500/10 hover:text-[#0066FF] dark:hover:bg-blue-500/20 dark:hover:text-blue-400"
+                  : "hover:bg-emerald-500/10 hover:text-emerald-600 dark:hover:bg-emerald-500/20 dark:hover:text-emerald-400"
+              } text-neutral-700 dark:text-neutral-300 transition-colors cursor-pointer text-center`}
             >
-              Now
+              {mode === "date" ? "Today" : "Now"}
             </button>
             <button
               type="button"
               onClick={handlePresetYesterday}
-              className="py-1.5 px-3 rounded-xl text-xs font-semibold bg-neutral-100 dark:bg-white/[0.06] hover:bg-emerald-500/10 hover:text-emerald-600 dark:hover:bg-emerald-500/20 dark:hover:text-emerald-400 text-neutral-700 dark:text-neutral-300 transition-colors cursor-pointer text-center"
+              className={`py-1.5 px-3 rounded-xl text-xs font-semibold bg-neutral-100 dark:bg-white/[0.06] ${
+                isBlue
+                  ? "hover:bg-blue-500/10 hover:text-[#0066FF] dark:hover:bg-blue-500/20 dark:hover:text-blue-400"
+                  : "hover:bg-emerald-500/10 hover:text-emerald-600 dark:hover:bg-emerald-500/20 dark:hover:text-emerald-400"
+              } text-neutral-700 dark:text-neutral-300 transition-colors cursor-pointer text-center`}
             >
               Yesterday
             </button>
@@ -461,7 +529,7 @@ export default function DateTimePickerPopover({
                   onClick={() => handleSelectDay(dObj)}
                   className={`relative w-8 h-8 mx-auto flex items-center justify-center text-xs font-semibold rounded-full transition-all cursor-pointer ${
                     sel
-                      ? "bg-emerald-500 text-white shadow-md shadow-emerald-500/30 font-bold"
+                      ? accentClasses.bgActive
                       : dObj.isCurrentMonth
                       ? "text-neutral-800 dark:text-neutral-200 hover:bg-black/5 dark:hover:bg-white/10"
                       : "text-neutral-300 dark:text-neutral-600 hover:bg-black/5 dark:hover:bg-white/5"
@@ -469,7 +537,7 @@ export default function DateTimePickerPopover({
                 >
                   <span>{dObj.dayNumber}</span>
                   {tod && !sel && (
-                    <span className="absolute bottom-1 w-1 h-1 rounded-full bg-emerald-500" />
+                    <span className={`absolute bottom-1 w-1 h-1 rounded-full ${accentClasses.todayDot}`} />
                   )}
                 </button>
               );
@@ -478,11 +546,11 @@ export default function DateTimePickerPopover({
 
           {/* Actions footer */}
           <div className="mt-3 pt-2.5 border-t border-black/[0.06] dark:border-white/[0.08] flex items-center justify-between">
-            {parsedDate ? (
+            {parsedDate && mode !== "date" ? (
               <button
                 type="button"
                 onClick={() => setViewMode("time")}
-                className="text-xs font-medium text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1 cursor-pointer"
+                className={`text-xs font-medium ${accentClasses.linkText} hover:underline flex items-center gap-1 cursor-pointer`}
               >
                 <Clock className="w-3.5 h-3.5" /> Adjust Time
               </button>
@@ -494,9 +562,9 @@ export default function DateTimePickerPopover({
                 type="button"
                 onClick={() => {
                   setIsOpen(false);
-                  setViewMode("date");
+                  setViewMode(mode === "time" ? "time" : "date");
                 }}
-                className="px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white text-xs font-semibold transition-colors cursor-pointer flex items-center gap-1 shadow-sm shadow-emerald-500/25"
+                className={`px-3 py-1.5 rounded-xl ${accentClasses.btnDone} text-white text-xs font-semibold transition-colors cursor-pointer flex items-center gap-1 shadow-sm`}
               >
                 <Check className="w-3.5 h-3.5 stroke-[2.5]" /> Done
               </button>
@@ -510,7 +578,7 @@ export default function DateTimePickerPopover({
           <button
             type="button"
             onClick={() => setViewMode("date")}
-            className="flex items-center gap-2 text-xs font-semibold text-neutral-800 dark:text-neutral-200 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors mb-3 cursor-pointer"
+            className={`flex items-center gap-2 text-xs font-semibold text-neutral-800 dark:text-neutral-200 hover:${accentClasses.linkText} transition-colors mb-3 cursor-pointer`}
           >
             <div className="p-1 rounded-lg border border-black/[0.08] dark:border-white/[0.1] bg-neutral-50 dark:bg-white/[0.04]">
               <ChevronLeft className="w-3.5 h-3.5" />
@@ -590,11 +658,11 @@ export default function DateTimePickerPopover({
           <button
             type="button"
             onClick={() => {
-              onChange(selectedDate);
+              emitChange(selectedDate);
               setIsOpen(false);
-              setViewMode("date");
+              setViewMode(mode === "time" ? "time" : "date");
             }}
-            className="w-full mt-5 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-white font-semibold rounded-2xl transition-all shadow-md shadow-emerald-500/25 active:scale-[0.98] flex items-center justify-center gap-1.5 text-sm cursor-pointer"
+            className={`w-full mt-5 py-2.5 ${accentClasses.btnDone} text-white font-semibold rounded-2xl transition-all shadow-md active:scale-[0.98] flex items-center justify-center gap-1.5 text-sm cursor-pointer`}
           >
             <Check className="w-4 h-4 stroke-[2.5]" /> Done
           </button>
@@ -623,12 +691,12 @@ export default function DateTimePickerPopover({
           error
             ? "border-rose-500/80 ring-1 ring-rose-500/50 bg-rose-500/[0.04]"
             : isOpen
-            ? "border-emerald-500 ring-2 ring-emerald-500/20 bg-white dark:bg-[#121622]"
+            ? accentClasses.ring
             : "border-black/[0.08] dark:border-white/[0.12] bg-white/70 dark:bg-white/[0.04] hover:border-black/20 dark:hover:border-white/20"
         } ${disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
       >
         <div className="flex items-center gap-2.5 overflow-hidden">
-          <CalendarIcon className="w-4 h-4 text-neutral-400 dark:text-neutral-500 shrink-0" />
+          <CalendarIcon className={`w-4 h-4 ${isOpen ? accentClasses.icon : "text-neutral-400 dark:text-neutral-500"} shrink-0`} />
           <span
             className={`text-sm truncate ${
               formattedDisplayText

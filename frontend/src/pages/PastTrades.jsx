@@ -3,11 +3,14 @@
 // Faithfully replicates https://app.tradefxbook.com/?view=portfolio
 // Fully implements Filters Drawer, View Popover (Columns, Sort, Display, Tips), and Table Row Architecture
 
-import { useEffect, useState, useMemo, useRef, useCallback } from "react";
+import { useEffect, useState, useMemo, useRef, useCallback, Fragment } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import api from "../api/axios";
 import AccountFilter from "../components/AccountFilter";
 import TradeFXBookAddTradeModal from "../components/dashboard/TradeFXBookAddTradeModal";
+import TradeShareModal from "../components/dashboard/TradeShareModal";
+import DateTimePickerPopover from "../components/ui/DateTimePickerPopover";
+import PhotoLightboxModal from "../components/ui/PhotoLightboxModal";
 import {
   getImmediateCachedTrades,
   getTradesWithCache,
@@ -41,6 +44,10 @@ import {
   GripVertical,
   Layers,
   Sparkles,
+  FileText,
+  FileSpreadsheet,
+  Copy,
+  Maximize2,
 } from "lucide-react";
 
 // ── Column Definitions (All 16 Institutional Columns) ──
@@ -145,6 +152,9 @@ export default function PastTrades() {
   const [expandedRows, setExpandedRows] = useState(new Set());
   const [selectedRowIds, setSelectedRowIds] = useState(new Set());
   const [copiedTradeId, setCopiedTradeId] = useState(null);
+  const [shareModalTrade, setShareModalTrade] = useState(null);
+  const [lightboxImage, setLightboxImage] = useState(null);
+  const [bulkToast, setBulkToast] = useState("");
 
   // ── VIEW POPOVER STATE (Matches Screenshots 1 & 3) ──
   const [isViewOpen, setIsViewOpen] = useState(false);
@@ -473,24 +483,17 @@ export default function PastTrades() {
     }
   };
 
-  // Share trade link
-  const handleShareTrade = (trade, e) => {
-    if (e) e.stopPropagation();
-    const shareText = `Trade on ${trade.asset}: ${trade.direction} (${normalizeTradeR(trade) >= 0 ? "+" : ""}${normalizeTradeR(trade).toFixed(2)}R) logged on ForexNotes.`;
-    navigator.clipboard.writeText(shareText);
-    setCopiedTradeId(trade.id);
-    setTimeout(() => setCopiedTradeId(null), 2000);
-  };
-
-  // Export CSV
-  const handleExportCSV = () => {
-    if (sortedTrades.length === 0) {
+  // Export CSV helper
+  const exportTradesToCSV = (tradeList, filename = "ForexNotes-Trades.csv", isExcel = false) => {
+    if (!tradeList || tradeList.length === 0) {
       alert("No trades to export.");
       return;
     }
     const headers = [
       "Open Date",
       "Open Time",
+      "Close Date",
+      "Close Time",
       "Symbol",
       "Direction",
       "Entry Price",
@@ -499,47 +502,108 @@ export default function PastTrades() {
       "Net PnL",
       "R-Multiple",
       "Outcome",
+      "Commission",
+      "Swap",
       "Setup",
       "Session",
       "Account",
       "Source",
+      "Notes",
     ];
-    const rows = sortedTrades.map((t) => [
+    const rows = tradeList.map((t) => [
       t.date || "",
       t.time || "",
+      t.exit_date || t.date || "",
+      t.exit_time || t.time || "",
       t.asset || "",
       t.direction || "",
       t.entry || t.entry_price || "",
       t.exit || t.exit_price || "",
       t.lot_size ?? t.size ?? "",
-      t.pnl ?? "",
+      t.pnl !== null && t.pnl !== undefined ? t.pnl : "",
       normalizeTradeR(t).toFixed(2),
       t.result || "",
+      t.commission || "",
+      t.swap || "",
       t.setup || "",
       t.session || "",
       t.account_name || "",
       t.source || "Manual",
+      t.notes || t.reason || "",
     ]);
 
-    const csvContent =
-      "data:text/csv;charset=utf-8," +
-      [
-        headers.join(","),
-        ...rows.map((row) =>
-          row.map((val) => `"${String(val).replace(/"/g, '""')}"`).join(",")
-        ),
-      ].join("\n");
+    const csvContent = [headers, ...rows]
+      .map((row) =>
+        row
+          .map((cell) => {
+            const str = String(cell ?? "");
+            return str.includes(",") || str.includes('"') || str.includes("\n")
+              ? `"${str.replace(/"/g, '""')}"`
+              : str;
+          })
+          .join(",")
+      )
+      .join("\n");
 
-    const encodedUri = encodeURI(csvContent);
+    const prefix = isExcel ? "\uFEFF" : "";
+    const blob = new Blob([prefix + csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute(
-      "download",
-      `tradefxbook_trades_${new Date().toISOString().slice(0, 10)}.csv`
-    );
+    link.href = url;
+    link.download = filename;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  // Export all visible/filtered trades
+  const handleExportCSV = () => {
+    exportTradesToCSV(sortedTrades, `ForexNotes-Trades-${new Date().toISOString().slice(0, 10)}.csv`);
+  };
+
+  // Bulk actions on selected rows (Screenshot 5)
+  const selectedTradesNetPnl = useMemo(() => {
+    let total = 0;
+    trades.forEach((t) => {
+      if (selectedRowIds.has(t.id)) {
+        if (t.pnl !== null && t.pnl !== undefined && !Number.isNaN(Number(t.pnl))) {
+          total += Number(t.pnl);
+        } else {
+          const r = normalizeTradeR(t);
+          total += r * 100;
+        }
+      }
+    });
+    return total;
+  }, [trades, selectedRowIds]);
+
+  const handleBulkCopy = () => {
+    const selected = trades.filter((t) => selectedRowIds.has(t.id));
+    if (selected.length === 0) return;
+    const text = selected
+      .map(
+        (t) =>
+          `${t.asset || "Trade"}: ${t.direction || "LONG"} | Entry: ${t.entry || t.entry_price || "—"} | Exit: ${t.exit || t.exit_price || "—"} | P&L: ${
+            t.pnl !== null && t.pnl !== undefined ? `$${t.pnl}` : `${normalizeTradeR(t)}R`
+          }`
+      )
+      .join("\n");
+    navigator.clipboard.writeText(text);
+    setBulkToast("Selected trades copied to clipboard!");
+    setTimeout(() => setBulkToast(""), 3000);
+  };
+
+  const handleBulkExportCSV = () => {
+    const selected = trades.filter((t) => selectedRowIds.has(t.id));
+    if (selected.length === 0) return;
+    exportTradesToCSV(selected, `ForexNotes-Selected-${selected.length}-Trades.csv`);
+  };
+
+  const handleBulkExportExcel = () => {
+    const selected = trades.filter((t) => selectedRowIds.has(t.id));
+    if (selected.length === 0) return;
+    exportTradesToCSV(selected, `ForexNotes-Selected-${selected.length}-Trades-Excel.csv`, true);
   };
 
   // Toggle single column checkbox
@@ -1345,9 +1409,9 @@ export default function PastTrades() {
                   const hasPnl = t.pnl !== null && t.pnl !== undefined && !Number.isNaN(pnlNum) && pnlNum !== 0;
 
                   return (
-                    <tr
-                      key={t.id || idx}
-                      onClick={() => setSelectedTrade(t)}
+                    <Fragment key={t.id || idx}>
+                      <tr
+                        onClick={() => setSelectedTrade(t)}
                       className={`group hover:bg-black/[0.015] dark:hover:bg-white/[0.025] transition-colors cursor-pointer ${
                         isSelected ? "bg-blue-500/[0.04] dark:bg-blue-500/[0.06]" : ""
                       }`}
@@ -1534,18 +1598,17 @@ export default function PastTrades() {
                             <Pencil className="w-3.5 h-3.5" />
                           </button>
 
-                          {/* Share */}
+                          {/* Share Trade Poster (Screenshot 3) */}
                           <button
                             type="button"
-                            onClick={(e) => handleShareTrade(t, e)}
-                            className="p-1.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/10 text-neutral-500 hover:text-neutral-900 dark:hover:text-white transition-colors cursor-pointer"
-                            title="Share Trade"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setShareModalTrade(t);
+                            }}
+                            className="p-1.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/10 text-neutral-500 hover:text-[#0066FF] dark:hover:text-blue-400 transition-colors cursor-pointer"
+                            title="Share Trade Poster (Story, Post, Landscape)"
                           >
-                            {copiedTradeId === t.id ? (
-                              <Check className="w-3.5 h-3.5 text-emerald-500" />
-                            ) : (
-                              <Share2 className="w-3.5 h-3.5" />
-                            )}
+                            <Share2 className="w-3.5 h-3.5" />
                           </button>
 
                           {/* Delete */}
@@ -1560,7 +1623,234 @@ export default function PastTrades() {
                         </div>
                       </td>
                     </tr>
-                  );
+
+                    {/* ── EXPANDED ROW SUB-SECTION (Matches Screenshot 5) ── */}
+                    {isExpanded && (
+                      <tr className="bg-[#f8fafc]/90 dark:bg-[#0c101a] border-b border-black/[0.06] dark:border-white/[0.08]">
+                        <td colSpan={visibleColumns.length + 3} className="p-4 sm:p-6 space-y-5">
+                          {/* 1. EXECUTIONS SUB-TABLE (Screenshot 5) */}
+                          <div className="bg-white dark:bg-[#121622] rounded-2xl border border-black/[0.06] dark:border-white/[0.08] overflow-hidden shadow-xs">
+                            <div className="flex items-center justify-between px-4 py-3 border-b border-black/[0.05] dark:border-white/[0.06] bg-black/[0.015] dark:bg-white/[0.02]">
+                              <h4 className="text-xs font-extrabold uppercase tracking-widest text-neutral-600 dark:text-neutral-400 flex items-center gap-2">
+                                <SlidersHorizontal className="w-3.5 h-3.5 text-[#0066FF]" />
+                                <span>Executions</span>
+                              </h4>
+                              <span className="text-[11px] font-mono text-neutral-400">
+                                2 fills recorded
+                              </span>
+                            </div>
+
+                            <div className="overflow-x-auto">
+                              <table className="w-full text-left text-xs">
+                                <thead>
+                                  <tr className="border-b border-black/[0.05] dark:border-white/[0.06] text-[10px] uppercase font-bold text-neutral-400 dark:text-neutral-500">
+                                    <th className="px-4 py-2.5">Action</th>
+                                    <th className="px-4 py-2.5">Time</th>
+                                    <th className="px-4 py-2.5">Side</th>
+                                    <th className="px-4 py-2.5">Price</th>
+                                    <th className="px-4 py-2.5">Volume</th>
+                                    <th className="px-4 py-2.5">Commission</th>
+                                    <th className="px-4 py-2.5">Swap</th>
+                                    <th className="px-4 py-2.5">P&L</th>
+                                  </tr>
+                                </thead>
+                                <tbody className="divide-y divide-black/[0.04] dark:divide-white/[0.05]">
+                                  {/* Open Fill */}
+                                  <tr className="hover:bg-black/[0.01] dark:hover:bg-white/[0.01]">
+                                    <td className="px-4 py-2.5">
+                                      <span className="inline-block px-2.5 py-0.5 rounded-md bg-neutral-100 dark:bg-white/[0.08] text-neutral-800 dark:text-neutral-200 font-bold text-[11px]">
+                                        Open
+                                      </span>
+                                    </td>
+                                    <td className="px-4 py-2.5 font-mono text-neutral-600 dark:text-neutral-300">
+                                      {t.date ? `${t.date} ${t.time || "06:02 PM"}` : "—"}
+                                    </td>
+                                    <td className="px-4 py-2.5 font-bold">
+                                      <span className={t.direction === "SHORT" || t.direction === "SELL" ? "text-rose-500" : "text-emerald-500"}>
+                                        {t.direction === "SHORT" || t.direction === "SELL" ? "Sell" : "Buy"}
+                                      </span>
+                                    </td>
+                                    <td className="px-4 py-2.5 font-mono font-semibold text-neutral-900 dark:text-white">
+                                      {t.entry || t.entry_price ? Number(t.entry || t.entry_price).toLocaleString("en-US", { minimumFractionDigits: 2 }) : "—"}
+                                    </td>
+                                    <td className="px-4 py-2.5 font-mono text-neutral-700 dark:text-neutral-300">
+                                      {t.lot_size ?? t.size ?? "0.1"}
+                                    </td>
+                                    <td className="px-4 py-2.5 font-mono text-neutral-400">—</td>
+                                    <td className="px-4 py-2.5 font-mono text-neutral-400">—</td>
+                                    <td className="px-4 py-2.5 font-mono text-neutral-400">—</td>
+                                  </tr>
+
+                                  {/* Close Fill */}
+                                  <tr className="hover:bg-black/[0.01] dark:hover:bg-white/[0.01]">
+                                    <td className="px-4 py-2.5">
+                                      <span className="inline-block px-2.5 py-0.5 rounded-md bg-neutral-100 dark:bg-white/[0.08] text-neutral-800 dark:text-neutral-200 font-bold text-[11px]">
+                                        Close
+                                      </span>
+                                    </td>
+                                    <td className="px-4 py-2.5 font-mono text-neutral-600 dark:text-neutral-300">
+                                      {t.exit_date ? `${t.exit_date} ${t.exit_time || "06:02 PM"}` : t.date ? `${t.date} ${t.time || "06:02 PM"}` : "—"}
+                                    </td>
+                                    <td className="px-4 py-2.5 font-bold">
+                                      <span className={t.direction === "SHORT" || t.direction === "SELL" ? "text-emerald-500" : "text-rose-500"}>
+                                        {t.direction === "SHORT" || t.direction === "SELL" ? "Buy" : "Sell"}
+                                      </span>
+                                    </td>
+                                    <td className="px-4 py-2.5 font-mono font-semibold text-neutral-900 dark:text-white">
+                                      {t.exit || t.exit_price ? Number(t.exit || t.exit_price).toLocaleString("en-US", { minimumFractionDigits: 2 }) : "—"}
+                                    </td>
+                                    <td className="px-4 py-2.5 font-mono text-neutral-700 dark:text-neutral-300">
+                                      {t.lot_size ?? t.size ?? "0.1"}
+                                    </td>
+                                    <td className="px-4 py-2.5 font-mono text-neutral-600 dark:text-neutral-400">
+                                      {t.commission !== undefined && t.commission !== null ? `${Number(t.commission) >= 0 ? "+" : ""}$${Number(t.commission).toFixed(2)}` : "+$0.00"}
+                                    </td>
+                                    <td className="px-4 py-2.5 font-mono text-neutral-600 dark:text-neutral-400">
+                                      {t.swap !== undefined && t.swap !== null ? `${Number(t.swap) >= 0 ? "+" : ""}$${Number(t.swap).toFixed(2)}` : "+$0.00"}
+                                    </td>
+                                    <td className="px-4 py-2.5 font-mono font-black text-sm">
+                                      {hasPnl ? (
+                                        <span className={pnlNum >= 0 ? "text-[#0066FF] dark:text-blue-400" : "text-rose-500"}>
+                                          {pnlNum >= 0 ? "+" : ""}${pnlNum.toFixed(2)}
+                                        </span>
+                                      ) : (
+                                        <span className={isWin ? "text-[#0066FF] dark:text-blue-400" : isLoss ? "text-rose-500" : "text-neutral-400"}>
+                                          {r >= 0 ? "+" : ""}{r.toFixed(2)}R
+                                        </span>
+                                      )}
+                                    </td>
+                                  </tr>
+                                </tbody>
+                              </table>
+                            </div>
+                          </div>
+
+                          {/* 2. NOTES & PSYCHOLOGY SECTION */}
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {/* Notes / Technical Setup */}
+                            <div className="bg-white dark:bg-[#121622] rounded-2xl border border-black/[0.06] dark:border-white/[0.08] p-4 shadow-xs">
+                              <h5 className="text-[11px] font-extrabold uppercase tracking-wider text-neutral-500 dark:text-neutral-400 mb-2 flex items-center gap-1.5">
+                                <Pencil className="w-3.5 h-3.5 text-[#0066FF]" />
+                                <span>Notes</span>
+                              </h5>
+                              <p className="text-xs text-neutral-800 dark:text-neutral-200 leading-relaxed whitespace-pre-wrap font-sans">
+                                {t.notes || t.reason || t.lesson || "No notes logged for this trade."}
+                              </p>
+                            </div>
+
+                            {/* Psychology, Emotion & Rules */}
+                            <div className="bg-white dark:bg-[#121622] rounded-2xl border border-black/[0.06] dark:border-white/[0.08] p-4 shadow-xs">
+                              <h5 className="text-[11px] font-extrabold uppercase tracking-wider text-neutral-500 dark:text-neutral-400 mb-2 flex items-center gap-1.5">
+                                <Sparkles className="w-3.5 h-3.5 text-purple-500" />
+                                <span>Psychology & Discipline</span>
+                              </h5>
+                              <div className="space-y-2 text-xs">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-[10px] uppercase font-bold text-neutral-400">Mindset:</span>
+                                  <span className="px-2.5 py-0.5 rounded-md bg-purple-500/10 text-purple-600 dark:text-purple-400 font-bold text-[11px]">
+                                    {t.emotion_before || t.emotion || t.psych_note || "Disciplined"}
+                                  </span>
+                                  {t.emotion_after && (
+                                    <>
+                                      <span className="text-neutral-400">→</span>
+                                      <span className="px-2.5 py-0.5 rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold text-[11px]">
+                                        {t.emotion_after}
+                                      </span>
+                                    </>
+                                  )}
+                                </div>
+                                {t.mistake && (
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-[10px] uppercase font-bold text-rose-400">Mistake:</span>
+                                    <span className="text-rose-600 dark:text-rose-400 font-semibold">{t.mistake}</span>
+                                  </div>
+                                )}
+                                {t.lesson && (
+                                  <div className="pt-2 border-t border-black/[0.05] dark:border-white/[0.06]">
+                                    <p className="text-[10px] uppercase font-bold text-neutral-400 mb-0.5">Lesson Learned:</p>
+                                    <p className="text-neutral-700 dark:text-neutral-300 font-medium">{t.lesson}</p>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* 3. BEFORE & AFTER CHARTS (Interactive & Viewable Lightbox) */}
+                          <div>
+                            <h5 className="text-[11px] font-extrabold uppercase tracking-wider text-neutral-500 dark:text-neutral-400 mb-3 flex items-center gap-1.5">
+                              <ImageIcon className="w-3.5 h-3.5 text-emerald-500" />
+                              <span>Before & After Chart Analysis (Click photo to enlarge)</span>
+                            </h5>
+
+                            {(() => {
+                              const tradeImgs = [];
+                              if (t.before_image || t.before_chart) {
+                                tradeImgs.push({ src: t.before_image || t.before_chart, label: "Before Entry Setup" });
+                              }
+                              if (t.after_image || t.after_chart) {
+                                tradeImgs.push({ src: t.after_image || t.after_chart, label: "After Outcome Analysis" });
+                              }
+                              if (Array.isArray(t.images) && t.images.length > 0) {
+                                t.images.forEach((img, i) => {
+                                  if (!tradeImgs.some((x) => x.src === img)) {
+                                    tradeImgs.push({
+                                      src: img,
+                                      label: i === 0 ? "Before Setup" : i === 1 ? "After Outcome" : `Chart #${i + 1}`,
+                                    });
+                                  }
+                                });
+                              }
+
+                              if (tradeImgs.length === 0) {
+                                return (
+                                  <div className="p-4 rounded-2xl border border-dashed border-black/[0.08] dark:border-white/[0.1] bg-black/[0.01] dark:bg-white/[0.01] flex items-center justify-between">
+                                    <span className="text-xs text-neutral-400">
+                                      No before/after chart screenshots attached to this trade.
+                                    </span>
+                                    <button
+                                      type="button"
+                                      onClick={() => navigate(`/add-trade?edit=${t.id}`)}
+                                      className="px-3 py-1.5 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 text-[#0066FF] dark:text-blue-400 font-bold text-xs transition-colors cursor-pointer"
+                                    >
+                                      Upload Chart
+                                    </button>
+                                  </div>
+                                );
+                              }
+
+                              return (
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                  {tradeImgs.map((item, i) => (
+                                    <div
+                                      key={i}
+                                      onClick={() => setLightboxImage({ src: item.src, title: `${t.asset} · ${item.label}` })}
+                                      className="group relative aspect-video rounded-2xl overflow-hidden border border-black/[0.08] dark:border-white/[0.1] bg-neutral-900 cursor-pointer shadow-xs hover:shadow-md transition-all"
+                                    >
+                                      <img
+                                        src={item.src}
+                                        alt={item.label}
+                                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                      />
+                                      <div className="absolute top-2.5 left-2.5 px-2.5 py-1 rounded-lg bg-black/75 backdrop-blur-md text-[10px] font-bold text-white border border-white/15">
+                                        {item.label}
+                                      </div>
+                                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                        <span className="px-3 py-1.5 rounded-xl bg-white/95 text-neutral-900 text-xs font-bold shadow-lg flex items-center gap-1.5">
+                                          <Maximize2 className="w-3.5 h-3.5" />
+                                          View High-Res Photo
+                                        </span>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              );
+                            })()}
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </Fragment>
+                );
                 })
               )}
             </tbody>
@@ -1622,29 +1912,25 @@ export default function PastTrades() {
               </button>
             </div>
 
-            <div className="space-y-3 text-xs">
-              <div>
-                <label className="text-[11px] font-bold text-neutral-500 uppercase tracking-wider block mb-1">
-                  Start Date
-                </label>
-                <input
-                  type="date"
-                  value={customStartDate}
-                  onChange={(e) => setCustomStartDate(e.target.value)}
-                  className="w-full bg-white dark:bg-[#181d2c] border border-black/[0.08] dark:border-white/10 rounded-xl p-2.5 outline-none focus:border-blue-500"
-                />
-              </div>
-              <div>
-                <label className="text-[11px] font-bold text-neutral-500 uppercase tracking-wider block mb-1">
-                  End Date
-                </label>
-                <input
-                  type="date"
-                  value={customEndDate}
-                  onChange={(e) => setCustomEndDate(e.target.value)}
-                  className="w-full bg-white dark:bg-[#181d2c] border border-black/[0.08] dark:border-white/10 rounded-xl p-2.5 outline-none focus:border-blue-500"
-                />
-              </div>
+            <div className="space-y-3.5 text-xs">
+              <DateTimePickerPopover
+                label="Start Date"
+                mode="date"
+                accentColor="blue"
+                returnFormat="iso"
+                value={customStartDate}
+                onChange={(val) => setCustomStartDate(val || "")}
+                placeholder="Select start date"
+              />
+              <DateTimePickerPopover
+                label="End Date"
+                mode="date"
+                accentColor="blue"
+                returnFormat="iso"
+                value={customEndDate}
+                onChange={(val) => setCustomEndDate(val || "")}
+                placeholder="Select end date"
+              />
             </div>
 
             <div className="flex items-center justify-end gap-2 pt-2">
@@ -2019,6 +2305,81 @@ export default function PastTrades() {
               )}
             </div>
           </div>
+        </div>
+      )}
+
+      {/* ── FLOATING BULK ACTIONS BAR (Matches Screenshot 5) ── */}
+      {selectedRowIds.size > 0 && (
+        <div className="fixed bottom-6 inset-x-4 max-w-xl mx-auto z-40 bg-white/95 dark:bg-[#121622]/95 backdrop-blur-xl border border-black/[0.08] dark:border-white/[0.12] rounded-2xl shadow-2xl p-3 sm:px-5 sm:py-3.5 flex items-center justify-between animate-in slide-in-from-bottom-4 duration-200">
+          <div className="flex items-center gap-3">
+            <span className="text-xs font-bold text-neutral-900 dark:text-white">
+              {selectedRowIds.size} selected
+            </span>
+            <span className="text-xs font-mono font-bold">
+              Net{" "}
+              <span className={selectedTradesNetPnl >= 0 ? "text-[#0066FF] dark:text-blue-400 font-extrabold" : "text-rose-500 font-extrabold"}>
+                {selectedTradesNetPnl >= 0 ? "+" : "-"}${Math.abs(selectedTradesNetPnl).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </span>
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={handleBulkCopy}
+              className="px-3 py-1.5 rounded-xl border border-black/[0.08] dark:border-white/10 bg-white dark:bg-white/[0.04] hover:bg-neutral-50 dark:hover:bg-white/[0.08] text-neutral-700 dark:text-neutral-300 text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
+            >
+              <Copy className="w-3.5 h-3.5" />
+              <span>Copy</span>
+            </button>
+            <button
+              type="button"
+              onClick={handleBulkExportCSV}
+              className="px-3 py-1.5 rounded-xl border border-black/[0.08] dark:border-white/10 bg-white dark:bg-white/[0.04] hover:bg-neutral-50 dark:hover:bg-white/[0.08] text-neutral-700 dark:text-neutral-300 text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
+            >
+              <FileText className="w-3.5 h-3.5" />
+              <span>CSV</span>
+            </button>
+            <button
+              type="button"
+              onClick={handleBulkExportExcel}
+              className="px-3 py-1.5 rounded-xl border border-black/[0.08] dark:border-white/10 bg-white dark:bg-white/[0.04] hover:bg-neutral-50 dark:hover:bg-white/[0.08] text-neutral-700 dark:text-neutral-300 text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
+            >
+              <FileSpreadsheet className="w-3.5 h-3.5" />
+              <span>Excel</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setSelectedRowIds(new Set())}
+              className="p-1.5 rounded-xl hover:bg-black/5 dark:hover:bg-white/10 text-neutral-400 hover:text-neutral-700 dark:hover:text-white transition-colors cursor-pointer"
+              title="Deselect All"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ── SHARE TRADE 3-POSTER MODAL (Screenshot 3 & 4) ── */}
+      <TradeShareModal
+        isOpen={Boolean(shareModalTrade)}
+        onClose={() => setShareModalTrade(null)}
+        trade={shareModalTrade}
+      />
+
+      {/* ── FULL-RES PHOTO LIGHTBOX MODAL ── */}
+      <PhotoLightboxModal
+        isOpen={Boolean(lightboxImage)}
+        onClose={() => setLightboxImage(null)}
+        src={lightboxImage?.src}
+        title={lightboxImage?.title}
+      />
+
+      {/* ── BULK TOAST FEEDBACK ── */}
+      {bulkToast && (
+        <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 text-xs font-bold px-4 py-2 rounded-2xl shadow-2xl flex items-center gap-2 animate-in fade-in slide-in-from-bottom-2 duration-150">
+          <Check className="w-3.5 h-3.5 text-emerald-500" />
+          <span>{bulkToast}</span>
         </div>
       )}
     </div>
