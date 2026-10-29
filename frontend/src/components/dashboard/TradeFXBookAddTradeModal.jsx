@@ -34,6 +34,7 @@ export default function TradeFXBookAddTradeModal({ isOpen, onClose, onTradeAdded
   const [entryPrice, setEntryPrice] = useState("");
   const [exitPrice, setExitPrice] = useState("");
   const [stopLoss, setStopLoss] = useState("");
+  const [profitUsd, setProfitUsd] = useState("");
   const [riskPercent, setRiskPercent] = useState(() => {
     const raw = disciplineRules?.maxRiskPerTrade || "1.0";
     return String(raw).replace("%", "");
@@ -123,6 +124,7 @@ export default function TradeFXBookAddTradeModal({ isOpen, onClose, onTradeAdded
 
       const numRisk = riskPercent ? Number(riskPercent) : 1.0;
       const numSl = stopLoss ? Number(stopLoss) : null;
+      const numPnl = profitUsd !== "" && !isNaN(Number(profitUsd)) ? Number(profitUsd) : undefined;
 
       const payload = {
         userId,
@@ -148,6 +150,7 @@ export default function TradeFXBookAddTradeModal({ isOpen, onClose, onTradeAdded
         session: "New York",
         risk: numRisk,
         risk_percent: numRisk,
+        ...(numPnl !== undefined && { pnl: numPnl, profit: numPnl }),
       };
 
       const res = await api.post("/api/trades", payload);
@@ -345,6 +348,41 @@ export default function TradeFXBookAddTradeModal({ isOpen, onClose, onTradeAdded
                 className="w-full h-11 px-3.5 rounded-xl border border-black/[0.08] dark:border-white/[0.12] bg-white/70 dark:bg-white/[0.04] text-neutral-900 dark:text-white text-sm font-medium placeholder-neutral-400 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all font-mono"
               />
             </div>
+          </div>
+
+          {/* Profit Made in USD ($) */}
+          <div className="space-y-1.5 p-3 rounded-2xl bg-neutral-50 dark:bg-white/[0.02] border border-black/[0.06] dark:border-white/[0.08]">
+            <div className="flex items-center justify-between">
+              <label className="block text-[11px] font-bold text-neutral-700 dark:text-neutral-300 uppercase tracking-wider">
+                Profit / Loss Made ($ USD)
+              </label>
+              <span className="text-[10px] font-mono text-neutral-400">
+                {Number(profitUsd) > 0 ? "Win (+)" : Number(profitUsd) < 0 ? "Loss (-)" : "Optional / $0.00"}
+              </span>
+            </div>
+            <div className="relative">
+              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-bold text-neutral-400 font-mono pointer-events-none">
+                $
+              </span>
+              <input
+                type="number"
+                step="any"
+                value={profitUsd}
+                onChange={(e) => setProfitUsd(e.target.value)}
+                placeholder={direction === "SHORT" ? "-150.00 or +250.00" : "+250.00 or -150.00"}
+                className={`w-full h-11 pl-8 pr-3.5 rounded-xl border border-black/[0.08] dark:border-white/[0.12] bg-white dark:bg-white/[0.04] text-sm font-medium outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all font-mono ${
+                  Number(profitUsd) > 0
+                    ? "text-emerald-500 dark:text-emerald-400 font-bold"
+                    : Number(profitUsd) < 0
+                    ? "text-rose-500 dark:text-rose-400 font-bold"
+                    : "text-neutral-900 dark:text-white"
+                }`}
+              />
+            </div>
+            <p className="text-[11px] font-medium text-amber-600 dark:text-amber-400/90 leading-tight flex items-start gap-1 pt-0.5">
+              <span>⚠️</span>
+              <span>&ldquo;dear trader please enter exact profit made in current trade dont fool yourself by entering big profits for flex&rdquo;</span>
+            </p>
           </div>
 
           {/* Entry Date & Exit Date Popover Selectors (Screenshots 4 & 5) */}

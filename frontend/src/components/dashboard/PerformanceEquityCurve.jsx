@@ -174,7 +174,16 @@ export default function PerformanceEquityCurve({ trades = [] }) {
   const equityData = useMemo(() => {
     let cumR = 0;
     let cumPnl = 0;
-    let hasPnl = false;
+    let nonZeroPnlCount = 0;
+
+    filteredTrades.forEach((t) => {
+      const p = Number(t.pnl);
+      if (t.pnl !== null && t.pnl !== undefined && !isNaN(p) && p !== 0) {
+        nonZeroPnlCount++;
+      }
+    });
+
+    const hasPnl = nonZeroPnlCount > 0;
 
     // Start baseline point at 0
     const points = [
@@ -192,15 +201,20 @@ export default function PerformanceEquityCurve({ trades = [] }) {
           year: "numeric",
         }),
         trade: null,
+        cumDisplayStr: hasPnl ? "$0.00" : "0.00R",
+        cumSubStr: hasPnl ? "0.00R" : null,
+        tradeProfitDisplay: "0.00",
       },
     ];
 
     filteredTrades.forEach((t, i) => {
       const r = normalizeTradeR(t);
       cumR += r;
+
+      let tradePnl = null;
       if (t.pnl !== null && t.pnl !== undefined && !isNaN(Number(t.pnl))) {
-        cumPnl += Number(t.pnl);
-        hasPnl = true;
+        tradePnl = Number(t.pnl);
+        cumPnl += tradePnl;
       }
 
       const ts = getTradeTimestamp(t);
@@ -209,16 +223,34 @@ export default function PerformanceEquityCurve({ trades = [] }) {
         ? d.toLocaleDateString("en-US", { month: "short", day: "numeric" })
         : `T${i + 1}`;
 
+      // Build rich trade profit & net R string
+      let tradeProfitDisplay = "";
+      if (tradePnl !== null && tradePnl !== 0) {
+        const dollarStr = `${tradePnl >= 0 ? "+" : ""}$${Math.abs(tradePnl).toFixed(2)}`;
+        tradeProfitDisplay = `${dollarStr} (${r >= 0 ? "+" : ""}${r.toFixed(2)}R)`;
+      } else {
+        tradeProfitDisplay = `${r >= 0 ? "+" : ""}${r.toFixed(2)}R`;
+      }
+
+      const cumDisplayStr = hasPnl
+        ? `${cumPnl >= 0 ? "+" : ""}$${Math.abs(cumPnl).toFixed(2)}`
+        : `${cumR >= 0 ? "+" : ""}${cumR.toFixed(2)}R`;
+
+      const cumSubStr = hasPnl ? `${cumR >= 0 ? "+" : ""}${cumR.toFixed(2)}R` : null;
+
       points.push({
         r: cumR,
         pnl: cumPnl,
         tradeR: r,
-        tradePnl: t.pnl ? Number(t.pnl) : null,
+        tradePnl,
         tradeIndex: i + 1,
         timestamp: ts,
         dateLabel,
         fullDateStr: formatTradeDate(t, true),
         trade: t,
+        cumDisplayStr,
+        cumSubStr,
+        tradeProfitDisplay,
       });
     });
 
@@ -390,7 +422,8 @@ export default function PerformanceEquityCurve({ trades = [] }) {
   const headlineDisplay = useMemo(() => {
     if (filteredTrades.length === 0) return "+0.00R";
     if (equityData.hasPnl) {
-      return `${equityData.finalPnl >= 0 ? "+" : ""}$${Math.abs(equityData.finalPnl).toFixed(2)}`;
+      const pnlStr = `${equityData.finalPnl >= 0 ? "+" : ""}$${Math.abs(equityData.finalPnl).toFixed(2)}`;
+      return `${pnlStr} (${equityData.finalR >= 0 ? "+" : ""}${equityData.finalR.toFixed(2)}R)`;
     }
     return `${equityData.finalR >= 0 ? "+" : ""}${equityData.finalR.toFixed(2)}R`;
   }, [filteredTrades, equityData]);
@@ -672,16 +705,22 @@ export default function PerformanceEquityCurve({ trades = [] }) {
                   <span className="text-[9px] font-extrabold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 block">
                     Cumulative Equity
                   </span>
-                  <p
-                    className={`text-2xl font-extrabold font-mono tracking-tight ${
-                      hoverData.point.r >= 0
-                        ? "text-emerald-500 dark:text-emerald-400"
-                        : "text-rose-500 dark:text-rose-400"
-                    }`}
-                  >
-                    {hoverData.point.r >= 0 ? "+" : ""}
-                    {hoverData.point.r.toFixed(2)}R
-                  </p>
+                  <div className="flex items-baseline gap-1.5 flex-wrap">
+                    <p
+                      className={`text-2xl font-extrabold font-mono tracking-tight ${
+                        (equityData.hasPnl ? hoverData.point.pnl : hoverData.point.r) >= 0
+                          ? "text-emerald-500 dark:text-emerald-400"
+                          : "text-rose-500 dark:text-rose-400"
+                      }`}
+                    >
+                      {hoverData.point.cumDisplayStr}
+                    </p>
+                    {hoverData.point.cumSubStr && (
+                      <span className="text-xs font-bold font-mono text-neutral-400">
+                        ({hoverData.point.cumSubStr})
+                      </span>
+                    )}
+                  </div>
                 </div>
 
                 {hoverData.point.trade && (
@@ -691,24 +730,23 @@ export default function PerformanceEquityCurve({ trades = [] }) {
                         {hoverData.point.trade.asset || "Trade"}
                       </span>
                       <span
-                        className={`font-mono text-xs flex items-center gap-0.5 ${
-                          (hoverData.point.tradeR || 0) >= 0
+                        className={`font-mono text-xs flex items-center gap-1 ${
+                          (hoverData.point.tradePnl !== null ? hoverData.point.tradePnl >= 0 : (hoverData.point.tradeR || 0) >= 0)
                             ? "text-emerald-500 dark:text-emerald-400"
                             : "text-rose-500 dark:text-rose-400"
                         }`}
                       >
-                        {(hoverData.point.tradeR || 0) >= 0 ? (
+                        {(hoverData.point.tradePnl !== null ? hoverData.point.tradePnl >= 0 : (hoverData.point.tradeR || 0) >= 0) ? (
                           <TrendingUp className="w-3 h-3 inline" />
                         ) : (
                           <TrendingDown className="w-3 h-3 inline" />
                         )}
-                        {(hoverData.point.tradeR || 0) >= 0 ? "+" : ""}
-                        {(hoverData.point.tradeR || 0).toFixed(2)}R
+                        <span>{hoverData.point.tradeProfitDisplay}</span>
                       </span>
                     </div>
                     <div className="flex items-center justify-between text-[10px] text-neutral-400">
                       <span className="font-semibold">{hoverData.point.trade.direction}</span>
-                      <span className="capitalize">{hoverData.point.trade.result || "Closed"}</span>
+                      <span className="capitalize font-medium">{hoverData.point.trade.result || "Closed"}</span>
                     </div>
                   </div>
                 )}

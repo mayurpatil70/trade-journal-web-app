@@ -9,36 +9,37 @@ import {
   Target,
 } from "lucide-react";
 
-export default function TradeFXBookKpiCards({ stats, trades }) {
-  // Compute realized vs unrealized
+export default function TradeFXBookKpiCards({ stats, trades = [] }) {
+  // Compute metrics
   const closedTrades = trades.filter((t) => t.result !== "open");
   const openTrades = trades.filter((t) => t.result === "open");
 
   let totalR = parseFloat(stats.totalR) || 0;
-  let hasDollarPnl = false;
+  let nonZeroDollarCount = 0;
   let totalDollarPnl = 0;
 
   trades.forEach((t) => {
-    if (t.pnl !== null && t.pnl !== undefined) {
-      totalDollarPnl += Number(t.pnl);
-      hasDollarPnl = true;
+    if (t.pnl !== null && t.pnl !== undefined && !isNaN(Number(t.pnl))) {
+      const p = Number(t.pnl);
+      totalDollarPnl += p;
+      if (p !== 0) nonZeroDollarCount++;
     }
   });
 
+  const hasDollarPnl = nonZeroDollarCount > 0 || stats.hasDollarPnl;
   const totalPnlDisplay = hasDollarPnl
     ? `${totalDollarPnl >= 0 ? "+" : ""}$${Math.abs(totalDollarPnl).toFixed(2)}`
     : `${totalR >= 0 ? "+" : ""}${totalR.toFixed(2)}R`;
 
-  const realizedDisplay = totalPnlDisplay;
-  const unrealizedDisplay = "+$0.00";
-
   const avgRVal = parseFloat(stats.avgR) || 0;
   const netRVal = parseFloat(stats.totalR) || 0;
   const maxDdVal = parseFloat(stats.maxDrawdown) || 0;
+  const maxDollarDdVal = parseFloat(stats.maxDollarDD) || 0;
+  const avgRRR = stats.avgRRR || "2.00";
 
   return (
     <div className="space-y-4">
-      {/* ── 4 PRIMARY KPI CARDS (Color Theme: Emerald Green, Yellow/Amber, Red, Neutral) ── */}
+      {/* ── 4 PRIMARY KPI CARDS (Color Theme: Emerald Green, Amber/Red, Cyan/Emerald, Trophy) ── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* 1. TOTAL P&L */}
         <div className="rounded-3xl p-5 bg-white dark:bg-[#121622] border border-black/[0.06] dark:border-white/[0.08] shadow-[0_4px_20px_rgb(0,0,0,0.03)] dark:shadow-[0_4px_25px_rgba(0,0,0,0.4)] flex items-start gap-4 transition-all hover:border-emerald-500/30">
@@ -49,56 +50,70 @@ export default function TradeFXBookKpiCards({ stats, trades }) {
             <p className="text-[11px] font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-wider">
               TOTAL P&L
             </p>
-            <p
-              className={`text-2xl font-extrabold font-mono mt-0.5 tracking-tight ${
-                totalR >= 0 ? "text-emerald-500 dark:text-emerald-400" : "text-rose-500 dark:text-rose-400"
-              }`}
-            >
-              {totalPnlDisplay}
-            </p>
+            <div className="flex items-baseline gap-2 flex-wrap mt-0.5">
+              <p
+                className={`text-2xl font-extrabold font-mono tracking-tight ${
+                  (hasDollarPnl ? totalDollarPnl >= 0 : totalR >= 0)
+                    ? "text-emerald-500 dark:text-emerald-400"
+                    : "text-rose-500 dark:text-rose-400"
+                }`}
+              >
+                {totalPnlDisplay}
+              </p>
+              {hasDollarPnl && (
+                <span className="text-xs font-bold font-mono text-neutral-400">
+                  ({totalR >= 0 ? "+" : ""}{totalR.toFixed(2)}R)
+                </span>
+              )}
+            </div>
             <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1 flex items-center gap-1 font-medium">
               <span>&rarr;</span>
-              <span>{trades.length} trades</span>
+              <span>{trades.length} logged trades</span>
             </p>
           </div>
         </div>
 
-        {/* 2. UNREALIZED */}
-        <div className="rounded-3xl p-5 bg-white dark:bg-[#121622] border border-black/[0.06] dark:border-white/[0.08] shadow-[0_4px_20px_rgb(0,0,0,0.03)] dark:shadow-[0_4px_25px_rgba(0,0,0,0.4)] flex items-start gap-4 transition-all hover:border-amber-500/30">
-          <div className="w-12 h-12 rounded-2xl bg-amber-500/10 dark:bg-amber-500/15 border border-amber-500/20 text-amber-500 flex items-center justify-center shrink-0">
-            <Zap className="w-6 h-6" />
+        {/* 2. EQUITY DRAWDOWN (Optimised from old Unrealized) */}
+        <div className="rounded-3xl p-5 bg-white dark:bg-[#121622] border border-black/[0.06] dark:border-white/[0.08] shadow-[0_4px_20px_rgb(0,0,0,0.03)] dark:shadow-[0_4px_25px_rgba(0,0,0,0.4)] flex items-start gap-4 transition-all hover:border-rose-500/30">
+          <div className="w-12 h-12 rounded-2xl bg-rose-500/10 dark:bg-rose-500/15 border border-rose-500/20 text-rose-500 flex items-center justify-center shrink-0">
+            <ShieldAlert className="w-6 h-6" />
           </div>
           <div className="overflow-hidden">
             <p className="text-[11px] font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-wider">
-              UNREALIZED
+              EQUITY DRAWDOWN
             </p>
-            <p className="text-2xl font-extrabold font-mono mt-0.5 tracking-tight text-neutral-900 dark:text-white">
-              {unrealizedDisplay}
-            </p>
+            <div className="flex items-baseline gap-2 flex-wrap mt-0.5">
+              <p className="text-2xl font-extrabold font-mono tracking-tight text-rose-500 dark:text-rose-400">
+                {hasDollarPnl && maxDollarDdVal > 0
+                  ? `-$${maxDollarDdVal.toFixed(2)}`
+                  : `-${maxDdVal.toFixed(2)}R`}
+              </p>
+              {hasDollarPnl && maxDollarDdVal > 0 && (
+                <span className="text-xs font-bold font-mono text-neutral-400">
+                  (-{maxDdVal.toFixed(2)}R)
+                </span>
+              )}
+            </div>
             <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1 font-medium">
-              {openTrades.length} open positions
+              Peak-to-trough decline
             </p>
           </div>
         </div>
 
-        {/* 3. REALIZED */}
+        {/* 3. AVERAGE RRR (Optimised from old duplicate Realized) */}
         <div className="rounded-3xl p-5 bg-white dark:bg-[#121622] border border-black/[0.06] dark:border-white/[0.08] shadow-[0_4px_20px_rgb(0,0,0,0.03)] dark:shadow-[0_4px_25px_rgba(0,0,0,0.4)] flex items-start gap-4 transition-all hover:border-emerald-500/30">
           <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 dark:bg-emerald-500/15 border border-emerald-500/20 text-emerald-500 flex items-center justify-center shrink-0">
-            <CreditCard className="w-6 h-6" />
+            <Target className="w-6 h-6" />
           </div>
           <div className="overflow-hidden">
             <p className="text-[11px] font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-wider">
-              REALIZED
+              AVERAGE RRR
             </p>
-            <p
-              className={`text-2xl font-extrabold font-mono mt-0.5 tracking-tight ${
-                totalR >= 0 ? "text-emerald-500 dark:text-emerald-400" : "text-rose-500 dark:text-rose-400"
-              }`}
-            >
-              {realizedDisplay}
+            <p className="text-2xl font-extrabold font-mono mt-0.5 tracking-tight text-emerald-500 dark:text-emerald-400">
+              1:{avgRRR}
             </p>
             <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1 font-medium">
-              {closedTrades.length} closed trades
+              Avg R:R across {trades.length} trades
             </p>
           </div>
         </div>

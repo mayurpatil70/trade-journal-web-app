@@ -344,10 +344,16 @@ export default function PastTrades() {
                       )}
                     </div>
                     <div
-                      className={`px-3 py-1.5 rounded-lg border text-sm font-bold ${isWin ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : "bg-red-500/10 text-red-400 border-red-500/20"}`}
+                      className={`px-3 py-1.5 rounded-lg border text-sm font-bold flex items-center gap-1.5 ${isWin ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : "bg-red-500/10 text-red-400 border-red-500/20"}`}
                     >
-                      {isWin ? "+" : ""}
-                      {r.toFixed(2)}R
+                      {t.pnl !== null && t.pnl !== undefined && Number(t.pnl) !== 0 && (
+                        <span className="font-mono">
+                          {Number(t.pnl) >= 0 ? "+" : ""}${Math.abs(Number(t.pnl)).toFixed(2)}
+                        </span>
+                      )}
+                      <span className="font-mono text-xs opacity-90">
+                        {t.pnl !== null && t.pnl !== undefined && Number(t.pnl) !== 0 ? `(${isWin ? "+" : ""}${r.toFixed(2)}R)` : `${isWin ? "+" : ""}${r.toFixed(2)}R`}
+                      </span>
                     </div>
                     <button
                       type="button"
@@ -470,6 +476,15 @@ export default function PastTrades() {
                 return (
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     {[
+                      {
+                        label: "Profit / Loss ($)",
+                        value:
+                          selectedTrade.pnl !== null && selectedTrade.pnl !== undefined && Number(selectedTrade.pnl) !== 0
+                            ? `${Number(selectedTrade.pnl) >= 0 ? "+" : ""}$${Math.abs(Number(selectedTrade.pnl)).toFixed(2)}`
+                            : "—",
+                        isNet: true,
+                        isLoss: Number(selectedTrade.pnl) < 0 || selIsLoss,
+                      },
                       {
                         label: "Net R",
                         value: `${selR >= 0 ? "+" : ""}${selR.toFixed(2)}R`,
