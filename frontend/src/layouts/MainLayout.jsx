@@ -2,7 +2,6 @@
 import NotificationBell from "../components/NotificationBell.jsx";
 import BrandLogo from "../components/BrandLogo";
 import ThemeToggle from "../components/ThemeToggle.jsx";
-import { useTheme } from "../components/theme-provider";
 import { useState, useEffect, useRef, useCallback, Suspense } from "react";
 import { createPortal } from "react-dom";
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
@@ -216,7 +215,6 @@ const ExpandableNavItem = ({ item, currentPath, closeMenu }) => {
 };
 
 export default function MainLayout() {
-  const { theme, isDark } = useTheme();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [profileCoords, setProfileCoords] = useState({ bottom: 0, left: 0, width: 236 });
@@ -809,7 +807,7 @@ export default function MainLayout() {
       {/* ── Mobile iOS Header ── */}
       <div className="md:hidden fixed top-0 left-0 right-0 h-14 bg-white/75 dark:bg-[#0c0e15]/75 backdrop-blur-2xl border-b border-black/[0.06] dark:border-white/[0.08] flex items-center justify-between px-4 z-40 shadow-sm">
         <div className="flex items-center gap-2">
-          <BrandLogo className="h-10 w-auto object-contain" />
+          <BrandLogo />
         </div>
         <div className="flex items-center gap-2">
           <button
@@ -851,7 +849,7 @@ export default function MainLayout() {
               <span className="w-3 h-3 rounded-full bg-[#FFBD2E] border border-[#DEA123] shadow-sm inline-block group-hover/traffic:brightness-95 transition-all" />
               <span className="w-3 h-3 rounded-full bg-[#27C93F] border border-[#1AAB29] shadow-sm inline-block group-hover/traffic:brightness-95 transition-all" />
             </div>
-            <BrandLogo className="h-8 w-auto object-contain" />
+            <BrandLogo />
           </div>
         </div>
 
@@ -1056,7 +1054,7 @@ export default function MainLayout() {
       {/* ── Main Viewport Area ── */}
       <main className="flex-1 overflow-y-auto relative pt-14 pb-16 md:pt-0 md:pb-0 z-10">
         {/* System Broadcast Announcement */}
-        <SystemAnnouncementBanner announcement={announcement} isDark={isDark} />
+        <SystemAnnouncementBanner announcement={announcement} />
 
         {/* Workspace Route Container */}
         <Suspense

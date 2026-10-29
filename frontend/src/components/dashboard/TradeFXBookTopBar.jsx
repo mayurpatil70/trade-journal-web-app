@@ -210,30 +210,6 @@ export default function TradeFXBookTopBar({
                 type="button"
                 onClick={() => {
                   setIsQuickActionsOpen(false);
-                  navigate("/trades");
-                }}
-                className="w-full px-3 py-2.5 rounded-xl text-xs font-semibold text-neutral-700 dark:text-neutral-200 hover:bg-emerald-500/10 hover:text-emerald-600 dark:hover:text-emerald-400 flex items-center gap-2.5 transition-colors cursor-pointer text-left"
-              >
-                <PenSquare className="w-4 h-4 text-neutral-400" />
-                <span>New Journal Entry</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setIsQuickActionsOpen(false);
-                  navigate("/admin/setup");
-                }}
-                className="w-full px-3 py-2.5 rounded-xl text-xs font-semibold text-neutral-700 dark:text-neutral-200 hover:bg-emerald-500/10 hover:text-emerald-600 dark:hover:text-emerald-400 flex items-center gap-2.5 transition-colors cursor-pointer text-left"
-              >
-                <RefreshCw className="w-4 h-4 text-neutral-400" />
-                <span>Sync MT5 Account</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setIsQuickActionsOpen(false);
                   navigate("/analytics");
                 }}
                 className="w-full px-3 py-2.5 rounded-xl text-xs font-semibold text-neutral-700 dark:text-neutral-200 hover:bg-emerald-500/10 hover:text-emerald-600 dark:hover:text-emerald-400 flex items-center gap-2.5 transition-colors cursor-pointer text-left"

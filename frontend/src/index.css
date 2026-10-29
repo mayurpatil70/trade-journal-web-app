@@ -60,10 +60,17 @@
 /* =========================================================
    TRADEFXBOOK CIRCULAR MOTION WAVE THEME VIEW TRANSITION
 ========================================================= */
+::view-transition-group(root) {
+  animation-duration: 400ms;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+}
+
 ::view-transition-old(root),
 ::view-transition-new(root) {
   animation: none;
   mix-blend-mode: normal;
+  display: block;
 }
 
 ::view-transition-old(root) {
@@ -71,7 +78,7 @@
 }
 
 ::view-transition-new(root) {
-  z-index: 9999;
+  z-index: 999999;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -80,22 +87,6 @@
   ::view-transition-new(*) {
     animation: none !important;
   }
-}
-
-/* =========================================================
-SMOOTH MAC OS / TRADEFXBOOK THEME TRANSITION
-========================================================= */
-html.theme-transitioning,
-html.theme-transitioning *,
-html.theme-transitioning *::before,
-html.theme-transitioning *::after {
-  transition: background-color 0.28s cubic-bezier(0.4, 0, 0.2, 1),
-              border-color 0.28s cubic-bezier(0.4, 0, 0.2, 1),
-              color 0.22s cubic-bezier(0.4, 0, 0.2, 1),
-              box-shadow 0.28s cubic-bezier(0.4, 0, 0.2, 1),
-              fill 0.22s cubic-bezier(0.4, 0, 0.2, 1),
-              stroke 0.22s cubic-bezier(0.4, 0, 0.2, 1) !important;
-  transition-delay: 0s !important;
 }
 
 /* =========================================================
@@ -842,7 +833,7 @@ html.light body:not(.terminal) [class~="text-gray-100"] {
 
 html.light
   body:not(.terminal)
-  .text-white:not([class*="bg-[#0066"]):not([class*="btn-primary-blue"]):not([class~="bg-emerald-500"]):not([class~="bg-emerald-600"]):not(
+  .text-white:not([class*="bg-[#0066"]):not([class*="btn-primary-blue"]):not(:is(button, a, .btn-primary-blue, [class*="bg-[#0066"], [class*="bg-blue-600"]) *):not([class~="bg-emerald-500"]):not([class~="bg-emerald-600"]):not(
     [class~="bg-emerald-400"]
   ):not([class~="bg-green-500"]):not([class~="bg-green-600"]):not(
     [class~="bg-red-500"]

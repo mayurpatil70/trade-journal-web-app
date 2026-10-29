@@ -25,6 +25,7 @@ import {
   ChevronRight,
   ChevronDown,
   ChevronUp,
+  Eye,
   Image as ImageIcon,
   X,
   Plus,
@@ -940,15 +941,15 @@ export default function PastTrades() {
             </button>
           </div>
 
-          {/* + Add Trade Button (Guaranteed pure white text and icon in light/dark mode) */}
+          {/* + Add Trade Button (Harmonized with header buttons, guaranteed crisp white text/icon) */}
           <button
             type="button"
             onClick={() => setIsAddTradeModalOpen(true)}
             style={{ backgroundColor: "#0066FF", color: "#ffffff" }}
-            className="w-full sm:w-auto h-11 sm:h-10 px-4 rounded-xl bg-[#0066FF] hover:bg-[#0052CC] text-white font-bold text-xs sm:text-sm tracking-wide shadow-md shadow-[#0066FF]/25 active:scale-[0.98] transition-all cursor-pointer flex items-center justify-center gap-1.5 btn-primary-blue shrink-0"
+            className="w-full sm:w-auto h-10 px-4 rounded-xl bg-[#0066FF] hover:bg-[#0052CC] text-white font-bold text-xs sm:text-sm tracking-wide shadow-md shadow-[#0066FF]/25 active:scale-[0.98] transition-all cursor-pointer flex items-center justify-center gap-1.5 btn-primary-blue shrink-0"
           >
-            <Plus className="w-4 h-4 stroke-[2.5] text-white" style={{ color: "#ffffff", stroke: "#ffffff" }} />
-            <span style={{ color: "#ffffff" }} className="text-white font-bold">Add Trade</span>
+            <Plus className="w-4 h-4 stroke-[2.5]" style={{ color: "#ffffff", stroke: "#ffffff" }} />
+            <span style={{ color: "#ffffff" }} className="font-bold">Add Trade</span>
           </button>
         </div>
       </div>
@@ -1513,27 +1514,40 @@ export default function PastTrades() {
                         })
                       )}
 
-                      {/* Action Icons */}
-                      <td className={`${rowPaddingClass} text-right whitespace-nowrap`} onClick={(e) => e.stopPropagation()}>
-                        <div className="flex items-center justify-end gap-1.5 opacity-40 group-hover:opacity-100 transition-opacity">
+                      {/* Action Icons (Sticky Right on Mobile & Desktop, 100% Touch Visible) */}
+                      <td
+                        className={`${rowPaddingClass} text-right whitespace-nowrap sticky right-0 bg-white/95 dark:bg-[#121622]/95 backdrop-blur-md z-10 shadow-[-6px_0_12px_rgba(0,0,0,0.03)] dark:shadow-[-6px_0_16px_rgba(0,0,0,0.4)]`}
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <div className="flex items-center justify-end gap-1 opacity-100 sm:opacity-50 sm:group-hover:opacity-100 transition-opacity">
+                          {/* Expand/View Details */}
+                          <button
+                            type="button"
+                            onClick={(e) => handleToggleRowExpand(t.id, e)}
+                            className="w-7 h-7 sm:w-6 sm:h-6 rounded-lg bg-black/[0.04] dark:bg-white/[0.06] hover:bg-black/10 dark:hover:bg-white/15 text-neutral-600 dark:text-neutral-300 flex items-center justify-center transition-colors cursor-pointer"
+                            title={isExpanded ? "Collapse trade" : "View trade details"}
+                          >
+                            <Eye className="w-3.5 h-3.5" />
+                          </button>
+
                           {/* Edit */}
                           <button
                             type="button"
                             onClick={() => navigate(`/add-trade?edit=${t.id}`)}
-                            className="p-1.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/10 text-neutral-500 hover:text-[#0066FF] dark:hover:text-blue-400 transition-colors cursor-pointer"
+                            className="w-7 h-7 sm:w-6 sm:h-6 rounded-lg bg-black/[0.04] dark:bg-white/[0.06] hover:bg-blue-500/10 hover:text-[#0066FF] dark:hover:text-blue-400 text-neutral-600 dark:text-neutral-300 flex items-center justify-center transition-colors cursor-pointer"
                             title="Edit Trade"
                           >
                             <Pencil className="w-3.5 h-3.5" />
                           </button>
 
-                          {/* Share Trade Poster (Screenshot 3) */}
+                          {/* Share Trade Poster */}
                           <button
                             type="button"
                             onClick={(e) => {
                               e.stopPropagation();
                               setShareModalTrade(t);
                             }}
-                            className="p-1.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/10 text-neutral-500 hover:text-[#0066FF] dark:hover:text-blue-400 transition-colors cursor-pointer"
+                            className="w-7 h-7 sm:w-6 sm:h-6 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 text-[#0066FF] dark:text-blue-400 flex items-center justify-center transition-colors cursor-pointer"
                             title="Share Trade Poster (Story, Post, Landscape)"
                           >
                             <Share2 className="w-3.5 h-3.5" />
@@ -1543,7 +1557,7 @@ export default function PastTrades() {
                           <button
                             type="button"
                             onClick={(e) => handleDeleteTrade(t.id, e)}
-                            className="p-1.5 rounded-lg hover:bg-rose-500/10 text-neutral-400 hover:text-rose-500 transition-colors cursor-pointer"
+                            className="w-7 h-7 sm:w-6 sm:h-6 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 dark:text-rose-400 flex items-center justify-center transition-colors cursor-pointer"
                             title="Delete Trade"
                           >
                             <Trash2 className="w-3.5 h-3.5" />

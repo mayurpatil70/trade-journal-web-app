@@ -1,10 +1,13 @@
 import { useState, useEffect, useRef, memo } from "react";
 import { X } from "lucide-react";
+import { useTheme } from "./theme-provider";
 
 const SystemAnnouncementBanner = memo(function SystemAnnouncementBanner({
   announcement,
-  isDark,
+  isDark: isDarkProp,
 }) {
+  const { isDark: contextIsDark } = useTheme();
+  const isDark = isDarkProp ?? contextIsDark;
   const [isExpanded, setIsExpanded] = useState(false);
   const [isDismissed, setIsDismissed] = useState(false);
   const cardRef = useRef(null);

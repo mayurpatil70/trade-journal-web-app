@@ -97,6 +97,19 @@ export const createTrade = async (req, res) => {
         req.files.map((file) => uploadToCloudinary(file.buffer))
       );
       imageUrls.push(...uploaded);
+    } else if (tradeData.images) {
+      try {
+        const parsed = typeof tradeData.images === "string" ? JSON.parse(tradeData.images) : tradeData.images;
+        if (Array.isArray(parsed)) imageUrls.push(...parsed.filter(Boolean));
+      } catch (e) {
+        if (typeof tradeData.images === "string" && tradeData.images.startsWith("http")) {
+          imageUrls.push(tradeData.images);
+        }
+      }
+    }
+    if (imageUrls.length === 0) {
+      if (tradeData.before_image) imageUrls.push(tradeData.before_image);
+      if (tradeData.after_image) imageUrls.push(tradeData.after_image);
     }
 
     const rawLotSize =
@@ -201,8 +214,8 @@ export const createTrade = async (req, res) => {
       psych_note: tradeData.psychNote,
       account_name: tradeData.accountName || "Default Account",
       images: imageUrls,
-      before_image: imageUrls[0] || null,
-      after_image: imageUrls[1] || null,
+      before_image: imageUrls[0] || tradeData.before_image || null,
+      after_image: imageUrls[1] || tradeData.after_image || null,
       executions: parsedExecutions,
       ...(rawLotSize !== null && { lot_size: rawLotSize }),
       ...(finalPnl !== null && { pnl: finalPnl }),
@@ -516,8 +529,8 @@ export const updateTrade = async (req, res) => {
       ...(tradeData.psychNote !== undefined && { psych_note: tradeData.psychNote }),
       ...(tradeData.accountName !== undefined && { account_name: tradeData.accountName }),
       images: imageUrls,
-      before_image: imageUrls[0] || null,
-      after_image: imageUrls[1] || null,
+      before_image: imageUrls[0] || tradeData.before_image || null,
+      after_image: imageUrls[1] || tradeData.after_image || null,
       ...(parsedExecutions !== undefined && { executions: parsedExecutions }),
       ...(rawLotSize !== undefined && { lot_size: rawLotSize }),
       ...(tradeData.entry_date !== undefined && { entry_date: tradeData.entry_date }),

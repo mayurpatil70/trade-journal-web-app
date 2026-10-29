@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { flushSync } from "react-dom";
 
 export const THEME_KEY = "vite-ui-theme";
 
@@ -29,9 +30,10 @@ export function ThemeProvider({ children }) {
 
   useEffect(() => {
     const root = document.documentElement;
-
-    root.classList.remove("light", "dark");
-    root.classList.add(theme);
+    if (!root.classList.contains(theme)) {
+      root.classList.remove("light", "dark");
+      root.classList.add(theme);
+    }
     root.style.colorScheme = theme;
 
     const metaThemeColor = document.querySelector('meta[name="theme-color"]');
@@ -58,11 +60,10 @@ export function ThemeProvider({ children }) {
       // Check if View Transition API is supported and user doesn't prefer reduced motion
       const isReducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
       if (!document.startViewTransition || isReducedMotion) {
-        root.classList.add("theme-transitioning");
+        root.classList.remove("light", "dark");
+        root.classList.add(next);
+        root.style.colorScheme = next;
         setThemeState(next);
-        setTimeout(() => {
-          root.classList.remove("theme-transitioning");
-        }, 300);
         return;
       }
 
@@ -71,17 +72,21 @@ export function ThemeProvider({ children }) {
       let y = 0;
 
       if (event) {
-        if (
+        const target =
+          event.currentTarget ||
+          (event.target && event.target.closest ? event.target.closest("button") : null);
+
+        if (target && typeof target.getBoundingClientRect === "function") {
+          const rect = target.getBoundingClientRect();
+          x = rect.left + rect.width / 2;
+          y = rect.top + rect.height / 2;
+        } else if (
           typeof event.clientX === "number" &&
           typeof event.clientY === "number" &&
           (event.clientX !== 0 || event.clientY !== 0)
         ) {
           x = event.clientX;
           y = event.clientY;
-        } else if (event.currentTarget && typeof event.currentTarget.getBoundingClientRect === "function") {
-          const rect = event.currentTarget.getBoundingClientRect();
-          x = rect.left + rect.width / 2;
-          y = rect.top + rect.height / 2;
         }
       }
 
@@ -91,11 +96,14 @@ export function ThemeProvider({ children }) {
         Math.max(y, window.innerHeight - y)
       );
 
+      // Execute synchronous DOM commit via flushSync to guarantee zero React re-render jank during the animation
       const transition = document.startViewTransition(() => {
-        root.classList.remove("light", "dark");
-        root.classList.add(next);
-        root.style.colorScheme = next;
-        setThemeState(next);
+        flushSync(() => {
+          root.classList.remove("light", "dark");
+          root.classList.add(next);
+          root.style.colorScheme = next;
+          setThemeState(next);
+        });
       });
 
       transition.ready
@@ -108,8 +116,8 @@ export function ThemeProvider({ children }) {
               ],
             },
             {
-              duration: 450,
-              easing: "cubic-bezier(0.25, 1, 0.3, 1)",
+              duration: 400,
+              easing: "cubic-bezier(0.22, 1, 0.36, 1)",
               pseudoElement: "::view-transition-new(root)",
             }
           );
