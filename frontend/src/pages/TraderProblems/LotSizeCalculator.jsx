@@ -1,5 +1,6 @@
 // frontend/src/pages/TraderProblems/LotSizeCalculator.jsx
 import { useState, useMemo } from "react";
+import { Link } from "react-router-dom";
 import {
   Calculator,
   DollarSign,
@@ -10,6 +11,7 @@ import {
   Target,
   AlertCircle,
   Zap,
+  ArrowLeft,
 } from "lucide-react";
 
 const INSTRUMENTS = [
@@ -139,8 +141,23 @@ export default function LotSizeCalculator() {
   };
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-300">
-      {/* Hero Title with Glow */}
+    <div
+      className="w-full max-w-7xl mx-auto font-sans pb-16 px-4 md:px-8 mt-4 md:mt-6 box-border"
+      style={{ fontFamily: "'Inter', sans-serif" }}
+    >
+      {/* Back to Tools Button */}
+      <div className="mb-4">
+        <Link
+          to="/tools"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-neutral-500 hover:text-neutral-900 dark:hover:text-white transition-colors group px-3 py-1.5 rounded-xl hover:bg-black/[0.04] dark:hover:bg-white/[0.05]"
+        >
+          <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
+          <span>Back to Tools</span>
+        </Link>
+      </div>
+
+      <div className="space-y-8 animate-in fade-in duration-300">
+        {/* Hero Title with Glow */}
       <div className="relative overflow-hidden rounded-3xl p-6 sm:p-8 bg-gradient-to-r from-emerald-500/10 via-emerald-500/10 to-emerald-500/10 border border-emerald-500/20 backdrop-blur-xl shadow-[0_8px_32px_0_rgba(16,185,129,0.1)]">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
@@ -494,5 +511,6 @@ export default function LotSizeCalculator() {
         </div>
       </div>
     </div>
+  </div>
   );
 }

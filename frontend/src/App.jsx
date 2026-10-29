@@ -82,10 +82,6 @@ const AffiliateDashboard = safeLazy(
   () => import("./pages/AffiliateDashboard.jsx"),
   "affiliate",
 );
-const CalculatorLayout = safeLazy(
-  () => import("./pages/TraderProblems/Layout.jsx"),
-  "calculator-layout",
-);
 const PropFirm = safeLazy(
   () => import("./pages/TraderProblems/PropFirm.jsx"),
   "prop-firm",
@@ -485,11 +481,12 @@ function App() {
 
                   <Route path="tools" element={<Tools />} />
 
-                  <Route path="calculator" element={<CalculatorLayout />}>
-                    <Route index element={<Navigate to="lot-size" replace />} />
-                    <Route path="lot-size" element={<LotSizeCalculator />} />
-                    <Route path="prop-firm" element={<PropFirm />} />
-                  </Route>
+                  {/* Completely Separated Calculator & Prop Firm Routes */}
+                  <Route path="calculator" element={<Navigate to="/calculator/lot-size" replace />} />
+                  <Route path="calculator/lot-size" element={<LotSizeCalculator />} />
+                  <Route path="calculator/position-size" element={<LotSizeCalculator />} />
+                  <Route path="calculator/prop-firm" element={<PropFirm />} />
+                  <Route path="prop-firm" element={<PropFirm />} />
                 </Route>
               </Route>
             </Route>

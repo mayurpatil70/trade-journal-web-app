@@ -32,6 +32,7 @@ import {
   User,
   CreditCard,
   ShieldCheck,
+  ShieldAlert,
   Zap,
   Lock,
   Calculator as CalculatorIcon,
@@ -390,6 +391,15 @@ export default function MainLayout() {
       iconColor: "text-emerald-500",
       bgColor: "bg-emerald-500/10",
       keywords: ["lot", "size", "calculator", "calc", "pip", "risk", "position"],
+    },
+    {
+      to: "/calculator/prop-firm",
+      label: "Prop Firm Challenge Calculator",
+      sub: "Simulate drawdown limits and pass evaluations safely",
+      icon: ShieldAlert,
+      iconColor: "text-rose-500",
+      bgColor: "bg-rose-500/10",
+      keywords: ["prop", "firm", "drawdown", "ftmo", "calculator", "evaluation", "funding"],
     },
     {
       to: "/charts",
