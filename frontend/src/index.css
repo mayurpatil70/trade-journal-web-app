@@ -1560,3 +1560,13 @@ button[class*="bg-[#0052CC]"] * {
   color: #ffffff !important;
   fill: #ffffff !important;
 }
+
+/* WinPro Partnership Card High-Contrast Overrides */
+.winpro-partnership-card button[aria-label="Close"],
+.winpro-partnership-card button[aria-label="Close"] * {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+}
+.winpro-partnership-card span {
+  text-shadow: none;
+}

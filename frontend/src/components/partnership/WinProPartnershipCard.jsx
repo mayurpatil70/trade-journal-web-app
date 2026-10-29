@@ -21,7 +21,7 @@ export default function WinProPartnershipCard({ onClose, isEmbedded = false }) {
         borderColor: "rgba(255, 255, 255, 0.15)",
         color: "#ffffff",
       }}
-      className={`relative w-full ${
+      className={`winpro-partnership-card relative w-full ${
         isEmbedded ? "max-w-2xl mx-auto" : "max-w-[420px]"
       } rounded-3xl overflow-hidden border shadow-[0_30px_90px_rgba(0,0,0,0.7),0_0_40px_rgba(212,255,0,0.08)] p-6 sm:p-7 flex flex-col justify-between font-sans select-none text-left`}
     >
@@ -64,14 +64,14 @@ export default function WinProPartnershipCard({ onClose, isEmbedded = false }) {
           </span>
         </div>
 
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2">
           <span
             style={{
-              borderColor: "rgba(255, 255, 255, 0.25)",
-              color: "rgba(255, 255, 255, 0.9)",
-              backgroundColor: "rgba(255, 255, 255, 0.06)",
+              borderColor: "rgba(255, 255, 255, 0.35)",
+              color: "#ffffff",
+              backgroundColor: "rgba(255, 255, 255, 0.14)",
             }}
-            className="text-[9.5px] font-extrabold uppercase tracking-widest px-2.5 py-0.5 rounded-full border"
+            className="text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full border shadow-xs backdrop-blur-md select-none"
           >
             IB PARTNER
           </span>
@@ -81,13 +81,14 @@ export default function WinProPartnershipCard({ onClose, isEmbedded = false }) {
               type="button"
               onClick={onClose}
               style={{
-                backgroundColor: "rgba(255, 255, 255, 0.12)",
+                backgroundColor: "rgba(255, 255, 255, 0.22)",
+                borderColor: "rgba(255, 255, 255, 0.35)",
                 color: "#ffffff",
               }}
-              className="w-7 h-7 rounded-full hover:bg-white/20 flex items-center justify-center transition-all cursor-pointer"
+              className="w-8 h-8 rounded-full border hover:bg-white/35 active:scale-95 flex items-center justify-center transition-all cursor-pointer shadow-md backdrop-blur-md"
               aria-label="Close"
             >
-              <X className="w-4 h-4" />
+              <X className="w-4 h-4 text-white stroke-[2.5]" style={{ color: "#ffffff", stroke: "#ffffff" }} />
             </button>
           )}
         </div>
