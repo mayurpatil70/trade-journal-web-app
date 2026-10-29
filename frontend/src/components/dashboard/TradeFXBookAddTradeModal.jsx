@@ -7,10 +7,10 @@ import {
   ArrowUpRight,
   ArrowDownRight,
   ChevronRight,
-  ChevronDown,
   Loader2,
-  Check,
   Briefcase,
+  Upload,
+  Image as ImageIcon,
 } from "lucide-react";
 import DateTimePickerPopover from "../ui/DateTimePickerPopover";
 import AppleSelect from "../ui/AppleSelect";
@@ -77,6 +77,39 @@ export default function TradeFXBookAddTradeModal({ isOpen, onClose, onTradeAdded
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+  const [beforeImage, setBeforeImage] = useState(null);
+  const [beforePreview, setBeforePreview] = useState(null);
+  const [afterImage, setAfterImage] = useState(null);
+  const [afterPreview, setAfterPreview] = useState(null);
+
+  const handleBeforeFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setBeforeImage(file);
+      setBeforePreview(URL.createObjectURL(file));
+      setErrorMsg("");
+    }
+  };
+
+  const handleAfterFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setAfterImage(file);
+      setAfterPreview(URL.createObjectURL(file));
+      setErrorMsg("");
+    }
+  };
+
+  const handleClose = () => {
+    if (beforePreview && beforePreview.startsWith("blob:")) URL.revokeObjectURL(beforePreview);
+    if (afterPreview && afterPreview.startsWith("blob:")) URL.revokeObjectURL(afterPreview);
+    setBeforeImage(null);
+    setBeforePreview(null);
+    setAfterImage(null);
+    setAfterPreview(null);
+    setErrorMsg("");
+    onClose();
+  };
 
   // Real-time Guardrails Validation ACCOUNT-WISE
   const guardrailValidation = useMemo(() => {
@@ -105,6 +138,10 @@ export default function TradeFXBookAddTradeModal({ isOpen, onClose, onTradeAdded
     }
     if (!entryPrice || isNaN(Number(entryPrice))) {
       setErrorMsg("Please enter a valid entry price.");
+      return;
+    }
+    if (!beforeImage || !afterImage) {
+      setErrorMsg("Please upload both Before Entry and After Exit screenshots (*).");
       return;
     }
 
@@ -154,36 +191,48 @@ export default function TradeFXBookAddTradeModal({ isOpen, onClose, onTradeAdded
       const numSl = stopLoss ? Number(stopLoss) : null;
       const numPnl = profitUsd !== "" && !isNaN(Number(profitUsd)) ? Number(profitUsd) : undefined;
 
-      const payload = {
-        userId,
-        account_name: accountName || "Default Account",
-        accountName: accountName || "Default Account",
-        asset: symbol.trim().toUpperCase(),
-        direction,
-        entry: numEntry,
-        exitPrice: numExit,
-        exit_price: numExit,
-        stop_loss: numSl,
-        sl: numSl,
-        lotSize: quantity ? Number(quantity) : 1.0,
-        lot_size: quantity ? Number(quantity) : 1.0,
-        date: dateStr,
-        time: timeStr,
-        entry_date: dateStr,
-        entry_time: timeStr,
-        exit_date: exDateStr,
-        exit_time: exTimeStr,
-        result: result === "open" ? "win" : result, // default to win/loss calculation
-        reason: notes,
-        lesson: Object.values(checklist).filter(Boolean).length > 0 ? "Checklist items satisfied" : "",
-        setup: "Manual Trade",
-        session: "New York",
-        risk: numRisk,
-        risk_percent: numRisk,
-        ...(numPnl !== undefined && { pnl: numPnl, profit: numPnl }),
-      };
+      const formData = new FormData();
+      formData.append("userId", userId);
+      formData.append("account_name", accountName || "Default Account");
+      formData.append("accountName", accountName || "Default Account");
+      formData.append("asset", symbol.trim().toUpperCase());
+      formData.append("direction", direction);
+      formData.append("entry", numEntry);
+      if (numExit !== null && !isNaN(numExit)) {
+        formData.append("exit_price", numExit);
+        formData.append("exitPrice", numExit);
+      }
+      if (numSl !== null && !isNaN(numSl)) {
+        formData.append("sl", numSl);
+        formData.append("stop_loss", numSl);
+      }
+      if (quantity && !isNaN(Number(quantity))) {
+        formData.append("lot_size", Number(quantity));
+        formData.append("lotSize", Number(quantity));
+      }
+      formData.append("date", dateStr);
+      formData.append("time", timeStr);
+      formData.append("entry_date", dateStr);
+      formData.append("entry_time", timeStr);
+      if (exDateStr) {
+        formData.append("exit_date", exDateStr);
+        formData.append("exit_time", exTimeStr);
+      }
+      formData.append("result", result);
+      if (notes.trim()) formData.append("reason", notes.trim());
+      if (numPnl !== undefined) {
+        formData.append("pnl", numPnl);
+        formData.append("profit", numPnl);
+      }
+      formData.append("risk", numRisk);
+      formData.append("risk_percent", numRisk);
+      formData.append("source", "Manual");
+      formData.append("images", beforeImage, beforeImage.name || `before_entry_${Date.now()}.png`);
+      formData.append("images", afterImage, afterImage.name || `after_exit_${Date.now()}.png`);
 
-      const res = await api.post("/api/trades", payload);
+      const res = await api.post("/api/trades", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
       if (res.data?.success || res.status === 201) {
         invalidateTradeCache();
         if (onTradeAdded) onTradeAdded(res.data.data);
@@ -202,7 +251,7 @@ export default function TradeFXBookAddTradeModal({ isOpen, onClose, onTradeAdded
   return createPortal(
     <div
       className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-black/45 dark:bg-black/75 backdrop-blur-md animate-in fade-in duration-200"
-      onClick={onClose}
+      onClick={handleClose}
     >
       <div
         className="w-full max-w-[480px] bg-white dark:bg-[#121622] border border-black/[0.08] dark:border-white/[0.12] rounded-3xl shadow-[0_25px_60px_rgba(0,0,0,0.2)] dark:shadow-[0_25px_70px_rgba(0,0,0,0.8)] backdrop-blur-2xl p-6 relative max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-200 scrollbar-hide"
@@ -217,7 +266,8 @@ export default function TradeFXBookAddTradeModal({ isOpen, onClose, onTradeAdded
             <h2 className="text-xl font-bold text-neutral-900 dark:text-white">Add Trade</h2>
           </div>
           <button
-            onClick={onClose}
+            type="button"
+            onClick={handleClose}
             className="p-1.5 rounded-full text-neutral-400 hover:text-neutral-700 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-white/[0.08] transition-colors"
           >
             <X className="w-5 h-5" />
@@ -497,6 +547,123 @@ export default function TradeFXBookAddTradeModal({ isOpen, onClose, onTradeAdded
             )}
           </div>
 
+          {/* Mandatory Before & After Screenshots Section */}
+          <div className="space-y-2.5 p-3.5 rounded-2xl bg-neutral-50/80 dark:bg-white/[0.03] border border-black/[0.06] dark:border-white/[0.08]">
+            <div className="flex items-center justify-between">
+              <label className="text-[11px] font-bold text-neutral-800 dark:text-neutral-200 uppercase tracking-wider flex items-center gap-1.5">
+                <ImageIcon className="w-3.5 h-3.5 text-emerald-500" />
+                <span>Execution Screenshots <span className="text-rose-500">*</span></span>
+              </label>
+              <span className="text-[10px] text-neutral-400 font-medium">Both mandatory for analysis</span>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 pt-1">
+              {/* Before Entry Screenshot Box */}
+              <div className="flex flex-col gap-1.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-bold text-neutral-700 dark:text-neutral-300">
+                    Before Entry <span className="text-rose-500">*</span>
+                  </span>
+                  {beforePreview && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (beforePreview.startsWith("blob:")) URL.revokeObjectURL(beforePreview);
+                        setBeforeImage(null);
+                        setBeforePreview(null);
+                      }}
+                      className="text-[10px] text-rose-500 hover:text-rose-600 font-semibold cursor-pointer"
+                    >
+                      Remove
+                    </button>
+                  )}
+                </div>
+
+                {beforePreview ? (
+                  <div className="relative rounded-xl overflow-hidden border border-emerald-500/30 bg-black/5 aspect-[4/3] group">
+                    <img src={beforePreview} alt="Before Entry Preview" className="w-full h-full object-cover" />
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <span className="text-[11px] font-bold text-white bg-black/60 px-2 py-1 rounded-md">
+                        Change Image
+                      </span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleBeforeFileChange}
+                        className="absolute inset-0 opacity-0 cursor-pointer"
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <label className="flex flex-col items-center justify-center p-3 rounded-xl border-2 border-dashed border-neutral-300 dark:border-white/10 hover:border-emerald-500 dark:hover:border-emerald-400/50 bg-white dark:bg-white/[0.02] cursor-pointer transition-colors text-center aspect-[4/3] group">
+                    <Upload className="w-5 h-5 text-neutral-400 group-hover:text-emerald-500 transition-colors mb-1" />
+                    <span className="text-[11px] font-semibold text-neutral-700 dark:text-neutral-300">Upload Entry</span>
+                    <span className="text-[9px] text-neutral-400 mt-0.5">PNG, JPG</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleBeforeFileChange}
+                      className="hidden"
+                      required
+                    />
+                  </label>
+                )}
+              </div>
+
+              {/* After Exit Screenshot Box */}
+              <div className="flex flex-col gap-1.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-bold text-neutral-700 dark:text-neutral-300">
+                    After Exit <span className="text-rose-500">*</span>
+                  </span>
+                  {afterPreview && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (afterPreview.startsWith("blob:")) URL.revokeObjectURL(afterPreview);
+                        setAfterImage(null);
+                        setAfterPreview(null);
+                      }}
+                      className="text-[10px] text-rose-500 hover:text-rose-600 font-semibold cursor-pointer"
+                    >
+                      Remove
+                    </button>
+                  )}
+                </div>
+
+                {afterPreview ? (
+                  <div className="relative rounded-xl overflow-hidden border border-emerald-500/30 bg-black/5 aspect-[4/3] group">
+                    <img src={afterPreview} alt="After Exit Preview" className="w-full h-full object-cover" />
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <span className="text-[11px] font-bold text-white bg-black/60 px-2 py-1 rounded-md">
+                        Change Image
+                      </span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleAfterFileChange}
+                        className="absolute inset-0 opacity-0 cursor-pointer"
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <label className="flex flex-col items-center justify-center p-3 rounded-xl border-2 border-dashed border-neutral-300 dark:border-white/10 hover:border-emerald-500 dark:hover:border-emerald-400/50 bg-white dark:bg-white/[0.02] cursor-pointer transition-colors text-center aspect-[4/3] group">
+                    <Upload className="w-5 h-5 text-neutral-400 group-hover:text-emerald-500 transition-colors mb-1" />
+                    <span className="text-[11px] font-semibold text-neutral-700 dark:text-neutral-300">Upload Exit</span>
+                    <span className="text-[9px] text-neutral-400 mt-0.5">PNG, JPG</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleAfterFileChange}
+                      className="hidden"
+                      required
+                    />
+                  </label>
+                )}
+              </div>
+            </div>
+          </div>
+
           {/* Notes (Screenshot 4 & 5) */}
           <div>
             <label className="block text-[11px] font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-1.5">
@@ -515,7 +682,7 @@ export default function TradeFXBookAddTradeModal({ isOpen, onClose, onTradeAdded
           <div className="flex items-center justify-end gap-3 pt-3">
             <button
               type="button"
-              onClick={onClose}
+              onClick={handleClose}
               disabled={isSubmitting}
               className="px-5 py-2.5 rounded-xl text-xs font-semibold text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-white/[0.06] transition-colors cursor-pointer"
             >

@@ -165,6 +165,20 @@ export default function PastTrades() {
   const viewButtonRef = useRef(null);
   const viewPopoverRef = useRef(null);
 
+  // ── Column Visibility State (Declared first to avoid TDZ ReferenceErrors) ──
+  const [visibleColumns, setVisibleColumns] = useState(() => {
+    try {
+      const saved = localStorage.getItem("tfb_trades_visible_columns");
+      return saved ? JSON.parse(saved) : DEFAULT_VISIBLE_IDS;
+    } catch {
+      return DEFAULT_VISIBLE_IDS;
+    }
+  });
+
+  useEffect(() => {
+    localStorage.setItem("tfb_trades_visible_columns", JSON.stringify(visibleColumns));
+  }, [visibleColumns]);
+
   // ── Column Order State (Supports Custom Drag & Drop / Up-Down Shuffling & Custom CSV Export) ──
   const [columnOrder, setColumnOrder] = useState(() => {
     try {
@@ -186,6 +200,7 @@ export default function PastTrades() {
     localStorage.setItem("tfb_trades_column_order", JSON.stringify(columnOrder));
   }, [columnOrder]);
 
+  // ── Derived Ordered Visible Columns (Guaranteed safe execution: both columnOrder and visibleColumns initialized) ──
   const orderedVisibleColumns = useMemo(
     () => columnOrder.filter((id) => visibleColumns.includes(id)),
     [columnOrder, visibleColumns]
@@ -224,15 +239,6 @@ export default function PastTrades() {
       return next;
     });
   };
-
-  const [visibleColumns, setVisibleColumns] = useState(() => {
-    try {
-      const saved = localStorage.getItem("tfb_trades_visible_columns");
-      return saved ? JSON.parse(saved) : DEFAULT_VISIBLE_IDS;
-    } catch {
-      return DEFAULT_VISIBLE_IDS;
-    }
-  });
 
   const [sortBy, setSortBy] = useState(() => {
     return localStorage.getItem("tfb_trades_sort_by") || "";
@@ -531,7 +537,7 @@ export default function PastTrades() {
       setTrades(updated);
       setCachedTrades(updated);
       if (selectedTrade?.id === tradeId) setSelectedTrade(null);
-    } catch (err) {
+    } catch {
       alert("Failed to delete trade. Please try again.");
     }
   };
@@ -569,7 +575,7 @@ export default function PastTrades() {
     const getColValue = (colId, t) => {
       switch (colId) {
         case "open_close":
-          return `Open: ${t.date || ""} ${t.time || ""} | Close: ${t.exit_date || t.date || ""} ${t.exit_time || t.time || ""}`.trim();
+          return `Open: ${t.date || ""} ${t.time || ""} | Close: ${t.exit_date ? `${t.exit_date} ${t.exit_time || ""}` : "Open"}`.trim();
         case "symbol":
           return t.asset || "";
         case "type":
@@ -588,7 +594,7 @@ export default function PastTrades() {
         case "open_time":
           return `${t.date || ""} ${t.time || ""}`.trim();
         case "close_time":
-          return `${t.exit_date || t.date || ""} ${t.exit_time || t.time || ""}`.trim();
+          return t.exit_date ? `${t.exit_date} ${t.exit_time || ""}`.trim() : "";
         case "duration":
           return getTradeDuration(t);
         case "commission":
@@ -731,19 +737,6 @@ export default function PastTrades() {
     setColumnFilters({});
   };
 
-  // Add condition
-  const handleAddCondition = () => {
-    setConditions((prev) => [
-      ...prev,
-      { id: Date.now(), field: "asset", operator: "equals", value: "" },
-    ]);
-  };
-
-  // Remove condition
-  const handleRemoveCondition = (id) => {
-    setConditions((prev) => prev.filter((c) => c.id !== id));
-  };
-
   // Padding based on rowHeight setting
   const rowPaddingClass =
     rowHeight === "compact"
@@ -796,19 +789,19 @@ export default function PastTrades() {
       case "entry":
         return (
           <td key={colId} className={`${rowPaddingClass} font-mono font-medium text-neutral-700 dark:text-neutral-300 whitespace-nowrap`}>
-            {t.entry || t.entry_price ? Number(t.entry || t.entry_price).toLocaleString() : "4,100.00"}
+            {t.entry || t.entry_price ? Number(t.entry || t.entry_price).toLocaleString() : "—"}
           </td>
         );
       case "exit":
         return (
           <td key={colId} className={`${rowPaddingClass} font-mono font-medium text-neutral-700 dark:text-neutral-300 whitespace-nowrap`}>
-            {t.exit || t.exit_price ? Number(t.exit || t.exit_price).toLocaleString() : "4,190.00"}
+            {t.exit || t.exit_price ? Number(t.exit || t.exit_price).toLocaleString() : "—"}
           </td>
         );
       case "size":
         return (
           <td key={colId} className={`${rowPaddingClass} font-mono font-medium text-neutral-700 dark:text-neutral-300 whitespace-nowrap`}>
-            {t.lot_size ?? t.size ?? "0.1"}
+            {t.lot_size ?? t.size ?? "—"}
           </td>
         );
       case "pnl":
@@ -859,7 +852,7 @@ export default function PastTrades() {
       case "close_time":
         return (
           <td key={colId} className={`${rowPaddingClass} font-mono text-neutral-600 dark:text-neutral-400`}>
-            {t.exit_time || t.time || "—"}
+            {t.exit_time || "—"}
           </td>
         );
       case "duration":
@@ -1312,15 +1305,15 @@ export default function PastTrades() {
               </div>
             </div>
 
-            {/* ROW 3: Clear All Filters */}
-            <div className="flex items-center justify-end pt-1">
+            {/* ROW 3: Reset Filters */}
+            <div className="flex items-center justify-end pt-2 border-t border-black/[0.05] dark:border-white/[0.05]">
               <button
                 type="button"
                 onClick={handleClearAllFilters}
                 className="text-neutral-500 hover:text-rose-500 font-semibold flex items-center gap-1.5 cursor-pointer transition-colors text-xs"
               >
                 <X className="w-3.5 h-3.5" />
-                <span>Clear All Filters</span>
+                <span>Reset Filters</span>
               </button>
             </div>
           </div>
@@ -1450,12 +1443,10 @@ export default function PastTrades() {
 
                   // Stacked Open & Close dates (Matches Screenshot 2 Exactly)
                   const openDateStr = t.date
-                    ? `Open: ${t.date} ${t.time || "06:02 PM"}`
+                    ? `Open: ${t.date}${t.time ? ` ${t.time}` : ""}`
                     : "Open: —";
                   const closeDateStr = t.exit_date
-                    ? `Close: ${t.exit_date} ${t.exit_time || "06:02 PM"}`
-                    : t.date
-                    ? `Close: ${t.date} ${t.time || "06:02 PM"}`
+                    ? `Close: ${t.exit_date}${t.exit_time ? ` ${t.exit_time}` : ""}`
                     : "Close: —";
 
                   const pnlNum = Number(t.pnl);

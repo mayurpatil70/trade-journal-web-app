@@ -12,6 +12,7 @@ import {
   LayoutList,
   BarChart2,
   FolderOpen,
+  FileText,
   ChevronDown,
   X,
 } from "lucide-react";
@@ -23,62 +24,54 @@ import { getEventSpecs } from "../utils/forexFactorySpecs.js";
 
 const HOUR = 3600_000;
 
-// Forex Factory Iconic Folder Graphic
-function ImpactFolder({ impact, className = "w-4 h-4" }) {
+// Modern Institutional Impact Indicator Badge (TradeFXBook style)
+function ImpactFolder({ impact, className = "" }) {
   const imp = String(impact || "").toLowerCase();
   if (imp === "high") {
     return (
-      <span title="High Impact (Red Folder)" className="inline-flex items-center justify-center shrink-0">
-        <svg className={className} viewBox="0 0 24 24" fill="#ef4444" stroke="#b91c1c" strokeWidth="1.2">
-          <path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-        </svg>
+      <span title="High Impact" className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 font-mono font-extrabold text-[10px] tracking-wider select-none shrink-0">
+        <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+        <span>HIGH</span>
       </span>
     );
   }
   if (imp === "medium") {
     return (
-      <span title="Medium Impact (Orange Folder)" className="inline-flex items-center justify-center shrink-0">
-        <svg className={className} viewBox="0 0 24 24" fill="#f97316" stroke="#c2410c" strokeWidth="1.2">
-          <path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-        </svg>
+      <span title="Medium Impact" className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 font-mono font-bold text-[10px] tracking-wider select-none shrink-0">
+        <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+        <span>MED</span>
       </span>
     );
   }
   if (imp === "low") {
     return (
-      <span title="Low Impact (Yellow Folder)" className="inline-flex items-center justify-center shrink-0">
-        <svg className={className} viewBox="0 0 24 24" fill="#eab308" stroke="#a16207" strokeWidth="1.2">
-          <path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-        </svg>
+      <span title="Low Impact" className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-500/10 text-slate-600 dark:text-slate-400 border border-slate-500/20 font-mono font-medium text-[10px] tracking-wider select-none shrink-0">
+        <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
+        <span>LOW</span>
       </span>
     );
   }
   return (
-    <span title="Non-economic / Holiday" className="inline-flex items-center justify-center shrink-0 opacity-60">
-      <svg className={className} viewBox="0 0 24 24" fill="#9ca3af" stroke="#4b5563" strokeWidth="1.2">
-        <path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-      </svg>
+    <span title="Non-economic / Holiday" className="inline-flex items-center px-2 py-0.5 rounded-md bg-neutral-500/10 text-neutral-400 border border-neutral-500/20 font-mono text-[10px] select-none shrink-0">
+      —
     </span>
   );
 }
 
-// Forex Factory Detail Folder Button
+// Modern Detail Specs Button
 function DetailFolderButton({ isOpen, onClick, title }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      title={title || "Click to view Forex Factory event specifications & analysis"}
-      className={`p-1 rounded-lg transition-all cursor-pointer ${
+      title={title || "Click to view event specifications & analysis"}
+      className={`p-1.5 rounded-lg transition-all cursor-pointer border ${
         isOpen
-          ? "bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/40 shadow-sm"
-          : "hover:bg-black/5 dark:hover:bg-white/10 text-neutral-400 hover:text-amber-500"
+          ? "bg-blue-500/10 text-[#0066FF] dark:text-blue-400 border-blue-500/30 shadow-xs"
+          : "hover:bg-black/5 dark:hover:bg-white/10 text-neutral-400 hover:text-blue-500 border-transparent"
       }`}
     >
-      <svg className="w-4 h-4" viewBox="0 0 24 24" fill={isOpen ? "#f59e0b" : "#fbbf24"} stroke={isOpen ? "#d97706" : "#b45309"} strokeWidth="1.2">
-        <path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-        <path d="M9 13h6M9 16h4" stroke="#ffffff" strokeWidth="1.5" strokeLinecap="round" />
-      </svg>
+      <FileText className="w-3.5 h-3.5" />
     </button>
   );
 }
@@ -126,12 +119,18 @@ function analyzeNewsImpact(e) {
       explanation = `${e.country} release came in exactly as forecasted (${actualStr}). Minimal fundamental deviation.`;
     }
   } else {
-    bias = e.impact === "High" ? "High Volatility Release" : "Moderate Risk Event";
-    color = e.impact === "High" ? "text-rose-600 dark:text-rose-400" : "text-amber-600 dark:text-amber-400";
-    badgeBg = e.impact === "High"
-      ? "bg-rose-500/15 text-rose-700 dark:text-rose-300 border-rose-500/30"
-      : "bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-500/30";
-    explanation = `Major high-volatility event for ${e.country}. Expect rapid spread widening and slippage across major ${e.country} crosses (e.g. ${e.country === "USD" ? "EURUSD, GBPUSD, XAUUSD" : e.country + "/USD"}). Avoid market orders +/-15 mins of release.`;
+    const isHigh = e.impact === "High";
+    const isMed = e.impact === "Medium";
+    bias = isHigh ? "High Volatility Watch" : isMed ? "Medium Risk Watch" : "Pending Release";
+    color = isHigh ? "text-rose-600 dark:text-rose-400" : isMed ? "text-amber-600 dark:text-amber-400" : "text-neutral-500";
+    badgeBg = isHigh
+      ? "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20"
+      : isMed
+      ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20"
+      : "bg-slate-500/10 text-slate-600 dark:text-slate-400 border-slate-500/20";
+    explanation = isHigh
+      ? `Major high-volatility event for ${e.country}. Expect rapid spread widening and slippage across major ${e.country} crosses. Avoid market orders +/-15 mins of release.`
+      : `Scheduled macroeconomic release for ${e.country}. Monitor print for deviations against market consensus.`;
   }
 
   return { bias, color, badgeBg, explanation };
@@ -408,31 +407,31 @@ export default function EconomicCalendar() {
                     onClick={() => setImpactFilter("High")}
                     className={`px-2.5 py-1 rounded-lg font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
                       impactFilter === "High"
-                        ? "bg-rose-500/20 text-rose-700 dark:text-rose-300 border border-rose-500/30 shadow-sm"
-                        : "text-neutral-600 dark:text-neutral-400"
+                        ? "bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/30 shadow-xs"
+                        : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
                     }`}
                   >
-                    <ImpactFolder impact="High" className="w-3.5 h-3.5" /> High
+                    <span className="w-2 h-2 rounded-full bg-rose-500" /> High
                   </button>
                   <button
                     onClick={() => setImpactFilter("Medium")}
                     className={`px-2.5 py-1 rounded-lg font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
                       impactFilter === "Medium"
-                        ? "bg-orange-500/20 text-orange-700 dark:text-orange-300 border border-orange-500/30 shadow-sm"
-                        : "text-neutral-600 dark:text-neutral-400"
+                        ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30 shadow-xs"
+                        : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
                     }`}
                   >
-                    <ImpactFolder impact="Medium" className="w-3.5 h-3.5" /> Medium
+                    <span className="w-2 h-2 rounded-full bg-amber-500" /> Medium
                   </button>
                   <button
                     onClick={() => setImpactFilter("Low")}
                     className={`px-2.5 py-1 rounded-lg font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
                       impactFilter === "Low"
-                        ? "bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-500/30 shadow-sm"
-                        : "text-neutral-600 dark:text-neutral-400"
+                        ? "bg-slate-500/10 text-slate-700 dark:text-slate-300 border border-slate-500/30 shadow-xs"
+                        : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
                     }`}
                   >
-                    <ImpactFolder impact="Low" className="w-3.5 h-3.5" /> Low
+                    <span className="w-2 h-2 rounded-full bg-slate-400" /> Low
                   </button>
                 </div>
               </div>
@@ -630,23 +629,27 @@ export default function EconomicCalendar() {
                                 {/* Action Badge */}
                                 <td className="py-2.5 px-3 text-right whitespace-nowrap">
                                   <span
-                                    className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${impactData.badgeBg}`}
+                                    className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${
+                                      ev.actual
+                                        ? impactData.badgeBg
+                                        : "bg-neutral-100 dark:bg-white/[0.04] text-neutral-500 dark:text-neutral-400 border-black/[0.06] dark:border-white/[0.08]"
+                                    }`}
                                   >
-                                    {impactData.bias.split(" ")[0]}
+                                    {ev.actual ? impactData.bias.split(" ")[0] : "Pending"}
                                   </span>
                                 </td>
                               </tr>
 
                               {/* INLINE FOREX FACTORY DETAIL SPECIFICATIONS ACCORDION */}
                               {isDetailOpen && (
-                                <tr className="bg-neutral-100/90 dark:bg-[#121622]/95 border-b-2 border-emerald-500/30 animate-in fade-in duration-150">
+                                <tr className="bg-neutral-100/90 dark:bg-[#121622]/95 border-b-2 border-blue-500/30 animate-in fade-in duration-150">
                                   <td colSpan={9} className="p-4 sm:p-6">
                                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 bg-white dark:bg-[#171c28] p-5 rounded-2xl border border-black/[0.08] dark:border-white/[0.1] shadow-md">
                                       {/* Specs Column */}
                                       <div className="space-y-2.5 text-xs">
                                         <div className="flex items-center justify-between pb-2 border-b border-black/[0.06] dark:border-white/[0.08]">
-                                          <span className="font-extrabold uppercase tracking-wider text-[11px] text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
-                                            <FolderOpen className="w-4 h-4" /> Specs (Forex Factory Format)
+                                          <span className="font-extrabold uppercase tracking-wider text-[11px] text-neutral-800 dark:text-neutral-200 flex items-center gap-1.5">
+                                            <FileText className="w-4 h-4 text-blue-500" /> Event Specifications & Methodology
                                           </span>
                                           <span className="font-mono text-[10px] text-neutral-500">
                                             {specs.country} • {specs.impact} Impact
