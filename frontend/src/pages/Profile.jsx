@@ -3,6 +3,7 @@ import { useState, useEffect, useRef, lazy, Suspense } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { createPortal } from "react-dom";
 import ApplePresetDropdown from "../components/ui/ApplePresetDropdown";
+import ProfilePhotoModal from "../components/ui/ProfilePhotoModal";
 import {
   User,
   Pencil,
@@ -282,6 +283,7 @@ export default function Profile({ defaultTab }) {
   });
 
   // Modal States
+  const [isPhotoModalOpen, setIsPhotoModalOpen] = useState(false);
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
   const [isEditRulesOpen, setIsEditRulesOpen] = useState(false);
   const [isEditPreferencesOpen, setIsEditPreferencesOpen] = useState(false);
@@ -330,6 +332,22 @@ export default function Profile({ defaultTab }) {
               email: p.email || prev.email || userEmail,
             };
             localStorage.setItem(`trader_profile_${userId}`, JSON.stringify(updated));
+            if (p.display_name) {
+              localStorage.setItem("userName", p.display_name);
+              localStorage.setItem("userDisplayName", p.display_name);
+            }
+            if (p.avatar_url) {
+              localStorage.setItem("userAvatar", p.avatar_url);
+              localStorage.setItem(`user_avatar_${userId}`, p.avatar_url);
+            }
+            window.dispatchEvent(
+              new CustomEvent("user_profile_updated", {
+                detail: {
+                  displayName: p.display_name || updated.displayName,
+                  avatarUrl: p.avatar_url || updated.avatarUrl,
+                },
+              })
+            );
             return updated;
           });
 
@@ -496,6 +514,11 @@ export default function Profile({ defaultTab }) {
           localStorage.setItem(`trader_profile_${userId}`, JSON.stringify(updated));
           localStorage.setItem(`user_avatar_${userId}`, newUrl);
           localStorage.setItem("userAvatar", newUrl);
+          window.dispatchEvent(
+            new CustomEvent("user_profile_updated", {
+              detail: { avatarUrl: newUrl },
+            })
+          );
           return updated;
         });
       }
@@ -513,7 +536,16 @@ export default function Profile({ defaultTab }) {
     localStorage.setItem(`trader_profile_${userId}`, JSON.stringify(editProfileForm));
     if (editProfileForm.displayName) {
       localStorage.setItem("userName", editProfileForm.displayName);
+      localStorage.setItem("userDisplayName", editProfileForm.displayName);
     }
+    window.dispatchEvent(
+      new CustomEvent("user_profile_updated", {
+        detail: {
+          displayName: editProfileForm.displayName,
+          avatarUrl: editProfileForm.avatarUrl,
+        },
+      })
+    );
     setIsEditProfileOpen(false);
 
     try {
@@ -734,10 +766,16 @@ export default function Profile({ defaultTab }) {
               <img
                 src={profile.avatarUrl}
                 alt={profile.displayName}
-                className="w-16 h-16 rounded-full object-cover ring-2 ring-emerald-500/20 shadow-md"
+                onClick={() => setIsPhotoModalOpen(true)}
+                className="w-16 h-16 rounded-full object-cover ring-2 ring-emerald-500/20 shadow-md cursor-pointer hover:ring-4 hover:ring-emerald-500/40 hover:scale-105 transition-all"
+                title="Click to view & update profile photo"
               />
             ) : (
-              <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-emerald-500 to-teal-500 text-white flex items-center justify-center font-black text-2xl shadow-md">
+              <div
+                onClick={() => setIsPhotoModalOpen(true)}
+                className="w-16 h-16 rounded-full bg-gradient-to-tr from-emerald-500 to-teal-500 text-white flex items-center justify-center font-black text-2xl shadow-md cursor-pointer hover:ring-4 hover:ring-emerald-500/40 hover:scale-105 transition-all"
+                title="Click to view & update profile photo"
+              >
                 {initialLetter}
               </div>
             )}
@@ -2343,6 +2381,18 @@ export default function Profile({ defaultTab }) {
           </div>,
           document.body
         )}
+
+      {/* Profile Photo Lightbox Modal */}
+      <ProfilePhotoModal
+        isOpen={isPhotoModalOpen}
+        onClose={() => setIsPhotoModalOpen(false)}
+        avatarUrl={profile.avatarUrl}
+        displayName={profile.displayName}
+        subText={`@${profile.username}`}
+        onAvatarUpdated={(newUrl) => {
+          setProfile((prev) => ({ ...prev, avatarUrl: newUrl }));
+        }}
+      />
     </div>
   );
 }

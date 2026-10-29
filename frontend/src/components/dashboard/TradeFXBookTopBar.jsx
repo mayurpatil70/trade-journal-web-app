@@ -11,6 +11,7 @@ import {
 import ThemeToggle from "../ThemeToggle";
 import NotificationBell from "../NotificationBell";
 import AccountFilter from "../AccountFilter";
+import ProfilePhotoModal from "../ui/ProfilePhotoModal";
 
 export default function TradeFXBookTopBar({
   trades = [],
@@ -23,10 +24,61 @@ export default function TradeFXBookTopBar({
   const [isQuickActionsOpen, setIsQuickActionsOpen] = useState(false);
   const [currentTimeStr, setCurrentTimeStr] = useState("");
   const [currentDateStr, setCurrentDateStr] = useState("");
+  const [isPhotoModalOpen, setIsPhotoModalOpen] = useState(false);
   const dropdownRef = useRef(null);
 
-  const userEmail = localStorage.getItem("userEmail") || "Trader";
-  const userAvatar = localStorage.getItem("userAvatar") || "";
+  const getStoredDisplayName = () => {
+    const custom =
+      localStorage.getItem("userName") ||
+      localStorage.getItem("userDisplayName");
+    if (custom && custom.trim() && custom !== "undefined" && custom !== "null") {
+      return custom.trim();
+    }
+    const uid = localStorage.getItem("userId") || localStorage.getItem("userEmail") || "";
+    try {
+      const cached = JSON.parse(localStorage.getItem(`trader_profile_${uid}`) || "{}");
+      if (cached.displayName && cached.displayName.trim()) {
+        return cached.displayName.trim();
+      }
+    } catch (e) {}
+    const email = localStorage.getItem("userEmail") || "";
+    if (email && email.includes("@")) {
+      return email.split("@")[0];
+    }
+    return email || "Trader";
+  };
+
+  const [displayName, setDisplayName] = useState(getStoredDisplayName);
+  const [userEmail, setUserEmail] = useState(() => localStorage.getItem("userEmail") || "Trader");
+  const [userAvatar, setUserAvatar] = useState(() => {
+    const uid = localStorage.getItem("userId") || localStorage.getItem("userEmail") || "";
+    return localStorage.getItem("userAvatar") || localStorage.getItem(`user_avatar_${uid}`) || "";
+  });
+
+  // Sync profile details across browser tabs and components
+  useEffect(() => {
+    const handleProfileSync = (e) => {
+      const uid = localStorage.getItem("userId") || localStorage.getItem("userEmail") || "";
+      if (e?.detail?.displayName) {
+        setDisplayName(e.detail.displayName);
+      } else {
+        setDisplayName(getStoredDisplayName());
+      }
+      if (e?.detail?.avatarUrl) {
+        setUserAvatar(e.detail.avatarUrl);
+      } else {
+        setUserAvatar(localStorage.getItem("userAvatar") || localStorage.getItem(`user_avatar_${uid}`) || "");
+      }
+      setUserEmail(localStorage.getItem("userEmail") || "Trader");
+    };
+
+    window.addEventListener("user_profile_updated", handleProfileSync);
+    window.addEventListener("storage", handleProfileSync);
+    return () => {
+      window.removeEventListener("user_profile_updated", handleProfileSync);
+      window.removeEventListener("storage", handleProfileSync);
+    };
+  }, []);
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -82,7 +134,7 @@ export default function TradeFXBookTopBar({
         <h1 className="text-2xl font-bold text-neutral-900 dark:text-white tracking-tight">
           {getGreeting()},{" "}
           <span className="text-emerald-500 font-semibold">
-            {userEmail.split("@")[0] || "Trader"}
+            {displayName}
           </span>
         </h1>
         <p className="text-xs font-medium text-neutral-500 dark:text-neutral-400 mt-0.5">
@@ -201,23 +253,37 @@ export default function TradeFXBookTopBar({
 
         {/* 4. User Profile Badge */}
         <div
-          onClick={() => navigate("/profile")}
-          className="h-10 flex items-center gap-2 px-2 rounded-2xl bg-white/80 dark:bg-[#121622]/80 border border-black/[0.06] dark:border-white/[0.08] hover:border-emerald-500/30 transition-all cursor-pointer shadow-sm select-none"
+          className="h-10 flex items-center gap-2 px-2 rounded-2xl bg-white/80 dark:bg-[#121622]/80 border border-black/[0.06] dark:border-white/[0.08] hover:border-emerald-500/30 transition-all shadow-sm select-none"
         >
-          {userAvatar ? (
-            <img
-              src={userAvatar}
-              alt="avatar"
-              className="w-6 h-6 rounded-lg object-cover ring-1 ring-emerald-500/20 shadow-sm"
-            />
-          ) : (
-            <div className="w-6 h-6 rounded-lg bg-gradient-to-tr from-emerald-500 to-teal-500 text-white flex items-center justify-center font-bold text-[11px] shadow-sm">
-              {userEmail.charAt(0).toUpperCase()}
-            </div>
-          )}
-          <div className="hidden sm:flex flex-col items-start leading-none pr-1">
-            <span className="text-[11px] font-bold text-neutral-800 dark:text-neutral-200 truncate max-w-[80px]">
-              {userEmail.split("@")[0]}
+          {/* Avatar button opens transparent preview modal */}
+          <div
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsPhotoModalOpen(true);
+            }}
+            className="cursor-pointer group/avatar relative"
+            title="Click to view & update profile photo"
+          >
+            {userAvatar ? (
+              <img
+                src={userAvatar}
+                alt="avatar"
+                className="w-6 h-6 rounded-lg object-cover ring-1 ring-emerald-500/20 shadow-sm group-hover/avatar:scale-110 group-hover/avatar:ring-emerald-500 transition-all"
+              />
+            ) : (
+              <div className="w-6 h-6 rounded-lg bg-gradient-to-tr from-emerald-500 to-teal-500 text-white flex items-center justify-center font-bold text-[11px] shadow-sm group-hover/avatar:scale-110 transition-transform">
+                {(displayName || userEmail).charAt(0).toUpperCase()}
+              </div>
+            )}
+          </div>
+
+          <div
+            onClick={() => navigate("/profile")}
+            className="hidden sm:flex flex-col items-start leading-none pr-1 cursor-pointer"
+            title="Go to Profile"
+          >
+            <span className="text-[11px] font-bold text-neutral-800 dark:text-neutral-200 truncate max-w-[95px]">
+              {displayName}
             </span>
             <span className="text-[8px] uppercase font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">
               PRO
@@ -235,6 +301,16 @@ export default function TradeFXBookTopBar({
           <ThemeToggle />
         </div>
       </div>
+
+      {/* Transparent Profile Photo Lightbox Modal */}
+      <ProfilePhotoModal
+        isOpen={isPhotoModalOpen}
+        onClose={() => setIsPhotoModalOpen(false)}
+        avatarUrl={userAvatar}
+        displayName={displayName}
+        subText={userEmail}
+        onAvatarUpdated={(newUrl) => setUserAvatar(newUrl)}
+      />
     </div>
   );
 }

@@ -9,6 +9,7 @@ import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import PreTradeGate from "../components/PreTradeGate.jsx";
 import PromoPopup from "../components/PromoPopup.jsx";
 import SystemAnnouncementBanner from "../components/SystemAnnouncementBanner.jsx";
+import ProfilePhotoModal from "../components/ui/ProfilePhotoModal.jsx";
 import api from "../api/axios";
 import {
   LayoutDashboard,
@@ -211,8 +212,56 @@ export default function MainLayout() {
 
   const userId = localStorage.getItem("userId") || localStorage.getItem("userEmail");
   const userEmail = localStorage.getItem("userEmail") || "Trader";
-  const userName = localStorage.getItem("userName") || userEmail;
-  const userAvatar = localStorage.getItem("userAvatar") || localStorage.getItem(`user_avatar_${userId}`);
+
+  const getStoredUserName = () => {
+    const custom =
+      localStorage.getItem("userName") ||
+      localStorage.getItem("userDisplayName");
+    if (custom && custom.trim() && custom !== "undefined" && custom !== "null") {
+      return custom.trim();
+    }
+    const uid = localStorage.getItem("userId") || localStorage.getItem("userEmail") || "";
+    try {
+      const cached = JSON.parse(localStorage.getItem(`trader_profile_${uid}`) || "{}");
+      if (cached.displayName && cached.displayName.trim()) {
+        return cached.displayName.trim();
+      }
+    } catch (e) {}
+    if (userEmail && userEmail.includes("@")) {
+      return userEmail.split("@")[0];
+    }
+    return userEmail || "Trader";
+  };
+
+  const [userName, setUserName] = useState(getStoredUserName);
+  const [userAvatar, setUserAvatar] = useState(() => {
+    const uid = localStorage.getItem("userId") || localStorage.getItem("userEmail");
+    return localStorage.getItem("userAvatar") || localStorage.getItem(`user_avatar_${uid}`) || "";
+  });
+  const [isPhotoModalOpen, setIsPhotoModalOpen] = useState(false);
+
+  useEffect(() => {
+    const handleProfileSync = (e) => {
+      const uid = localStorage.getItem("userId") || localStorage.getItem("userEmail");
+      if (e?.detail?.displayName) {
+        setUserName(e.detail.displayName);
+      } else {
+        setUserName(getStoredUserName());
+      }
+      if (e?.detail?.avatarUrl) {
+        setUserAvatar(e.detail.avatarUrl);
+      } else {
+        setUserAvatar(localStorage.getItem("userAvatar") || localStorage.getItem(`user_avatar_${uid}`) || "");
+      }
+    };
+    window.addEventListener("user_profile_updated", handleProfileSync);
+    window.addEventListener("storage", handleProfileSync);
+    return () => {
+      window.removeEventListener("user_profile_updated", handleProfileSync);
+      window.removeEventListener("storage", handleProfileSync);
+    };
+  }, []);
+
   const isAdmin = userId === "noballondesk@gmail.com" || userId === "akpatil51340@gmail.com";
 
   // System broadcast announcement
@@ -632,12 +681,19 @@ export default function MainLayout() {
             className="flex items-center justify-between p-2.5 rounded-2xl bg-white/70 dark:bg-white/[0.04] hover:bg-white/95 dark:hover:bg-white/[0.08] border border-black/[0.06] dark:border-white/[0.08] shadow-[0_2px_10px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_16px_rgba(0,0,0,0.25)] transition-all cursor-pointer group"
           >
             <div className="flex items-center gap-3 overflow-hidden">
-              <div className="relative">
-                <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 text-emerald-700 dark:text-emerald-400 flex items-center justify-center font-bold text-xs shrink-0 border border-emerald-500/30 shadow-inner">
+              <div
+                className="relative cursor-pointer group/avatar"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsPhotoModalOpen(true);
+                }}
+                title="Click to view & update profile photo"
+              >
+                <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 text-emerald-700 dark:text-emerald-400 flex items-center justify-center font-bold text-xs shrink-0 border border-emerald-500/30 shadow-inner group-hover/avatar:ring-2 group-hover/avatar:ring-emerald-500 transition-all overflow-hidden">
                   {userAvatar ? (
-                    <img src={userAvatar} alt="Avatar" className="w-full h-full object-cover" />
+                    <img src={userAvatar} alt="Avatar" className="w-full h-full object-cover group-hover/avatar:scale-110 transition-transform" />
                   ) : (
-                    userEmail.charAt(0).toUpperCase()
+                    (userName || userEmail).charAt(0).toUpperCase()
                   )}
                 </div>
                 <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-500 border-2 border-white dark:border-[#10131b] rounded-full" />
@@ -838,6 +894,14 @@ export default function MainLayout() {
 
       <PromoPopup />
       <PreTradeGate />
+      <ProfilePhotoModal
+        isOpen={isPhotoModalOpen}
+        onClose={() => setIsPhotoModalOpen(false)}
+        avatarUrl={userAvatar}
+        displayName={userName || userEmail}
+        subText={userEmail}
+        onAvatarUpdated={(newUrl) => setUserAvatar(newUrl)}
+      />
     </div>
   );
 }

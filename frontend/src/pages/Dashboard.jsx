@@ -190,6 +190,21 @@ export default function Dashboard() {
           setDisciplineRules(p.discipline_rules);
           localStorage.setItem(`trader_discipline_${activeUserId}`, JSON.stringify(p.discipline_rules));
         }
+        if (p.display_name) {
+          localStorage.setItem("userName", p.display_name);
+          localStorage.setItem("userDisplayName", p.display_name);
+        }
+        if (p.avatar_url) {
+          localStorage.setItem("userAvatar", p.avatar_url);
+          localStorage.setItem(`user_avatar_${activeUserId}`, p.avatar_url);
+        }
+        if (p.display_name || p.avatar_url) {
+          window.dispatchEvent(
+            new CustomEvent("user_profile_updated", {
+              detail: { displayName: p.display_name, avatarUrl: p.avatar_url },
+            })
+          );
+        }
         if (p.rules_onboarded || (p.discipline_rules && Object.keys(p.discipline_rules).length > 0)) {
           setShowOnboardingRules(false);
           localStorage.setItem(`rules_onboarded_${activeUserId}`, "true");
