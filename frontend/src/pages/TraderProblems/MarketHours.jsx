@@ -1,5 +1,5 @@
 // frontend/src/pages/TraderProblems/MarketHours.jsx
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { Link } from "react-router-dom";
 import {
   Clock,
@@ -15,7 +15,8 @@ import {
   Building2,
   ChevronRight,
   TrendingUp,
-  Sparkles,
+  ChevronDown,
+  Check,
 } from "lucide-react";
 import MarketClock from "../../components/onboarding/MarketClock";
 
@@ -186,6 +187,33 @@ export default function MarketHours() {
     () => localStorage.getItem("forex_preferred_tz") || "LOCAL"
   );
   const [clockTz, setClockTz] = useState("UTC");
+  const [isTzDropdownOpen, setIsTzDropdownOpen] = useState(false);
+  const tzDropdownRef = useRef(null);
+
+  // Close timezone dropdown on outside click or Escape key
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (tzDropdownRef.current && !tzDropdownRef.current.contains(e.target)) {
+        setIsTzDropdownOpen(false);
+      }
+    };
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") {
+        setIsTzDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
+
+  const selectedTzLabel = useMemo(() => {
+    const found = TIMEZONES.find((t) => t.id === selectedTz);
+    return found ? found.label : "Local Device Time";
+  }, [selectedTz]);
 
   // Live timer tick every second
   useEffect(() => {
@@ -359,27 +387,72 @@ export default function MarketHours() {
               </div>
             </div>
 
-            {/* Timezone Selector Controls */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full lg:w-auto">
-              <div className="flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-white/80 dark:bg-[#121418]/90 border border-black/[0.08] dark:border-white/10 shadow-xs backdrop-blur-md w-full sm:w-auto">
-                <Globe className="w-4 h-4 text-blue-500 shrink-0" />
-                <div className="flex flex-col">
-                  <span className="text-[10px] uppercase font-bold text-neutral-600 dark:text-neutral-300">
-                    Display Timezone
-                  </span>
-                  <select
-                    value={selectedTz}
-                    onChange={(e) => handleTzChange(e.target.value)}
-                    className="bg-transparent text-xs font-bold text-neutral-900 dark:text-neutral-100 focus:outline-none cursor-pointer pr-4"
-                  >
-                    {TIMEZONES.map((tz) => (
-                      <option key={tz.id} value={tz.id} className="bg-white dark:bg-[#181a20] text-neutral-900 dark:text-white">
-                        {tz.label}
-                      </option>
-                    ))}
-                  </select>
+            {/* Timezone Selector Controls - Apple Bento Custom Dropdown */}
+            <div className="relative w-full sm:w-auto" ref={tzDropdownRef}>
+              <button
+                type="button"
+                onClick={() => setIsTzDropdownOpen((prev) => !prev)}
+                className={`flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-2xl border transition-all duration-200 cursor-pointer text-left w-full sm:min-w-[240px] backdrop-blur-xl shadow-xs group select-none ${
+                  isTzDropdownOpen
+                    ? "bg-white dark:bg-[#161a24] border-blue-500/50 ring-2 ring-blue-500/20 shadow-md"
+                    : "bg-white/80 hover:bg-white dark:bg-[#121418]/90 dark:hover:bg-[#181b22] border-black/[0.08] dark:border-white/10 hover:border-black/20 dark:hover:border-white/20"
+                }`}
+                aria-haspopup="listbox"
+                aria-expanded={isTzDropdownOpen}
+              >
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="w-7 h-7 rounded-xl bg-blue-500/10 dark:bg-blue-500/15 border border-blue-500/20 text-blue-500 flex items-center justify-center shrink-0">
+                    <Globe className="w-4 h-4" />
+                  </div>
+                  <div className="flex flex-col min-w-0">
+                    <span className="text-[10px] uppercase font-bold text-neutral-500 dark:text-neutral-400 tracking-wider">
+                      Display Timezone
+                    </span>
+                    <span className="text-xs font-bold text-neutral-900 dark:text-neutral-100 truncate pr-1">
+                      {selectedTzLabel}
+                    </span>
+                  </div>
                 </div>
-              </div>
+                <ChevronDown
+                  className={`w-4 h-4 text-neutral-400 dark:text-neutral-500 shrink-0 transition-transform duration-200 ${
+                    isTzDropdownOpen ? "rotate-180 text-blue-500" : "group-hover:text-neutral-700 dark:group-hover:text-neutral-300"
+                  }`}
+                />
+              </button>
+
+              {/* Custom Apple-Style Frosted Glass Dropdown Panel */}
+              {isTzDropdownOpen && (
+                <div className="absolute right-0 sm:right-0 left-0 sm:left-auto top-full mt-2 w-full sm:w-72 bg-white/95 dark:bg-[#121622]/95 border border-black/[0.08] dark:border-white/[0.12] rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.18)] dark:shadow-[0_25px_60px_rgba(0,0,0,0.7)] backdrop-blur-2xl z-50 p-1.5 max-h-72 overflow-y-auto animate-in fade-in zoom-in-95 duration-150 space-y-0.5 select-none">
+                  <div className="px-3 py-1.5 text-[10px] font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-widest border-b border-black/[0.04] dark:border-white/[0.06] mb-1">
+                    Select Benchmark Timezone
+                  </div>
+                  {TIMEZONES.map((tz) => {
+                    const isSelected = selectedTz === tz.id;
+                    return (
+                      <button
+                        key={tz.id}
+                        type="button"
+                        onClick={() => {
+                          handleTzChange(tz.id);
+                          setIsTzDropdownOpen(false);
+                        }}
+                        className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs transition-colors text-left cursor-pointer ${
+                          isSelected
+                            ? "bg-blue-500/10 dark:bg-blue-500/15 text-blue-600 dark:text-blue-400 font-bold border border-blue-500/20"
+                            : "text-neutral-700 dark:text-neutral-200 hover:bg-black/[0.04] dark:hover:bg-white/[0.08]"
+                        }`}
+                        role="option"
+                        aria-selected={isSelected}
+                      >
+                        <span className="truncate">{tz.label}</span>
+                        {isSelected && (
+                          <Check className="w-3.5 h-3.5 text-blue-500 shrink-0 ml-2" />
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -849,8 +922,7 @@ export default function MarketHours() {
           {/* Right Rules & Golden Advice (7 Cols) */}
           <div className="lg:col-span-7 space-y-4">
             <div className="p-6 rounded-3xl bg-white/80 dark:bg-[#121418]/90 border border-black/[0.06] dark:border-white/10 backdrop-blur-xl shadow-lg space-y-4">
-              <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400">
-                <Sparkles className="w-5 h-5" />
+              <div>
                 <h3 className="text-base font-bold text-neutral-900 dark:text-white">
                   The Golden Rules of Session Timing
                 </h3>
