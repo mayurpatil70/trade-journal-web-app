@@ -12,12 +12,17 @@ import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
 import { mark3DLoaderShown } from "../utils/navigationState";
 import {
+  calculatePerformanceMetrics,
+  formatCurrency,
+} from "../utils/performanceMetrics";
+import {
   Activity,
   Clock,
   ArrowRight,
   ChevronRight,
   Brain,
   ShieldCheck,
+  Target,
 } from "lucide-react";
 
 export const normalizeTradeR = (t) => {
@@ -229,39 +234,8 @@ export default function Dashboard() {
       .slice(0, 5);
   }, [trades]);
 
-  const analyticsSetups = useMemo(() => {
-    const setups = {};
-    trades.forEach((t) => {
-      if (!t.setup) return;
-      if (!setups[t.setup]) setups[t.setup] = { total: 0, wins: 0, r: 0 };
-      setups[t.setup].total++;
-      if (isTradeWin(t)) setups[t.setup].wins++;
-      setups[t.setup].r += normalizeTradeR(t);
-    });
-    return Object.entries(setups)
-      .map(([name, d]) => ({ name, netR: d.r, total: d.total, winRate: (d.wins / d.total) * 100 }))
-      .sort((a, b) => b.netR - a.netR)
-      .slice(0, 3);
-  }, [trades]);
-
-  const topEmotion = useMemo(() => {
-    const map = {};
-    trades.forEach((t) => {
-      if (!t.emotion_before) return;
-      if (!map[t.emotion_before]) map[t.emotion_before] = { r: 0, count: 0 };
-      map[t.emotion_before].r += normalizeTradeR(t);
-      map[t.emotion_before].count++;
-    });
-    return Object.entries(map)
-      .map(([name, d]) => ({ name, netR: d.r, count: d.count }))
-      .sort((a, b) => b.netR - a.netR)
-      .slice(0, 3);
-  }, [trades]);
-
-  const mistakesData = useMemo(() => {
-    const unforced = trades.filter((t) => (t.result || "").toLowerCase() === "loss" && t.rule_break === "yes");
-    const cost = unforced.reduce((acc, t) => acc + normalizeTradeR(t), 0);
-    return { count: unforced.length, cost };
+  const performanceMetrics = useMemo(() => {
+    return calculatePerformanceMetrics(trades, "$");
   }, [trades]);
 
   if (isLoading) {
@@ -398,139 +372,251 @@ export default function Dashboard() {
         <BacktestSummary live={stats.totalTrades ? stats : null} />
       </div>
 
-      {/* ── 6. DEEP ANALYSIS (Strategy Analytics, Psychology Lab, Mistake Lab) ── */}
-      <div>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-[15px] font-bold text-neutral-900 dark:text-white">Deep Analysis</h2>
-          <span className="text-[11px] text-neutral-500 dark:text-neutral-400 font-medium">
-            {selectedAccount ? `Showing: ${selectedAccount}` : "All Accounts"}
-          </span>
+      {/* ── 6. TRADING INTELLIGENCE & LABS HUB (Deep Analysis) ── */}
+      <div className="rounded-3xl bg-white dark:bg-[#12151e]/85 backdrop-blur-xl border border-black/[0.06] dark:border-white/[0.08] shadow-[0_4px_24px_rgba(0,0,0,0.03)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.35)] p-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center font-bold">
+              <Brain className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="text-sm font-bold text-neutral-900 dark:text-white">
+                Trading Intelligence & Labs Hub
+              </h3>
+              <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                Consolidated Strategy Analytics, Psychology Lab discipline, and Mistake Lab leak detection.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] text-neutral-500 dark:text-neutral-400 font-medium mr-1">
+              {selectedAccount ? `Showing: ${selectedAccount}` : "All Accounts"}
+            </span>
+            <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+              Discipline: {(performanceMetrics.mistakes?.ruleAdherenceRate || 100).toFixed(0)}%
+            </span>
+          </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          {/* Strategy Analytics */}
+
+        {/* 3 Core Labs Bento Grid (Matches Institutional Performance Hub) */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* LAB 1: Strategy Edge */}
           <div
-            onClick={() => navigate("/analytics")}
-            className="rounded-3xl p-5 bg-white dark:bg-[#121622] border border-black/[0.06] dark:border-white/[0.08] hover:border-emerald-500/25 cursor-pointer group transition-all flex flex-col justify-between h-full"
+            onClick={() => navigate("/analysis/performance")}
+            className="p-5 rounded-2xl bg-neutral-50 dark:bg-white/[0.03] border border-black/[0.04] dark:border-white/[0.05] hover:border-emerald-500/30 cursor-pointer group transition-all flex flex-col justify-between"
           >
             <div>
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <div className="p-2 bg-emerald-500/10 rounded-xl">
-                    <Activity className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                  </div>
-                  <span className="text-[13px] font-semibold text-neutral-900 dark:text-white">
-                    Strategy Analytics
-                  </span>
-                </div>
-                <ChevronRight className="w-4 h-4 text-neutral-400 group-hover:text-emerald-500 transition-colors" />
+              <div className="flex items-center justify-between mb-3.5 pb-2.5 border-b border-black/[0.04] dark:border-white/[0.05]">
+                <span className="text-xs font-bold text-neutral-800 dark:text-neutral-200 flex items-center gap-1.5">
+                  <Target className="w-4 h-4 text-emerald-500" /> Strategy Edge
+                </span>
+                <span className="text-[10px] font-medium text-neutral-400">
+                  {performanceMetrics.setupInsights?.length || 0} Setups
+                </span>
               </div>
-              {analyticsSetups.length === 0 ? (
-                <p className="text-[12px] text-neutral-500 dark:text-neutral-400">No setup data yet.</p>
+
+              {(!performanceMetrics.setupInsights || performanceMetrics.setupInsights.length === 0) ? (
+                <p className="text-xs text-neutral-400 py-6 text-center">No setup data logged</p>
               ) : (
                 <div className="space-y-2.5">
-                  {analyticsSetups.map((s, i) => (
-                    <div key={i} className="flex items-center justify-between">
-                      <span className="text-[12px] text-neutral-700 dark:text-neutral-300 truncate max-w-[130px]">
-                        {s.name}
-                      </span>
-                      <span className={`text-[12px] font-bold ${s.netR >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600"}`}>
-                        {s.netR >= 0 ? "+" : ""}{s.netR.toFixed(2)}R
-                      </span>
+                  {performanceMetrics.setupInsights.slice(0, 4).map((s) => (
+                    <div
+                      key={s.name}
+                      className="flex items-center justify-between text-xs p-2.5 rounded-xl bg-white/70 dark:bg-white/[0.02] border border-black/[0.03] dark:border-white/[0.03]"
+                    >
+                      <div className="truncate max-w-[130px]">
+                        <p className="font-semibold text-neutral-800 dark:text-neutral-200 truncate">{s.name}</p>
+                        <p className="text-[10px] text-neutral-400">
+                          {s.count} trades • {s.r > 0 ? `+${s.r}R` : `${s.r}R`}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <span
+                          className={`font-bold font-mono ${
+                            s.pnl >= 0 ? "text-emerald-500 dark:text-emerald-400" : "text-rose-500 dark:text-rose-400"
+                          }`}
+                        >
+                          {formatCurrency(s.pnl)}
+                        </span>
+                        <p className="text-[10px] font-medium text-neutral-400">
+                          {(s.winRate || 0).toFixed(0)}% Win Rate
+                        </p>
+                      </div>
                     </div>
                   ))}
                 </div>
               )}
             </div>
-            <div className="mt-4 pt-3 border-t border-black/[0.05] dark:border-white/5 text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">
-              Full Analysis <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
-            </div>
-          </div>
 
-          {/* Psychology Lab */}
-          <div
-            onClick={() => navigate("/psychology")}
-            className="rounded-3xl p-5 bg-white dark:bg-[#121622] border border-black/[0.06] dark:border-white/[0.08] hover:border-amber-500/25 cursor-pointer group transition-all flex flex-col justify-between h-full"
-          >
+            {/* Session Breakdown Mini Bar */}
             <div>
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <div className="p-2 bg-amber-500/10 rounded-xl">
-                    <Brain className="w-4 h-4 text-amber-500" />
-                  </div>
-                  <span className="text-[13px] font-semibold text-neutral-900 dark:text-white">
-                    Psychology Lab
-                  </span>
-                </div>
-                <ChevronRight className="w-4 h-4 text-neutral-400 group-hover:text-amber-500 transition-colors" />
-              </div>
-              {topEmotion.length === 0 ? (
-                <p className="text-[12px] text-neutral-500 dark:text-neutral-400">No psychology data yet.</p>
-              ) : (
-                <div className="space-y-2.5">
-                  {topEmotion.map((e, i) => (
-                    <div key={i} className="flex items-center justify-between">
-                      <span className="text-[12px] text-neutral-700 dark:text-neutral-300 truncate max-w-[130px]">
-                        {e.name}
-                      </span>
-                      <span className={`text-[12px] font-bold ${e.netR >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600"}`}>
-                        {e.netR >= 0 ? "+" : ""}{e.netR.toFixed(2)}R
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-            <div className="mt-4 pt-3 border-t border-black/[0.05] dark:border-white/5 text-[11px] text-amber-500 font-semibold flex items-center gap-1">
-              Full Analysis <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
-            </div>
-          </div>
-
-          {/* Mistake Lab */}
-          <div
-            onClick={() => navigate("/mistakes")}
-            className="rounded-3xl p-5 bg-white dark:bg-[#121622] border border-black/[0.06] dark:border-white/[0.08] hover:border-rose-500/25 cursor-pointer group transition-all flex flex-col justify-between h-full"
-          >
-            <div>
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <div className="p-2 bg-rose-500/10 rounded-xl">
-                    <ShieldCheck className="w-4 h-4 text-rose-600 dark:text-rose-400" />
-                  </div>
-                  <span className="text-[13px] font-semibold text-neutral-900 dark:text-white">
-                    Mistake Lab
-                  </span>
-                </div>
-                <ChevronRight className="w-4 h-4 text-neutral-400 group-hover:text-rose-500 transition-colors" />
-              </div>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-[12px] text-neutral-500 dark:text-neutral-400">Unforced Errors</span>
-                  <span className="text-[13px] font-bold text-neutral-900 dark:text-white">{mistakesData.count}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-[12px] text-neutral-500 dark:text-neutral-400">Cost of Mistakes</span>
-                  <span className={`text-[13px] font-bold ${mistakesData.cost < 0 ? "text-rose-600 dark:text-rose-400" : "text-neutral-600"}`}>
-                    {mistakesData.cost.toFixed(2)}R
-                  </span>
-                </div>
-                {trades.length > 0 && (
-                  <div>
-                    <div className="flex items-center justify-between text-[11px] text-neutral-500 dark:text-neutral-400 mb-1">
-                      <span>Rule Discipline</span>
-                      <span>{(((trades.length - mistakesData.count) / trades.length) * 100).toFixed(0)}%</span>
-                    </div>
-                    <div className="w-full h-1.5 bg-black/5 dark:bg-white/5 rounded-full overflow-hidden">
+              {performanceMetrics.sessionInsights && performanceMetrics.sessionInsights.length > 0 && (
+                <div className="mt-4 pt-3 border-t border-black/[0.04] dark:border-white/[0.05]">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-neutral-400 mb-2">Session Edge</p>
+                  <div className="grid grid-cols-3 gap-1.5 text-center">
+                    {performanceMetrics.sessionInsights.slice(0, 3).map((sess) => (
                       <div
-                        className="h-full bg-emerald-500 dark:bg-emerald-400 rounded-full"
-                        style={{ width: `${((trades.length - mistakesData.count) / trades.length) * 100}%` }}
-                      />
-                    </div>
+                        key={sess.name}
+                        className="p-1.5 rounded-lg bg-white/80 dark:bg-white/[0.02] border border-black/[0.02] dark:border-white/[0.04]"
+                      >
+                        <p className="text-[10px] font-bold text-neutral-700 dark:text-neutral-300 truncate">{sess.name}</p>
+                        <p className={`text-[10px] font-mono font-bold ${sess.pnl >= 0 ? "text-emerald-500" : "text-rose-500"}`}>
+                          {formatCurrency(sess.pnl)}
+                        </p>
+                      </div>
+                    ))}
                   </div>
-                )}
+                </div>
+              )}
+
+              <div className="mt-4 pt-3 border-t border-black/[0.05] dark:border-white/5 text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold flex items-center justify-between">
+                <span>Full Strategy Analytics</span>
+                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
               </div>
             </div>
-            <div className="mt-4 pt-3 border-t border-black/[0.05] dark:border-white/5 text-[11px] text-rose-600 dark:text-rose-400 font-semibold flex items-center gap-1">
-              Full Analysis <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
+          </div>
+
+          {/* LAB 2: Psychology & Discipline */}
+          <div
+            onClick={() => navigate("/analysis/performance")}
+            className="p-5 rounded-2xl bg-neutral-50 dark:bg-white/[0.03] border border-black/[0.04] dark:border-white/[0.05] hover:border-purple-500/30 cursor-pointer group transition-all flex flex-col justify-between"
+          >
+            <div>
+              <div className="flex items-center justify-between mb-3.5 pb-2.5 border-b border-black/[0.04] dark:border-white/[0.05]">
+                <span className="text-xs font-bold text-neutral-800 dark:text-neutral-200 flex items-center gap-1.5">
+                  <Brain className="w-4 h-4 text-purple-500" /> Psychology & Discipline
+                </span>
+                <span className="text-[10px] font-medium text-neutral-400">Rules vs Emotions</span>
+              </div>
+
+              {/* Side-by-Side: Followed vs Broken Rules */}
+              <div className="grid grid-cols-2 gap-2 mb-3.5">
+                <div className="p-2.5 rounded-xl bg-emerald-500/[0.06] border border-emerald-500/20 text-center">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+                    Rules Followed
+                  </p>
+                  <p className="text-base font-extrabold text-emerald-600 dark:text-emerald-400 font-mono mt-0.5">
+                    {formatCurrency(performanceMetrics.rulesFollowed?.pnl || 0)}
+                  </p>
+                  <p className="text-[10px] text-neutral-500 dark:text-neutral-400 mt-0.5">
+                    {performanceMetrics.rulesFollowed?.count || 0} trades • {(performanceMetrics.rulesFollowed?.winRate || 0).toFixed(0)}% WR
+                  </p>
+                </div>
+                <div className="p-2.5 rounded-xl bg-rose-500/[0.06] border border-rose-500/20 text-center">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400">
+                    Rules Broken
+                  </p>
+                  <p className="text-base font-extrabold text-rose-600 dark:text-rose-400 font-mono mt-0.5">
+                    {formatCurrency(performanceMetrics.rulesBroken?.pnl || 0)}
+                  </p>
+                  <p className="text-[10px] text-neutral-500 dark:text-neutral-400 mt-0.5">
+                    {performanceMetrics.rulesBroken?.count || 0} trades • {(performanceMetrics.rulesBroken?.winRate || 0).toFixed(0)}% WR
+                  </p>
+                </div>
+              </div>
+
+              {/* Emotions Tag Feed */}
+              {performanceMetrics.emotionInsights && performanceMetrics.emotionInsights.length > 0 && (
+                <div className="space-y-1.5">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-neutral-400">Pre-Trade Emotional States</p>
+                  {performanceMetrics.emotionInsights.slice(0, 3).map((e) => (
+                    <div
+                      key={e.name}
+                      className="flex items-center justify-between text-xs py-1.5 px-2.5 rounded-lg bg-white/70 dark:bg-white/[0.02] border border-black/[0.02] dark:border-white/[0.03]"
+                    >
+                      <span className="font-medium text-neutral-700 dark:text-neutral-300">{e.name}</span>
+                      <div className="flex items-center gap-2 font-mono">
+                        <span className="text-[10px] text-neutral-400">{e.count}t</span>
+                        <span className={`font-bold ${e.pnl >= 0 ? "text-emerald-500" : "text-rose-500"}`}>
+                          {formatCurrency(e.pnl)}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="mt-4 pt-3 border-t border-black/[0.05] dark:border-white/5 text-[11px] text-purple-600 dark:text-purple-400 font-semibold flex items-center justify-between">
+              <span>Full Psychology Lab</span>
+              <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+            </div>
+          </div>
+
+          {/* LAB 3: Mistake Lab */}
+          <div
+            onClick={() => navigate("/analysis/performance")}
+            className="p-5 rounded-2xl bg-neutral-50 dark:bg-white/[0.03] border border-black/[0.04] dark:border-white/[0.05] hover:border-amber-500/30 cursor-pointer group transition-all flex flex-col justify-between"
+          >
+            <div>
+              <div className="flex items-center justify-between mb-3.5 pb-2.5 border-b border-black/[0.04] dark:border-white/[0.05]">
+                <span className="text-xs font-bold text-neutral-800 dark:text-neutral-200 flex items-center gap-1.5">
+                  <ShieldCheck className="w-4 h-4 text-amber-500" /> Mistake Lab
+                </span>
+                <span className="text-[10px] font-bold text-rose-500">
+                  {performanceMetrics.mistakes?.unforcedErrorsCount || 0} Breaches
+                </span>
+              </div>
+
+              <div className="space-y-2 text-xs mb-3.5">
+                <div className="flex items-center justify-between p-2 rounded-xl bg-white/70 dark:bg-white/[0.02] border border-black/[0.03] dark:border-white/[0.03]">
+                  <span className="text-neutral-600 dark:text-neutral-400">Rule Adherence Rate</span>
+                  <span className="font-bold text-emerald-500 font-mono">
+                    {(performanceMetrics.mistakes?.ruleAdherenceRate || 100).toFixed(1)}%
+                  </span>
+                </div>
+                <div className="flex items-center justify-between p-2 rounded-xl bg-white/70 dark:bg-white/[0.02] border border-black/[0.03] dark:border-white/[0.03]">
+                  <span className="text-neutral-600 dark:text-neutral-400">Capital Leak to Mistakes</span>
+                  <span className="font-bold text-rose-500 font-mono">
+                    {formatCurrency(-(performanceMetrics.mistakes?.costOfMistakes || 0))}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between p-2 rounded-xl bg-white/70 dark:bg-white/[0.02] border border-black/[0.03] dark:border-white/[0.03]">
+                  <span className="text-neutral-600 dark:text-neutral-400">Total R Drag</span>
+                  <span className="font-bold text-rose-500 font-mono">
+                    -{Math.abs(performanceMetrics.mistakes?.costOfMistakesR || 0).toFixed(1)}R
+                  </span>
+                </div>
+              </div>
+
+              {/* Mistake Audit Feed */}
+              {performanceMetrics.mistakes?.unforcedErrors && performanceMetrics.mistakes.unforcedErrors.length > 0 && (
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-neutral-400 mb-1.5">
+                    Recent Unforced Errors
+                  </p>
+                  <div className="space-y-1.5">
+                    {performanceMetrics.mistakes.unforcedErrors.slice(0, 2).map((err, i) => (
+                      <div key={i} className="p-2 rounded-xl bg-rose-500/[0.04] border border-rose-500/10 text-[11px]">
+                        <div className="flex items-center justify-between mb-0.5">
+                          <span className="font-bold text-rose-600 dark:text-rose-400">
+                            {err.setup || err.asset || "Discretionary"}
+                          </span>
+                          <span className="font-mono text-rose-500 font-bold">{formatCurrency(err.pnl)}</span>
+                        </div>
+                        {(err.reason || err.notes) && (
+                          <p className="text-neutral-500 dark:text-neutral-400 truncate">Why: {err.reason || err.notes}</p>
+                        )}
+                        {(err.lesson || err.takeaway) && (
+                          <p className="text-neutral-600 dark:text-neutral-300 font-medium truncate">Fix: {err.lesson || err.takeaway}</p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {(!performanceMetrics.mistakes?.unforcedErrors || performanceMetrics.mistakes.unforcedErrors.length === 0) && (
+                <div className="p-3 rounded-xl bg-emerald-500/[0.04] border border-emerald-500/10 text-center">
+                  <p className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">Zero Unforced Errors</p>
+                  <p className="text-[10px] text-neutral-400 mt-0.5">100% disciplined rule execution</p>
+                </div>
+              )}
+            </div>
+
+            <div className="mt-4 pt-3 border-t border-black/[0.05] dark:border-white/5 text-[11px] text-amber-600 dark:text-amber-400 font-semibold flex items-center justify-between">
+              <span>Full Mistake Lab</span>
+              <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
             </div>
           </div>
         </div>

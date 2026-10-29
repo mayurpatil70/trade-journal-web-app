@@ -561,9 +561,15 @@ export const calculatePerformanceMetrics = (rawTrades, currency = "$") => {
   };
 
   // ── MISTAKE LAB (Collected from rule violation & unforced error records) ──
-  const unforcedErrors = closedTrades.filter(
-    (t) => isTradeLoss(t) && (t.rule_break || "").toLowerCase() === "yes"
-  );
+  const unforcedErrors = closedTrades
+    .filter(
+      (t) => isTradeLoss(t) && (t.rule_break || "").toLowerCase() === "yes"
+    )
+    .map((t) => ({
+      ...t,
+      pnl: getTradePnL(t),
+      r: normalizeTradeR(t),
+    }));
   const costOfMistakes = unforcedErrors.reduce((acc, t) => acc + Math.abs(getTradePnL(t)), 0);
   const costOfMistakesR = unforcedErrors.reduce((acc, t) => acc + Math.abs(normalizeTradeR(t)), 0);
   const ruleAdherenceRate = totalClosed > 0 ? (rulesFollowed.count / totalClosed) * 100 : 100;
