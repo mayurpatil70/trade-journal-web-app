@@ -405,23 +405,25 @@ export default function PerformanceAnalytics() {
             </div>
           </div>
 
-          <div className="flex items-center p-0.5 rounded-xl bg-neutral-100 dark:bg-neutral-900 border border-black/[0.04] dark:border-white/[0.06]">
+          <div className="inline-flex items-center p-1 rounded-2xl bg-neutral-200/50 dark:bg-white/[0.06] backdrop-blur-xl border border-black/[0.04] dark:border-white/[0.08]">
             <button
+              type="button"
               onClick={() => setChartMode("equity")}
-              className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all duration-150 antialiased select-none cursor-pointer ${
                 chartMode === "equity"
-                  ? "bg-[#2563EB] text-white shadow-sm"
-                  : "text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
+                  ? "bg-[#007AFF] dark:bg-[#0A84FF] text-white shadow-[0_1px_3px_rgba(0,0,0,0.15)] ring-1 ring-white/20"
+                  : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white hover:bg-black/[0.03] dark:hover:bg-white/[0.04]"
               }`}
             >
               Equity
             </button>
             <button
+              type="button"
               onClick={() => setChartMode("drawdown")}
-              className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all duration-150 antialiased select-none cursor-pointer ${
                 chartMode === "drawdown"
-                  ? "bg-[#2563EB] text-white shadow-sm"
-                  : "text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
+                  ? "bg-[#007AFF] dark:bg-[#0A84FF] text-white shadow-[0_1px_3px_rgba(0,0,0,0.15)] ring-1 ring-white/20"
+                  : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white hover:bg-black/[0.03] dark:hover:bg-white/[0.04]"
               }`}
             >
               Drawdown
