@@ -9,8 +9,13 @@ import {
   getProfile,
   updateProfile,
   updateChecklist,
+  logoutUser,
+  getActiveSessions,
+  revokeSessionById,
+  revokeOtherSessions,
 } from "../controllers/authController.js";
 import { rateLimit } from "../middlewares/rateLimit.js";
+import { requireAuth } from "../middlewares/requireAuth.js";
 
 const upload = multer({
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
@@ -26,5 +31,11 @@ router.post("/onboarding-profile", saveOnboardingProfile);
 router.get("/profile", getProfile);
 router.put("/profile", updateProfile);
 router.post("/checklist", updateChecklist);
+
+// Session & Device Management Endpoints
+router.post("/logout", requireAuth, logoutUser);
+router.get("/sessions", requireAuth, getActiveSessions);
+router.delete("/sessions/:sessionId", requireAuth, revokeSessionById);
+router.post("/sessions/revoke-others", requireAuth, revokeOtherSessions);
 
 export default router;

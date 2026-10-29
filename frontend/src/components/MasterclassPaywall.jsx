@@ -19,9 +19,19 @@ import {
 } from "lucide-react";
 import api from "../api/axios";
 
+const FALLBACK_CONFIG = {
+  success: true,
+  price: 7.0,
+  wallets: {
+    BEP20:
+      (typeof import.meta !== "undefined" && import.meta.env?.VITE_BEP20_ADDRESS) ||
+      "0xeEE0DCbddd4cf94913dd2E69cA1009290F5B076E",
+  },
+};
+
 export default function MasterclassPaywall() {
   const [step, setStep] = useState(1);
-  const [config, setConfig] = useState(null);
+  const [config, setConfig] = useState(FALLBACK_CONFIG);
   const [chain, setChain] = useState("BEP20");
   const [txHash, setTxHash] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);

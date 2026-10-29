@@ -33,7 +33,7 @@ router.get("/config", (req, res) => {
     success: true,
     price: JOURNAL_PRICE,
     wallets: {
-      BEP20: process.env.BEP20_ADDRESS,
+      BEP20: process.env.BEP20_ADDRESS || "0xeEE0DCbddd4cf94913dd2E69cA1009290F5B076E",
     },
   });
 });

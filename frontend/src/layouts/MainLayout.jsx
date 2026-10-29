@@ -13,7 +13,7 @@ import ProfilePhotoModal from "../components/ui/ProfilePhotoModal.jsx";
 import SupportFeedbackModal from "../components/support/SupportFeedbackModal.jsx";
 import SocialFollowPopup from "../components/support/SocialFollowPopup.jsx";
 import { prefetchRoute, prefetchAllSecondaryRoutes } from "../utils/routePrefetch";
-import api from "../api/axios";
+import api, { logoutSession } from "../api/axios";
 import {
   LayoutDashboard,
   PlusCircle,
@@ -425,11 +425,14 @@ export default function MainLayout() {
     setIsProfileOpen((p) => !p);
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("userId");
-    localStorage.removeItem("token");
-    localStorage.removeItem("userEmail");
-    navigate("/login");
+  const handleLogout = async () => {
+    try {
+      await logoutSession();
+    } catch {
+      // handled in logoutSession
+    } finally {
+      navigate("/login");
+    }
   };
 
   const closeMenu = () => {

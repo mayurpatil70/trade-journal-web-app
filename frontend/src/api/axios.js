@@ -23,13 +23,24 @@ const api = axios.create({
   },
 });
 
+// ── Persistent Device Identifier ─────────────────────────────────────────────
+export function getDeviceId() {
+  if (typeof window === "undefined") return "browser-device";
+  let did = localStorage.getItem("deviceId");
+  if (!did) {
+    did = "dev_" + Math.random().toString(36).substring(2, 10) + "_" + Date.now().toString(36);
+    localStorage.setItem("deviceId", did);
+  }
+  return did;
+}
+
 // ── Session helpers ─────────────────────────────────────────────────────────
-// Save session with a timestamp so AuthGuard can expire it client-side.
-export function saveSession({ userId, token, email }) {
+export function saveSession({ userId, token, email, sessionId, deviceId }) {
   if (userId) localStorage.setItem("userId", userId);
   if (token) localStorage.setItem("token", token);
   if (email) localStorage.setItem("userEmail", email);
-  // Store the login timestamp (ms) — used to compute local 24-hour expiry
+  if (sessionId) localStorage.setItem("sessionId", sessionId);
+  if (deviceId) localStorage.setItem("deviceId", deviceId);
   localStorage.setItem("sessionCreatedAt", String(Date.now()));
 }
 
@@ -37,6 +48,7 @@ export function clearSession() {
   localStorage.removeItem("userId");
   localStorage.removeItem("token");
   localStorage.removeItem("userEmail");
+  localStorage.removeItem("sessionId");
   localStorage.removeItem("sessionCreatedAt");
   if (typeof window !== "undefined") {
     sessionStorage.removeItem("user_in_app");
@@ -44,47 +56,42 @@ export function clearSession() {
   }
 }
 
-// Returns true if a valid session exists and hasn't exceeded the daily reset window.
-// Session is valid for 24 hours, then auto-expires at the next 2:30 AM IST.
-export function isSessionValid() {
-  const token = localStorage.getItem("token");
-  const userId = localStorage.getItem("userId") || localStorage.getItem("userEmail");
-  if (!token || !userId) return false;
-
-  const createdAt = parseInt(localStorage.getItem("sessionCreatedAt") || "0", 10);
-  if (!createdAt) return true; // Legacy sessions without timestamp — stay logged in
-
-  // Check if we've passed the next 2:30 AM IST after 24 hours from login
-  const now = Date.now();
-  const elapsed = now - createdAt;
-  const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;
-
-  if (elapsed < TWENTY_FOUR_HOURS) return true; // Within 24h — always valid
-
-  // Beyond 24h — check if current time is past 2:30 AM IST today
-  // IST = UTC+5:30, so 2:30 AM IST = 21:00 UTC previous day
-  const nowDate = new Date(now);
-  // Get today's 2:30 AM in local time
-  const todayReset = new Date(nowDate);
-  todayReset.setHours(2, 30, 0, 0);
-
-  // If it's before 2:30 AM today, the reset is from yesterday's 2:30 AM
-  if (nowDate < todayReset) {
-    todayReset.setDate(todayReset.getDate() - 1);
+/**
+ * Handles explicit manual logout for this specific device
+ */
+export async function logoutSession() {
+  const sessionId = localStorage.getItem("sessionId");
+  try {
+    if (sessionId) {
+      await api.post("/api/auth/logout", { sessionId });
+    }
+  } catch (err) {
+    console.warn("[Auth] Backend logout notice:", err.message);
+  } finally {
+    clearSession();
   }
-
-  // If session was created before the most recent 2:30 AM reset → expired
-  if (createdAt < todayReset.getTime()) {
-    return false;
-  }
-
-  return true;
 }
 
-// ── Request interceptor: attach Bearer token ────────────────────────────────
+/**
+ * Checks if a session exists.
+ * Persistent caching: Keeps the user logged in across days without arbitrary daily wipes.
+ * Revocation & Subscription expiry are enforced server-side.
+ */
+export function isSessionValid() {
+  if (typeof window === "undefined") return false;
+  const token = localStorage.getItem("token");
+  const userId = localStorage.getItem("userId") || localStorage.getItem("userEmail");
+  return Boolean(token && userId);
+}
+
+// ── Request interceptor: attach Bearer token and Device ID ───────────────────
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
   if (token) config.headers.Authorization = `Bearer ${token}`;
+
+  const deviceId = getDeviceId();
+  if (deviceId) config.headers["x-device-id"] = deviceId;
+
   return config;
 });
 
@@ -92,16 +99,30 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    // If server returns 401 (token expired/invalid) → auto-logout
+    // If server returns 401 (token expired/invalid/subscription expired) → auto-logout
     if (error.response?.status === 401) {
       const url = error.config?.url || "";
-      // Don't auto-logout on auth endpoints (login/verify) — those have their own error handling
-      if (!url.includes("/api/auth/")) {
-        console.warn("[Auth] Session expired — logging out");
+      // Don't auto-logout on auth submission endpoints (login/verify)
+      if (!url.includes("/api/auth/login") && !url.includes("/api/auth/verify")) {
+        const errorType = error.response?.data?.error;
+        console.warn("[Auth] Session invalidated or subscription expired:", errorType);
         clearSession();
-        // Only redirect if not already on login page
-        if (!window.location.pathname.includes("/login")) {
-          window.location.replace("/login");
+
+        if (errorType === "SUBSCRIPTION_EXPIRED") {
+          if (
+            typeof window !== "undefined" &&
+            !window.location.pathname.includes("/paywall") &&
+            !window.location.pathname.includes("/pricing")
+          ) {
+            window.location.replace("/paywall?expired=1");
+          }
+        } else {
+          if (
+            typeof window !== "undefined" &&
+            !window.location.pathname.includes("/login")
+          ) {
+            window.location.replace("/login");
+          }
         }
       }
     }

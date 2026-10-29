@@ -3,6 +3,13 @@ import crypto from "crypto";
 import { signAuthToken } from "../utils/authToken.js";
 import { supabase } from "../config/supabase.js";
 import { uploadToCloudinary } from "../utils/cloudinary.js";
+import {
+  createSession,
+  revokeSession,
+  revokeAllOtherSessions,
+  getUserSessions,
+} from "../services/sessionService.js";
+import { parseDeviceName, getClientIp } from "../utils/deviceHelper.js";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -129,11 +136,30 @@ export const verifyLogin = async (req, res) => {
     // 4. Combined access check
     const hasPaid = isAdmin || hasActiveProfile || Boolean(subData);
 
+    // 5. Per-Device Persistent Session Initialization
+    const deviceId = req.body?.deviceId || req.headers["x-device-id"] || crypto.randomUUID();
+    const deviceName = req.body?.deviceName || parseDeviceName(req.headers["user-agent"]);
+    const ipAddress = getClientIp(req);
+
+    const session = await createSession({
+      userId: user.id,
+      deviceId,
+      deviceName,
+      ipAddress,
+    });
+
+    const authToken = signAuthToken(user.id, {
+      sessionId: session?.id,
+      deviceId,
+    });
+
     res.json({
       message: "Verified successfully",
       discordVerified: user.discord_verified,
       userId: user.id,
-      authToken: signAuthToken(user.id),
+      sessionId: session?.id || null,
+      deviceId,
+      authToken,
       hasPaid: hasPaid,
       isAdmin: isAdmin,
     });
@@ -577,3 +603,83 @@ export const updateChecklist = async (req, res) => {
     res.status(500).json({ success: false, error: "Failed to update checklist." });
   }
 };
+
+/**
+ * Logout the current device session
+ */
+export const logoutUser = async (req, res) => {
+  try {
+    const sessionId = req.sessionId || req.body?.sessionId;
+    const userId = req.userId || req.body?.userId;
+
+    if (sessionId) {
+      await revokeSession(sessionId, userId);
+    }
+
+    res.json({ success: true, message: "Logged out successfully." });
+  } catch (error) {
+    console.error("[Auth] logout error:", error);
+    res.status(500).json({ success: false, error: "Failed to log out." });
+  }
+};
+
+/**
+ * Get all active sessions for current user (Settings UI)
+ */
+export const getActiveSessions = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const currentSessionId = req.sessionId;
+
+    if (!userId) {
+      return res.status(401).json({ success: false, error: "Unauthorized" });
+    }
+
+    const sessions = await getUserSessions(userId, currentSessionId);
+    res.json({ success: true, sessions });
+  } catch (error) {
+    console.error("[Auth] getActiveSessions error:", error);
+    res.status(500).json({ success: false, error: "Failed to fetch active devices." });
+  }
+};
+
+/**
+ * Revoke a specific device session
+ */
+export const revokeSessionById = async (req, res) => {
+  try {
+    const { sessionId } = req.params;
+    const userId = req.userId;
+
+    if (!sessionId || !userId) {
+      return res.status(400).json({ success: false, error: "Session ID and User ID required" });
+    }
+
+    await revokeSession(sessionId, userId);
+    res.json({ success: true, message: "Device session revoked successfully." });
+  } catch (error) {
+    console.error("[Auth] revokeSessionById error:", error);
+    res.status(500).json({ success: false, error: "Failed to revoke device session." });
+  }
+};
+
+/**
+ * Revoke all other sessions except the current one
+ */
+export const revokeOtherSessions = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const currentSessionId = req.sessionId;
+
+    if (!userId) {
+      return res.status(401).json({ success: false, error: "Unauthorized" });
+    }
+
+    await revokeAllOtherSessions(userId, currentSessionId);
+    res.json({ success: true, message: "All other device sessions logged out." });
+  } catch (error) {
+    console.error("[Auth] revokeOtherSessions error:", error);
+    res.status(500).json({ success: false, error: "Failed to revoke other devices." });
+  }
+};
+

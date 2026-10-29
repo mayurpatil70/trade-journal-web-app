@@ -6,6 +6,31 @@
 import { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import { X, Download, Share2, Check, Loader2 } from "lucide-react";
 
+// Aspect configurations defined at module level
+const ASPECT_CONFIGS = {
+  post: {
+    label: "Post",
+    dims: "1080×1080",
+    width: 1080,
+    height: 1080,
+    previewClasses: "w-[340px] sm:w-[380px] h-[340px] sm:h-[380px] aspect-square",
+  },
+  story: {
+    label: "Story",
+    dims: "1080×1920",
+    width: 1080,
+    height: 1920,
+    previewClasses: "w-[240px] sm:w-[270px] h-[426px] sm:h-[480px] aspect-[9/16]",
+  },
+  landscape: {
+    label: "Landscape",
+    dims: "1920×1080",
+    width: 1920,
+    height: 1080,
+    previewClasses: "w-[360px] sm:w-[480px] h-[202px] sm:h-[270px] aspect-[16/9]",
+  },
+};
+
 export default function TradeShareModal({ isOpen, onClose, trade }) {
   const [aspect, setAspect] = useState("post"); // "post" | "story" | "landscape"
   const [isGenerating, setIsGenerating] = useState(false);
@@ -106,37 +131,11 @@ export default function TradeShareModal({ isOpen, onClose, trade }) {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [isOpen, onClose]);
 
-  if (!isOpen || !trade || !tradeMetrics) return null;
-
-  // Aspect configurations
-  const aspectConfigs = {
-    post: {
-      label: "Post",
-      dims: "1080×1080",
-      width: 1080,
-      height: 1080,
-      previewClasses: "w-[340px] sm:w-[380px] h-[340px] sm:h-[380px] aspect-square",
-    },
-    story: {
-      label: "Story",
-      dims: "1080×1920",
-      width: 1080,
-      height: 1920,
-      previewClasses: "w-[240px] sm:w-[270px] h-[426px] sm:h-[480px] aspect-[9/16]",
-    },
-    landscape: {
-      label: "Landscape",
-      dims: "1920×1080",
-      width: 1920,
-      height: 1080,
-      previewClasses: "w-[360px] sm:w-[480px] h-[202px] sm:h-[270px] aspect-[16/9]",
-    },
-  };
-
-  const currentCfg = aspectConfigs[aspect];
+  const currentCfg = ASPECT_CONFIGS[aspect] || ASPECT_CONFIGS.post;
 
   // Canvas Exporter
-  const renderCardToCanvas = async (targetWidth, targetHeight) => {
+  const renderCardToCanvas = useCallback(async (targetWidth, targetHeight) => {
+    if (!tradeMetrics) return null;
     const canvas = document.createElement("canvas");
     canvas.width = targetWidth;
     canvas.height = targetHeight;
@@ -235,8 +234,8 @@ export default function TradeShareModal({ isOpen, onClose, trade }) {
     ctx.font = `900 ${Math.round(baseDim * 0.038)}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
     ctx.fillText("ForexNotes", brandTextX, topY + logoSize * 0.46);
 
-    ctx.fillStyle = "rgba(255, 255, 255, 0.65)";
-    ctx.font = `600 ${Math.round(baseDim * 0.018)}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
+    ctx.fillStyle = "rgba(255, 255, 255, 0.55)";
+    ctx.font = `600 ${Math.round(baseDim * 0.016)}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
     ctx.fillText("Track Trades. Analyze PnL. Master Markets.", brandTextX, topY + logoSize * 0.82);
 
     // Top-Right Institutional Badge (IB Card style)
@@ -298,15 +297,21 @@ export default function TradeShareModal({ isOpen, onClose, trade }) {
     ctx.fillText(tradeMetrics.symbol, padX + dirW + sep1W + lotsW + sep2W, subY);
 
     // Giant Hero P&L Headline
-    const heroY = subY + targetHeight * (aspect === "story" ? 0.08 : 0.11);
-    ctx.font = `900 ${Math.round(baseDim * 0.088)}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
+    const heroY = subY + targetHeight * (aspect === "story" ? 0.09 : aspect === "landscape" ? 0.15 : 0.13);
+    const heroFontSize = Math.round(baseDim * (aspect === "story" ? 0.09 : aspect === "landscape" ? 0.088 : 0.086));
+    ctx.font = `900 ${heroFontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
     ctx.fillStyle = tradeMetrics.isProfit ? "#38bdf8" : "#fb7185";
-    ctx.fillText(tradeMetrics.formattedPnl, padX, heroY);
 
-    // 6. Bento Metrics Boxes (Entry & Exit Prices)
-    const bentoY = heroY + targetHeight * (aspect === "story" ? 0.05 : 0.065);
-    const boxWidth = (targetWidth - padX * 2 - (aspect === "landscape" ? 32 : 18)) / (aspect === "landscape" ? 2.5 : 2);
-    const boxHeight = targetHeight * (aspect === "story" ? 0.08 : 0.13);
+    // Text Shadow for vibrancy
+    ctx.shadowColor = tradeMetrics.isProfit ? "rgba(56, 189, 248, 0.45)" : "rgba(251, 113, 133, 0.45)";
+    ctx.shadowBlur = 35;
+    ctx.fillText(tradeMetrics.formattedPnl, padX, heroY);
+    ctx.shadowBlur = 0; // reset
+
+    // 6. Bento Grid Execution Details: Entry & Exit Boxes
+    const bentoY = heroY + targetHeight * (aspect === "story" ? 0.045 : aspect === "landscape" ? 0.065 : 0.06);
+    const boxHeight = targetHeight * (aspect === "story" ? 0.11 : aspect === "landscape" ? 0.16 : 0.135);
+    const boxWidth = (targetWidth - padX * 2 - (aspect === "landscape" ? 32 : 18)) / 2;
     const box2X = padX + boxWidth + (aspect === "landscape" ? 32 : 18);
 
     // Draw Box 1 (Entry)
@@ -441,13 +446,43 @@ export default function TradeShareModal({ isOpen, onClose, trade }) {
     }
 
     return canvas;
-  };
+  }, [aspect, tradeMetrics, userInfo]);
+
+  // Synchronously update poster preview whenever aspect, trade, or user changes
+  useEffect(() => {
+    let active = true;
+    if (!isOpen || !trade || !tradeMetrics) {
+      setPreviewDataUrl(null);
+      setIsRenderingPreview(false);
+      return;
+    }
+    const generatePreview = async () => {
+      setIsRenderingPreview(true);
+      try {
+        const cfg = ASPECT_CONFIGS[aspect] || ASPECT_CONFIGS.post;
+        const canvas = await renderCardToCanvas(cfg.width, cfg.height);
+        if (active && canvas) {
+          setPreviewDataUrl(canvas.toDataURL("image/png"));
+        }
+      } catch (err) {
+        console.error("Preview render failed:", err);
+      } finally {
+        if (active) setIsRenderingPreview(false);
+      }
+    };
+    generatePreview();
+    return () => {
+      active = false;
+    };
+  }, [isOpen, aspect, trade, tradeMetrics, renderCardToCanvas]);
 
   // Download Handler
   const handleDownload = async () => {
+    if (!tradeMetrics) return;
     setIsGenerating(true);
     try {
       const canvas = await renderCardToCanvas(currentCfg.width, currentCfg.height);
+      if (!canvas) throw new Error("Canvas generation failed");
       const url = canvas.toDataURL("image/png");
       const a = document.createElement("a");
       a.href = url;
@@ -461,41 +496,6 @@ export default function TradeShareModal({ isOpen, onClose, trade }) {
     } catch (err) {
       console.error("Failed to export trade card:", err);
       alert("Failed to export image. Please try again.");
-    } finally {
-      setIsGenerating(false);
-    }
-  };
-
-  // Share Handler
-  const handleShare = async () => {
-    setIsGenerating(true);
-    try {
-      const canvas = await renderCardToCanvas(currentCfg.width, currentCfg.height);
-
-      if (navigator.share && canvas.toBlob) {
-        canvas.toBlob(async (blob) => {
-          if (blob) {
-            const file = new File([blob], `forexnotes-${tradeMetrics.symbol}.png`, { type: "image/png" });
-            try {
-              if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                await navigator.share({
-                  title: `${tradeMetrics.symbol} Trade Result - ForexNotes`,
-                  text: `Check out my ${tradeMetrics.directionLabel} trade on ${tradeMetrics.symbol} (${tradeMetrics.formattedPnl}) tracked on ForexNotes!`,
-                  files: [file],
-                });
-                return;
-              }
-            } catch {
-              // fallback
-            }
-          }
-          copyToClipboard(canvas);
-        }, "image/png");
-      } else {
-        copyToClipboard(canvas);
-      }
-    } catch {
-      copyToClipboard();
     } finally {
       setIsGenerating(false);
     }
@@ -530,27 +530,45 @@ export default function TradeShareModal({ isOpen, onClose, trade }) {
     }
   };
 
-  // Synchronously update poster preview whenever aspect, trade or user changes
-  useEffect(() => {
-    let active = true;
-    const generatePreview = async () => {
-      setIsRenderingPreview(true);
-      try {
-        const canvas = await renderCardToCanvas(currentCfg.width, currentCfg.height);
-        if (active) {
-          setPreviewDataUrl(canvas.toDataURL("image/png"));
-        }
-      } catch (err) {
-        console.error("Preview render failed:", err);
-      } finally {
-        if (active) setIsRenderingPreview(false);
+  // Share Handler
+  const handleShare = async () => {
+    if (!tradeMetrics) return;
+    setIsGenerating(true);
+    try {
+      const canvas = await renderCardToCanvas(currentCfg.width, currentCfg.height);
+      if (!canvas) throw new Error("Canvas generation failed");
+
+      if (navigator.share && canvas.toBlob) {
+        canvas.toBlob(async (blob) => {
+          if (blob) {
+            const file = new File([blob], `forexnotes-${tradeMetrics.symbol}.png`, { type: "image/png" });
+            try {
+              if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                await navigator.share({
+                  title: `${tradeMetrics.symbol} Trade Result - ForexNotes`,
+                  text: `Check out my ${tradeMetrics.directionLabel} trade on ${tradeMetrics.symbol} (${tradeMetrics.formattedPnl}) tracked on ForexNotes!`,
+                  files: [file],
+                });
+                return;
+              }
+            } catch {
+              // fallback
+            }
+          }
+          copyToClipboard(canvas);
+        }, "image/png");
+      } else {
+        copyToClipboard(canvas);
       }
-    };
-    generatePreview();
-    return () => {
-      active = false;
-    };
-  }, [aspect, trade, userInfo]);
+    } catch {
+      copyToClipboard();
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  // UNCONDITIONAL HOOKS ARE COMPLETE. SAFE EARLY RETURN ONLY HERE:
+  if (!isOpen || !trade || !tradeMetrics) return null;
 
   return (
     <div
@@ -599,7 +617,7 @@ export default function TradeShareModal({ isOpen, onClose, trade }) {
         {/* Aspect Ratio Selector Tabs */}
         <div className="px-6 pt-3 pb-2 bg-white dark:bg-[#121622] border-t border-black/[0.05] dark:border-white/[0.06]">
           <div className="grid grid-cols-3 gap-1.5 p-1 bg-neutral-100 dark:bg-white/[0.05] rounded-2xl border border-black/[0.05] dark:border-white/[0.08]">
-            {Object.entries(aspectConfigs).map(([key, cfg]) => {
+            {Object.entries(ASPECT_CONFIGS).map(([key, cfg]) => {
               const isActive = aspect === key;
               return (
                 <button

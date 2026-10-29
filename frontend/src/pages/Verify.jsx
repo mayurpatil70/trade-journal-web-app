@@ -1,7 +1,7 @@
 // frontend/src/pages/Verify.jsx
 import { useEffect, useState, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import api, { saveSession } from "../api/axios";
+import api, { saveSession, getDeviceId } from "../api/axios";
 import { Loader2, CheckCircle, AlertTriangle, ArrowRight } from "lucide-react";
 import Logo3DLoader from "../components/Logo3DLoader";
 
@@ -29,17 +29,19 @@ export default function Verify() {
 
     const verifyToken = async () => {
       try {
-        // 2. Send BOTH parameters to your backend to fix the 401 Unauthorized error
-        const response = await api.post("/api/auth/verify", { token, email });
+        const deviceId = getDeviceId();
+        // 2. Send token, email, and device identifier to backend
+        const response = await api.post("/api/auth/verify", { token, email, deviceId });
 
         const userId =
           response.data.userId || response.data.user?.id || response.data.id;
         const authToken = response.data.authToken;
+        const sessionId = response.data.sessionId;
         const discordVerified = response.data.discordVerified;
         const hasPaid = response.data.hasPaid; // Extracted from backend response
 
-        // Save session with timestamp for 24-hour persistence
-        saveSession({ userId, token: authToken, email });
+        // Save session with persistent multi-device session caching
+        saveSession({ userId, token: authToken, email, sessionId, deviceId });
         localStorage.setItem("fn_new_signup", "true");
 
         setStatus("success");
