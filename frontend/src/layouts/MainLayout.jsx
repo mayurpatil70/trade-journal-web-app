@@ -221,9 +221,34 @@ export default function MainLayout() {
   const [showLockPopup, setShowLockPopup] = useState(false);
   const [isSupportModalOpen, setIsSupportModalOpen] = useState(false);
   const [supportModalMode, setSupportModalMode] = useState("new");
-  const [showBugCallout, setShowBugCallout] = useState(
-    () => sessionStorage.getItem("fn_hide_bug_callout") !== "true"
-  );
+  // TradeFXBook "Found a bug?" sidebar callout card: Resets on page refresh, on new sign up, and every 24h trading cycle
+  const [showBugCallout, setShowBugCallout] = useState(true);
+
+  useEffect(() => {
+    // Clear legacy suppression so page refresh always restores the support card
+    sessionStorage.removeItem("fn_hide_bug_callout");
+
+    const check24hReset = () => {
+      const dismissedAt = localStorage.getItem("fn_bug_callout_dismissed_at");
+      if (dismissedAt) {
+        const elapsed = Date.now() - parseInt(dismissedAt, 10);
+        const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;
+        if (elapsed >= TWENTY_FOUR_HOURS) {
+          setShowBugCallout(true);
+          localStorage.removeItem("fn_bug_callout_dismissed_at");
+        }
+      }
+    };
+
+    check24hReset();
+    const interval = setInterval(check24hReset, 60 * 1000); // Check every minute
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleDismissBugCallout = () => {
+    setShowBugCallout(false);
+    localStorage.setItem("fn_bug_callout_dismissed_at", Date.now().toString());
+  };
   const userCardRef = useRef(null);
   const location = useLocation();
   const navigate = useNavigate();
@@ -821,23 +846,20 @@ export default function MainLayout() {
         <nav className="flex-1 overflow-y-auto py-5 px-3 space-y-6 scrollbar-hide mt-14 md:mt-0">
           {navSections.map((section) => (
             <div key={section.label}>
-              {/* Found a bug? Callout card (Matches TradeFXBook Screenshot 2) placed above System */}
+              {/* Found a bug? Callout card (Matches TradeFXBook Screenshot 3) placed above System */}
               {section.label === "System" && showBugCallout && (
-                <div className="mb-4 p-3 rounded-2xl bg-white dark:bg-[#121622] border border-blue-500/20 dark:border-blue-400/20 shadow-[0_2px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_16px_rgba(0,0,0,0.3)] relative overflow-hidden">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-[13px] font-bold text-neutral-900 dark:text-white tracking-tight">
+                <div className="mb-4 p-3.5 rounded-2xl bg-[#F0F6FF] dark:bg-[#0D1527] border border-[#BFDBFE] dark:border-blue-500/25 shadow-xs relative overflow-hidden transition-all duration-200">
+                  <div className="flex items-center justify-between mb-2.5">
+                    <span className="text-[13.5px] font-bold text-[#0F172A] dark:text-white tracking-tight">
                       Found a bug?
                     </span>
                     <button
                       type="button"
-                      onClick={() => {
-                        setShowBugCallout(false);
-                        sessionStorage.setItem("fn_hide_bug_callout", "true");
-                      }}
+                      onClick={handleDismissBugCallout}
                       className="w-5 h-5 rounded-md flex items-center justify-center text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 hover:bg-black/5 dark:hover:bg-white/10 transition-colors cursor-pointer"
                       aria-label="Dismiss bug prompt"
                     >
-                      <X className="w-3.5 h-3.5" />
+                      <X className="w-3.5 h-3.5 stroke-[2.5]" />
                     </button>
                   </div>
                   <button
@@ -846,10 +868,10 @@ export default function MainLayout() {
                       setSupportModalMode("new");
                       setIsSupportModalOpen(true);
                     }}
-                    className="w-full py-2 px-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-md shadow-blue-500/25 active:scale-[0.98] transition-all cursor-pointer"
+                    className="w-full py-2.5 px-3 rounded-xl bg-[#0066FF] hover:bg-[#0052CC] text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-[0_2px_8px_rgba(0,102,255,0.25)] active:scale-[0.98] transition-all cursor-pointer"
                   >
                     <span>Report an issue</span>
-                    <ArrowUpRight className="w-4 h-4" />
+                    <ArrowUpRight className="w-3.5 h-3.5 stroke-[2.5]" />
                   </button>
                 </div>
               )}

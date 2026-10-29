@@ -255,3 +255,4 @@ export default function WinProPartnershipCard({ onClose, isEmbedded = false }) {
     </div>
   );
 }
+

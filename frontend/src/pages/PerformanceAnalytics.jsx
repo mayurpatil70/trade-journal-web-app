@@ -223,8 +223,8 @@ export default function PerformanceAnalytics() {
 
   return (
     <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-8 font-sans transition-colors duration-300">
-      {/* ── Top Header Bar ── */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5 mb-8">
+      {/* ── Top Header Bar (With right padding clearance for fixed desktop action buttons) ── */}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5 mb-8 lg:pr-36 xl:pr-40">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-2xl bg-blue-500/10 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center border border-blue-500/20 shadow-sm">
             <Activity className="w-5 h-5" strokeWidth={2.5} />
