@@ -33,6 +33,7 @@ import {
   CreditCard,
   ShieldCheck,
   ShieldAlert,
+  Clock,
   Zap,
   Lock,
   Calculator as CalculatorIcon,
@@ -351,6 +352,7 @@ export default function MainLayout() {
     if (p.includes("psychology")) return "Psychology Lab";
     if (p.includes("mistakes")) return "Mistake Lab";
     if (p.includes("tools")) return "Trading Tools";
+    if (p.includes("market-hours")) return "Forex Market Hours";
     if (p.includes("charts")) return "Live Charts";
     if (p.includes("sessions")) return "Setup Backtesting";
     if (p.includes("news")) return "Economic Calendar";
@@ -400,6 +402,15 @@ export default function MainLayout() {
       iconColor: "text-rose-500",
       bgColor: "bg-rose-500/10",
       keywords: ["prop", "firm", "drawdown", "ftmo", "calculator", "evaluation", "funding"],
+    },
+    {
+      to: "/market-hours",
+      label: "Forex Market Hours",
+      sub: "Track London, New York, Asian, Sydney sessions & ICT killzones",
+      icon: Clock,
+      iconColor: "text-blue-500",
+      bgColor: "bg-blue-500/10",
+      keywords: ["market", "hours", "forex", "session", "london", "new york", "killzone", "sydney", "tokyo", "asian", "clock"],
     },
     {
       to: "/charts",

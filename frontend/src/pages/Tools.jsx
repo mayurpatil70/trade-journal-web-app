@@ -69,6 +69,18 @@ export default function Tools() {
       badge: "LIVE",
       badgeColor: "blue",
       isAvailable: true,
+      path: "/market-hours",
+      category: "utility",
+    },
+    {
+      id: "backtest-sessions",
+      title: "Setup Backtesting",
+      description:
+        "Replay historical market sessions, test setup execution, and practice bar-by-bar backtesting.",
+      icon: Zap,
+      badge: "LIVE",
+      badgeColor: "amber",
+      isAvailable: true,
       path: "/sessions",
       category: "utility",
     },

@@ -90,6 +90,10 @@ const LotSizeCalculator = safeLazy(
   () => import("./pages/TraderProblems/LotSizeCalculator.jsx"),
   "lot-size",
 );
+const MarketHours = safeLazy(
+  () => import("./pages/TraderProblems/MarketHours.jsx"),
+  "market-hours",
+);
 const Tools = safeLazy(() => import("./pages/Tools.jsx"), "tools");
 
 // Heavy / Secondary Pages (Prefetched on hover and idle)
@@ -487,6 +491,8 @@ function App() {
                   <Route path="calculator/position-size" element={<LotSizeCalculator />} />
                   <Route path="calculator/prop-firm" element={<PropFirm />} />
                   <Route path="prop-firm" element={<PropFirm />} />
+                  <Route path="market-hours" element={<MarketHours />} />
+                  <Route path="tools/market-hours" element={<MarketHours />} />
                 </Route>
               </Route>
             </Route>
