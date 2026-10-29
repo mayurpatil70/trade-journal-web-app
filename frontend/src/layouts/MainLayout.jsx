@@ -46,6 +46,11 @@ import {
   HelpCircle,
   PenSquare,
   ArrowUpRight,
+  ArrowRight,
+  BookOpen,
+  Brain,
+  AlertTriangle,
+  Briefcase,
 } from "lucide-react";
 
 // Nav Item with Apple Squircle Geometry & Glossy Interaction
@@ -210,6 +215,9 @@ export default function MainLayout() {
   const [profileCoords, setProfileCoords] = useState({ bottom: 0, left: 0, width: 236 });
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const searchInputRef = useRef(null);
+  const listContainerRef = useRef(null);
   const [showLockPopup, setShowLockPopup] = useState(false);
   const [isSupportModalOpen, setIsSupportModalOpen] = useState(false);
   const [supportModalMode, setSupportModalMode] = useState("new");
@@ -344,6 +352,28 @@ export default function MainLayout() {
     };
   }, []);
 
+  // Spotlight search focus & scroll synchronization
+  useEffect(() => {
+    if (isSearchOpen) {
+      setSelectedIndex(0);
+      const timer = setTimeout(() => {
+        searchInputRef.current?.focus();
+      }, 40);
+      return () => clearTimeout(timer);
+    }
+  }, [isSearchOpen]);
+
+  useEffect(() => {
+    if (isSearchOpen && listContainerRef.current) {
+      const activeEl = listContainerRef.current.querySelector(
+        `[data-index="${selectedIndex}"]`
+      );
+      if (activeEl) {
+        activeEl.scrollIntoView({ block: "nearest" });
+      }
+    }
+  }, [selectedIndex, isSearchOpen]);
+
   // Update position of user profile dropdown popover
   const updateProfileCoords = useCallback(() => {
     if (!userCardRef.current) return;
@@ -444,108 +474,239 @@ export default function MainLayout() {
     return "Forex Notes";
   })();
 
-  const spotlightActions = [
+  const spotlightCategories = [
     {
-      to: "/add-trade",
-      label: "Log a new trade",
-      sub: "Enter entry, exit, PnL and trade setup",
-      icon: PlusCircle,
-      iconColor: "text-emerald-500",
-      bgColor: "bg-emerald-500/10",
-      keywords: ["add", "trade", "log", "new", "entry", "pnl", "manual"],
+      title: "BACKTESTING",
+      items: [
+        {
+          to: "/sessions",
+          label: "Backtesting",
+          sub: "Open Backtesting backtesting sessions",
+          icon: TrendingUp,
+          keywords: ["backtest", "backtesting", "sessions", "replay", "bar", "history"],
+        },
+      ],
     },
     {
-      to: "/tools",
-      label: "Trading Tools Hub",
-      sub: "Professional calculators, market hours, and utilities",
-      icon: Wrench,
-      iconColor: "text-blue-500",
-      bgColor: "bg-blue-500/10",
-      keywords: ["tools", "tool", "calculator", "position", "size", "prop", "firm", "utility"],
+      title: "MAIN",
+      items: [
+        {
+          to: "/dashboard",
+          label: "Dashboard",
+          sub: "View your trading overview and stats",
+          icon: LayoutDashboard,
+          keywords: ["dashboard", "home", "stats", "overview", "equity", "pnl", "main"],
+        },
+        {
+          to: "/trades",
+          label: "Trades",
+          sub: "View and manage all your trades",
+          icon: Briefcase,
+          keywords: ["trades", "past", "history", "records", "orders", "journal"],
+        },
+        {
+          to: "/add-trade",
+          label: "Journal",
+          sub: "Write and review your trade journal entries",
+          icon: BookOpen,
+          keywords: ["journal", "add", "trade", "log", "new", "entry"],
+        },
+        {
+          to: "/accounts",
+          label: "Trader POV",
+          sub: "View trader POV dashboards or manage your access codes",
+          icon: Users,
+          keywords: ["trader", "pov", "prop", "firm", "accounts", "challenges"],
+        },
+        {
+          to: "/calendar",
+          label: "Calendar",
+          sub: "Monthly calendar view of your trading sessions and PnL",
+          icon: CalendarIcon,
+          keywords: ["calendar", "monthly", "days", "schedule", "pnl"],
+        },
+      ],
     },
     {
-      to: "/calculator/lot-size",
-      label: "Lot Size Calculator",
-      sub: "Calculate exact standard lot sizes for your risk",
-      icon: CalculatorIcon,
-      iconColor: "text-emerald-500",
-      bgColor: "bg-emerald-500/10",
-      keywords: ["lot", "size", "calculator", "calc", "pip", "risk", "position"],
+      title: "ANALYTICS",
+      items: [
+        {
+          to: "/analysis/performance",
+          label: "Performance",
+          sub: "Analyze your win rate, profit factor and edge",
+          icon: BarChart2,
+          keywords: ["performance", "analytics", "win", "rate", "profit", "edge", "drawdown"],
+        },
+        {
+          to: "/analysis/trades",
+          label: "Trade Analysis",
+          sub: "Detailed breakdown of your execution and setups",
+          icon: FileText,
+          keywords: ["trade", "analysis", "breakdown", "setups", "execution"],
+        },
+        {
+          to: "/psychology",
+          label: "Psychology Lab",
+          sub: "Track mindset, discipline, and emotional triggers",
+          icon: Brain,
+          keywords: ["psychology", "discipline", "mindset", "fomo", "greed", "emotions"],
+        },
+        {
+          to: "/mistakes",
+          label: "Mistake Lab",
+          sub: "Identify recurring errors and stop revenue leaks",
+          icon: AlertTriangle,
+          keywords: ["mistake", "error", "rules", "leak", "discipline"],
+        },
+      ],
     },
     {
-      to: "/calculator/prop-firm",
-      label: "Prop Firm Challenge Calculator",
-      sub: "Simulate drawdown limits and pass evaluations safely",
-      icon: ShieldAlert,
-      iconColor: "text-rose-500",
-      bgColor: "bg-rose-500/10",
-      keywords: ["prop", "firm", "drawdown", "ftmo", "calculator", "evaluation", "funding"],
+      title: "TOOLS & CALCULATORS",
+      items: [
+        {
+          to: "/tools",
+          label: "Trading Tools Hub",
+          sub: "Professional calculators, market hours, and utilities",
+          icon: Wrench,
+          keywords: ["tools", "tool", "calculator", "position", "size", "prop", "firm", "utility"],
+        },
+        {
+          to: "/calculator/lot-size",
+          label: "Lot Size Calculator",
+          sub: "Calculate exact standard lot sizes for your risk",
+          icon: CalculatorIcon,
+          keywords: ["lot", "size", "calculator", "calc", "pip", "risk", "position"],
+        },
+        {
+          to: "/calculator/prop-firm",
+          label: "Prop Firm Challenge Calculator",
+          sub: "Simulate drawdown limits and pass evaluations safely",
+          icon: ShieldAlert,
+          keywords: ["prop", "firm", "drawdown", "ftmo", "calculator", "evaluation", "funding"],
+        },
+        {
+          to: "/market-hours",
+          label: "Forex Market Hours",
+          sub: "Track London, New York, Asian, Sydney sessions & ICT killzones",
+          icon: Clock,
+          keywords: ["market", "hours", "forex", "session", "london", "new york", "killzone", "sydney", "tokyo", "asian", "clock"],
+        },
+        {
+          to: "/charts",
+          label: "Live Charts",
+          sub: "TradingView real-time technical analysis & charting",
+          icon: Activity,
+          keywords: ["chart", "live", "charts", "tradingview", "technical", "candle", "crypto", "forex"],
+        },
+        {
+          to: "/news",
+          label: "Economic Calendar",
+          sub: "Upcoming high-impact macroeconomic events and CPI",
+          icon: Globe,
+          keywords: ["news", "calendar", "economic", "cpi", "fomc", "nfp", "events"],
+        },
+      ],
     },
     {
-      to: "/market-hours",
-      label: "Forex Market Hours",
-      sub: "Track London, New York, Asian, Sydney sessions & ICT killzones",
-      icon: Clock,
-      iconColor: "text-blue-500",
-      bgColor: "bg-blue-500/10",
-      keywords: ["market", "hours", "forex", "session", "london", "new york", "killzone", "sydney", "tokyo", "asian", "clock"],
+      title: "COMMUNITY",
+      items: [
+        {
+          to: "/affiliate",
+          label: "Lounges & Affiliate",
+          sub: "Connect with elite traders and earn partner rewards",
+          icon: Wallet,
+          keywords: ["community", "affiliate", "partner", "lounges", "referral", "reward"],
+        },
+      ],
     },
     {
-      to: "/charts",
-      label: "Live Charts",
-      sub: "TradingView real-time technical analysis & charting",
-      icon: Activity,
-      iconColor: "text-cyan-500",
-      bgColor: "bg-cyan-500/10",
-      keywords: ["chart", "live", "charts", "tradingview", "technical", "candle", "crypto", "forex"],
-    },
-    {
-      to: "/sessions",
-      label: "Setup Backtesting",
-      sub: "Replay sessions, test setups & backtest execution",
-      icon: Zap,
-      iconColor: "text-amber-500",
-      bgColor: "bg-amber-500/10",
-      keywords: ["backtest", "backtesting", "setup", "session", "replay", "bar", "history"],
-    },
-    {
-      to: "/analysis/performance",
-      label: "Strategy Analytics",
-      sub: "Win rate, profit factor, drawdown & edge metrics",
-      icon: TrendingUp,
-      iconColor: "text-blue-500",
-      bgColor: "bg-blue-500/10",
-      keywords: ["analytics", "performance", "win", "rate", "profit", "drawdown", "edge"],
-    },
-    {
-      to: "/trades",
-      label: "Past Trades Journal",
-      sub: "Search and inspect historical trade records",
-      icon: List,
-      iconColor: "text-purple-500",
-      bgColor: "bg-purple-500/10",
-      keywords: ["past", "trades", "journal", "history", "table", "records"],
-    },
-    {
-      to: "/news",
-      label: "Economic Calendar",
-      sub: "Upcoming high-impact macroeconomic events",
-      icon: Globe,
-      iconColor: "text-rose-500",
-      bgColor: "bg-rose-500/10",
-      keywords: ["news", "calendar", "economic", "cpi", "fomc", "nfp", "events"],
+      title: "SETTINGS",
+      items: [
+        {
+          to: "/profile",
+          label: "Profile",
+          sub: "Manage your trader profile, rules, and preferences",
+          icon: User,
+          keywords: ["profile", "account", "user", "avatar", "rules", "preferences"],
+        },
+        {
+          to: "/settings",
+          label: "Settings",
+          sub: "Workspace configuration and account settings",
+          icon: Settings,
+          keywords: ["settings", "preferences", "config", "workspace", "account"],
+        },
+        {
+          to: "/paywall",
+          label: "Subscription & Billing",
+          sub: "Manage your Pro Trader subscription and billing tier",
+          icon: CreditCard,
+          keywords: ["billing", "subscription", "plan", "pro", "pricing", "paywall", "tier"],
+        },
+        {
+          to: "/support",
+          label: "Help & Support",
+          sub: "Report an issue, send feedback, or reach developer support",
+          icon: HelpCircle,
+          keywords: ["support", "help", "bug", "report", "feedback", "issue"],
+        },
+      ],
     },
   ];
 
-  const filteredSpotlightActions = spotlightActions.filter((action) => {
-    if (!searchQuery.trim()) return true;
-    const q = searchQuery.toLowerCase().trim();
-    return (
-      action.label.toLowerCase().includes(q) ||
-      action.sub.toLowerCase().includes(q) ||
-      action.keywords.some((kw) => kw.includes(q))
-    );
-  });
+  const searchQ = searchQuery.toLowerCase().trim();
+
+  let globalCounter = 0;
+  const filteredCategories = spotlightCategories
+    .map((cat) => {
+      const items = cat.items
+        .filter((item) => {
+          if (!searchQ) return true;
+          return (
+            item.label.toLowerCase().includes(searchQ) ||
+            item.sub.toLowerCase().includes(searchQ) ||
+            item.keywords.some((kw) => kw.includes(searchQ))
+          );
+        })
+        .map((item) => ({
+          ...item,
+          globalIndex: globalCounter++,
+        }));
+      return {
+        title: cat.title,
+        items,
+      };
+    })
+    .filter((cat) => cat.items.length > 0);
+
+  const flatFilteredItems = filteredCategories.flatMap((cat) => cat.items);
+
+  const handleSearchKeyDown = (e) => {
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      if (flatFilteredItems.length > 0) {
+        setSelectedIndex((prev) => (prev + 1) % flatFilteredItems.length);
+      }
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      if (flatFilteredItems.length > 0) {
+        setSelectedIndex(
+          (prev) => (prev - 1 + flatFilteredItems.length) % flatFilteredItems.length
+        );
+      }
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      if (flatFilteredItems.length > 0 && flatFilteredItems[selectedIndex]) {
+        navigate(flatFilteredItems[selectedIndex].to);
+        setIsSearchOpen(false);
+        setSearchQuery("");
+      }
+    } else if (e.key === "Escape") {
+      e.preventDefault();
+      setIsSearchOpen(false);
+      setSearchQuery("");
+    }
+  };
 
   return (
     <div
@@ -879,91 +1040,136 @@ export default function MainLayout() {
         </Suspense>
       </main>
 
-      {/* ── REACT PORTAL: macOS Spotlight Command Palette ── */}
+      {/* ── REACT PORTAL: TradeFXBook Spotlight Command Palette ── */}
       {isSearchOpen &&
         createPortal(
           <div
-            className="fixed inset-0 z-[10000] flex items-start justify-center pt-[14vh] p-4 bg-black/40 dark:bg-black/70 backdrop-blur-md animate-in fade-in duration-150"
+            className="fixed inset-0 z-[10000] flex items-start justify-center pt-[10vh] sm:pt-[12vh] p-4 bg-black/50 dark:bg-black/75 backdrop-blur-sm animate-in fade-in duration-150"
             onClick={() => {
               setIsSearchOpen(false);
               setSearchQuery("");
             }}
           >
             <div
-              className="w-full max-w-xl bg-white/95 dark:bg-[#121622]/95 border border-black/[0.08] dark:border-white/[0.12] rounded-3xl shadow-[0_30px_70px_rgba(0,0,0,0.2)] dark:shadow-[0_35px_80px_rgba(0,0,0,0.7)] backdrop-blur-2xl overflow-hidden animate-in zoom-in-95 duration-150"
+              className="w-full max-w-xl bg-white dark:bg-[#121622] border border-neutral-200 dark:border-white/[0.12] rounded-2xl shadow-[0_25px_60px_rgba(0,0,0,0.25)] dark:shadow-[0_30px_70px_rgba(0,0,0,0.7)] overflow-hidden animate-in zoom-in-95 duration-150 flex flex-col"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex items-center px-4 py-3.5 border-b border-black/[0.06] dark:border-white/[0.08]">
-                <Search className="w-5 h-5 text-emerald-500 mr-3 shrink-0" />
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && filteredSpotlightActions.length > 0) {
-                      navigate(filteredSpotlightActions[0].to);
-                      setIsSearchOpen(false);
-                      setSearchQuery("");
-                    }
-                  }}
-                  placeholder="Search tools, calculators, live charts, backtesting..."
-                  autoFocus
-                  className="flex-1 bg-transparent border-none outline-none text-neutral-900 dark:text-white placeholder-neutral-400 text-sm font-medium"
-                />
+              {/* Header Search Box with TradeFXBook blue focus border */}
+              <div className="p-3 sm:p-3.5 border-b border-neutral-100 dark:border-white/[0.08] flex items-center gap-2.5">
+                <Search className="w-5 h-5 text-neutral-400 dark:text-neutral-500 shrink-0 ml-1" />
+                <div className="flex-1 flex items-center border border-blue-500 rounded-lg px-3 py-1.5 bg-white dark:bg-[#10131d] shadow-2xs focus-within:ring-2 focus-within:ring-blue-500/20">
+                  <input
+                    ref={searchInputRef}
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => {
+                      setSearchQuery(e.target.value);
+                      setSelectedIndex(0);
+                    }}
+                    onKeyDown={handleSearchKeyDown}
+                    placeholder="Search pages, trades, or symbols..."
+                    autoFocus
+                    className="w-full bg-transparent border-none outline-none text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-500 text-sm font-medium"
+                  />
+                </div>
                 <button
+                  type="button"
                   onClick={() => {
                     setIsSearchOpen(false);
                     setSearchQuery("");
                   }}
-                  className="px-2 py-0.5 bg-black/[0.05] dark:bg-white/10 text-neutral-500 dark:text-neutral-400 text-[11px] font-mono rounded-md hover:bg-black/10 dark:hover:bg-white/15 cursor-pointer"
+                  className="px-2 py-1 text-[11px] font-mono text-neutral-500 dark:text-neutral-400 bg-neutral-100 dark:bg-white/10 rounded-md border border-neutral-200 dark:border-white/10 hover:bg-neutral-200 dark:hover:bg-white/15 transition-colors cursor-pointer shrink-0"
                 >
                   ESC
                 </button>
               </div>
 
-              <div className="p-2 space-y-1 max-h-[380px] overflow-y-auto scrollbar-hide">
-                <p className="px-3 py-1.5 text-[10px] font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-widest">
-                  {searchQuery.trim() ? "Search Results" : "Quick Actions"}
-                </p>
-                {filteredSpotlightActions.length === 0 ? (
-                  <div className="px-4 py-8 text-center text-xs text-neutral-400">
-                    No matching actions found for &ldquo;{searchQuery}&rdquo;.
+              {/* Categorized List of Routes with Active/Hover TradeFXBook Effect */}
+              <div
+                ref={listContainerRef}
+                className="p-3 space-y-4 max-h-[460px] overflow-y-auto"
+              >
+                {flatFilteredItems.length === 0 ? (
+                  <div className="px-4 py-12 text-center text-xs text-neutral-400 dark:text-neutral-500">
+                    No matching pages or tools found for &ldquo;{searchQuery}&rdquo;.
                   </div>
                 ) : (
-                  filteredSpotlightActions.map((action) => {
-                    const ActionIcon = action.icon;
-                    return (
-                      <button
-                        key={action.to + action.label}
-                        onClick={() => {
-                          navigate(action.to);
-                          setIsSearchOpen(false);
-                          setSearchQuery("");
-                        }}
-                        className="w-full flex items-center justify-between px-3 py-2.5 text-xs font-medium text-neutral-700 dark:text-neutral-200 hover:bg-black/[0.04] dark:hover:bg-white/[0.06] rounded-xl transition-colors text-left group cursor-pointer"
-                      >
-                        <div className="flex items-center gap-3 min-w-0">
-                          <div
-                            className={`w-7 h-7 rounded-lg ${action.bgColor} ${action.iconColor} flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform`}
-                          >
-                            <ActionIcon className="w-4 h-4" />
-                          </div>
-                          <div className="truncate">
-                            <p className="font-semibold text-neutral-900 dark:text-white leading-tight">
-                              {action.label}
-                            </p>
-                            <p className="text-[11px] text-neutral-500 dark:text-neutral-400 truncate mt-0.5">
-                              {action.sub}
-                            </p>
-                          </div>
-                        </div>
-                        <span className="text-[10px] font-mono font-medium text-emerald-600 dark:text-emerald-400 opacity-0 group-hover:opacity-100 transition-opacity ml-2 shrink-0">
-                          Jump →
-                        </span>
-                      </button>
-                    );
-                  })
+                  filteredCategories.map((category) => (
+                    <div key={category.title} className="space-y-1.5">
+                      <p className="px-2 text-[11px] font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-wider">
+                        {category.title}
+                      </p>
+                      <div className="space-y-1">
+                        {category.items.map((action) => {
+                          const ActionIcon = action.icon;
+                          const isSelected = selectedIndex === action.globalIndex;
+                          return (
+                            <button
+                              key={action.to + action.label}
+                              data-index={action.globalIndex}
+                              type="button"
+                              onClick={() => {
+                                navigate(action.to);
+                                setIsSearchOpen(false);
+                                setSearchQuery("");
+                              }}
+                              onMouseEnter={() => setSelectedIndex(action.globalIndex)}
+                              className={`w-full flex items-center justify-between p-2.5 rounded-xl text-left transition-all cursor-pointer group ${
+                                isSelected
+                                  ? "border border-blue-500 bg-blue-50/70 dark:bg-blue-500/10 shadow-2xs"
+                                  : "border border-transparent hover:border-blue-500 hover:bg-blue-50/70 dark:hover:bg-blue-500/10"
+                              }`}
+                            >
+                              <div className="flex items-center gap-3 min-w-0">
+                                <div className="w-10 h-10 rounded-xl bg-neutral-100 dark:bg-white/[0.06] flex items-center justify-center shrink-0 text-neutral-600 dark:text-neutral-300 group-hover:scale-102 transition-transform">
+                                  <ActionIcon className="w-5 h-5" />
+                                </div>
+                                <div className="truncate">
+                                  <p className="font-semibold text-neutral-900 dark:text-white text-sm leading-tight">
+                                    {action.label}
+                                  </p>
+                                  <p className="text-xs text-neutral-500 dark:text-neutral-400 truncate mt-0.5">
+                                    {action.sub}
+                                  </p>
+                                </div>
+                              </div>
+                              {isSelected && (
+                                <ArrowRight className="w-4 h-4 text-blue-500 shrink-0 ml-2 animate-in fade-in slide-in-from-left-1 duration-150" />
+                              )}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))
                 )}
+              </div>
+
+              {/* TradeFXBook Footer Keyboard Shortcuts Bar */}
+              <div className="px-4 py-2.5 bg-neutral-50/90 dark:bg-[#0e1118]/90 border-t border-neutral-100 dark:border-white/[0.08] flex items-center gap-4 text-xs text-neutral-500 dark:text-neutral-400 select-none">
+                <div className="flex items-center gap-1.5">
+                  <span className="inline-flex items-center justify-center w-5 h-5 rounded bg-white dark:bg-white/10 border border-neutral-200 dark:border-white/15 text-[10px] font-mono shadow-2xs font-semibold text-neutral-600 dark:text-neutral-300">
+                    ↑
+                  </span>
+                  <span className="inline-flex items-center justify-center w-5 h-5 rounded bg-white dark:bg-white/10 border border-neutral-200 dark:border-white/15 text-[10px] font-mono shadow-2xs font-semibold text-neutral-600 dark:text-neutral-300">
+                    ↓
+                  </span>
+                  <span className="ml-0.5">Navigate</span>
+                </div>
+
+                <div className="flex items-center gap-1.5">
+                  <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1 rounded bg-white dark:bg-white/10 border border-neutral-200 dark:border-white/15 text-[10px] font-mono shadow-2xs font-semibold text-neutral-600 dark:text-neutral-300">
+                    ↵
+                  </span>
+                  <span className="ml-0.5">Select</span>
+                </div>
+
+                <div className="flex items-center gap-1.5">
+                  <span className="inline-flex items-center justify-center min-w-[26px] h-5 px-1 rounded bg-white dark:bg-white/10 border border-neutral-200 dark:border-white/15 text-[10px] font-mono shadow-2xs font-semibold text-neutral-600 dark:text-neutral-300">
+                    Esc
+                  </span>
+                  <span className="ml-0.5">Close</span>
+                </div>
               </div>
             </div>
           </div>,
