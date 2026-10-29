@@ -6,6 +6,7 @@ import { useState, useEffect, useMemo, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
 import AppleSelect from "../components/ui/AppleSelect";
+import AccountFilter from "../components/AccountFilter";
 import {
   Activity,
   TrendingUp,
@@ -48,7 +49,7 @@ export default function PerformanceAnalytics() {
   // Filters
   const [timePeriod, setTimePeriod] = useState("30 Days"); // "Today", "7 Days", "30 Days", "3 Months", "1 Year", "All Time"
   const [outcomeFilter, setOutcomeFilter] = useState("All Trades"); // "All Trades", "Winners", "Losers"
-  const [selectedAccount, setSelectedAccount] = useState("All Accounts");
+  const [selectedAccount, setSelectedAccount] = useState(""); // "" = All Accounts (matches /dashboard)
 
   // Chart Toggle
   const [chartMode, setChartMode] = useState("equity"); // "equity" | "drawdown"
@@ -78,25 +79,13 @@ export default function PerformanceAnalytics() {
     fetchTrades();
   }, [navigate]);
 
-  // Unique accounts list for AppleSelect
-  const accountOptions = useMemo(() => {
-    const accs = new Set();
-    allTrades.forEach((t) => {
-      if (t.account_name) accs.add(t.account_name);
-    });
-    return [
-      { value: "All Accounts", label: "All Accounts" },
-      ...Array.from(accs).map((a) => ({ value: a, label: a })),
-    ];
-  }, [allTrades]);
-
   // Filter pipeline
   const filteredTrades = useMemo(() => {
     let list = allTrades;
     const activeAccount =
       typeof selectedAccount === "object" && selectedAccount !== null
         ? (selectedAccount.target?.value ?? selectedAccount.value ?? String(selectedAccount))
-        : String(selectedAccount || "All Accounts");
+        : String(selectedAccount || "");
 
     if (activeAccount && activeAccount !== "All Accounts") {
       list = list.filter((t) => t.account_name === activeAccount);
@@ -252,18 +241,19 @@ export default function PerformanceAnalytics() {
 
         {/* Filter Controls Cluster */}
         <div className="flex flex-wrap items-center gap-3">
-          {/* Time Period Filter Pills */}
-          <div className="flex items-center p-1 rounded-2xl bg-neutral-200/60 dark:bg-neutral-900/80 backdrop-blur-md border border-black/[0.04] dark:border-white/[0.08]">
+          {/* Time Period Filter Pills (macOS / iOS Crisp Segmented Control) */}
+          <div className="inline-flex items-center p-1 rounded-2xl bg-neutral-200/50 dark:bg-white/[0.06] backdrop-blur-xl border border-black/[0.04] dark:border-white/[0.08]">
             {["Today", "7 Days", "30 Days", "3 Months", "1 Year", "All Time"].map((p) => {
               const active = timePeriod === p;
               return (
                 <button
                   key={p}
+                  type="button"
                   onClick={() => setTimePeriod(p)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all duration-200 ${
+                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all duration-150 antialiased select-none cursor-pointer ${
                     active
-                      ? "bg-[#2563EB] text-white shadow-[0_2px_10px_rgba(37,99,235,0.4)]"
-                      : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
+                      ? "bg-[#007AFF] dark:bg-[#0A84FF] text-white shadow-[0_1px_3px_rgba(0,0,0,0.15)] ring-1 ring-white/20"
+                      : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white hover:bg-black/[0.03] dark:hover:bg-white/[0.04]"
                   }`}
                 >
                   {p}
@@ -272,8 +262,8 @@ export default function PerformanceAnalytics() {
             })}
           </div>
 
-          {/* Outcome Filter Pills */}
-          <div className="flex items-center p-1 rounded-2xl bg-neutral-200/60 dark:bg-neutral-900/80 backdrop-blur-md border border-black/[0.04] dark:border-white/[0.08]">
+          {/* Outcome Filter Pills (macOS / iOS Crisp Segmented Control) */}
+          <div className="inline-flex items-center p-1 rounded-2xl bg-neutral-200/50 dark:bg-white/[0.06] backdrop-blur-xl border border-black/[0.04] dark:border-white/[0.08]">
             {[
               { id: "All Trades", label: "All Trades", icon: null },
               { id: "Winners", label: "Winners", icon: Check },
@@ -284,11 +274,12 @@ export default function PerformanceAnalytics() {
               return (
                 <button
                   key={f.id}
+                  type="button"
                   onClick={() => setOutcomeFilter(f.id)}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all duration-200 ${
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all duration-150 antialiased select-none cursor-pointer ${
                     active
-                      ? "bg-[#2563EB] text-white shadow-[0_2px_10px_rgba(37,99,235,0.4)]"
-                      : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
+                      ? "bg-[#007AFF] dark:bg-[#0A84FF] text-white shadow-[0_1px_3px_rgba(0,0,0,0.15)] ring-1 ring-white/20"
+                      : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white hover:bg-black/[0.03] dark:hover:bg-white/[0.04]"
                   }`}
                 >
                   {Icon && <Icon className="w-3.5 h-3.5" strokeWidth={2.5} />}
@@ -298,25 +289,12 @@ export default function PerformanceAnalytics() {
             })}
           </div>
 
-          {/* Account Filter using AppleSelect */}
-          <div className="w-44">
-            <AppleSelect
-              value={
-                typeof selectedAccount === "object" && selectedAccount !== null
-                  ? (selectedAccount.target?.value ?? selectedAccount.value ?? "All Accounts")
-                  : selectedAccount
-              }
-              onChange={(val) => {
-                const acc =
-                  typeof val === "object" && val !== null
-                    ? (val.target?.value ?? val.value ?? String(val))
-                    : String(val);
-                setSelectedAccount(acc);
-              }}
-              options={accountOptions}
-              placeholder="Account"
-            />
-          </div>
+          {/* Account Filter matching Dashboard (All Accounts by default) */}
+          <AccountFilter
+            trades={allTrades}
+            selectedAccount={selectedAccount}
+            onChange={setSelectedAccount}
+          />
         </div>
       </div>
 

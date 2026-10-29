@@ -257,10 +257,10 @@ export default function TradeAnalysis() {
                 <button
                   key={tab.id}
                   onClick={() => setOutcomeTab(tab.id)}
-                  className={`flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-xl text-xs font-semibold transition-all duration-200 ${
+                  className={`flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg text-xs font-semibold transition-all duration-150 antialiased select-none cursor-pointer ${
                     active
-                      ? "bg-[#2563EB] text-white shadow-[0_2px_8px_rgba(37,99,235,0.4)]"
-                      : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
+                      ? "bg-[#007AFF] dark:bg-[#0A84FF] text-white shadow-[0_1px_3px_rgba(0,0,0,0.15)] ring-1 ring-white/20"
+                      : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white hover:bg-black/[0.03] dark:hover:bg-white/[0.04]"
                   }`}
                 >
                   <span>{tab.label}</span>

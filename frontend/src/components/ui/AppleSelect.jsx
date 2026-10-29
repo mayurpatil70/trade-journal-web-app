@@ -187,7 +187,8 @@ export default function AppleSelect({
           >
             <div className="space-y-0.5">
               {normalizedOptions.map((opt) => {
-                const isSelected = String(opt.value) === String(value);
+                const isSelected =
+                  String(opt.value).toLowerCase() === String(rawValue || "").toLowerCase();
                 return (
                   <button
                     key={String(opt.value)}
