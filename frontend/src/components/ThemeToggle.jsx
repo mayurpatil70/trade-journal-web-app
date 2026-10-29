@@ -8,7 +8,7 @@ export default function ThemeToggle({ className = "", onDark = false }) {
   return (
     <button
       type="button"
-      onClick={toggleTheme}
+      onClick={(e) => toggleTheme(e)}
       aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
       title={dark ? "Switch to Light Mode (macOS Glass)" : "Switch to Dark Mode (macOS Obsidian)"}
       className={`group relative h-9 w-9 shrink-0 rounded-xl border backdrop-blur-xl transition-all duration-300 active:scale-95 cursor-pointer flex items-center justify-center overflow-hidden ${

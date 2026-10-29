@@ -41,29 +41,87 @@ export function ThemeProvider({ children }) {
   }, [theme]);
 
   const value = useMemo(() => {
-    const setTheme = (next) => {
+    const applyThemeChange = (next, event = null) => {
       try {
         localStorage.setItem(THEME_KEY, next);
       } catch {
         /* storage blocked */
       }
-      if (typeof document !== "undefined") {
-        const root = document.documentElement;
+
+      if (typeof document === "undefined") {
+        setThemeState(next);
+        return;
+      }
+
+      const root = document.documentElement;
+
+      // Check if View Transition API is supported and user doesn't prefer reduced motion
+      const isReducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+      if (!document.startViewTransition || isReducedMotion) {
         root.classList.add("theme-transitioning");
         setThemeState(next);
         setTimeout(() => {
           root.classList.remove("theme-transitioning");
         }, 300);
-      } else {
-        setThemeState(next);
+        return;
       }
+
+      // Circular motion wave origin coordinates
+      let x = window.innerWidth / 2;
+      let y = 0;
+
+      if (event) {
+        if (
+          typeof event.clientX === "number" &&
+          typeof event.clientY === "number" &&
+          (event.clientX !== 0 || event.clientY !== 0)
+        ) {
+          x = event.clientX;
+          y = event.clientY;
+        } else if (event.currentTarget && typeof event.currentTarget.getBoundingClientRect === "function") {
+          const rect = event.currentTarget.getBoundingClientRect();
+          x = rect.left + rect.width / 2;
+          y = rect.top + rect.height / 2;
+        }
+      }
+
+      // Calculate maximum distance to the furthest screen corner
+      const endRadius = Math.hypot(
+        Math.max(x, window.innerWidth - x),
+        Math.max(y, window.innerHeight - y)
+      );
+
+      const transition = document.startViewTransition(() => {
+        root.classList.remove("light", "dark");
+        root.classList.add(next);
+        root.style.colorScheme = next;
+        setThemeState(next);
+      });
+
+      transition.ready
+        .then(() => {
+          document.documentElement.animate(
+            {
+              clipPath: [
+                `circle(0px at ${x}px ${y}px)`,
+                `circle(${endRadius}px at ${x}px ${y}px)`,
+              ],
+            },
+            {
+              duration: 450,
+              easing: "cubic-bezier(0.25, 1, 0.3, 1)",
+              pseudoElement: "::view-transition-new(root)",
+            }
+          );
+        })
+        .catch(() => {});
     };
 
     return {
       theme,
       isDark: theme === "dark",
-      setTheme,
-      toggleTheme: () => setTheme(theme === "dark" ? "light" : "dark"),
+      setTheme: (next, event = null) => applyThemeChange(next, event),
+      toggleTheme: (event = null) => applyThemeChange(theme === "dark" ? "light" : "dark", event),
     };
   }, [theme]);
 
