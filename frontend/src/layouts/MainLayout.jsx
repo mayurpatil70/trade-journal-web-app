@@ -10,6 +10,8 @@ import PreTradeGate from "../components/PreTradeGate.jsx";
 import PromoPopup from "../components/PromoPopup.jsx";
 import SystemAnnouncementBanner from "../components/SystemAnnouncementBanner.jsx";
 import ProfilePhotoModal from "../components/ui/ProfilePhotoModal.jsx";
+import SupportFeedbackModal from "../components/support/SupportFeedbackModal.jsx";
+import SocialFollowPopup from "../components/support/SocialFollowPopup.jsx";
 import api from "../api/axios";
 import {
   LayoutDashboard,
@@ -41,6 +43,9 @@ import {
   Search,
   Sparkles,
   Wrench,
+  HelpCircle,
+  PenSquare,
+  ArrowUpRight,
 } from "lucide-react";
 
 // Nav Item with Apple Squircle Geometry & Glossy Interaction
@@ -206,9 +211,33 @@ export default function MainLayout() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [showLockPopup, setShowLockPopup] = useState(false);
+  const [isSupportModalOpen, setIsSupportModalOpen] = useState(false);
+  const [supportModalMode, setSupportModalMode] = useState("new");
+  const [showBugCallout, setShowBugCallout] = useState(
+    () => sessionStorage.getItem("fn_hide_bug_callout") !== "true"
+  );
   const userCardRef = useRef(null);
   const location = useLocation();
   const navigate = useNavigate();
+
+  // Support / feedback event listeners & query param sync
+  useEffect(() => {
+    const handleOpenSupport = (e) => {
+      setIsSupportModalOpen(true);
+      if (e?.detail?.mode) setSupportModalMode(e.detail.mode);
+    };
+    window.addEventListener("open-support-modal", handleOpenSupport);
+
+    const params = new URLSearchParams(location.search);
+    if (params.get("supportOpen") === "1" || params.get("support") === "new") {
+      setIsSupportModalOpen(true);
+      if (params.get("support") === "new") setSupportModalMode("new");
+    }
+
+    return () => {
+      window.removeEventListener("open-support-modal", handleOpenSupport);
+    };
+  }, [location.search]);
 
   const userId = localStorage.getItem("userId") || localStorage.getItem("userEmail");
   const userEmail = localStorage.getItem("userEmail") || "Trader";
@@ -381,7 +410,8 @@ export default function MainLayout() {
       label: "System",
       items: [
         { to: "/accounts", icon: Users, label: "Prop firm" },
-        { to: "/support", icon: Headphones, label: "Support" },
+        { to: "/settings", icon: Settings, label: "Settings" },
+        { to: "/support", icon: HelpCircle, label: "Help & Support" },
         { to: "/affiliate", icon: Wallet, label: "Affiliate" },
       ],
     },
@@ -561,6 +591,18 @@ export default function MainLayout() {
       {/* ── Desktop Top-Right Action Cluster (Always Visible across pages, hidden on /dashboard to avoid duplicate overlap) ── */}
       {location.pathname !== "/dashboard" && (
         <div className="max-md:hidden flex fixed top-3.5 right-6 z-50 items-center gap-2 p-1 rounded-2xl bg-white/75 dark:bg-[#10131b]/75 backdrop-blur-2xl border border-black/[0.08] dark:border-white/[0.12] shadow-[0_4px_20px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.5)] transition-all">
+          <button
+            type="button"
+            onClick={() => {
+              setSupportModalMode("new");
+              setIsSupportModalOpen(true);
+            }}
+            title="Help & Feedback"
+            className="w-8 h-8 rounded-xl flex items-center justify-center text-neutral-500 hover:text-blue-600 dark:text-neutral-400 dark:hover:text-blue-400 hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
+            aria-label="Send feedback"
+          >
+            <PenSquare className="w-4 h-4" />
+          </button>
           <NotificationBell />
           <ThemeToggle />
         </div>
@@ -572,6 +614,18 @@ export default function MainLayout() {
           <BrandLogo className="h-10 w-auto object-contain" />
         </div>
         <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => {
+              setSupportModalMode("new");
+              setIsSupportModalOpen(true);
+            }}
+            title="Help & Feedback"
+            className="p-2 rounded-xl text-neutral-600 dark:text-neutral-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
+            aria-label="Send feedback"
+          >
+            <PenSquare className="w-4 h-4" />
+          </button>
           <ThemeToggle />
           <NotificationBell />
           <button
@@ -607,6 +661,39 @@ export default function MainLayout() {
         <nav className="flex-1 overflow-y-auto py-5 px-3 space-y-6 scrollbar-hide mt-14 md:mt-0">
           {navSections.map((section) => (
             <div key={section.label}>
+              {/* Found a bug? Callout card (Matches TradeFXBook Screenshot 2) placed above System */}
+              {section.label === "System" && showBugCallout && (
+                <div className="mb-4 p-3 rounded-2xl bg-white dark:bg-[#121622] border border-blue-500/20 dark:border-blue-400/20 shadow-[0_2px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_16px_rgba(0,0,0,0.3)] relative overflow-hidden">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-[13px] font-bold text-neutral-900 dark:text-white tracking-tight">
+                      Found a bug?
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowBugCallout(false);
+                        sessionStorage.setItem("fn_hide_bug_callout", "true");
+                      }}
+                      className="w-5 h-5 rounded-md flex items-center justify-center text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 hover:bg-black/5 dark:hover:bg-white/10 transition-colors cursor-pointer"
+                      aria-label="Dismiss bug prompt"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSupportModalMode("new");
+                      setIsSupportModalOpen(true);
+                    }}
+                    className="w-full py-2 px-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-md shadow-blue-500/25 active:scale-[0.98] transition-all cursor-pointer"
+                  >
+                    <span>Report an issue</span>
+                    <ArrowUpRight className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
+
               <p className="px-3.5 text-[10px] font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-widest mb-2">
                 {section.label}
               </p>
@@ -902,6 +989,12 @@ export default function MainLayout() {
         subText={userEmail}
         onAvatarUpdated={(newUrl) => setUserAvatar(newUrl)}
       />
+      <SupportFeedbackModal
+        isOpen={isSupportModalOpen}
+        onClose={() => setIsSupportModalOpen(false)}
+        initialMode={supportModalMode}
+      />
+      <SocialFollowPopup />
     </div>
   );
 }

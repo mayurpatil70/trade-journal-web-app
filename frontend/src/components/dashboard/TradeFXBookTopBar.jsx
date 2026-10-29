@@ -291,6 +291,17 @@ export default function TradeFXBookTopBar({
           </div>
         </div>
 
+        {/* Support & Feedback Pencil Button (Matches Screenshot 2) */}
+        <button
+          type="button"
+          onClick={() => window.dispatchEvent(new CustomEvent("open-support-modal", { detail: { mode: "new" } }))}
+          className="h-10 w-10 rounded-2xl bg-white/80 dark:bg-[#121622]/80 border border-black/[0.06] dark:border-white/[0.08] shadow-sm flex items-center justify-center text-neutral-600 dark:text-neutral-300 hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-500/30 transition-all cursor-pointer"
+          title="Report an issue or feedback"
+          aria-label="Report issue"
+        >
+          <PenSquare className="w-4 h-4" />
+        </button>
+
         {/* 5. Notification Bell (Right side of profile icon) */}
         <div className="h-10 p-0.5 rounded-2xl bg-white/80 dark:bg-[#121622]/80 border border-black/[0.06] dark:border-white/[0.08] shadow-sm flex items-center justify-center">
           <NotificationBell />
