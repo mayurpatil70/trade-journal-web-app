@@ -10,6 +10,7 @@ import AccountFilter from "../components/AccountFilter";
 import TradeFXBookAddTradeModal from "../components/dashboard/TradeFXBookAddTradeModal";
 import TradeShareModal from "../components/dashboard/TradeShareModal";
 import DateTimePickerPopover from "../components/ui/DateTimePickerPopover";
+import AppleSelect from "../components/ui/AppleSelect";
 import PhotoLightboxModal from "../components/ui/PhotoLightboxModal";
 import {
   getImmediateCachedTrades,
@@ -23,6 +24,7 @@ import {
   Filter,
   ChevronRight,
   ChevronDown,
+  ChevronUp,
   Image as ImageIcon,
   X,
   Plus,
@@ -161,6 +163,66 @@ export default function PastTrades() {
   const [isViewOpen, setIsViewOpen] = useState(false);
   const viewButtonRef = useRef(null);
   const viewPopoverRef = useRef(null);
+
+  // ── Column Order State (Supports Custom Drag & Drop / Up-Down Shuffling & Custom CSV Export) ──
+  const [columnOrder, setColumnOrder] = useState(() => {
+    try {
+      const saved = localStorage.getItem("tfb_trades_column_order");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        const validIds = ALL_COLUMNS.map((c) => c.id);
+        const merged = [
+          ...parsed.filter((id) => validIds.includes(id)),
+          ...validIds.filter((id) => !parsed.includes(id)),
+        ];
+        return merged;
+      }
+    } catch (e) {}
+    return ALL_COLUMNS.map((c) => c.id);
+  });
+
+  useEffect(() => {
+    localStorage.setItem("tfb_trades_column_order", JSON.stringify(columnOrder));
+  }, [columnOrder]);
+
+  const orderedVisibleColumns = useMemo(
+    () => columnOrder.filter((id) => visibleColumns.includes(id)),
+    [columnOrder, visibleColumns]
+  );
+
+  const handleMoveColumn = (colId, direction) => {
+    setColumnOrder((prev) => {
+      const idx = prev.indexOf(colId);
+      if (idx === -1) return prev;
+      const targetIdx = direction === "up" ? idx - 1 : idx + 1;
+      if (targetIdx < 0 || targetIdx >= prev.length) return prev;
+      const next = [...prev];
+      const temp = next[idx];
+      next[idx] = next[targetIdx];
+      next[targetIdx] = temp;
+      return next;
+    });
+  };
+
+  const handleDragStart = (e, index) => {
+    e.dataTransfer.setData("text/plain", String(index));
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = (e, targetIndex) => {
+    e.preventDefault();
+    const sourceIndex = parseInt(e.dataTransfer.getData("text/plain"), 10);
+    if (isNaN(sourceIndex) || sourceIndex === targetIndex) return;
+    setColumnOrder((prev) => {
+      const next = [...prev];
+      const [moved] = next.splice(sourceIndex, 1);
+      next.splice(targetIndex, 0, moved);
+      return next;
+    });
+  };
 
   const [visibleColumns, setVisibleColumns] = useState(() => {
     try {
@@ -491,54 +553,57 @@ export default function PastTrades() {
     }
   };
 
-  // Export CSV helper
-  const exportTradesToCSV = (tradeList, filename = "ForexNotes-Trades.csv", isExcel = false) => {
+  // Export CSV helper driven dynamically by customized columnOrder
+  const exportTradesToCSV = (tradeList, filename = "forexnotes_trade_history.csv", isExcel = false) => {
     if (!tradeList || tradeList.length === 0) {
       alert("No trades to export.");
       return;
     }
-    const headers = [
-      "Open Date",
-      "Open Time",
-      "Close Date",
-      "Close Time",
-      "Symbol",
-      "Direction",
-      "Entry Price",
-      "Exit Price",
-      "Lot Size",
-      "Net PnL",
-      "R-Multiple",
-      "Outcome",
-      "Commission",
-      "Swap",
-      "Setup",
-      "Session",
-      "Account",
-      "Source",
-      "Notes",
-    ];
-    const rows = tradeList.map((t) => [
-      t.date || "",
-      t.time || "",
-      t.exit_date || t.date || "",
-      t.exit_time || t.time || "",
-      t.asset || "",
-      t.direction || "",
-      t.entry || t.entry_price || "",
-      t.exit || t.exit_price || "",
-      t.lot_size ?? t.size ?? "",
-      t.pnl !== null && t.pnl !== undefined ? t.pnl : "",
-      normalizeTradeR(t).toFixed(2),
-      t.result || "",
-      t.commission || "",
-      t.swap || "",
-      t.setup || "",
-      t.session || "",
-      t.account_name || "",
-      t.source || "Manual",
-      t.notes || t.reason || "",
-    ]);
+    const activeCols = columnOrder.filter((id) => visibleColumns.includes(id));
+    const headers = activeCols.map((id) => {
+      const colDef = ALL_COLUMNS.find((c) => c.id === id);
+      return colDef ? colDef.label : id;
+    });
+
+    const getColValue = (colId, t) => {
+      switch (colId) {
+        case "open_close":
+          return `Open: ${t.date || ""} ${t.time || ""} | Close: ${t.exit_date || t.date || ""} ${t.exit_time || t.time || ""}`.trim();
+        case "symbol":
+          return t.asset || "";
+        case "type":
+          return (t.direction || "").toUpperCase();
+        case "entry":
+          return t.entry || t.entry_price || "";
+        case "exit":
+          return t.exit || t.exit_price || "";
+        case "size":
+          return t.lot_size ?? t.size ?? "";
+        case "pnl":
+        case "net_pnl":
+          return t.pnl !== null && t.pnl !== undefined ? t.pnl : "";
+        case "source":
+          return t.source || "Manual";
+        case "open_time":
+          return `${t.date || ""} ${t.time || ""}`.trim();
+        case "close_time":
+          return `${t.exit_date || t.date || ""} ${t.exit_time || t.time || ""}`.trim();
+        case "duration":
+          return getTradeDuration(t);
+        case "commission":
+          return t.commission ?? "";
+        case "swap":
+          return t.swap ?? "";
+        case "day":
+          return getTradeDayOfWeek(t);
+        case "notes":
+          return t.notes || t.reason || t.lesson || "";
+        default:
+          return t[colId] ?? "";
+      }
+    };
+
+    const rows = tradeList.map((t) => activeCols.map((colId) => getColValue(colId, t)));
 
     const csvContent = [headers, ...rows]
       .map((row) =>
@@ -686,6 +751,161 @@ export default function PastTrades() {
       ? "py-3 px-3"
       : "py-4 px-3";
 
+  // ── Dynamic Cell Renderer (Respects Custom User Shuffled Column Order) ──
+  const renderTableCell = (colId, t, ctx) => {
+    const { openDateStr, closeDateStr, isLong, isWin, isLoss, hasPnl, pnlNum, r, rowPaddingClass } = ctx;
+    switch (colId) {
+      case "open_close":
+        return (
+          <td key={colId} className={`${rowPaddingClass} whitespace-nowrap`}>
+            <div className="flex flex-col text-[11px] leading-tight font-medium text-neutral-700 dark:text-neutral-300">
+              <span>{openDateStr}</span>
+              <span className="text-neutral-500 dark:text-neutral-400 mt-0.5">{closeDateStr}</span>
+            </div>
+          </td>
+        );
+      case "symbol":
+        return (
+          <td key={colId} className={`${rowPaddingClass} whitespace-nowrap`}>
+            <div className="flex items-center gap-2 font-bold text-neutral-900 dark:text-white">
+              <Globe className="w-3.5 h-3.5 text-neutral-400 shrink-0" />
+              <span>{t.asset}</span>
+            </div>
+          </td>
+        );
+      case "type":
+        return (
+          <td key={colId} className={`${rowPaddingClass} whitespace-nowrap`}>
+            <span
+              className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[11px] font-bold border ${
+                isLong
+                  ? "bg-blue-500/10 text-[#0066FF] dark:text-blue-400 border-blue-500/20"
+                  : "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20"
+              }`}
+            >
+              {isLong ? (
+                <TrendingUp className="w-3 h-3 stroke-[2.5]" />
+              ) : (
+                <TrendingDown className="w-3 h-3 stroke-[2.5]" />
+              )}
+              <span>{isLong ? "Long" : "Short"}</span>
+            </span>
+          </td>
+        );
+      case "entry":
+        return (
+          <td key={colId} className={`${rowPaddingClass} font-mono font-medium text-neutral-700 dark:text-neutral-300 whitespace-nowrap`}>
+            {t.entry || t.entry_price ? Number(t.entry || t.entry_price).toLocaleString() : "4,100.00"}
+          </td>
+        );
+      case "exit":
+        return (
+          <td key={colId} className={`${rowPaddingClass} font-mono font-medium text-neutral-700 dark:text-neutral-300 whitespace-nowrap`}>
+            {t.exit || t.exit_price ? Number(t.exit || t.exit_price).toLocaleString() : "4,190.00"}
+          </td>
+        );
+      case "size":
+        return (
+          <td key={colId} className={`${rowPaddingClass} font-mono font-medium text-neutral-700 dark:text-neutral-300 whitespace-nowrap`}>
+            {t.lot_size ?? t.size ?? "0.1"}
+          </td>
+        );
+      case "pnl":
+        return (
+          <td key={colId} className={`${rowPaddingClass} font-mono font-black text-sm whitespace-nowrap`}>
+            <span
+              className={
+                isWin
+                  ? "text-[#0066FF] dark:text-blue-400 font-black"
+                  : isLoss
+                  ? "text-rose-500 dark:text-rose-400 font-black"
+                  : "text-neutral-500 font-bold"
+              }
+            >
+              {hasPnl
+                ? `${pnlNum >= 0 ? "+" : ""}${Math.abs(pnlNum).toFixed(2)}`
+                : `${r >= 0 ? "+" : ""}${r.toFixed(2)}R`}
+            </span>
+          </td>
+        );
+      case "source":
+        return (
+          <td key={colId} className={`${rowPaddingClass} whitespace-nowrap`}>
+            <span
+              className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[11px] font-semibold border ${
+                t.source === "MT5" || t.source === "mt5_auto"
+                  ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20"
+                  : "bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20"
+              }`}
+            >
+              {t.source === "MT5" || t.source === "mt5_auto" ? (
+                <Cpu className="w-3 h-3" />
+              ) : (
+                <Pencil className="w-3 h-3" />
+              )}
+              <span>
+                {t.source === "MT5" || t.source === "mt5_auto" ? "MT5 Auto" : "Manual"}
+              </span>
+            </span>
+          </td>
+        );
+      case "open_time":
+        return (
+          <td key={colId} className={`${rowPaddingClass} font-mono text-neutral-600 dark:text-neutral-400`}>
+            {t.time || "—"}
+          </td>
+        );
+      case "close_time":
+        return (
+          <td key={colId} className={`${rowPaddingClass} font-mono text-neutral-600 dark:text-neutral-400`}>
+            {t.exit_time || t.time || "—"}
+          </td>
+        );
+      case "duration":
+        return (
+          <td key={colId} className={`${rowPaddingClass} text-neutral-600 dark:text-neutral-400`}>
+            {getTradeDuration(t)}
+          </td>
+        );
+      case "net_pnl":
+        return (
+          <td key={colId} className={`${rowPaddingClass} font-mono font-bold text-neutral-900 dark:text-white`}>
+            {hasPnl ? `${Number(t.pnl).toFixed(2)}` : "—"}
+          </td>
+        );
+      case "commission":
+        return (
+          <td key={colId} className={`${rowPaddingClass} font-mono text-neutral-500`}>
+            {t.commission ? `${Number(t.commission).toFixed(2)}` : "$0.00"}
+          </td>
+        );
+      case "swap":
+        return (
+          <td key={colId} className={`${rowPaddingClass} font-mono text-neutral-500`}>
+            {t.swap ? `${Number(t.swap).toFixed(2)}` : "$0.00"}
+          </td>
+        );
+      case "day":
+        return (
+          <td key={colId} className={`${rowPaddingClass} text-neutral-600 dark:text-neutral-400`}>
+            {getTradeDayOfWeek(t)}
+          </td>
+        );
+      case "notes":
+        return (
+          <td key={colId} className={`${rowPaddingClass} text-neutral-500 truncate max-w-[120px]`}>
+            {t.reason || t.lesson || "—"}
+          </td>
+        );
+      default:
+        return (
+          <td key={colId} className={rowPaddingClass}>
+            {String(t[colId] || "—")}
+          </td>
+        );
+    }
+  };
+
   return (
     <div className="w-full max-w-7xl mx-auto font-sans pb-24 px-4 sm:px-6 lg:px-8 mt-4 sm:mt-6 space-y-6">
       {/* ── 1. TOP HEADER (Trades Title + All Accounts + Clear All + Add Trade) ── */}
@@ -811,31 +1031,66 @@ export default function PastTrades() {
                       </button>
                     </div>
 
-                    {/* Columns Checklist */}
-                    <div className="space-y-1 max-h-[320px] overflow-y-auto pr-1">
-                      {ALL_COLUMNS.map((col) => {
-                        const isChecked = visibleColumns.includes(col.id);
+                    {/* Columns Checklist with Drag & Drop and Up/Down Column Shuffling */}
+                    <div className="space-y-1 max-h-[340px] overflow-y-auto pr-1">
+                      {columnOrder.map((colId, index) => {
+                        const col = ALL_COLUMNS.find((c) => c.id === colId) || { id: colId, label: colId };
+                        const isChecked = visibleColumns.includes(colId);
                         return (
                           <div
-                            key={col.id}
-                            onClick={() => handleToggleColumn(col.id)}
-                            className="flex items-center gap-2.5 p-2 rounded-xl transition-colors cursor-pointer select-none hover:bg-black/[0.03] dark:hover:bg-white/[0.06]"
+                            key={colId}
+                            draggable
+                            onDragStart={(e) => handleDragStart(e, index)}
+                            onDragOver={handleDragOver}
+                            onDrop={(e) => handleDrop(e, index)}
+                            onClick={() => handleToggleColumn(colId)}
+                            className="flex items-center justify-between p-1.5 rounded-xl transition-colors cursor-pointer select-none hover:bg-black/[0.03] dark:hover:bg-white/[0.06] group"
                           >
-                            <GripVertical className="w-3.5 h-3.5 text-neutral-400 shrink-0 cursor-grab" />
-                            <input
-                              type="checkbox"
-                              checked={isChecked}
-                              disabled={col.required}
-                              onChange={() => {}}
-                              className={`w-4 h-4 rounded accent-blue-600 cursor-pointer ${
-                                col.required ? "opacity-60 cursor-not-allowed" : ""
-                              }`}
-                            />
-                            <span className={`text-xs font-semibold ${
-                              isChecked ? "text-neutral-900 dark:text-white" : "text-neutral-600 dark:text-neutral-400"
-                            }`}>
-                              {col.label}
-                            </span>
+                            <div className="flex items-center gap-2 overflow-hidden">
+                              <span
+                                title="Drag to reorder column"
+                                className="cursor-grab active:cursor-grabbing text-neutral-400 hover:text-neutral-600 dark:hover:text-white p-0.5"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <GripVertical className="w-3.5 h-3.5" />
+                              </span>
+                              <input
+                                type="checkbox"
+                                checked={isChecked}
+                                disabled={col.required}
+                                onChange={() => {}}
+                                className={`w-4 h-4 rounded accent-blue-600 cursor-pointer ${
+                                  col.required ? "opacity-60 cursor-not-allowed" : ""
+                                }`}
+                              />
+                              <span className={`text-xs font-semibold truncate ${
+                                isChecked ? "text-neutral-900 dark:text-white" : "text-neutral-600 dark:text-neutral-400"
+                              }`}>
+                                {col.label}
+                              </span>
+                            </div>
+
+                            {/* Up / Down Shuffling Triggers */}
+                            <div className="flex items-center gap-0.5 opacity-40 group-hover:opacity-100 transition-opacity" onClick={(e) => e.stopPropagation()}>
+                              <button
+                                type="button"
+                                disabled={index === 0}
+                                onClick={() => handleMoveColumn(colId, "up")}
+                                className="p-1 rounded-md hover:bg-black/5 dark:hover:bg-white/10 disabled:opacity-20 disabled:cursor-not-allowed text-neutral-500 hover:text-neutral-900 dark:hover:text-white"
+                                title="Move column up"
+                              >
+                                <ChevronUp className="w-3 h-3" />
+                              </button>
+                              <button
+                                type="button"
+                                disabled={index === columnOrder.length - 1}
+                                onClick={() => handleMoveColumn(colId, "down")}
+                                className="p-1 rounded-md hover:bg-black/5 dark:hover:bg-white/10 disabled:opacity-20 disabled:cursor-not-allowed text-neutral-500 hover:text-neutral-900 dark:hover:text-white"
+                                title="Move column down"
+                              >
+                                <ChevronDown className="w-3 h-3" />
+                              </button>
+                            </div>
                           </div>
                         );
                       })}
@@ -844,7 +1099,7 @@ export default function PastTrades() {
 
                   {/* ── RIGHT COLUMN: SORT, DISPLAY, TIPS ── */}
                   <div className="space-y-4 md:pl-5 pt-4 md:pt-0">
-                    {/* 1. SORT Section */}
+                    {/* 1. SORT Section (Apple Custom Frosted Dropdown) */}
                     <div>
                       <span className="text-xs font-black uppercase tracking-wider text-neutral-900 dark:text-white block mb-1">
                         SORT
@@ -853,21 +1108,21 @@ export default function PastTrades() {
                         Newest trades first. Click a column header to sort, Shift+click to add another.
                       </p>
 
-                      <select
+                      <AppleSelect
                         value={sortBy}
-                        onChange={(e) => setSortBy(e.target.value)}
-                        className="w-full bg-neutral-100 dark:bg-[#181d2c] border border-black/10 dark:border-white/15 rounded-xl px-3 py-2 text-xs font-semibold text-neutral-900 dark:text-white outline-none focus:border-blue-500 cursor-pointer shadow-xs"
-                      >
-                        <option value="">Sort by... (Default)</option>
-                        {ALL_COLUMNS.map((c) => (
-                          <option key={c.id} value={c.id}>
-                            {c.label}
-                          </option>
-                        ))}
-                      </select>
+                        onChange={(val) => setSortBy(val)}
+                        options={[
+                          { value: "", label: "Sort by... (Default)" },
+                          ...columnOrder.map((colId) => {
+                            const c = ALL_COLUMNS.find((col) => col.id === colId);
+                            return { value: colId, label: c ? c.label : colId };
+                          }),
+                        ]}
+                        placeholder="Sort by..."
+                      />
                     </div>
 
-                    {/* 2. DISPLAY Section */}
+                    {/* 2. DISPLAY Section (Row Height Only - Trades per page and Filter under column removed) */}
                     <div className="space-y-3 pt-1 border-t border-black/[0.05] dark:border-white/[0.06]">
                       <span className="text-xs font-black uppercase tracking-wider text-neutral-900 dark:text-white block">
                         DISPLAY
@@ -894,49 +1149,6 @@ export default function PastTrades() {
                             </button>
                           ))}
                         </div>
-                      </div>
-
-                      {/* Trades per page */}
-                      <div className="flex items-center justify-between text-xs">
-                        <span className="text-neutral-700 dark:text-neutral-300 font-semibold">
-                          Trades per page
-                        </span>
-                        <div className="flex items-center bg-neutral-100 dark:bg-white/[0.06] p-0.5 rounded-xl border border-black/[0.05] dark:border-white/[0.08]">
-                          {[10, 15, 25, 50, 100].map((num) => (
-                            <button
-                              key={num}
-                              type="button"
-                              onClick={() => setTradesPerPage(num)}
-                              className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                                tradesPerPage === num
-                                  ? "bg-blue-600 text-white shadow-xs"
-                                  : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
-                              }`}
-                            >
-                              {num}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Filter under each column Toggle */}
-                      <div className="flex items-center justify-between text-xs pt-1">
-                        <span className="text-neutral-700 dark:text-neutral-300 font-semibold">
-                          Filter under each column
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => setFilterUnderColumns((v) => !v)}
-                          className={`w-10 h-6 rounded-full transition-colors p-0.5 cursor-pointer relative ${
-                            filterUnderColumns ? "bg-blue-600" : "bg-neutral-300 dark:bg-neutral-700"
-                          }`}
-                        >
-                          <span
-                            className={`w-5 h-5 rounded-full bg-white block shadow-sm transition-transform ${
-                              filterUnderColumns ? "translate-x-4" : "translate-x-0"
-                            }`}
-                          />
-                        </button>
                       </div>
                     </div>
 
@@ -1132,96 +1344,22 @@ export default function PastTrades() {
                 </th>
                 <th className="py-3 px-1 w-6"></th>
 
-                {visibleColumns.includes("open_close") && (
-                  <th
-                    className="py-3 px-3 cursor-pointer hover:text-neutral-700 dark:hover:text-white"
-                    onClick={() => setSortBy(sortBy === "open_close" ? "" : "open_close")}
-                  >
-                    OPEN / CLOSE
-                  </th>
-                )}
-                {visibleColumns.includes("symbol") && (
-                  <th
-                    className="py-3 px-3 cursor-pointer hover:text-neutral-700 dark:hover:text-white"
-                    onClick={() => setSortBy(sortBy === "symbol" ? "" : "symbol")}
-                  >
-                    SYMBOL
-                  </th>
-                )}
-                {visibleColumns.includes("type") && (
-                  <th
-                    className="py-3 px-3 cursor-pointer hover:text-neutral-700 dark:hover:text-white"
-                    onClick={() => setSortBy(sortBy === "type" ? "" : "type")}
-                  >
-                    TYPE
-                  </th>
-                )}
-                {visibleColumns.includes("entry") && (
-                  <th
-                    className="py-3 px-3 cursor-pointer hover:text-neutral-700 dark:hover:text-white"
-                    onClick={() => setSortBy(sortBy === "entry" ? "" : "entry")}
-                  >
-                    ENTRY
-                  </th>
-                )}
-                {visibleColumns.includes("exit") && (
-                  <th
-                    className="py-3 px-3 cursor-pointer hover:text-neutral-700 dark:hover:text-white"
-                    onClick={() => setSortBy(sortBy === "exit" ? "" : "exit")}
-                  >
-                    EXIT
-                  </th>
-                )}
-                {visibleColumns.includes("size") && (
-                  <th
-                    className="py-3 px-3 cursor-pointer hover:text-neutral-700 dark:hover:text-white"
-                    onClick={() => setSortBy(sortBy === "size" ? "" : "size")}
-                  >
-                    SIZE
-                  </th>
-                )}
-                {visibleColumns.includes("pnl") && (
-                  <th
-                    className="py-3 px-3 cursor-pointer hover:text-neutral-700 dark:hover:text-white"
-                    onClick={() => setSortBy(sortBy === "pnl" ? "" : "pnl")}
-                  >
-                    P&L
-                  </th>
-                )}
-                {visibleColumns.includes("source") && (
-                  <th
-                    className="py-3 px-3 cursor-pointer hover:text-neutral-700 dark:hover:text-white"
-                    onClick={() => setSortBy(sortBy === "source" ? "" : "source")}
-                  >
-                    SOURCE
-                  </th>
-                )}
-
-                {/* Optional Institutional Columns */}
-                {visibleColumns.includes("open_time") && (
-                  <th className="py-3 px-3">OPEN TIME</th>
-                )}
-                {visibleColumns.includes("close_time") && (
-                  <th className="py-3 px-3">CLOSE TIME</th>
-                )}
-                {visibleColumns.includes("duration") && (
-                  <th className="py-3 px-3">DURATION</th>
-                )}
-                {visibleColumns.includes("net_pnl") && (
-                  <th className="py-3 px-3">NET P&L</th>
-                )}
-                {visibleColumns.includes("commission") && (
-                  <th className="py-3 px-3">COMMISSION</th>
-                )}
-                {visibleColumns.includes("swap") && (
-                  <th className="py-3 px-3">SWAP</th>
-                )}
-                {visibleColumns.includes("day") && (
-                  <th className="py-3 px-3">DAY</th>
-                )}
-                {visibleColumns.includes("notes") && (
-                  <th className="py-3 px-3">NOTES</th>
-                )}
+                {orderedVisibleColumns.map((colId) => {
+                  const colDef = ALL_COLUMNS.find((c) => c.id === colId);
+                  const isSorted = sortBy === colId;
+                  return (
+                    <th
+                      key={colId}
+                      className="py-3 px-3 cursor-pointer select-none hover:text-neutral-700 dark:hover:text-white transition-colors whitespace-nowrap"
+                      onClick={() => setSortBy(sortBy === colId ? "" : colId)}
+                    >
+                      <div className="flex items-center gap-1">
+                        <span>{colDef?.label.toUpperCase() || colId.toUpperCase()}</span>
+                        {isSorted && <ChevronDown className="w-3.5 h-3.5 text-[#0066FF]" />}
+                      </div>
+                    </th>
+                  );
+                })}
 
                 <th className="py-3 px-3 text-right sticky right-0 bg-white/95 dark:bg-[#121622]/95 backdrop-blur-md z-10 shadow-[-6px_0_12px_rgba(0,0,0,0.03)] dark:shadow-[-6px_0_16px_rgba(0,0,0,0.4)]"></th>
               </tr>
@@ -1280,7 +1418,7 @@ export default function PastTrades() {
             <tbody className="divide-y divide-black/[0.04] dark:divide-white/[0.04] text-xs">
               {loading ? (
                 <tr>
-                  <td colSpan={visibleColumns.length + 3} className="py-16 text-center">
+                  <td colSpan={orderedVisibleColumns.length + 3} className="py-16 text-center">
                     <Loader2 className="w-6 h-6 text-[#0066FF] animate-spin mx-auto mb-2" />
                     <span className="text-neutral-400 text-xs">
                       Loading trade history...
@@ -1289,7 +1427,7 @@ export default function PastTrades() {
                 </tr>
               ) : currentTrades.length === 0 ? (
                 <tr>
-                  <td colSpan={visibleColumns.length + 3} className="py-16 text-center">
+                  <td colSpan={orderedVisibleColumns.length + 3} className="py-16 text-center">
                     <div className="max-w-xs mx-auto space-y-2">
                       <p className="text-neutral-500 dark:text-neutral-400 font-semibold text-sm">
                         No trades found
@@ -1360,148 +1498,19 @@ export default function PastTrades() {
                         </button>
                       </td>
 
-                      {/* 1. OPEN / CLOSE (Stacked on 2 lines per Screenshot 2) */}
-                      {visibleColumns.includes("open_close") && (
-                        <td className={`${rowPaddingClass} whitespace-nowrap`}>
-                          <div className="flex flex-col text-[11px] leading-tight font-medium text-neutral-700 dark:text-neutral-300">
-                            <span>{openDateStr}</span>
-                            <span className="text-neutral-500 dark:text-neutral-400 mt-0.5">{closeDateStr}</span>
-                          </div>
-                        </td>
-                      )}
-
-                      {/* 2. SYMBOL */}
-                      {visibleColumns.includes("symbol") && (
-                        <td className={`${rowPaddingClass} whitespace-nowrap`}>
-                          <div className="flex items-center gap-2 font-bold text-neutral-900 dark:text-white">
-                            <Globe className="w-3.5 h-3.5 text-neutral-400 shrink-0" />
-                            <span>{t.asset}</span>
-                          </div>
-                        </td>
-                      )}
-
-                      {/* 3. TYPE (Pill Badge: Long / Short) */}
-                      {visibleColumns.includes("type") && (
-                        <td className={`${rowPaddingClass} whitespace-nowrap`}>
-                          <span
-                            className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[11px] font-bold border ${
-                              isLong
-                                ? "bg-blue-500/10 text-[#0066FF] dark:text-blue-400 border-blue-500/20"
-                                : "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20"
-                            }`}
-                          >
-                            {isLong ? (
-                              <TrendingUp className="w-3 h-3 stroke-[2.5]" />
-                            ) : (
-                              <TrendingDown className="w-3 h-3 stroke-[2.5]" />
-                            )}
-                            <span>{isLong ? "Long" : "Short"}</span>
-                          </span>
-                        </td>
-                      )}
-
-                      {/* 4. ENTRY */}
-                      {visibleColumns.includes("entry") && (
-                        <td className={`${rowPaddingClass} font-mono font-medium text-neutral-700 dark:text-neutral-300 whitespace-nowrap`}>
-                          {t.entry || t.entry_price ? Number(t.entry || t.entry_price).toLocaleString() : "4,100.00"}
-                        </td>
-                      )}
-
-                      {/* 5. EXIT */}
-                      {visibleColumns.includes("exit") && (
-                        <td className={`${rowPaddingClass} font-mono font-medium text-neutral-700 dark:text-neutral-300 whitespace-nowrap`}>
-                          {t.exit || t.exit_price ? Number(t.exit || t.exit_price).toLocaleString() : "4,190.00"}
-                        </td>
-                      )}
-
-                      {/* 6. SIZE */}
-                      {visibleColumns.includes("size") && (
-                        <td className={`${rowPaddingClass} font-mono font-medium text-neutral-700 dark:text-neutral-300 whitespace-nowrap`}>
-                          {t.lot_size ?? t.size ?? "0.1"}
-                        </td>
-                      )}
-
-                      {/* 7. P&L (Vibrant Electric Blue on Profit per Screenshot 2) */}
-                      {visibleColumns.includes("pnl") && (
-                        <td className={`${rowPaddingClass} font-mono font-black text-sm whitespace-nowrap`}>
-                          <span
-                            className={
-                              isWin
-                                ? "text-[#0066FF] dark:text-blue-400 font-black"
-                                : isLoss
-                                ? "text-rose-500 dark:text-rose-400 font-black"
-                                : "text-neutral-500 font-bold"
-                            }
-                          >
-                            {hasPnl
-                              ? `${pnlNum >= 0 ? "+" : ""}$${Math.abs(pnlNum).toFixed(2)}`
-                              : `${r >= 0 ? "+" : ""}${r.toFixed(2)}R`}
-                          </span>
-                        </td>
-                      )}
-
-                      {/* 8. SOURCE */}
-                      {visibleColumns.includes("source") && (
-                        <td className={`${rowPaddingClass} whitespace-nowrap`}>
-                          <span
-                            className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[11px] font-semibold border ${
-                              t.source === "MT5" || t.source === "mt5_auto"
-                                ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20"
-                                : "bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20"
-                            }`}
-                          >
-                            {t.source === "MT5" || t.source === "mt5_auto" ? (
-                              <Cpu className="w-3 h-3" />
-                            ) : (
-                              <Pencil className="w-3 h-3" />
-                            )}
-                            <span>
-                              {t.source === "MT5" || t.source === "mt5_auto" ? "MT5 Auto" : "Manual"}
-                            </span>
-                          </span>
-                        </td>
-                      )}
-
-                      {/* Optional Columns */}
-                      {visibleColumns.includes("open_time") && (
-                        <td className={`${rowPaddingClass} font-mono text-neutral-600 dark:text-neutral-400`}>
-                          {t.time || "—"}
-                        </td>
-                      )}
-                      {visibleColumns.includes("close_time") && (
-                        <td className={`${rowPaddingClass} font-mono text-neutral-600 dark:text-neutral-400`}>
-                          {t.exit_time || t.time || "—"}
-                        </td>
-                      )}
-                      {visibleColumns.includes("duration") && (
-                        <td className={`${rowPaddingClass} text-neutral-600 dark:text-neutral-400`}>
-                          {getTradeDuration(t)}
-                        </td>
-                      )}
-                      {visibleColumns.includes("net_pnl") && (
-                        <td className={`${rowPaddingClass} font-mono font-bold text-neutral-900 dark:text-white`}>
-                          {hasPnl ? `$${Number(t.pnl).toFixed(2)}` : "—"}
-                        </td>
-                      )}
-                      {visibleColumns.includes("commission") && (
-                        <td className={`${rowPaddingClass} font-mono text-neutral-500`}>
-                          {t.commission ? `$${Number(t.commission).toFixed(2)}` : "$0.00"}
-                        </td>
-                      )}
-                      {visibleColumns.includes("swap") && (
-                        <td className={`${rowPaddingClass} font-mono text-neutral-500`}>
-                          {t.swap ? `$${Number(t.swap).toFixed(2)}` : "$0.00"}
-                        </td>
-                      )}
-                      {visibleColumns.includes("day") && (
-                        <td className={`${rowPaddingClass} text-neutral-600 dark:text-neutral-400`}>
-                          {getTradeDayOfWeek(t)}
-                        </td>
-                      )}
-                      {visibleColumns.includes("notes") && (
-                        <td className={`${rowPaddingClass} text-neutral-500 truncate max-w-[120px]`}>
-                          {t.reason || t.lesson || "—"}
-                        </td>
+                      {/* Dynamic Shuffled Columns Driven by orderedVisibleColumns */}
+                      {orderedVisibleColumns.map((colId) =>
+                        renderTableCell(colId, t, {
+                          openDateStr,
+                          closeDateStr,
+                          isLong,
+                          isWin,
+                          isLoss,
+                          hasPnl,
+                          pnlNum,
+                          r,
+                          rowPaddingClass,
+                        })
                       )}
 
                       {/* Action Icons */}
@@ -1546,7 +1555,7 @@ export default function PastTrades() {
                     {/* ── EXPANDED ROW SUB-SECTION (Matches Screenshot 5) ── */}
                     {isExpanded && (
                       <tr className="bg-[#f8fafc]/90 dark:bg-[#0c101a] border-b border-black/[0.06] dark:border-white/[0.08]">
-                        <td colSpan={visibleColumns.length + 3} className="p-4 sm:p-6 space-y-5">
+                        <td colSpan={orderedVisibleColumns.length + 3} className="p-4 sm:p-6 space-y-5">
                           {/* 1. EXECUTIONS SUB-TABLE (Screenshot 5) */}
                           <div className="bg-white dark:bg-[#121622] rounded-2xl border border-black/[0.06] dark:border-white/[0.08] overflow-hidden shadow-xs">
                             <div className="flex items-center justify-between px-4 py-3 border-b border-black/[0.05] dark:border-white/[0.06] bg-black/[0.015] dark:bg-white/[0.02]">

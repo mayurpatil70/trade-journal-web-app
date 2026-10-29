@@ -240,7 +240,7 @@ export default function TradeShareModal({ isOpen, onClose, trade }) {
 
     // Top-Right Institutional Badge (IB Card style)
     const rightPillX = targetWidth - padX;
-    const badgeText = "VERIFIED TRADE";
+    const badgeText = "VERIFIED";
     ctx.font = `800 ${Math.round(baseDim * 0.016)}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
     const badgeWidth = ctx.measureText(badgeText).width + 28;
     const badgeHeight = Math.round(baseDim * 0.036);
@@ -323,7 +323,7 @@ export default function TradeShareModal({ isOpen, onClose, trade }) {
     ctx.fill();
     ctx.stroke();
 
-    ctx.fillStyle = "rgba(255, 255, 255, 0.55)";
+    ctx.fillStyle = "rgba(255, 255, 255, 0.75)";
     ctx.font = `700 ${Math.round(baseDim * 0.018)}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
     ctx.fillText("ENTRY PRICE", padX + 22, bentoY + boxHeight * 0.38);
 
@@ -340,7 +340,7 @@ export default function TradeShareModal({ isOpen, onClose, trade }) {
     ctx.fill();
     ctx.stroke();
 
-    ctx.fillStyle = "rgba(255, 255, 255, 0.55)";
+    ctx.fillStyle = "rgba(255, 255, 255, 0.75)";
     ctx.font = `700 ${Math.round(baseDim * 0.018)}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
     ctx.fillText("EXIT PRICE", box2X + 22, bentoY + boxHeight * 0.38);
 
