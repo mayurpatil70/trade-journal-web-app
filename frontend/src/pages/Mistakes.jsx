@@ -2,7 +2,7 @@
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
 import AccountFilter from "../components/AccountFilter";
-import { Loader2, ShieldCheck, AlertTriangle, Crosshair, ChevronRight } from "lucide-react";
+import { Loader2, ShieldCheck, ShieldAlert, AlertTriangle, Crosshair, ChevronRight } from "lucide-react";
 
 export default function Mistakes() {
   const navigate = useNavigate();

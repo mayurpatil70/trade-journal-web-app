@@ -27,6 +27,7 @@ import {
   ChevronRight,
   Brain,
   ShieldCheck,
+  ShieldAlert,
   Target,
 } from "lucide-react";
 

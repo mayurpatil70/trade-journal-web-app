@@ -22,6 +22,7 @@ import {
   X,
   Award,
   ShieldCheck,
+  ShieldAlert,
   Brain,
   AlertTriangle,
   FileText,
