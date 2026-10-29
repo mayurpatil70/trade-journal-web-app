@@ -415,7 +415,12 @@ export default function Profile({ defaultTab }) {
         setLoadingHistory(false);
       }
     };
+    fetchHistory();
+  }, [activeTab, userId]);
 
+  // ── 4. FETCH ACTIVE SESSIONS ON MOUNT / USERID ──
+  useEffect(() => {
+    if (!userId) return;
     const fetchSessions = async () => {
       setLoadingSessions(true);
       try {
@@ -429,10 +434,8 @@ export default function Profile({ defaultTab }) {
         setLoadingSessions(false);
       }
     };
-
-    fetchHistory();
     fetchSessions();
-  }, [activeTab, userId]);
+  }, [userId]);
 
   const handleRevokeSession = async (sessionId) => {
     setRevokingId(sessionId);
@@ -456,6 +459,175 @@ export default function Profile({ defaultTab }) {
     } finally {
       setRevokingAll(false);
     }
+  };
+
+  // ── ACTIVE DEVICES & SESSIONS COMPONENT (Rendered on Profile & Settings) ──
+  const renderActiveDevicesCard = () => {
+    const clientSessionId = typeof window !== "undefined" ? localStorage.getItem("sessionId") : null;
+    const clientDeviceId = typeof window !== "undefined" ? localStorage.getItem("deviceId") : null;
+
+    const fallbackDeviceName = typeof navigator !== "undefined"
+      ? (/iPhone|iPad|iPod/.test(navigator.userAgent)
+          ? "iPhone · Safari"
+          : /Android/.test(navigator.userAgent)
+            ? "Android Phone · Chrome"
+            : /Macintosh|Mac OS X/.test(navigator.userAgent)
+              ? "macOS · Safari"
+              : /Windows/.test(navigator.userAgent)
+                ? "Windows · Chrome"
+                : "Web Browser")
+      : "Current Browser";
+
+    const hasOtherSessions = sessions.some(
+      (s) => !s.isCurrent && s.id !== clientSessionId && s.deviceId !== clientDeviceId
+    );
+
+    return (
+      <div className="rounded-3xl p-6 bg-white dark:bg-[#121622] border border-black/[0.06] dark:border-white/[0.08] shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] space-y-5">
+        <div className="flex items-center justify-between pb-4 border-b border-black/[0.05] dark:border-white/10 flex-wrap gap-3">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/20 flex items-center justify-center">
+              <Shield className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+            </div>
+            <div>
+              <h2 className="text-base font-bold text-neutral-900 dark:text-white">
+                Active Devices & Sessions
+              </h2>
+              <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                Manage persistent browser sessions logged into your ForexNotes account across devices
+              </p>
+            </div>
+          </div>
+
+          {hasOtherSessions && (
+            <button
+              type="button"
+              onClick={handleRevokeOtherSessions}
+              disabled={revokingAll}
+              className="px-3 py-1.5 rounded-xl border border-rose-500/30 bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-50"
+            >
+              {revokingAll ? (
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              ) : (
+                <LogOut className="w-3.5 h-3.5" />
+              )}
+              <span>Log Out All Other Devices</span>
+            </button>
+          )}
+        </div>
+
+        {loadingSessions ? (
+          <div className="py-8 flex items-center justify-center text-neutral-400 text-xs gap-2">
+            <Loader2 className="w-4 h-4 animate-spin text-emerald-500" />
+            <span>Loading active devices...</span>
+          </div>
+        ) : sessions.length === 0 ? (
+          <div className="space-y-3">
+            <div className="p-4 rounded-2xl border transition-all flex items-center justify-between gap-4 flex-wrap bg-emerald-500/[0.04] dark:bg-emerald-500/[0.06] border-emerald-500/30 ring-1 ring-emerald-500/20">
+              <div className="flex items-center gap-3.5">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                  <Laptop className="w-5 h-5" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-bold text-neutral-900 dark:text-white">
+                      {fallbackDeviceName}
+                    </span>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
+                      This Device
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
+                    <span>Current active session</span>
+                    <span>•</span>
+                    <span>Active now</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {sessions.map((s, index) => {
+              const isCurrent = Boolean(
+                s.isCurrent ||
+                (clientSessionId && s.id === clientSessionId) ||
+                (clientDeviceId && s.deviceId === clientDeviceId) ||
+                (sessions.length === 1) ||
+                (index === 0 && !sessions.some((x) => x.isCurrent))
+              );
+              const isMobile = /iPhone|Android|iPad/i.test(s.deviceName);
+              const DeviceIcon = isMobile ? Smartphone : Laptop;
+              const formattedDate = s.lastActiveAt
+                ? new Date(s.lastActiveAt).toLocaleString(undefined, {
+                    month: "short",
+                    day: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })
+                : "Recently";
+
+              return (
+                <div
+                  key={s.id || index}
+                  className={`p-4 rounded-2xl border transition-all flex items-center justify-between gap-4 flex-wrap ${
+                    isCurrent
+                      ? "bg-emerald-500/[0.04] dark:bg-emerald-500/[0.06] border-emerald-500/30 ring-1 ring-emerald-500/20"
+                      : "bg-neutral-50 dark:bg-white/[0.02] border-black/[0.06] dark:border-white/[0.06]"
+                  }`}
+                >
+                  <div className="flex items-center gap-3.5">
+                    <div
+                      className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                        isCurrent
+                          ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20"
+                          : "bg-black/[0.04] dark:bg-white/[0.04] text-neutral-600 dark:text-neutral-400 border border-black/[0.06] dark:border-white/[0.08]"
+                      }`}
+                    >
+                      <DeviceIcon className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-bold text-neutral-900 dark:text-white">
+                          {s.deviceName || fallbackDeviceName}
+                        </span>
+                        {isCurrent && (
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
+                            This Device
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2 text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
+                        {s.ipAddress && <span>IP: {s.ipAddress}</span>}
+                        {s.ipAddress && <span>•</span>}
+                        <span>Last active: {isCurrent ? "Active now" : formattedDate}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {!isCurrent && (
+                    <button
+                      type="button"
+                      onClick={() => handleRevokeSession(s.id)}
+                      disabled={revokingId === s.id}
+                      className="px-3 py-1.5 rounded-xl border border-black/[0.08] dark:border-white/[0.1] bg-white dark:bg-white/[0.04] hover:bg-rose-500/10 hover:border-rose-500/30 hover:text-rose-500 text-xs font-semibold text-neutral-700 dark:text-neutral-300 transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                      title="Revoke and log out this device"
+                    >
+                      {revokingId === s.id ? (
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      ) : (
+                        <LogOut className="w-3.5 h-3.5" />
+                      )}
+                      <span>Revoke / Log out this device</span>
+                    </button>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    );
   };
 
   // Sync preference updates immediately to state, localStorage & backend
@@ -1302,6 +1474,9 @@ export default function Profile({ defaultTab }) {
               </div>
             </div>
           </div>
+
+          {/* ── ACTIVE DEVICES & SESSIONS (Prominently displayed in Profile) ── */}
+          {renderActiveDevicesCard()}
         </div>
       )}
 
@@ -1535,122 +1710,7 @@ export default function Profile({ defaultTab }) {
           </div>
 
           {/* ── 3. ACTIVE DEVICES & SESSIONS ── */}
-          <div className="rounded-3xl p-6 bg-white dark:bg-[#121622] border border-black/[0.06] dark:border-white/[0.08] shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] space-y-5">
-            <div className="flex items-center justify-between pb-4 border-b border-black/[0.05] dark:border-white/10 flex-wrap gap-3">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/20 flex items-center justify-center">
-                  <Shield className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                </div>
-                <div>
-                  <h2 className="text-base font-bold text-neutral-900 dark:text-white">
-                    Active Devices & Sessions
-                  </h2>
-                  <p className="text-xs text-neutral-500 dark:text-neutral-400">
-                    Manage persistent browser sessions logged into your ForexNotes account across devices
-                  </p>
-                </div>
-              </div>
-
-              {sessions.filter((s) => !s.isCurrent).length > 0 && (
-                <button
-                  type="button"
-                  onClick={handleRevokeOtherSessions}
-                  disabled={revokingAll}
-                  className="px-3 py-1.5 rounded-xl border border-rose-500/30 bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-50"
-                >
-                  {revokingAll ? (
-                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                  ) : (
-                    <LogOut className="w-3.5 h-3.5" />
-                  )}
-                  <span>Log Out All Other Devices</span>
-                </button>
-              )}
-            </div>
-
-            {loadingSessions ? (
-              <div className="py-8 flex items-center justify-center text-neutral-400 text-xs gap-2">
-                <Loader2 className="w-4 h-4 animate-spin text-emerald-500" />
-                <span>Loading active devices...</span>
-              </div>
-            ) : sessions.length === 0 ? (
-              <div className="py-6 text-center text-xs text-neutral-500">
-                No extra active sessions recorded. Current session is authenticated.
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {sessions.map((s) => {
-                  const isMobile = /iPhone|Android|iPad/i.test(s.deviceName);
-                  const DeviceIcon = isMobile ? Smartphone : Laptop;
-                  const formattedDate = s.lastActiveAt
-                    ? new Date(s.lastActiveAt).toLocaleString(undefined, {
-                        month: "short",
-                        day: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })
-                    : "Recently";
-
-                  return (
-                    <div
-                      key={s.id}
-                      className={`p-4 rounded-2xl border transition-all flex items-center justify-between gap-4 flex-wrap ${
-                        s.isCurrent
-                          ? "bg-emerald-500/[0.04] dark:bg-emerald-500/[0.06] border-emerald-500/30 ring-1 ring-emerald-500/20"
-                          : "bg-neutral-50 dark:bg-white/[0.02] border-black/[0.06] dark:border-white/[0.06]"
-                      }`}
-                    >
-                      <div className="flex items-center gap-3.5">
-                        <div
-                          className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-                            s.isCurrent
-                              ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20"
-                              : "bg-black/[0.04] dark:bg-white/[0.04] text-neutral-600 dark:text-neutral-400 border border-black/[0.06] dark:border-white/[0.08]"
-                          }`}
-                        >
-                          <DeviceIcon className="w-5 h-5" />
-                        </div>
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm font-bold text-neutral-900 dark:text-white">
-                              {s.deviceName}
-                            </span>
-                            {s.isCurrent && (
-                              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
-                                This Device
-                              </span>
-                            )}
-                          </div>
-                          <div className="flex items-center gap-2 text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
-                            <span>IP: {s.ipAddress}</span>
-                            <span>•</span>
-                            <span>Last active: {s.isCurrent ? "Active now" : formattedDate}</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      {!s.isCurrent && (
-                        <button
-                          type="button"
-                          onClick={() => handleRevokeSession(s.id)}
-                          disabled={revokingId === s.id}
-                          className="px-3 py-1.5 rounded-xl border border-black/[0.08] dark:border-white/[0.1] bg-white dark:bg-white/[0.04] hover:bg-rose-500/10 hover:border-rose-500/30 hover:text-rose-500 text-xs font-semibold text-neutral-700 dark:text-neutral-300 transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
-                          title="Revoke and log out this device"
-                        >
-                          {revokingId === s.id ? (
-                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                          ) : (
-                            <LogOut className="w-3.5 h-3.5" />
-                          )}
-                          <span>Revoke / Log out this device</span>
-                        </button>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
+          {renderActiveDevicesCard()}
 
           {/* ── 4. DANGER ZONE ── */}
           <div className="rounded-3xl p-6 bg-rose-500/[0.03] dark:bg-rose-500/[0.05] border border-rose-500/20 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] space-y-3">
