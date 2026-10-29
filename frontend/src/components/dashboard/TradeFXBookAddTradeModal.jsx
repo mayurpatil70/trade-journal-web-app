@@ -26,7 +26,7 @@ export default function TradeFXBookAddTradeModal({ isOpen, onClose, onTradeAdded
   const disciplineRules = useMemo(() => {
     try {
       return JSON.parse(localStorage.getItem(`trader_discipline_${userId}`) || "{}");
-    } catch (e) {
+    } catch {
       return {};
     }
   }, [userId]);
@@ -175,7 +175,6 @@ export default function TradeFXBookAddTradeModal({ isOpen, onClose, onTradeAdded
 
       // Compute result if exit price is provided
       let result = "open";
-      let rMultiple = 0;
       const numEntry = Number(entryPrice);
       const numExit = exitPrice ? Number(exitPrice) : null;
       
