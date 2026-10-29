@@ -3,14 +3,16 @@
 // Styled with institutional IB Card aesthetics, transparent FN 3D logo, and responsive layouts
 // Generates Story (1080x1920), Post (1080x1080), and Landscape (1920x1080) shareable posters
 
-import { useState, useRef, useEffect, useMemo } from "react";
-import { X, Download, Share2, Check } from "lucide-react";
+import { useState, useRef, useEffect, useMemo, useCallback } from "react";
+import { X, Download, Share2, Check, Loader2 } from "lucide-react";
 
 export default function TradeShareModal({ isOpen, onClose, trade }) {
   const [aspect, setAspect] = useState("post"); // "post" | "story" | "landscape"
   const [isGenerating, setIsGenerating] = useState(false);
   const [copied, setCopied] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
+  const [previewDataUrl, setPreviewDataUrl] = useState(null);
+  const [isRenderingPreview, setIsRenderingPreview] = useState(true);
 
   // Fetch logged-in user profile info
   const userInfo = useMemo(() => {
@@ -219,10 +221,10 @@ export default function TradeShareModal({ isOpen, onClose, trade }) {
       logoImg = null;
     }
 
-    // Draw Top-Left Brand Header with Transparent Logo
-    const padX = targetWidth * 0.07;
-    const topY = targetHeight * 0.07;
-    const logoSize = Math.max(72, targetWidth * 0.085);
+    const baseDim = Math.min(targetWidth, targetHeight);
+    const padX = targetWidth * (aspect === "landscape" ? 0.055 : 0.07);
+    const topY = targetHeight * (aspect === "story" ? 0.05 : 0.07);
+    const logoSize = Math.max(64, Math.round(baseDim * 0.082));
 
     if (logoImg && logoImg.width > 0) {
       ctx.drawImage(logoImg, padX, topY, logoSize, logoSize);
@@ -230,48 +232,48 @@ export default function TradeShareModal({ isOpen, onClose, trade }) {
 
     const brandTextX = padX + (logoImg && logoImg.width > 0 ? logoSize + 16 : 0);
     ctx.fillStyle = "#ffffff";
-    ctx.font = `900 ${Math.round(targetWidth * 0.038)}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
+    ctx.font = `900 ${Math.round(baseDim * 0.038)}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
     ctx.fillText("ForexNotes", brandTextX, topY + logoSize * 0.46);
 
-    ctx.fillStyle = "rgba(255, 255, 255, 0.55)";
-    ctx.font = `600 ${Math.round(targetWidth * 0.018)}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
+    ctx.fillStyle = "rgba(255, 255, 255, 0.65)";
+    ctx.font = `600 ${Math.round(baseDim * 0.018)}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
     ctx.fillText("Track Trades. Analyze PnL. Master Markets.", brandTextX, topY + logoSize * 0.82);
 
     // Top-Right Institutional Badge (IB Card style)
-    const rightPillX = targetWidth * 0.93;
+    const rightPillX = targetWidth - padX;
     const badgeText = "VERIFIED TRADE";
-    ctx.font = `800 ${Math.round(targetWidth * 0.016)}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
+    ctx.font = `800 ${Math.round(baseDim * 0.016)}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
     const badgeWidth = ctx.measureText(badgeText).width + 28;
-    const badgeHeight = Math.round(targetWidth * 0.036);
+    const badgeHeight = Math.round(baseDim * 0.036);
 
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.18)";
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.22)";
     ctx.lineWidth = 1.5;
-    ctx.fillStyle = "rgba(255, 255, 255, 0.04)";
+    ctx.fillStyle = "rgba(255, 255, 255, 0.06)";
     ctx.beginPath();
-    ctx.roundRect(rightPillX - badgeWidth, topY + 6, badgeWidth, badgeHeight, badgeHeight / 2);
+    ctx.roundRect(rightPillX - badgeWidth, topY + 4, badgeWidth, badgeHeight, badgeHeight / 2);
     ctx.fill();
     ctx.stroke();
 
-    ctx.fillStyle = "rgba(255, 255, 255, 0.85)";
+    ctx.fillStyle = "#ffffff";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillText(badgeText, rightPillX - badgeWidth / 2, topY + 6 + badgeHeight / 2);
+    ctx.fillText(badgeText, rightPillX - badgeWidth / 2, topY + 4 + badgeHeight / 2);
 
     // Reset alignment
     ctx.textAlign = "left";
     ctx.textBaseline = "alphabetic";
 
     // 5. Body Section: Trade Performance
-    const bodyY = targetHeight * (aspect === "story" ? 0.32 : aspect === "landscape" ? 0.36 : 0.34);
+    const bodyY = targetHeight * (aspect === "story" ? 0.30 : aspect === "landscape" ? 0.32 : 0.33);
 
     // Category Pill / Tag
     ctx.fillStyle = tradeMetrics.isProfit ? "#38bdf8" : "#fb7185";
-    ctx.font = `800 ${Math.round(targetWidth * 0.02)}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
+    ctx.font = `800 ${Math.round(baseDim * 0.02)}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
     ctx.fillText("TRADE PERFORMANCE", padX, bodyY);
 
     // Subtitle Execution Bar: [Sell / Buy] | [Lots] | [Symbol]
-    const subY = bodyY + targetHeight * 0.045;
-    const subFontSize = Math.round(targetWidth * 0.026);
+    const subY = bodyY + targetHeight * (aspect === "story" ? 0.035 : 0.048);
+    const subFontSize = Math.round(baseDim * 0.026);
     ctx.font = `800 ${subFontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace`;
 
     // Direction Pill
@@ -283,7 +285,7 @@ export default function TradeShareModal({ isOpen, onClose, trade }) {
     ctx.fillText("  |  ", padX + dirW, subY);
     const sep1W = ctx.measureText("  |  ").width;
 
-    ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
+    ctx.fillStyle = "rgba(255, 255, 255, 0.85)";
     const lotsText = `${tradeMetrics.lots} Lots`;
     ctx.fillText(lotsText, padX + dirW + sep1W, subY);
     const lotsW = ctx.measureText(lotsText).width;
@@ -296,61 +298,63 @@ export default function TradeShareModal({ isOpen, onClose, trade }) {
     ctx.fillText(tradeMetrics.symbol, padX + dirW + sep1W + lotsW + sep2W, subY);
 
     // Giant Hero P&L Headline
-    const heroY = subY + targetHeight * 0.11;
-    ctx.font = `900 ${Math.round(targetWidth * 0.088)}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
+    const heroY = subY + targetHeight * (aspect === "story" ? 0.08 : 0.11);
+    ctx.font = `900 ${Math.round(baseDim * 0.088)}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
     ctx.fillStyle = tradeMetrics.isProfit ? "#38bdf8" : "#fb7185";
     ctx.fillText(tradeMetrics.formattedPnl, padX, heroY);
 
     // 6. Bento Metrics Boxes (Entry & Exit Prices)
-    const bentoY = heroY + targetHeight * 0.07;
-    const boxWidth = targetWidth * 0.38;
-    const boxHeight = targetHeight * (aspect === "story" ? 0.09 : 0.13);
-    const box2X = padX + boxWidth + 18;
+    const bentoY = heroY + targetHeight * (aspect === "story" ? 0.05 : 0.065);
+    const boxWidth = (targetWidth - padX * 2 - (aspect === "landscape" ? 32 : 18)) / (aspect === "landscape" ? 2.5 : 2);
+    const boxHeight = targetHeight * (aspect === "story" ? 0.08 : 0.13);
+    const box2X = padX + boxWidth + (aspect === "landscape" ? 32 : 18);
 
     // Draw Box 1 (Entry)
-    ctx.fillStyle = "rgba(255, 255, 255, 0.035)";
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.08)";
+    ctx.fillStyle = "rgba(255, 255, 255, 0.04)";
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
     ctx.lineWidth = 1.5;
     ctx.beginPath();
     ctx.roundRect(padX, bentoY, boxWidth, boxHeight, 18);
     ctx.fill();
     ctx.stroke();
 
-    ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
-    ctx.font = `700 ${Math.round(targetWidth * 0.018)}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
-    ctx.fillText("ENTRY PRICE", padX + 22, bentoY + boxHeight * 0.4);
+    ctx.fillStyle = "rgba(255, 255, 255, 0.55)";
+    ctx.font = `700 ${Math.round(baseDim * 0.018)}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
+    ctx.fillText("ENTRY PRICE", padX + 22, bentoY + boxHeight * 0.38);
 
     ctx.fillStyle = "#ffffff";
-    ctx.font = `800 ${Math.round(targetWidth * 0.034)}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace`;
-    ctx.fillText(tradeMetrics.entryPrice, padX + 22, bentoY + boxHeight * 0.82);
+    ctx.font = `800 ${Math.round(baseDim * 0.034)}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace`;
+    ctx.fillText(tradeMetrics.entryPrice, padX + 22, bentoY + boxHeight * 0.80);
 
     // Draw Box 2 (Exit)
-    ctx.fillStyle = "rgba(255, 255, 255, 0.035)";
+    ctx.fillStyle = "rgba(255, 255, 255, 0.04)";
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
+    ctx.lineWidth = 1.5;
     ctx.beginPath();
     ctx.roundRect(box2X, bentoY, boxWidth, boxHeight, 18);
     ctx.fill();
     ctx.stroke();
 
-    ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
-    ctx.font = `700 ${Math.round(targetWidth * 0.018)}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
-    ctx.fillText("EXIT PRICE", box2X + 22, bentoY + boxHeight * 0.4);
+    ctx.fillStyle = "rgba(255, 255, 255, 0.55)";
+    ctx.font = `700 ${Math.round(baseDim * 0.018)}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
+    ctx.fillText("EXIT PRICE", box2X + 22, bentoY + boxHeight * 0.38);
 
     ctx.fillStyle = "#ffffff";
-    ctx.font = `800 ${Math.round(targetWidth * 0.034)}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace`;
-    ctx.fillText(tradeMetrics.exitPrice, box2X + 22, bentoY + boxHeight * 0.82);
+    ctx.font = `800 ${Math.round(baseDim * 0.034)}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace`;
+    ctx.fillText(tradeMetrics.exitPrice, box2X + 22, bentoY + boxHeight * 0.80);
 
     // 7. Hairline Separator Line
-    const sepLineY = targetHeight * 0.86;
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.08)";
+    const sepLineY = targetHeight * 0.85;
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(padX, sepLineY);
-    ctx.lineTo(targetWidth * 0.93, sepLineY);
+    ctx.lineTo(targetWidth - padX, sepLineY);
     ctx.stroke();
 
     // 8. Footer: User Avatar & Metadata (Left) + Transparent Logo Watermark (Right)
-    const footerY = sepLineY + targetHeight * 0.03;
-    const avatarSize = Math.max(56, targetWidth * 0.065);
+    const footerY = sepLineY + targetHeight * 0.025;
+    const avatarSize = Math.max(52, Math.round(baseDim * 0.065));
     const avatarX = padX;
     const avatarY = footerY;
 
@@ -415,16 +419,16 @@ export default function TradeShareModal({ isOpen, onClose, trade }) {
     ctx.textBaseline = "alphabetic";
 
     ctx.fillStyle = "#ffffff";
-    ctx.font = `800 ${Math.round(avatarSize * 0.42)}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
+    ctx.font = `800 ${Math.round(avatarSize * 0.44)}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
     ctx.fillText(`@${userInfo.name}`, userTextX, avatarY + avatarSize * 0.45);
 
-    ctx.fillStyle = "rgba(255, 255, 255, 0.45)";
-    ctx.font = `600 ${Math.round(avatarSize * 0.28)}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace`;
+    ctx.fillStyle = "rgba(255, 255, 255, 0.55)";
+    ctx.font = `600 ${Math.round(avatarSize * 0.30)}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace`;
     ctx.fillText(tradeMetrics.dateStr, userTextX, avatarY + avatarSize * 0.88);
 
     // Bottom-Right Watermark: In place of raw "FN", render the 3D transparent Logo!
     const wmLogoSize = avatarSize * 0.95;
-    const wmX = targetWidth * 0.93 - wmLogoSize;
+    const wmX = targetWidth - padX - wmLogoSize;
     const wmY = avatarY;
 
     if (logoImg && logoImg.width > 0) {
@@ -433,7 +437,7 @@ export default function TradeShareModal({ isOpen, onClose, trade }) {
       ctx.textAlign = "right";
       ctx.font = `900 ${Math.round(avatarSize * 0.65)}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
       ctx.fillStyle = "rgba(255, 255, 255, 0.85)";
-      ctx.fillText("ForexNotes", targetWidth * 0.93, avatarY + avatarSize * 0.68);
+      ctx.fillText("ForexNotes", targetWidth - padX, avatarY + avatarSize * 0.68);
     }
 
     return canvas;
@@ -526,6 +530,28 @@ export default function TradeShareModal({ isOpen, onClose, trade }) {
     }
   };
 
+  // Synchronously update poster preview whenever aspect, trade or user changes
+  useEffect(() => {
+    let active = true;
+    const generatePreview = async () => {
+      setIsRenderingPreview(true);
+      try {
+        const canvas = await renderCardToCanvas(currentCfg.width, currentCfg.height);
+        if (active) {
+          setPreviewDataUrl(canvas.toDataURL("image/png"));
+        }
+      } catch (err) {
+        console.error("Preview render failed:", err);
+      } finally {
+        if (active) setIsRenderingPreview(false);
+      }
+    };
+    generatePreview();
+    return () => {
+      active = false;
+    };
+  }, [aspect, trade, userInfo]);
+
   return (
     <div
       className="fixed inset-0 z-[10000] flex items-center justify-center p-3 sm:p-4 bg-black/80 dark:bg-black/90 backdrop-blur-md animate-in fade-in duration-200 select-none"
@@ -550,140 +576,24 @@ export default function TradeShareModal({ isOpen, onClose, trade }) {
           </button>
         </div>
 
-        {/* Modal Content / Preview Area */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6 flex flex-col items-center justify-center bg-neutral-100/80 dark:bg-black/50">
-          {/* Card Preview Container */}
-          <div
-            className={`relative rounded-3xl overflow-hidden shadow-2xl border border-white/10 transition-all duration-300 ${currentCfg.previewClasses} flex flex-col justify-between p-4 sm:p-5 select-none text-white`}
-            style={{
-              background: "linear-gradient(155deg, #050914 0%, #0a1329 45%, #0d1b38 75%, #040710 100%)",
-            }}
-          >
-            {/* Subtle Grid Lines overlay */}
-            <div
-              className="absolute inset-0 pointer-events-none opacity-20"
-              style={{
-                backgroundImage:
-                  "linear-gradient(to right, rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.1) 1px, transparent 1px)",
-                backgroundSize: "22px 22px",
-              }}
-            />
-
-            {/* Glowing Arrow Backdrop */}
-            <div
-              className={`absolute -top-10 -right-10 w-44 h-44 rounded-full pointer-events-none blur-3xl ${
-                tradeMetrics.isProfit ? "bg-blue-500/25" : "bg-rose-500/25"
-              }`}
-            />
-
-            {/* Diagonal Vector Arrow */}
-            <div
-              className={`absolute top-5 right-5 w-20 h-20 sm:w-28 sm:h-28 pointer-events-none transition-transform ${
-                tradeMetrics.isProfit ? "text-blue-500/30" : "text-rose-500/30 rotate-90"
-              }`}
-            >
-              <svg viewBox="0 0 100 100" fill="currentColor" className="w-full h-full">
-                <path d="M 20 80 L 70 30 M 70 30 L 40 30 M 70 30 L 70 60" stroke="currentColor" strokeWidth="14" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-              </svg>
+        {/* Modal Content / Preview Area (Renders Exact Poster Image from Canvas) */}
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 flex flex-col items-center justify-center bg-neutral-100/90 dark:bg-black/60 min-h-[380px] sm:min-h-[460px]">
+          {isRenderingPreview || !previewDataUrl ? (
+            <div className="flex flex-col items-center justify-center py-16 gap-3">
+              <Loader2 className="w-8 h-8 text-[#0066FF] animate-spin" />
+              <span className="text-xs font-semibold text-neutral-500 dark:text-neutral-400">
+                Generating {currentCfg.label} poster preview...
+              </span>
             </div>
-
-            {/* Header: Transparent 3D Logo + ForexNotes Title + Institutional Pill */}
-            <div className="relative z-10 flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <img
-                  src="/brand/fn-logo.png"
-                  alt="ForexNotes Logo"
-                  className="w-9 h-9 sm:w-11 sm:h-11 object-contain drop-shadow-[0_8px_16px_rgba(0,0,0,0.5)]"
-                />
-                <div>
-                  <h4 className="text-xs sm:text-sm font-black tracking-tight text-white leading-tight">
-                    ForexNotes
-                  </h4>
-                  <p className="text-[8px] sm:text-[9px] font-medium text-white/60 tracking-tight leading-tight">
-                    Track Trades. Analyze PnL. Master Markets.
-                  </p>
-                </div>
-              </div>
-
-              {/* IB Card Style Institutional Pill */}
-              <div className="px-2.5 py-0.5 rounded-full border border-white/20 bg-white/[0.04] text-[9px] font-extrabold uppercase tracking-widest text-white/80">
-                VERIFIED
-              </div>
+          ) : (
+            <div className="relative group max-w-full flex items-center justify-center animate-in fade-in duration-200">
+              <img
+                src={previewDataUrl}
+                alt={`ForexNotes Trade Poster - ${currentCfg.label}`}
+                className="max-h-[50vh] sm:max-h-[56vh] max-w-[90vw] object-contain rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.4)] border border-black/10 dark:border-white/10"
+              />
             </div>
-
-            {/* Body: Section Header, direction, lots, hero P&L, bento boxes */}
-            <div className="relative z-10 my-auto py-2">
-              <p className={`text-[10px] sm:text-xs font-black uppercase tracking-widest mb-1 ${
-                tradeMetrics.isProfit ? "text-[#38bdf8]" : "text-rose-400"
-              }`}>
-                TRADE PERFORMANCE
-              </p>
-
-              {/* Subtitle Line: Sell | 0.2 Lots | XAUUSD */}
-              <div className="flex items-center gap-1.5 text-[10px] sm:text-xs font-mono font-bold mb-1.5">
-                <span className={`px-2 py-0.5 rounded-md text-[10px] uppercase font-black ${
-                  tradeMetrics.isSell ? "bg-rose-500/20 text-rose-400 border border-rose-500/30" : "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
-                }`}>
-                  {tradeMetrics.directionLabel}
-                </span>
-                <span className="text-white/40">•</span>
-                <span className="text-white/80">{tradeMetrics.lots} Lots</span>
-                <span className="text-white/40">•</span>
-                <span className="text-white font-extrabold tracking-tight">{tradeMetrics.symbol}</span>
-              </div>
-
-              {/* Big Hero P&L */}
-              <h2
-                className={`text-2xl sm:text-3xl md:text-4xl font-black tracking-tight mb-2 sm:mb-3 leading-tight ${
-                  tradeMetrics.isProfit ? "text-[#38bdf8] drop-shadow-[0_0_20px_rgba(56,189,248,0.35)]" : "text-[#fb7185] drop-shadow-[0_0_20px_rgba(251,113,133,0.35)]"
-                }`}
-              >
-                {tradeMetrics.formattedPnl}
-              </h2>
-
-              {/* Bento Metrics Box (IB Card Style) */}
-              <div className="grid grid-cols-2 gap-2 sm:gap-3 pt-1">
-                <div className="p-2 sm:p-2.5 rounded-xl sm:rounded-2xl bg-white/[0.035] border border-white/[0.08]">
-                  <p className="text-[8px] sm:text-[9px] text-white/50 uppercase font-bold tracking-wider">ENTRY PRICE</p>
-                  <p className="text-xs sm:text-sm font-extrabold font-mono text-white mt-0.5">{tradeMetrics.entryPrice}</p>
-                </div>
-                <div className="p-2 sm:p-2.5 rounded-xl sm:rounded-2xl bg-white/[0.035] border border-white/[0.08]">
-                  <p className="text-[8px] sm:text-[9px] text-white/50 uppercase font-bold tracking-wider">EXIT PRICE</p>
-                  <p className="text-xs sm:text-sm font-extrabold font-mono text-white mt-0.5">{tradeMetrics.exitPrice}</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Footer: User Profile + Transparent 3D Logo Watermark (In Place of FN) */}
-            <div className="relative z-10 flex items-center justify-between pt-2 border-t border-white/10">
-              <div className="flex items-center gap-2 min-w-0">
-                {userInfo.avatar ? (
-                  <img
-                    src={userInfo.avatar}
-                    alt={userInfo.name}
-                    className="w-7 h-7 sm:w-8 sm:h-8 rounded-full object-cover ring-2 ring-white/30"
-                  />
-                ) : (
-                  <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-tr from-[#0066FF] to-sky-400 flex items-center justify-center text-white text-[10px] font-bold ring-2 ring-white/30">
-                    {(userInfo.name || "T")[0].toUpperCase()}
-                  </div>
-                )}
-                <div className="truncate">
-                  <p className="text-[11px] sm:text-xs font-bold text-white truncate leading-tight">@{userInfo.name}</p>
-                  <p className="text-[9px] sm:text-[10px] font-mono text-white/50 leading-tight">{tradeMetrics.dateStr}</p>
-                </div>
-              </div>
-
-              {/* 3D Transparent Logo Watermark */}
-              <div className="flex items-center gap-1.5 opacity-90">
-                <img
-                  src="/brand/fn-logo.png"
-                  alt="ForexNotes"
-                  className="w-6 h-6 sm:w-7 sm:h-7 object-contain drop-shadow-sm"
-                />
-              </div>
-            </div>
-          </div>
+          )}
         </div>
 
         {/* Aspect Ratio Selector Tabs */}
@@ -714,9 +624,9 @@ export default function TradeShareModal({ isOpen, onClose, trade }) {
         <div className="p-4 sm:p-6 bg-white dark:bg-[#121622] border-t border-black/[0.06] dark:border-white/[0.08] flex items-center gap-3">
           <button
             type="button"
-            disabled={isGenerating}
+            disabled={isGenerating || isRenderingPreview}
             onClick={handleDownload}
-            className="flex-1 py-3 px-4 rounded-xl border border-black/[0.08] dark:border-white/10 bg-neutral-100 dark:bg-white/[0.06] hover:bg-neutral-200 dark:hover:bg-white/[0.1] text-neutral-900 dark:text-white text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50 shadow-xs"
+            className="flex-1 py-3 px-4 rounded-xl border border-black/[0.1] dark:border-white/10 bg-neutral-100 dark:bg-white/[0.06] hover:bg-neutral-200 dark:hover:bg-white/[0.1] text-neutral-900 dark:text-white text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50 shadow-xs"
           >
             <Download className="w-4 h-4" />
             <span>{isGenerating ? "Exporting..." : "Download"}</span>
@@ -724,12 +634,13 @@ export default function TradeShareModal({ isOpen, onClose, trade }) {
 
           <button
             type="button"
-            disabled={isGenerating}
+            disabled={isGenerating || isRenderingPreview}
             onClick={handleShare}
-            className="flex-1 py-3 px-4 rounded-xl bg-[#0066FF] hover:bg-[#0052cc] text-white text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50 shadow-md shadow-blue-500/25"
+            style={{ backgroundColor: "#0066FF", color: "#ffffff" }}
+            className="flex-1 py-3 px-4 rounded-xl bg-[#0066FF] hover:bg-[#0052cc] text-white text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50 shadow-md shadow-blue-500/25 btn-primary-blue"
           >
-            {copied ? <Check className="w-4 h-4" /> : <Share2 className="w-4 h-4" />}
-            <span>{copied ? "Copied!" : "Share"}</span>
+            {copied ? <Check className="w-4 h-4 text-white" /> : <Share2 className="w-4 h-4 text-white" />}
+            <span className="text-white font-bold">{copied ? "Copied!" : "Share"}</span>
           </button>
         </div>
 

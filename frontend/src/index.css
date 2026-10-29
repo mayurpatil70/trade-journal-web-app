@@ -1197,7 +1197,10 @@ html.light
   [class*="bg-black/"]:not([class*="fixed"]):not([class*="absolute"]) {
   background-color: rgb(0 0 0 / 0.04) !important;
 }
-html.light body:not(.terminal) [class*="bg-[#"][class*="/"] {
+/* Only convert dark hex backgrounds with opacity (e.g. bg-[#101216]/50) to light surface in light mode; never touch bright blue buttons */
+html.light body:not(.terminal) :not(button):not(a):not(.share-poster-preview):not(.share-poster-preview *)[class*="bg-[#0"][class*="/"],
+html.light body:not(.terminal) :not(button):not(a):not(.share-poster-preview):not(.share-poster-preview *)[class*="bg-[#1"][class*="/"],
+html.light body:not(.terminal) :not(button):not(a):not(.share-poster-preview):not(.share-poster-preview *)[class*="bg-[#2"][class*="/"] {
   background-color: var(--surface-raised) !important;
 }
 html.light body:not(.terminal) [class*="border-gray-"] {
@@ -1552,13 +1555,36 @@ video::-moz-media-controls {
 
 
 
-/* Ensure report an issue & primary blue buttons maintain pure white text in both light & dark themes */
-button[class*="bg-[#0066FF]"],
-button[class*="bg-[#0066FF]"] *,
-button[class*="bg-[#0052CC]"],
-button[class*="bg-[#0052CC]"] * {
+/* Primary Blue Button & Action Buttons Protection (Light & Dark Mode) */
+button[class*="bg-[#0066"],
+button[class*="bg-[#0052"],
+button[class*="bg-blue-600"],
+button.btn-primary-blue,
+.btn-primary-blue {
+  background-color: #0066FF !important;
+  color: #ffffff !important;
+}
+button[class*="bg-[#0066"]:hover,
+button[class*="bg-[#0052"]:hover,
+button[class*="bg-blue-600"]:hover,
+button.btn-primary-blue:hover {
+  background-color: #0052CC !important;
+  color: #ffffff !important;
+}
+button[class*="bg-[#0066"] *,
+button[class*="bg-[#0052"] *,
+button[class*="bg-blue-600"] *,
+button.btn-primary-blue *,
+.btn-primary-blue * {
   color: #ffffff !important;
   fill: #ffffff !important;
+  stroke: #ffffff !important;
+}
+
+/* Share Trade Poster Preview Protection */
+.share-poster-preview,
+.share-poster-preview * {
+  text-shadow: none;
 }
 
 /* WinPro Partnership Card High-Contrast Overrides */

@@ -1718,7 +1718,7 @@ export default function Profile({ defaultTab }) {
                       <h3 className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest mb-2 flex items-center gap-2">
                         <Target className="w-3.5 h-3.5" /> Analysis & Reason
                       </h3>
-                      <p className="text-xs text-neutral-700 dark:text-neutral-300 leading-relaxed bg-black/[0.025] dark:bg-white/[0.04] border border-black/[0.05] dark:border-white/[0.08] p-4 rounded-2xl min-h-[90px] whitespace-pre-wrap font-medium">
+                      <p className="text-xs text-neutral-900 dark:text-neutral-100 leading-relaxed bg-neutral-50 dark:bg-white/[0.04] border border-black/10 dark:border-white/10 p-4 rounded-2xl min-h-[90px] whitespace-pre-wrap font-medium shadow-xs">
                         {selectedTrade.reason || "No analysis recorded."}
                       </p>
                     </div>
@@ -1726,7 +1726,7 @@ export default function Profile({ defaultTab }) {
                       <h3 className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest mb-2 flex items-center gap-2">
                         <TrendingUp className="w-3.5 h-3.5" /> Key Lesson
                       </h3>
-                      <p className="text-xs text-neutral-700 dark:text-neutral-300 leading-relaxed bg-black/[0.025] dark:bg-white/[0.04] border border-black/[0.05] dark:border-white/[0.08] p-4 rounded-2xl min-h-[90px] whitespace-pre-wrap font-medium">
+                      <p className="text-xs text-neutral-900 dark:text-neutral-100 leading-relaxed bg-neutral-50 dark:bg-white/[0.04] border border-black/10 dark:border-white/10 p-4 rounded-2xl min-h-[90px] whitespace-pre-wrap font-medium shadow-xs">
                         {selectedTrade.lesson || "No lesson recorded."}
                       </p>
                     </div>

@@ -1,18 +1,21 @@
 // frontend/scripts/remove-white-bg.cjs
-const sharp = require('sharp');
-const path = require('path');
-const fs = require('fs');
+const sharp = require("sharp");
+const path = require("path");
+const fs = require("fs");
 
 async function processLogo() {
-  const inputPath = path.resolve(__dirname, '../public/brand/fn-logo.jpg');
-  const outputPath = path.resolve(__dirname, '../public/brand/fn-logo.png');
+  const inputPath = path.resolve(__dirname, "../public/brand/fn-logo.jpg");
+  const outputPath = path.resolve(__dirname, "../public/brand/fn-logo.png");
 
-  console.log('Processing logo from:', inputPath);
+  console.log("Processing logo from:", inputPath);
 
   // Get raw RGBA buffer
   const image = sharp(inputPath);
   const metadata = await image.metadata();
-  const { data, info } = await image.raw().ensureAlpha().toBuffer({ resolveWithObject: true });
+  const { data, info } = await image
+    .raw()
+    .ensureAlpha()
+    .toBuffer({ resolveWithObject: true });
 
   const { width, height, channels } = info;
   console.log(`Dimensions: ${width}x${height}, channels: ${channels}`);
@@ -50,8 +53,8 @@ async function processLogo() {
     .png({ compressionLevel: 9, adaptiveFiltering: true })
     .toFile(outputPath);
 
-  console.log('Successfully saved transparent logo to:', outputPath);
-  console.log('Output file size:', fs.statSync(outputPath).size, 'bytes');
+  console.log("Successfully saved transparent logo to:", outputPath);
+  console.log("Output file size:", fs.statSync(outputPath).size, "bytes");
 }
 
 processLogo().catch(console.error);

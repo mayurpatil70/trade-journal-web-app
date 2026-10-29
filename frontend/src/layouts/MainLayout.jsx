@@ -878,7 +878,7 @@ export default function MainLayout() {
                       setSupportModalMode("new");
                       setIsSupportModalOpen(true);
                     }}
-                    style={{ color: "#ffffff" }} className="w-full py-2.5 px-3 rounded-xl bg-[#0066FF] hover:bg-[#0052CC] text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-[0_2px_8px_rgba(0,102,255,0.25)] active:scale-[0.98] transition-all cursor-pointer"
+                    style={{ backgroundColor: "#0066FF", color: "#ffffff" }} className="w-full py-2.5 px-3 rounded-xl bg-[#0066FF] hover:bg-[#0052CC] text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-[0_2px_8px_rgba(0,102,255,0.25)] active:scale-[0.98] transition-all cursor-pointer btn-primary-blue"
                   >
                     <span style={{ color: "#ffffff" }} className="text-white font-bold">Report an issue</span>
                     <ArrowUpRight className="w-3.5 h-3.5 stroke-[2.5] text-white" style={{ color: "#ffffff" }} />

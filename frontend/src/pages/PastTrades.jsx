@@ -720,10 +720,11 @@ export default function PastTrades() {
           <button
             type="button"
             onClick={() => setIsAddTradeModalOpen(true)}
-            className="h-10 px-4 rounded-xl bg-[#0066FF] hover:bg-[#0052CC] text-white font-bold text-xs sm:text-sm tracking-wide shadow-md shadow-[#0066FF]/20 active:scale-[0.98] transition-all cursor-pointer flex items-center gap-1.5"
+            style={{ backgroundColor: "#0066FF", color: "#ffffff" }}
+            className="h-10 px-4 rounded-xl bg-[#0066FF] hover:bg-[#0052CC] text-white font-bold text-xs sm:text-sm tracking-wide shadow-md shadow-[#0066FF]/25 active:scale-[0.98] transition-all cursor-pointer flex items-center gap-1.5 btn-primary-blue"
           >
-            <Plus className="w-4 h-4 stroke-[2.5]" />
-            <span>Add Trade</span>
+            <Plus className="w-4 h-4 stroke-[2.5] text-white" />
+            <span className="text-white font-bold">Add Trade</span>
           </button>
         </div>
       </div>
@@ -784,41 +785,37 @@ export default function PastTrades() {
               <span>Export</span>
             </button>
 
-            {/* ── VIEW POPOVER MODAL (Matches Screenshots 1 & 3 Exactly) ── */}
+            {/* ── VIEW POPOVER MODAL (Apple Squircle Dropdown) ── */}
             {isViewOpen && (
               <div
                 ref={viewPopoverRef}
-                className="absolute right-0 top-full mt-2 w-[620px] max-w-[92vw] bg-white dark:bg-[#121622] rounded-2xl border border-black/[0.08] dark:border-white/[0.12] shadow-2xl z-[100] p-5 font-sans animate-in zoom-in-95 duration-150"
+                className="absolute right-0 top-full mt-2 w-[620px] max-w-[92vw] bg-white dark:bg-[#111522] rounded-3xl border border-black/10 dark:border-white/15 shadow-[0_25px_60px_rgba(0,0,0,0.2)] dark:shadow-[0_30px_70px_rgba(0,0,0,0.85)] z-[1000] p-5 sm:p-6 font-sans animate-in zoom-in-95 duration-150 backdrop-blur-2xl"
               >
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5 divide-y md:divide-y-0 md:divide-x divide-black/[0.06] dark:divide-white/[0.08]">
                   {/* ── LEFT COLUMN: COLUMNS · X OF 16 ── */}
                   <div className="space-y-3 md:pr-4">
-                    <div className="flex items-center justify-between pb-1">
-                      <span className="text-[11px] font-black uppercase tracking-wider text-neutral-900 dark:text-white">
+                    <div className="flex items-center justify-between pb-1 border-b border-black/[0.05] dark:border-white/[0.06]">
+                      <span className="text-xs font-black uppercase tracking-wider text-neutral-900 dark:text-white">
                         COLUMNS · {visibleColumns.length} OF {ALL_COLUMNS.length}
                       </span>
                       <button
                         type="button"
                         onClick={handleToggleShowAllColumns}
-                        className="text-xs font-bold text-[#0066FF] hover:underline cursor-pointer"
+                        className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
                       >
                         {visibleColumns.length === ALL_COLUMNS.length ? "Hide extra" : "Show all"}
                       </button>
                     </div>
 
                     {/* Columns Checklist */}
-                    <div className="space-y-1.5 max-h-[320px] overflow-y-auto pr-1">
+                    <div className="space-y-1 max-h-[320px] overflow-y-auto pr-1">
                       {ALL_COLUMNS.map((col) => {
                         const isChecked = visibleColumns.includes(col.id);
                         return (
                           <div
                             key={col.id}
                             onClick={() => handleToggleColumn(col.id)}
-                            className={`flex items-center gap-2.5 p-1.5 rounded-lg transition-colors cursor-pointer select-none ${
-                              isChecked
-                                ? "hover:bg-black/[0.02] dark:hover:bg-white/[0.04]"
-                                : "hover:bg-black/[0.02] dark:hover:bg-white/[0.04] opacity-75"
-                            }`}
+                            className="flex items-center gap-2.5 p-2 rounded-xl transition-colors cursor-pointer select-none hover:bg-black/[0.03] dark:hover:bg-white/[0.06]"
                           >
                             <GripVertical className="w-3.5 h-3.5 text-neutral-400 shrink-0 cursor-grab" />
                             <input
@@ -826,11 +823,13 @@ export default function PastTrades() {
                               checked={isChecked}
                               disabled={col.required}
                               onChange={() => {}}
-                              className={`w-3.5 h-3.5 rounded accent-[#0066FF] cursor-pointer ${
+                              className={`w-4 h-4 rounded accent-blue-600 cursor-pointer ${
                                 col.required ? "opacity-60 cursor-not-allowed" : ""
                               }`}
                             />
-                            <span className="text-xs font-medium text-neutral-800 dark:text-neutral-200">
+                            <span className={`text-xs font-semibold ${
+                              isChecked ? "text-neutral-900 dark:text-white" : "text-neutral-600 dark:text-neutral-400"
+                            }`}>
                               {col.label}
                             </span>
                           </div>
@@ -843,7 +842,7 @@ export default function PastTrades() {
                   <div className="space-y-4 md:pl-5 pt-4 md:pt-0">
                     {/* 1. SORT Section */}
                     <div>
-                      <span className="text-[11px] font-black uppercase tracking-wider text-neutral-900 dark:text-white block mb-1">
+                      <span className="text-xs font-black uppercase tracking-wider text-neutral-900 dark:text-white block mb-1">
                         SORT
                       </span>
                       <p className="text-[11px] text-neutral-500 dark:text-neutral-400 leading-snug mb-2">
@@ -853,7 +852,7 @@ export default function PastTrades() {
                       <select
                         value={sortBy}
                         onChange={(e) => setSortBy(e.target.value)}
-                        className="w-full bg-white dark:bg-[#181d2c] border border-black/[0.08] dark:border-white/10 rounded-xl px-3 py-2 text-xs font-semibold text-neutral-800 dark:text-neutral-200 outline-none focus:border-blue-500 cursor-pointer shadow-xs"
+                        className="w-full bg-neutral-100 dark:bg-[#181d2c] border border-black/10 dark:border-white/15 rounded-xl px-3 py-2 text-xs font-semibold text-neutral-900 dark:text-white outline-none focus:border-blue-500 cursor-pointer shadow-xs"
                       >
                         <option value="">Sort by... (Default)</option>
                         {ALL_COLUMNS.map((c) => (
@@ -866,16 +865,16 @@ export default function PastTrades() {
 
                     {/* 2. DISPLAY Section */}
                     <div className="space-y-3 pt-1 border-t border-black/[0.05] dark:border-white/[0.06]">
-                      <span className="text-[11px] font-black uppercase tracking-wider text-neutral-900 dark:text-white block">
+                      <span className="text-xs font-black uppercase tracking-wider text-neutral-900 dark:text-white block">
                         DISPLAY
                       </span>
 
                       {/* Row Height */}
                       <div className="flex items-center justify-between text-xs">
-                        <span className="text-neutral-600 dark:text-neutral-400 font-medium">
+                        <span className="text-neutral-700 dark:text-neutral-300 font-semibold">
                           Row height
                         </span>
-                        <div className="flex items-center bg-black/[0.04] dark:bg-white/[0.05] p-0.5 rounded-xl">
+                        <div className="flex items-center bg-neutral-100 dark:bg-white/[0.06] p-0.5 rounded-xl border border-black/[0.05] dark:border-white/[0.08]">
                           {["compact", "default", "relaxed"].map((opt) => (
                             <button
                               key={opt}
@@ -883,7 +882,7 @@ export default function PastTrades() {
                               onClick={() => setRowHeight(opt)}
                               className={`px-2.5 py-1 rounded-lg text-xs font-bold capitalize transition-all cursor-pointer ${
                                 rowHeight === opt
-                                  ? "bg-blue-100 dark:bg-blue-500/20 text-[#0066FF] dark:text-blue-400 shadow-xs"
+                                  ? "bg-blue-600 text-white shadow-xs"
                                   : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
                               }`}
                             >
@@ -895,18 +894,18 @@ export default function PastTrades() {
 
                       {/* Trades per page */}
                       <div className="flex items-center justify-between text-xs">
-                        <span className="text-neutral-600 dark:text-neutral-400 font-medium">
+                        <span className="text-neutral-700 dark:text-neutral-300 font-semibold">
                           Trades per page
                         </span>
-                        <div className="flex items-center bg-black/[0.04] dark:bg-white/[0.05] p-0.5 rounded-xl">
+                        <div className="flex items-center bg-neutral-100 dark:bg-white/[0.06] p-0.5 rounded-xl border border-black/[0.05] dark:border-white/[0.08]">
                           {[10, 15, 25, 50, 100].map((num) => (
                             <button
                               key={num}
                               type="button"
                               onClick={() => setTradesPerPage(num)}
-                              className={`px-2 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                              className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                                 tradesPerPage === num
-                                  ? "bg-blue-100 dark:bg-blue-500/20 text-[#0066FF] dark:text-blue-400 shadow-xs"
+                                  ? "bg-blue-600 text-white shadow-xs"
                                   : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
                               }`}
                             >
@@ -918,14 +917,14 @@ export default function PastTrades() {
 
                       {/* Filter under each column Toggle */}
                       <div className="flex items-center justify-between text-xs pt-1">
-                        <span className="text-neutral-600 dark:text-neutral-400 font-medium">
+                        <span className="text-neutral-700 dark:text-neutral-300 font-semibold">
                           Filter under each column
                         </span>
                         <button
                           type="button"
                           onClick={() => setFilterUnderColumns((v) => !v)}
                           className={`w-10 h-6 rounded-full transition-colors p-0.5 cursor-pointer relative ${
-                            filterUnderColumns ? "bg-[#0066FF]" : "bg-neutral-300 dark:bg-white/20"
+                            filterUnderColumns ? "bg-blue-600" : "bg-neutral-300 dark:bg-neutral-700"
                           }`}
                         >
                           <span
@@ -939,7 +938,7 @@ export default function PastTrades() {
 
                     {/* 3. TIPS Section */}
                     <div className="space-y-1 pt-1 border-t border-black/[0.05] dark:border-white/[0.06]">
-                      <span className="text-[11px] font-black uppercase tracking-wider text-neutral-900 dark:text-white block">
+                      <span className="text-xs font-black uppercase tracking-wider text-neutral-900 dark:text-white block">
                         TIPS
                       </span>
                       <p className="text-[11px] text-neutral-500 dark:text-neutral-400 leading-relaxed">
@@ -957,7 +956,7 @@ export default function PastTrades() {
                   <button
                     type="button"
                     onClick={handleResetView}
-                    className="font-bold text-[#0066FF] hover:underline flex items-center gap-1 cursor-pointer"
+                    className="font-bold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 cursor-pointer"
                   >
                     <RotateCcw className="w-3.5 h-3.5" />
                     <span>Reset view</span>
@@ -968,21 +967,7 @@ export default function PastTrades() {
           </div>
         </div>
 
-        {/* ── 3. FREE PLAN NOTICE BANNER (Matches Screenshot 2 Exactly) ── */}
-        <div className="p-3.5 rounded-2xl bg-blue-50/70 dark:bg-blue-500/10 border border-blue-200/70 dark:border-blue-500/20 text-xs text-neutral-700 dark:text-neutral-300 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-          <p className="m-0 leading-relaxed">
-            Free plan loads <strong className="font-bold text-neutral-900 dark:text-white">your last 15 trades</strong>. Upgrade to Pro to unlock full history and longer timeframes.
-          </p>
-          <Link
-            to="/paywall"
-            className="text-[#0066FF] dark:text-blue-400 font-bold hover:underline shrink-0 flex items-center gap-1"
-          >
-            <span>Upgrade to Pro</span>
-            <ArrowUpRight className="w-3.5 h-3.5" />
-          </Link>
-        </div>
-
-        {/* ── 4. FILTERS DRAWER (Matches Screenshot 2 Exactly) ── */}
+        {/* ── 3. FILTERS DRAWER (Matches Screenshot 2 Exactly) ── */}
         {isFiltersOpen && (
           <div className="p-4 rounded-2xl bg-slate-50/70 dark:bg-white/[0.02] border border-black/[0.05] dark:border-white/[0.06] space-y-4 animate-in fade-in duration-150">
             {/* ROW 1: P&L and TYPE Filters */}
@@ -1110,100 +1095,17 @@ export default function PastTrades() {
               </div>
             </div>
 
-            {/* ROW 3: CONDITIONS & Clear All Filters */}
-            <div className="flex items-center justify-between gap-4 pt-1 flex-wrap text-xs">
-              <div className="flex items-center gap-3">
-                <span className="text-[11px] font-black uppercase tracking-wider text-neutral-400 dark:text-neutral-500">
-                  CONDITIONS
-                </span>
-                <button
-                  type="button"
-                  onClick={handleAddCondition}
-                  className="font-bold text-[#0066FF] hover:underline cursor-pointer flex items-center gap-1"
-                >
-                  <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
-                  <span>Add condition</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => alert("Condition group added.")}
-                  className="font-bold text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200 cursor-pointer flex items-center gap-1"
-                >
-                  <Layers className="w-3.5 h-3.5" />
-                  <span>Add group</span>
-                </button>
-              </div>
-
-              {/* Clear All Filters */}
+            {/* ROW 3: Clear All Filters */}
+            <div className="flex items-center justify-end pt-1">
               <button
                 type="button"
                 onClick={handleClearAllFilters}
-                className="text-neutral-500 hover:text-rose-500 font-semibold flex items-center gap-1 cursor-pointer transition-colors"
+                className="text-neutral-500 hover:text-rose-500 font-semibold flex items-center gap-1.5 cursor-pointer transition-colors text-xs"
               >
                 <X className="w-3.5 h-3.5" />
                 <span>Clear All Filters</span>
               </button>
             </div>
-
-            {/* Dynamic Condition Rows */}
-            {conditions.length > 0 && (
-              <div className="space-y-2 pt-2 border-t border-black/[0.04] dark:border-white/[0.04]">
-                {conditions.map((cond) => (
-                  <div key={cond.id} className="flex items-center gap-2 flex-wrap">
-                    <select
-                      value={cond.field}
-                      onChange={(e) => {
-                        const val = e.target.value;
-                        setConditions((prev) =>
-                          prev.map((c) => (c.id === cond.id ? { ...c, field: val } : c))
-                        );
-                      }}
-                      className="bg-white dark:bg-[#181d2c] border border-black/[0.08] dark:border-white/10 rounded-lg px-2.5 py-1 text-xs"
-                    >
-                      <option value="asset">Symbol</option>
-                      <option value="setup">Setup</option>
-                      <option value="session">Session</option>
-                      <option value="account_name">Account</option>
-                    </select>
-
-                    <select
-                      value={cond.operator}
-                      onChange={(e) => {
-                        const val = e.target.value;
-                        setConditions((prev) =>
-                          prev.map((c) => (c.id === cond.id ? { ...c, operator: val } : c))
-                        );
-                      }}
-                      className="bg-white dark:bg-[#181d2c] border border-black/[0.08] dark:border-white/10 rounded-lg px-2.5 py-1 text-xs"
-                    >
-                      <option value="equals">equals</option>
-                      <option value="contains">contains</option>
-                    </select>
-
-                    <input
-                      type="text"
-                      placeholder="Value..."
-                      value={cond.value}
-                      onChange={(e) => {
-                        const val = e.target.value;
-                        setConditions((prev) =>
-                          prev.map((c) => (c.id === cond.id ? { ...c, value: val } : c))
-                        );
-                      }}
-                      className="bg-white dark:bg-[#181d2c] border border-black/[0.08] dark:border-white/10 rounded-lg px-2.5 py-1 text-xs outline-none focus:border-blue-500"
-                    />
-
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveCondition(cond.id)}
-                      className="p-1 text-neutral-400 hover:text-rose-500 cursor-pointer"
-                    >
-                      <X className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
           </div>
         )}
 
@@ -1434,16 +1336,21 @@ export default function PastTrades() {
                         />
                       </td>
 
-                      {/* Expand Chevron */}
+                      {/* Expand Chevron Button with high contrast hint */}
                       <td className={`${rowPaddingClass} text-center`} onClick={(e) => handleToggleRowExpand(t.id, e)}>
                         <button
                           type="button"
-                          className="p-1 rounded-md hover:bg-black/5 dark:hover:bg-white/10 text-neutral-400 hover:text-neutral-700 dark:hover:text-white transition-colors cursor-pointer"
+                          className={`w-7 h-7 rounded-lg border flex items-center justify-center transition-all cursor-pointer shadow-xs ${
+                            isExpanded
+                              ? "bg-blue-600 text-white border-blue-600 shadow-sm"
+                              : "bg-neutral-100 hover:bg-blue-50 dark:bg-white/[0.08] dark:hover:bg-blue-500/20 border-black/10 dark:border-white/15 text-neutral-700 dark:text-neutral-200 hover:text-[#0066FF]"
+                          }`}
+                          title={isExpanded ? "Collapse trade executions" : "Expand executions & details"}
                           aria-label="Expand trade details"
                         >
                           <ChevronRight
-                            className={`w-3.5 h-3.5 transition-transform duration-200 ${
-                              isExpanded ? "rotate-90 text-[#0066FF]" : ""
+                            className={`w-4 h-4 stroke-[2.5] transition-transform duration-200 ${
+                              isExpanded ? "rotate-90 text-white" : ""
                             }`}
                           />
                         </button>
@@ -1945,7 +1852,8 @@ export default function PastTrades() {
               <button
                 type="button"
                 onClick={() => setShowCustomDateModal(false)}
-                className="w-full py-2.5 rounded-xl bg-[#0066FF] hover:bg-[#0052CC] text-white font-bold text-xs"
+                style={{ backgroundColor: "#0066FF", color: "#ffffff" }}
+                className="w-full py-2.5 rounded-xl bg-[#0066FF] hover:bg-[#0052CC] text-white font-bold text-xs shadow-md shadow-[#0066FF]/25 btn-primary-blue cursor-pointer"
               >
                 Apply Range
               </button>
@@ -2233,25 +2141,25 @@ export default function PastTrades() {
               {/* Analysis Bento */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-4">
-                  <div className="p-4 rounded-2xl bg-black/[0.02] dark:bg-white/[0.03] border border-black/[0.05] dark:border-white/[0.08]">
+                  <div className="p-4 rounded-2xl bg-neutral-50 dark:bg-white/[0.04] border border-black/10 dark:border-white/10 shadow-xs">
                     <h3 className="text-xs font-bold text-[#0066FF] dark:text-blue-400 uppercase tracking-widest mb-2 flex items-center gap-1.5">
                       Technical Reason & Execution
                     </h3>
-                    <p className="text-xs sm:text-sm text-neutral-700 dark:text-neutral-300 leading-relaxed whitespace-pre-wrap">
+                    <p className="text-xs sm:text-sm text-neutral-900 dark:text-neutral-100 font-medium leading-relaxed whitespace-pre-wrap">
                       {selectedTrade.reason || "No technical reason recorded."}
                     </p>
                   </div>
-                  <div className="p-4 rounded-2xl bg-black/[0.02] dark:bg-white/[0.03] border border-black/[0.05] dark:border-white/[0.08]">
+                  <div className="p-4 rounded-2xl bg-neutral-50 dark:bg-white/[0.04] border border-black/10 dark:border-white/10 shadow-xs">
                     <h3 className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest mb-2 flex items-center gap-1.5">
                       <TrendingUp className="w-3.5 h-3.5" /> Key Lesson
                     </h3>
-                    <p className="text-xs sm:text-sm text-neutral-700 dark:text-neutral-300 leading-relaxed whitespace-pre-wrap">
+                    <p className="text-xs sm:text-sm text-neutral-900 dark:text-neutral-100 font-medium leading-relaxed whitespace-pre-wrap">
                       {selectedTrade.lesson || "No lesson recorded."}
                     </p>
                   </div>
                 </div>
 
-                <div className="p-5 rounded-2xl bg-black/[0.02] dark:bg-white/[0.03] border border-black/[0.05] dark:border-white/[0.08] flex flex-col">
+                <div className="p-5 rounded-2xl bg-neutral-50 dark:bg-white/[0.04] border border-black/10 dark:border-white/10 shadow-xs flex flex-col">
                   <h3 className="text-xs font-bold text-purple-600 dark:text-purple-400 uppercase tracking-widest mb-3 flex items-center gap-1.5">
                     <Clock className="w-3.5 h-3.5" /> Psychology & Timing
                   </h3>
