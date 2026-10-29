@@ -1,7 +1,7 @@
 // frontend/src/components/ui/ProfilePhotoModal.jsx
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { X, Camera, Loader2, Sparkles, User, ExternalLink } from "lucide-react";
+import { X, Camera, Loader2, User, ExternalLink } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import api from "../../api/axios";
 
@@ -150,12 +150,6 @@ export default function ProfilePhotoModal({
               <span className="text-xs font-semibold mt-2 opacity-80">No Photo Set</span>
             </div>
           )}
-
-          {/* Frosted Verified Badge at Bottom Left */}
-          <div className="absolute bottom-3 left-3 px-2.5 py-1 rounded-xl bg-black/50 backdrop-blur-md border border-white/20 text-white flex items-center gap-1.5 shadow-sm">
-            <Sparkles className="w-3 h-3 text-emerald-400" />
-            <span className="text-[10px] font-bold tracking-wide">ForexNotes Pro</span>
-          </div>
         </div>
 
         {/* Hidden File Input */}
