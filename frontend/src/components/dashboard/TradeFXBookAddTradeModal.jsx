@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPortal } from "react-dom";
 import {
@@ -10,13 +10,14 @@ import {
   ChevronDown,
   Loader2,
   Check,
+  Briefcase,
 } from "lucide-react";
 import DateTimePickerPopover from "../ui/DateTimePickerPopover";
 import { validateTradeAgainstRules } from "../../utils/guardrailValidator";
 import RuleBreachAlert from "../guardrails/RuleBreachAlert";
 import api from "../../api/axios";
 
-export default function TradeFXBookAddTradeModal({ isOpen, onClose, onTradeAdded, trades = [] }) {
+export default function TradeFXBookAddTradeModal({ isOpen, onClose, onTradeAdded, trades = [], activeAccount = "" }) {
   const navigate = useNavigate();
   const userId = localStorage.getItem("userId") || localStorage.getItem("userEmail") || "trader";
 
@@ -27,6 +28,29 @@ export default function TradeFXBookAddTradeModal({ isOpen, onClose, onTradeAdded
       return {};
     }
   }, [userId]);
+
+  const availableAccounts = useMemo(() => {
+    const set = new Set();
+    trades.forEach((t) => {
+      const a = (t.account_name || t.accountName || "").trim();
+      if (a && a !== "All Accounts") set.add(a);
+    });
+    if (activeAccount && activeAccount !== "All Accounts") set.add(activeAccount.trim());
+    if (set.size === 0) set.add("Default Account");
+    return Array.from(set).sort();
+  }, [trades, activeAccount]);
+
+  const [accountName, setAccountName] = useState(() => {
+    return activeAccount && activeAccount !== "All Accounts"
+      ? activeAccount
+      : (availableAccounts[0] || "Default Account");
+  });
+
+  useEffect(() => {
+    if (activeAccount && activeAccount !== "All Accounts") {
+      setAccountName(activeAccount);
+    }
+  }, [activeAccount, isOpen]);
 
   const [direction, setDirection] = useState("LONG");
   const [symbol, setSymbol] = useState("");
@@ -52,7 +76,7 @@ export default function TradeFXBookAddTradeModal({ isOpen, onClose, onTradeAdded
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
 
-  // Real-time Guardrails Validation
+  // Real-time Guardrails Validation ACCOUNT-WISE
   const guardrailValidation = useMemo(() => {
     return validateTradeAgainstRules({
       trade: {
@@ -61,11 +85,13 @@ export default function TradeFXBookAddTradeModal({ isOpen, onClose, onTradeAdded
         entry: entryPrice,
         sl: stopLoss,
         tp: exitPrice,
+        accountName,
       },
       rules: disciplineRules,
       allTrades: trades,
+      accountName,
     });
-  }, [riskPercent, entryPrice, stopLoss, exitPrice, disciplineRules, trades]);
+  }, [riskPercent, entryPrice, stopLoss, exitPrice, disciplineRules, trades, accountName]);
 
   if (!isOpen) return null;
 
@@ -128,6 +154,8 @@ export default function TradeFXBookAddTradeModal({ isOpen, onClose, onTradeAdded
 
       const payload = {
         userId,
+        account_name: accountName || "Default Account",
+        accountName: accountName || "Default Account",
         asset: symbol.trim().toUpperCase(),
         direction,
         entry: numEntry,
@@ -213,6 +241,28 @@ export default function TradeFXBookAddTradeModal({ isOpen, onClose, onTradeAdded
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Account Selector (Account-Wise Boundaries) */}
+          <div className="p-3 rounded-2xl bg-neutral-50/80 dark:bg-white/[0.03] border border-black/[0.06] dark:border-white/[0.08] space-y-1.5">
+            <div className="flex items-center justify-between">
+              <label className="text-[11px] font-bold text-neutral-700 dark:text-neutral-300 flex items-center gap-1.5 uppercase tracking-wider">
+                <Briefcase className="w-3.5 h-3.5 text-emerald-500" />
+                <span>Trading Account</span>
+              </label>
+              <span className="text-[10px] text-neutral-400 font-mono">Boundaries tracked per account</span>
+            </div>
+            <select
+              value={accountName}
+              onChange={(e) => setAccountName(e.target.value)}
+              className="w-full h-10 px-3 rounded-xl border border-black/[0.08] dark:border-white/[0.1] bg-white dark:bg-[#161b26] text-neutral-900 dark:text-white text-xs font-semibold outline-none focus:border-emerald-500 cursor-pointer transition-all"
+            >
+              {availableAccounts.map((acc) => (
+                <option key={acc} value={acc}>
+                  {acc}
+                </option>
+              ))}
+            </select>
+          </div>
+
           {/* Direction Pill Selector (Screenshots 4 & 5) */}
           <div className="grid grid-cols-2 gap-2 p-1 bg-neutral-100 dark:bg-white/[0.05] rounded-2xl border border-black/[0.04] dark:border-white/[0.06]">
             <button

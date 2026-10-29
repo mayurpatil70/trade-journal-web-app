@@ -55,6 +55,8 @@ export default function Onboarding() {
       // 1. Mark onboarding completed
       localStorage.setItem(`onboarding_completed_${completedUserId}`, "true");
       localStorage.setItem("onboarding_completed", "true");
+      localStorage.setItem(`rules_onboarded_${completedUserId}`, "true");
+      localStorage.setItem("rules_onboarded", "true");
 
       if (!isSkipped) {
         // 2. Persist profile locally

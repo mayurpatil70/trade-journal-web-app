@@ -173,6 +173,7 @@ export default function AddTrade() {
   }, []);
 
   const guardrailBreach = useMemo(() => {
+    const activeAccount = formData.accountName || "Default Account";
     return validateTradeAgainstRules({
       trade: {
         risk: formData.risk,
@@ -180,11 +181,13 @@ export default function AddTrade() {
         sl: formData.sl,
         tp: formData.tp,
         targetRR: calcRR,
+        accountName: activeAccount,
       },
       rules: disciplineRules,
       allTrades: allUserTrades,
+      accountName: activeAccount,
     });
-  }, [formData.risk, formData.entry, formData.sl, formData.tp, calcRR, disciplineRules, allUserTrades]);
+  }, [formData.risk, formData.entry, formData.sl, formData.tp, formData.accountName, calcRR, disciplineRules, allUserTrades]);
 
   // Fetch existing accounts from user's trades
   useEffect(() => {

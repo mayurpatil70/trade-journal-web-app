@@ -169,26 +169,59 @@ export default function Dashboard() {
     }
   });
 
-  // Check 24-hour timeline and daily loss guardrail violations
+  // Check 24-hour timeline and daily loss guardrail violations ACCOUNT-WISE
   const dailyBreach = useMemo(() => {
     return validateTradeAgainstRules({
       trade: {},
       rules: disciplineRules,
       allTrades,
+      accountName: selectedAccount && selectedAccount !== "All Accounts" ? selectedAccount : null,
     });
-  }, [disciplineRules, allTrades]);
+  }, [disciplineRules, allTrades, selectedAccount]);
+
+  const fetchProfileAndRules = async () => {
+    try {
+      const activeUserId = localStorage.getItem("userId") || localStorage.getItem("userEmail");
+      if (!activeUserId) return;
+      const res = await api.get(`/api/auth/profile?userId=${encodeURIComponent(activeUserId)}`);
+      if (res.data?.success && res.data?.profile) {
+        const p = res.data.profile;
+        if (p.discipline_rules) {
+          setDisciplineRules(p.discipline_rules);
+          localStorage.setItem(`trader_discipline_${activeUserId}`, JSON.stringify(p.discipline_rules));
+        }
+        if (p.rules_onboarded || (p.discipline_rules && Object.keys(p.discipline_rules).length > 0)) {
+          setShowOnboardingRules(false);
+          localStorage.setItem(`rules_onboarded_${activeUserId}`, "true");
+          localStorage.setItem("rules_onboarded", "true");
+          localStorage.setItem(`onboarding_completed_${activeUserId}`, "true");
+          localStorage.setItem("onboarding_completed", "true");
+        }
+      }
+    } catch (err) {
+      console.warn("[Dashboard] Rules fetch notice:", err.message);
+    }
+  };
+
+  useEffect(() => {
+    const handleRulesUpdated = (e) => {
+      if (e.detail) {
+        setDisciplineRules(e.detail);
+        setShowOnboardingRules(false);
+      }
+    };
+    window.addEventListener("trading-rules-updated", handleRulesUpdated);
+    return () => window.removeEventListener("trading-rules-updated", handleRulesUpdated);
+  }, []);
 
   useEffect(() => {
     const activeUserId = localStorage.getItem("userId") || localStorage.getItem("userEmail");
-    const isOnboardingCompleted =
-      localStorage.getItem(`onboarding_completed_${activeUserId}`) === "true" ||
-      localStorage.getItem("onboarding_completed") === "true";
-
-    if (!isOnboardingCompleted) {
-      navigate("/onboarding", { replace: true });
+    if (!activeUserId) {
+      navigate("/login", { replace: true });
       return;
     }
     fetchTrades();
+    fetchProfileAndRules();
   }, [navigate]);
 
   const fetchTrades = async () => {
@@ -631,6 +664,7 @@ export default function Dashboard() {
           fetchTrades();
         }}
         trades={allTrades}
+        activeAccount={selectedAccount}
       />
 
       {/* ── 8. MANDATORY ONBOARDING GUARDRAILS MODAL (New User First Login) ── */}

@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef, lazy, Suspense } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { createPortal } from "react-dom";
+import ApplePresetDropdown from "../components/ui/ApplePresetDropdown";
 import {
   User,
   Pencil,
@@ -80,9 +81,63 @@ const TIMEZONE_OPTIONS = [
   { value: "Australia/Sydney", label: "Australia/Sydney (AEST/AEDT, UTC+10 / +11)" },
 ];
 
+const RISK_PRESETS = [
+  { value: "0.25%", label: "0.25% (Micro)" },
+  { value: "0.5%", label: "0.5% (Conservative)" },
+  { value: "1%", label: "1.0% (Standard)" },
+  { value: "1.5%", label: "1.5% (Moderate)" },
+  { value: "2%", label: "2.0% (Aggressive)" },
+  { value: "2.5%", label: "2.5%" },
+  { value: "3%", label: "3.0%" },
+  { value: "5%", label: "5.0% (Prop Ceiling)" },
+];
+
+const TRADES_PRESETS = [
+  { value: "1", label: "1 Trade / Day" },
+  { value: "2", label: "2 Trades / Day" },
+  { value: "3", label: "3 Trades / Day" },
+  { value: "4", label: "4 Trades / Day" },
+  { value: "5", label: "5 Trades / Day" },
+  { value: "8", label: "8 Trades / Day" },
+  { value: "10", label: "10 Trades / Day" },
+  { value: "15", label: "15 Trades / Day" },
+];
+
+const LOSS_CAP_PRESETS = [
+  { value: "1%", label: "1.0% (Tight)" },
+  { value: "2%", label: "2.0%" },
+  { value: "3%", label: "3.0%" },
+  { value: "4%", label: "4.0%" },
+  { value: "5%", label: "5.0% (Standard Prop)" },
+  { value: "6%", label: "6.0%" },
+  { value: "8%", label: "8.0%" },
+  { value: "10%", label: "10.0% (Max)" },
+];
+
+const LOSS_STREAK_PRESETS = [
+  { value: "2 in a row", label: "2 in a row" },
+  { value: "3 in a row", label: "3 in a row" },
+  { value: "4 in a row", label: "4 in a row" },
+  { value: "5 in a row", label: "5 in a row" },
+  { value: "Disabled", label: "Disabled" },
+];
+
+const RR_PRESETS = [
+  { value: "1:1", label: "1:1.0 (Even Money)" },
+  { value: "1:1.5", label: "1:1.5 (Quick Scalp)" },
+  { value: "1:2", label: "1:2.0 (Standard Swing)" },
+  { value: "1:2.5", label: "1:2.5 (Trend Follower)" },
+  { value: "1:3", label: "1:3.0 (High Asymmetry)" },
+  { value: "1:4", label: "1:4.0 (Runner)" },
+  { value: "1:5", label: "1:5.0 (Institutional)" },
+];
+
 function formatLossStreak(val) {
   if (val === undefined || val === null || val === "") return "3 in a row";
   const s = String(val).trim();
+  if (s.toLowerCase().includes("disable") || s.toLowerCase() === "off" || s.toLowerCase() === "none") {
+    return "Disabled";
+  }
   return s.toLowerCase().includes("row") ? s : `${s} in a row`;
 }
 
@@ -568,12 +623,19 @@ export default function Profile({ defaultTab }) {
     setDisciplineRules(editRulesForm);
     localStorage.setItem(`trader_discipline_${userId}`, JSON.stringify(editRulesForm));
     localStorage.setItem(`rules_onboarded_${userId}`, "true");
+    localStorage.setItem("rules_onboarded", "true");
     setIsEditRulesOpen(false);
+
+    // Dispatch global event so Dashboard immediately updates rules and re-evaluates guardrails
+    window.dispatchEvent(
+      new CustomEvent("trading-rules-updated", { detail: editRulesForm })
+    );
 
     try {
       await api.put("/api/auth/profile", {
         userId,
         disciplineRules: editRulesForm,
+        rulesOnboarded: true,
       });
     } catch (err) {
       console.warn("[Profile] Rules save notice:", err.message);
@@ -1841,39 +1903,27 @@ export default function Profile({ defaultTab }) {
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 {/* 1. Max Risk / Trade */}
-                <div className="space-y-1.5">
-                  <div className="flex items-center justify-between">
-                    <label className="text-[11px] font-bold text-neutral-700 dark:text-neutral-300">
+                <div className="p-3.5 rounded-2xl bg-neutral-50/80 dark:bg-white/[0.03] border border-black/[0.06] dark:border-white/[0.08] hover:border-black/15 dark:hover:border-white/15 transition-all shadow-2xs space-y-2">
+                  <div className="flex items-center justify-between gap-2">
+                    <label className="text-[11px] font-bold text-neutral-800 dark:text-neutral-200 flex items-center gap-1.5 uppercase tracking-wider">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
                       Max Risk / Trade
                     </label>
-                    <select
-                      value={["0.25%", "0.5%", "1%", "1.5%", "2%", "2.5%", "3%", "5%"].includes(editRulesForm.maxRiskPerTrade) ? editRulesForm.maxRiskPerTrade : "custom"}
-                      onChange={(e) => {
-                        if (e.target.value !== "custom") {
-                          setEditRulesForm({ ...editRulesForm, maxRiskPerTrade: e.target.value });
-                        }
-                      }}
-                      className="text-[10px] font-semibold bg-neutral-100 dark:bg-white/[0.06] border border-black/[0.08] dark:border-white/[0.1] rounded-lg px-2 py-0.5 text-neutral-700 dark:text-neutral-300 focus:outline-none focus:border-emerald-500 cursor-pointer"
-                    >
-                      <option value="0.25%">0.25% (Micro)</option>
-                      <option value="0.5%">0.5% (Conservative)</option>
-                      <option value="1%">1.0% (Standard)</option>
-                      <option value="1.5%">1.5% (Moderate)</option>
-                      <option value="2%">2.0% (Aggressive)</option>
-                      <option value="2.5%">2.5%</option>
-                      <option value="3%">3.0%</option>
-                      <option value="5%">5.0% (Prop Ceiling)</option>
-                      <option value="custom">Custom Type</option>
-                    </select>
+                    <ApplePresetDropdown
+                      value={editRulesForm.maxRiskPerTrade}
+                      onChange={(val) => setEditRulesForm({ ...editRulesForm, maxRiskPerTrade: val })}
+                      options={RISK_PRESETS}
+                      placeholder="Preset"
+                    />
                   </div>
 
-                  <div className="flex items-center rounded-xl bg-neutral-100 dark:bg-white/[0.05] border border-black/[0.08] dark:border-white/[0.1] p-1 focus-within:border-emerald-500 transition-colors">
+                  <div className="flex items-center rounded-xl bg-white dark:bg-[#161b26] border border-black/[0.08] dark:border-white/[0.1] p-1 shadow-2xs focus-within:border-emerald-500/50 focus-within:ring-2 focus-within:ring-emerald-500/10 transition-all">
                     <button
                       type="button"
                       onClick={() => adjustRisk(-0.25)}
-                      className="w-7 h-7 rounded-lg bg-white dark:bg-white/[0.08] hover:bg-neutral-200 dark:hover:bg-white/[0.15] text-neutral-700 dark:text-neutral-200 flex items-center justify-center transition-all shadow-xs cursor-pointer active:scale-95"
+                      className="w-7 h-7 rounded-lg bg-neutral-100 dark:bg-white/[0.08] hover:bg-neutral-200 dark:hover:bg-white/[0.15] text-neutral-700 dark:text-neutral-200 flex items-center justify-center transition-all cursor-pointer active:scale-90 shadow-2xs"
                       title="Decrease risk"
                     >
                       <Minus className="w-3.5 h-3.5" />
@@ -1889,7 +1939,7 @@ export default function Profile({ defaultTab }) {
                     <button
                       type="button"
                       onClick={() => adjustRisk(+0.25)}
-                      className="w-7 h-7 rounded-lg bg-white dark:bg-white/[0.08] hover:bg-neutral-200 dark:hover:bg-white/[0.15] text-neutral-700 dark:text-neutral-200 flex items-center justify-center transition-all shadow-xs cursor-pointer active:scale-95"
+                      className="w-7 h-7 rounded-lg bg-neutral-100 dark:bg-white/[0.08] hover:bg-neutral-200 dark:hover:bg-white/[0.15] text-neutral-700 dark:text-neutral-200 flex items-center justify-center transition-all cursor-pointer active:scale-90 shadow-2xs"
                       title="Increase risk"
                     >
                       <Plus className="w-3.5 h-3.5" />
@@ -1898,36 +1948,25 @@ export default function Profile({ defaultTab }) {
                 </div>
 
                 {/* 2. Max Trades / Day */}
-                <div className="space-y-1.5">
-                  <div className="flex items-center justify-between">
-                    <label className="text-[11px] font-bold text-neutral-700 dark:text-neutral-300">
+                <div className="p-3.5 rounded-2xl bg-neutral-50/80 dark:bg-white/[0.03] border border-black/[0.06] dark:border-white/[0.08] hover:border-black/15 dark:hover:border-white/15 transition-all shadow-2xs space-y-2">
+                  <div className="flex items-center justify-between gap-2">
+                    <label className="text-[11px] font-bold text-neutral-800 dark:text-neutral-200 flex items-center gap-1.5 uppercase tracking-wider">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
                       Max Trades / Day
                     </label>
-                    <select
-                      value={["1", "2", "3", "4", "5", "8", "10", "15"].includes(String(editRulesForm.maxTradesPerDay)) ? String(editRulesForm.maxTradesPerDay) : "custom"}
-                      onChange={(e) => {
-                        if (e.target.value !== "custom") {
-                          setEditRulesForm({ ...editRulesForm, maxTradesPerDay: e.target.value });
-                        }
-                      }}
-                      className="text-[10px] font-semibold bg-neutral-100 dark:bg-white/[0.06] border border-black/[0.08] dark:border-white/[0.1] rounded-lg px-2 py-0.5 text-neutral-700 dark:text-neutral-300 focus:outline-none focus:border-emerald-500 cursor-pointer"
-                    >
-                      <option value="1">1 Trade / Day</option>
-                      <option value="2">2 Trades / Day</option>
-                      <option value="3">3 Trades / Day</option>
-                      <option value="4">4 Trades / Day</option>
-                      <option value="5">5 Trades / Day</option>
-                      <option value="8">8 Trades / Day</option>
-                      <option value="10">10 Trades / Day</option>
-                      <option value="custom">Custom Type</option>
-                    </select>
+                    <ApplePresetDropdown
+                      value={String(editRulesForm.maxTradesPerDay)}
+                      onChange={(val) => setEditRulesForm({ ...editRulesForm, maxTradesPerDay: val })}
+                      options={TRADES_PRESETS}
+                      placeholder="Preset"
+                    />
                   </div>
 
-                  <div className="flex items-center rounded-xl bg-neutral-100 dark:bg-white/[0.05] border border-black/[0.08] dark:border-white/[0.1] p-1 focus-within:border-emerald-500 transition-colors">
+                  <div className="flex items-center rounded-xl bg-white dark:bg-[#161b26] border border-black/[0.08] dark:border-white/[0.1] p-1 shadow-2xs focus-within:border-emerald-500/50 focus-within:ring-2 focus-within:ring-emerald-500/10 transition-all">
                     <button
                       type="button"
                       onClick={() => adjustMaxTrades(-1)}
-                      className="w-7 h-7 rounded-lg bg-white dark:bg-white/[0.08] hover:bg-neutral-200 dark:hover:bg-white/[0.15] text-neutral-700 dark:text-neutral-200 flex items-center justify-center transition-all shadow-xs cursor-pointer active:scale-95"
+                      className="w-7 h-7 rounded-lg bg-neutral-100 dark:bg-white/[0.08] hover:bg-neutral-200 dark:hover:bg-white/[0.15] text-neutral-700 dark:text-neutral-200 flex items-center justify-center transition-all cursor-pointer active:scale-90 shadow-2xs"
                       title="Decrease trades"
                     >
                       <Minus className="w-3.5 h-3.5" />
@@ -1945,7 +1984,7 @@ export default function Profile({ defaultTab }) {
                     <button
                       type="button"
                       onClick={() => adjustMaxTrades(+1)}
-                      className="w-7 h-7 rounded-lg bg-white dark:bg-white/[0.08] hover:bg-neutral-200 dark:hover:bg-white/[0.15] text-neutral-700 dark:text-neutral-200 flex items-center justify-center transition-all shadow-xs cursor-pointer active:scale-95"
+                      className="w-7 h-7 rounded-lg bg-neutral-100 dark:bg-white/[0.08] hover:bg-neutral-200 dark:hover:bg-white/[0.15] text-neutral-700 dark:text-neutral-200 flex items-center justify-center transition-all cursor-pointer active:scale-90 shadow-2xs"
                       title="Increase trades"
                     >
                       <Plus className="w-3.5 h-3.5" />
@@ -1954,37 +1993,25 @@ export default function Profile({ defaultTab }) {
                 </div>
 
                 {/* 3. Daily Loss Cap */}
-                <div className="space-y-1.5">
-                  <div className="flex items-center justify-between">
-                    <label className="text-[11px] font-bold text-neutral-700 dark:text-neutral-300">
+                <div className="p-3.5 rounded-2xl bg-neutral-50/80 dark:bg-white/[0.03] border border-black/[0.06] dark:border-white/[0.08] hover:border-black/15 dark:hover:border-white/15 transition-all shadow-2xs space-y-2">
+                  <div className="flex items-center justify-between gap-2">
+                    <label className="text-[11px] font-bold text-neutral-800 dark:text-neutral-200 flex items-center gap-1.5 uppercase tracking-wider">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
                       Daily Loss Cap
                     </label>
-                    <select
-                      value={["1%", "2%", "3%", "4%", "5%", "6%", "8%", "10%"].includes(editRulesForm.dailyLossCap) ? editRulesForm.dailyLossCap : "custom"}
-                      onChange={(e) => {
-                        if (e.target.value !== "custom") {
-                          setEditRulesForm({ ...editRulesForm, dailyLossCap: e.target.value });
-                        }
-                      }}
-                      className="text-[10px] font-semibold bg-neutral-100 dark:bg-white/[0.06] border border-black/[0.08] dark:border-white/[0.1] rounded-lg px-2 py-0.5 text-neutral-700 dark:text-neutral-300 focus:outline-none focus:border-emerald-500 cursor-pointer"
-                    >
-                      <option value="1%">1.0% (Tight)</option>
-                      <option value="2%">2.0%</option>
-                      <option value="3%">3.0%</option>
-                      <option value="4%">4.0%</option>
-                      <option value="5%">5.0% (Standard Prop)</option>
-                      <option value="6%">6.0%</option>
-                      <option value="8%">8.0%</option>
-                      <option value="10%">10.0% (Max)</option>
-                      <option value="custom">Custom Type</option>
-                    </select>
+                    <ApplePresetDropdown
+                      value={editRulesForm.dailyLossCap}
+                      onChange={(val) => setEditRulesForm({ ...editRulesForm, dailyLossCap: val })}
+                      options={LOSS_CAP_PRESETS}
+                      placeholder="Preset"
+                    />
                   </div>
 
-                  <div className="flex items-center rounded-xl bg-neutral-100 dark:bg-white/[0.05] border border-black/[0.08] dark:border-white/[0.1] p-1 focus-within:border-emerald-500 transition-colors">
+                  <div className="flex items-center rounded-xl bg-white dark:bg-[#161b26] border border-black/[0.08] dark:border-white/[0.1] p-1 shadow-2xs focus-within:border-emerald-500/50 focus-within:ring-2 focus-within:ring-emerald-500/10 transition-all">
                     <button
                       type="button"
                       onClick={() => adjustLossCap(-0.5)}
-                      className="w-7 h-7 rounded-lg bg-white dark:bg-white/[0.08] hover:bg-neutral-200 dark:hover:bg-white/[0.15] text-neutral-700 dark:text-neutral-200 flex items-center justify-center transition-all shadow-xs cursor-pointer active:scale-95"
+                      className="w-7 h-7 rounded-lg bg-neutral-100 dark:bg-white/[0.08] hover:bg-neutral-200 dark:hover:bg-white/[0.15] text-neutral-700 dark:text-neutral-200 flex items-center justify-center transition-all cursor-pointer active:scale-90 shadow-2xs"
                       title="Decrease loss cap"
                     >
                       <Minus className="w-3.5 h-3.5" />
@@ -2000,7 +2027,7 @@ export default function Profile({ defaultTab }) {
                     <button
                       type="button"
                       onClick={() => adjustLossCap(+0.5)}
-                      className="w-7 h-7 rounded-lg bg-white dark:bg-white/[0.08] hover:bg-neutral-200 dark:hover:bg-white/[0.15] text-neutral-700 dark:text-neutral-200 flex items-center justify-center transition-all shadow-xs cursor-pointer active:scale-95"
+                      className="w-7 h-7 rounded-lg bg-neutral-100 dark:bg-white/[0.08] hover:bg-neutral-200 dark:hover:bg-white/[0.15] text-neutral-700 dark:text-neutral-200 flex items-center justify-center transition-all cursor-pointer active:scale-90 shadow-2xs"
                       title="Increase loss cap"
                     >
                       <Plus className="w-3.5 h-3.5" />
@@ -2009,34 +2036,25 @@ export default function Profile({ defaultTab }) {
                 </div>
 
                 {/* 4. Loss Streak Break */}
-                <div className="space-y-1.5">
-                  <div className="flex items-center justify-between">
-                    <label className="text-[11px] font-bold text-neutral-700 dark:text-neutral-300">
+                <div className="p-3.5 rounded-2xl bg-neutral-50/80 dark:bg-white/[0.03] border border-black/[0.06] dark:border-white/[0.08] hover:border-black/15 dark:hover:border-white/15 transition-all shadow-2xs space-y-2">
+                  <div className="flex items-center justify-between gap-2">
+                    <label className="text-[11px] font-bold text-neutral-800 dark:text-neutral-200 flex items-center gap-1.5 uppercase tracking-wider">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
                       Loss Streak Break
                     </label>
-                    <select
-                      value={["2 in a row", "3 in a row", "4 in a row", "5 in a row", "Disabled"].includes(editRulesForm.lossStreakBreak) ? editRulesForm.lossStreakBreak : "custom"}
-                      onChange={(e) => {
-                        if (e.target.value !== "custom") {
-                          setEditRulesForm({ ...editRulesForm, lossStreakBreak: e.target.value });
-                        }
-                      }}
-                      className="text-[10px] font-semibold bg-neutral-100 dark:bg-white/[0.06] border border-black/[0.08] dark:border-white/[0.1] rounded-lg px-2 py-0.5 text-neutral-700 dark:text-neutral-300 focus:outline-none focus:border-emerald-500 cursor-pointer"
-                    >
-                      <option value="2 in a row">2 in a row</option>
-                      <option value="3 in a row">3 in a row</option>
-                      <option value="4 in a row">4 in a row</option>
-                      <option value="5 in a row">5 in a row</option>
-                      <option value="Disabled">Disabled</option>
-                      <option value="custom">Custom Type</option>
-                    </select>
+                    <ApplePresetDropdown
+                      value={editRulesForm.lossStreakBreak}
+                      onChange={(val) => setEditRulesForm({ ...editRulesForm, lossStreakBreak: val })}
+                      options={LOSS_STREAK_PRESETS}
+                      placeholder="Preset"
+                    />
                   </div>
 
-                  <div className="flex items-center rounded-xl bg-neutral-100 dark:bg-white/[0.05] border border-black/[0.08] dark:border-white/[0.1] p-1 focus-within:border-emerald-500 transition-colors">
+                  <div className="flex items-center rounded-xl bg-white dark:bg-[#161b26] border border-black/[0.08] dark:border-white/[0.1] p-1 shadow-2xs focus-within:border-emerald-500/50 focus-within:ring-2 focus-within:ring-emerald-500/10 transition-all">
                     <button
                       type="button"
                       onClick={() => adjustLossStreak(-1)}
-                      className="w-7 h-7 rounded-lg bg-white dark:bg-white/[0.08] hover:bg-neutral-200 dark:hover:bg-white/[0.15] text-neutral-700 dark:text-neutral-200 flex items-center justify-center transition-all shadow-xs cursor-pointer active:scale-95"
+                      className="w-7 h-7 rounded-lg bg-neutral-100 dark:bg-white/[0.08] hover:bg-neutral-200 dark:hover:bg-white/[0.15] text-neutral-700 dark:text-neutral-200 flex items-center justify-center transition-all cursor-pointer active:scale-90 shadow-2xs"
                       title="Decrease streak break"
                     >
                       <Minus className="w-3.5 h-3.5" />
@@ -2052,7 +2070,7 @@ export default function Profile({ defaultTab }) {
                     <button
                       type="button"
                       onClick={() => adjustLossStreak(+1)}
-                      className="w-7 h-7 rounded-lg bg-white dark:bg-white/[0.08] hover:bg-neutral-200 dark:hover:bg-white/[0.15] text-neutral-700 dark:text-neutral-200 flex items-center justify-center transition-all shadow-xs cursor-pointer active:scale-95"
+                      className="w-7 h-7 rounded-lg bg-neutral-100 dark:bg-white/[0.08] hover:bg-neutral-200 dark:hover:bg-white/[0.15] text-neutral-700 dark:text-neutral-200 flex items-center justify-center transition-all cursor-pointer active:scale-90 shadow-2xs"
                       title="Increase streak break"
                     >
                       <Plus className="w-3.5 h-3.5" />
@@ -2061,36 +2079,25 @@ export default function Profile({ defaultTab }) {
                 </div>
 
                 {/* 5. Target Risk / Reward (Full width) */}
-                <div className="col-span-1 sm:col-span-2 space-y-1.5">
-                  <div className="flex items-center justify-between">
-                    <label className="text-[11px] font-bold text-neutral-700 dark:text-neutral-300">
+                <div className="col-span-1 sm:col-span-2 p-3.5 rounded-2xl bg-neutral-50/80 dark:bg-white/[0.03] border border-black/[0.06] dark:border-white/[0.08] hover:border-black/15 dark:hover:border-white/15 transition-all shadow-2xs space-y-2">
+                  <div className="flex items-center justify-between gap-2">
+                    <label className="text-[11px] font-bold text-neutral-800 dark:text-neutral-200 flex items-center gap-1.5 uppercase tracking-wider">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
                       Target Risk / Reward Ratio
                     </label>
-                    <select
-                      value={["1:1", "1:1.5", "1:2", "1:2.5", "1:3", "1:4", "1:5"].includes(editRulesForm.targetRR) ? editRulesForm.targetRR : "custom"}
-                      onChange={(e) => {
-                        if (e.target.value !== "custom") {
-                          setEditRulesForm({ ...editRulesForm, targetRR: e.target.value });
-                        }
-                      }}
-                      className="text-[10px] font-semibold bg-neutral-100 dark:bg-white/[0.06] border border-black/[0.08] dark:border-white/[0.1] rounded-lg px-2 py-0.5 text-neutral-700 dark:text-neutral-300 focus:outline-none focus:border-emerald-500 cursor-pointer"
-                    >
-                      <option value="1:1">1:1.0 (Even Money)</option>
-                      <option value="1:1.5">1:1.5 (Quick Scalp)</option>
-                      <option value="1:2">1:2.0 (Standard Swing)</option>
-                      <option value="1:2.5">1:2.5 (Trend Follower)</option>
-                      <option value="1:3">1:3.0 (High Asymmetry)</option>
-                      <option value="1:4">1:4.0 (Runner)</option>
-                      <option value="1:5">1:5.0 (Institutional)</option>
-                      <option value="custom">Custom Type</option>
-                    </select>
+                    <ApplePresetDropdown
+                      value={editRulesForm.targetRR}
+                      onChange={(val) => setEditRulesForm({ ...editRulesForm, targetRR: val })}
+                      options={RR_PRESETS}
+                      placeholder="Preset"
+                    />
                   </div>
 
-                  <div className="flex items-center rounded-xl bg-neutral-100 dark:bg-white/[0.05] border border-black/[0.08] dark:border-white/[0.1] p-1 focus-within:border-emerald-500 transition-colors">
+                  <div className="flex items-center rounded-xl bg-white dark:bg-[#161b26] border border-black/[0.08] dark:border-white/[0.1] p-1 shadow-2xs focus-within:border-emerald-500/50 focus-within:ring-2 focus-within:ring-emerald-500/10 transition-all">
                     <button
                       type="button"
                       onClick={() => adjustRR(-0.5)}
-                      className="w-7 h-7 rounded-lg bg-white dark:bg-white/[0.08] hover:bg-neutral-200 dark:hover:bg-white/[0.15] text-neutral-700 dark:text-neutral-200 flex items-center justify-center transition-all shadow-xs cursor-pointer active:scale-95"
+                      className="w-7 h-7 rounded-lg bg-neutral-100 dark:bg-white/[0.08] hover:bg-neutral-200 dark:hover:bg-white/[0.15] text-neutral-700 dark:text-neutral-200 flex items-center justify-center transition-all cursor-pointer active:scale-90 shadow-2xs"
                       title="Decrease RR"
                     >
                       <Minus className="w-3.5 h-3.5" />
@@ -2106,7 +2113,7 @@ export default function Profile({ defaultTab }) {
                     <button
                       type="button"
                       onClick={() => adjustRR(+0.5)}
-                      className="w-7 h-7 rounded-lg bg-white dark:bg-white/[0.08] hover:bg-neutral-200 dark:hover:bg-white/[0.15] text-neutral-700 dark:text-neutral-200 flex items-center justify-center transition-all shadow-xs cursor-pointer active:scale-95"
+                      className="w-7 h-7 rounded-lg bg-neutral-100 dark:bg-white/[0.08] hover:bg-neutral-200 dark:hover:bg-white/[0.15] text-neutral-700 dark:text-neutral-200 flex items-center justify-center transition-all cursor-pointer active:scale-90 shadow-2xs"
                       title="Increase RR"
                     >
                       <Plus className="w-3.5 h-3.5" />

@@ -213,26 +213,55 @@ export const saveOnboardingProfile = async (req, res) => {
       return res.status(400).json({ success: false, error: "userId or email required" });
     }
 
-    if (userId) {
+    const isUuid = (val) =>
+      typeof val === "string" &&
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(val);
+
+    let targetUuid = isUuid(userId) ? userId : null;
+    let targetEmail = email || (userId && userId.includes("@") ? userId : null);
+
+    // Look up user row in public.users
+    if (!targetUuid && targetEmail) {
+      try {
+        const { data: u } = await supabase
+          .from("users")
+          .select("id, email")
+          .eq("email", targetEmail)
+          .maybeSingle();
+        if (u) {
+          targetUuid = u.id;
+          targetEmail = u.email;
+        }
+      } catch (e) {
+        console.warn("[Auth] Lookup user for onboarding notice:", e.message);
+      }
+    }
+
+    const disciplineRulesPayload = {
+      maxRiskPerTrade: maxRiskPerTrade || "2%",
+      dailyLossCap: dailyLossCap || "5%",
+      maxTradesPerDay: String(maxTradesPerDay || "5"),
+      lossStreakBreak: String(lossStreakBreak || "3 in a row"),
+      targetRR: targetRR || "1:2",
+      preferredSessions: preferredSessions || ["London", "New York"],
+      favoritePairs: favoritePairs || ["EUR/USD", "GBP/USD", "XAU/USD"],
+    };
+
+    // 1. Persist to profiles table (if targetUuid known)
+    if (targetUuid) {
       try {
         await supabase.from("profiles").upsert(
           {
-            id: userId,
+            id: targetUuid,
+            email: targetEmail,
             display_name: displayName,
             username: username?.replace(/^@/, ""),
             bio: bio || "",
             avatar_url: avatarUrl || null,
             currency: currency || "USD",
             timezone: timezone || "UTC",
-            discipline_rules: {
-              maxRiskPerTrade,
-              dailyLossCap,
-              maxTradesPerDay,
-              lossStreakBreak,
-              targetRR,
-              preferredSessions,
-              favoritePairs,
-            },
+            discipline_rules: disciplineRulesPayload,
+            rules_onboarded: true,
             updated_at: new Date().toISOString(),
           },
           { onConflict: "id" }
@@ -240,15 +269,24 @@ export const saveOnboardingProfile = async (req, res) => {
       } catch (profErr) {
         console.warn("[Auth] Save onboarding profile table notice:", profErr.message);
       }
+    }
 
-      try {
-        await supabase.from("users").update({
-          display_name: displayName,
-          avatar_url: avatarUrl || null,
-        }).eq("id", userId);
-      } catch (userErr) {
-        console.warn("[Auth] Save onboarding users table notice:", userErr.message);
+    // 2. Persist to users table (guaranteed fallback)
+    try {
+      const userUpdate = {
+        display_name: displayName,
+        avatar_url: avatarUrl || null,
+        discipline_rules: disciplineRulesPayload,
+        rules_onboarded: true,
+        onboarding_completed: true,
+      };
+      if (targetUuid) {
+        await supabase.from("users").update(userUpdate).eq("id", targetUuid);
+      } else if (targetEmail) {
+        await supabase.from("users").update(userUpdate).eq("email", targetEmail);
       }
+    } catch (userErr) {
+      console.warn("[Auth] Save onboarding users table notice:", userErr.message);
     }
 
     res.json({ success: true, message: "Onboarding profile saved successfully." });
@@ -260,20 +298,46 @@ export const saveOnboardingProfile = async (req, res) => {
 
 export const getProfile = async (req, res) => {
   try {
-    const userId = req.query?.userId || req.headers["x-user-id"] || req.user?.id;
+    const rawUserId = req.query?.userId || req.headers["x-user-id"] || req.user?.id;
     const email = req.query?.email;
 
-    if (!userId && !email) {
+    if (!rawUserId && !email) {
       return res.status(400).json({ success: false, error: "Missing userId or email" });
+    }
+
+    const isUuid = (val) =>
+      typeof val === "string" &&
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(val);
+
+    let targetUuid = isUuid(rawUserId) ? rawUserId : null;
+    let targetEmail = email || (rawUserId && rawUserId.includes("@") ? rawUserId : null);
+
+    // Look up user in users table if needed to bridge UUID and email
+    let userRowData = null;
+    try {
+      let query = supabase.from("users").select("id, email, display_name, avatar_url, created_at, discipline_rules, rules_onboarded");
+      if (targetUuid) {
+        query = query.eq("id", targetUuid);
+      } else if (targetEmail) {
+        query = query.eq("email", targetEmail);
+      }
+      const { data: u } = await query.maybeSingle();
+      if (u) {
+        userRowData = u;
+        targetUuid = u.id;
+        targetEmail = u.email;
+      }
+    } catch (uErr) {
+      console.warn("[Auth] User row fetch notice:", uErr.message);
     }
 
     let profileData = null;
 
-    if (userId) {
+    if (targetUuid) {
       const { data, error } = await supabase
         .from("profiles")
         .select("*")
-        .eq("id", userId)
+        .eq("id", targetUuid)
         .maybeSingle();
 
       if (!error && data) {
@@ -281,11 +345,11 @@ export const getProfile = async (req, res) => {
       }
     }
 
-    if (!profileData && email) {
+    if (!profileData && targetEmail) {
       const { data, error } = await supabase
         .from("profiles")
         .select("*")
-        .eq("email", email)
+        .eq("email", targetEmail)
         .maybeSingle();
 
       if (!error && data) {
@@ -293,27 +357,40 @@ export const getProfile = async (req, res) => {
       }
     }
 
-    // Fallback: check users table if not found in profiles
-    if (!profileData && userId) {
-      const { data: userRow } = await supabase
-        .from("users")
-        .select("id, email, display_name, avatar_url, created_at")
-        .eq("id", userId)
-        .maybeSingle();
+    // Fallback: construct profileData from users table if not in profiles
+    if (!profileData && userRowData) {
+      profileData = {
+        id: userRowData.id,
+        email: userRowData.email,
+        display_name: userRowData.display_name,
+        avatar_url: userRowData.avatar_url,
+        discipline_rules: userRowData.discipline_rules || null,
+        rules_onboarded: Boolean(userRowData.rules_onboarded),
+        created_at: userRowData.created_at,
+      };
+    }
 
-      if (userRow) {
-        profileData = {
-          id: userRow.id,
-          email: userRow.email,
-          display_name: userRow.display_name,
-          avatar_url: userRow.avatar_url,
-          created_at: userRow.created_at,
+    // If profileData exists but has no discipline_rules, check userRowData
+    if (profileData) {
+      if (!profileData.discipline_rules && userRowData?.discipline_rules) {
+        profileData.discipline_rules = userRowData.discipline_rules;
+      }
+      if (profileData.rules_onboarded === undefined && userRowData?.rules_onboarded !== undefined) {
+        profileData.rules_onboarded = Boolean(userRowData.rules_onboarded);
+      }
+
+      // Default fallback if still missing
+      if (!profileData.discipline_rules) {
+        profileData.discipline_rules = {
+          maxRiskPerTrade: "2%",
+          maxTradesPerDay: "5",
+          dailyLossCap: "5%",
+          lossStreakBreak: "3 in a row",
+          targetRR: "1:2",
         };
       }
-    }
 
-    if (profileData) {
-      const targetUserId = profileData.id || userId;
+      const targetUserId = profileData.id || targetUuid;
       if (targetUserId) {
         // Query journal_subscriptions for latest paid subscription
         const { data: latestSub } = await supabase
@@ -344,7 +421,7 @@ export const getProfile = async (req, res) => {
         "akpatil51340@gmail.com",
       ].map((e) => e.trim().toLowerCase()).filter(Boolean);
 
-      const userEmail = (profileData.email || email || "").trim().toLowerCase();
+      const userEmail = (profileData.email || targetEmail || "").trim().toLowerCase();
       if (userEmail && adminEmails.includes(userEmail)) {
         profileData.isAdmin = true;
       }
@@ -372,13 +449,36 @@ export const updateProfile = async (req, res) => {
       currency,
       timezone,
       disciplineRules,
+      rulesOnboarded,
       preTradeChecklist,
       currentPlan,
     } = req.body;
 
-    const targetId = userId || req.headers["x-user-id"] || req.user?.id;
+    const rawId = userId || req.headers["x-user-id"] || req.user?.id;
+    const isUuid = (val) =>
+      typeof val === "string" &&
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(val);
 
-    if (!targetId && !email) {
+    let targetUuid = isUuid(rawId) ? rawId : null;
+    let targetEmail = email || (rawId && rawId.includes("@") ? rawId : null);
+
+    if (!targetUuid && targetEmail) {
+      try {
+        const { data: u } = await supabase
+          .from("users")
+          .select("id, email")
+          .eq("email", targetEmail)
+          .maybeSingle();
+        if (u) {
+          targetUuid = u.id;
+          targetEmail = u.email;
+        }
+      } catch (e) {
+        console.warn("[Auth] updateProfile user lookup notice:", e.message);
+      }
+    }
+
+    if (!targetUuid && !targetEmail) {
       return res.status(400).json({ success: false, error: "Missing userId or email" });
     }
 
@@ -392,12 +492,18 @@ export const updateProfile = async (req, res) => {
     if (avatarUrl !== undefined) updatePayload.avatar_url = avatarUrl;
     if (currency !== undefined) updatePayload.currency = currency;
     if (timezone !== undefined) updatePayload.timezone = timezone;
-    if (disciplineRules !== undefined) updatePayload.discipline_rules = disciplineRules;
+    if (disciplineRules !== undefined) {
+      updatePayload.discipline_rules = disciplineRules;
+      updatePayload.rules_onboarded = true;
+    }
+    if (rulesOnboarded !== undefined) updatePayload.rules_onboarded = Boolean(rulesOnboarded);
     if (preTradeChecklist !== undefined) updatePayload.pre_trade_checklist = preTradeChecklist;
     if (currentPlan !== undefined) updatePayload.current_plan = currentPlan;
 
-    if (targetId) {
-      updatePayload.id = targetId;
+    // 1. Persist to profiles table
+    if (targetUuid) {
+      updatePayload.id = targetUuid;
+      if (targetEmail) updatePayload.email = targetEmail;
       try {
         await supabase
           .from("profiles")
@@ -405,18 +511,29 @@ export const updateProfile = async (req, res) => {
       } catch (profErr) {
         console.warn("[Auth] updateProfile profiles notice:", profErr.message);
       }
+    }
 
-      // Sync users table if applicable
-      try {
-        const userSync = {};
-        if (displayName !== undefined) userSync.display_name = displayName;
-        if (avatarUrl !== undefined) userSync.avatar_url = avatarUrl;
-        if (Object.keys(userSync).length > 0) {
-          await supabase.from("users").update(userSync).eq("id", targetId);
-        }
-      } catch (userErr) {
-        console.warn("[Auth] updateProfile users notice:", userErr.message);
+    // 2. Persist to users table (guaranteed sync)
+    try {
+      const userSync = {};
+      if (displayName !== undefined) userSync.display_name = displayName;
+      if (avatarUrl !== undefined) userSync.avatar_url = avatarUrl;
+      if (disciplineRules !== undefined) {
+        userSync.discipline_rules = disciplineRules;
+        userSync.rules_onboarded = true;
+        userSync.onboarding_completed = true;
       }
+      if (rulesOnboarded !== undefined) userSync.rules_onboarded = Boolean(rulesOnboarded);
+
+      if (Object.keys(userSync).length > 0) {
+        if (targetUuid) {
+          await supabase.from("users").update(userSync).eq("id", targetUuid);
+        } else if (targetEmail) {
+          await supabase.from("users").update(userSync).eq("email", targetEmail);
+        }
+      }
+    } catch (userErr) {
+      console.warn("[Auth] updateProfile users notice:", userErr.message);
     }
 
     res.json({
