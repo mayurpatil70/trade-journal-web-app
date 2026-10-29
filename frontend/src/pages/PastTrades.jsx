@@ -43,7 +43,7 @@ import {
   RotateCcw,
   GripVertical,
   Layers,
-  Sparkles,
+  Brain,
   FileText,
   FileSpreadsheet,
   Copy,
@@ -149,6 +149,7 @@ export default function PastTrades() {
   const [selectedTrade, setSelectedTrade] = useState(null);
 
   // Table selection & row expansion
+  const [selectedAccount, setSelectedAccount] = useState("");
   const [expandedRows, setExpandedRows] = useState(new Set());
   const [selectedRowIds, setSelectedRowIds] = useState(new Set());
   const [copiedTradeId, setCopiedTradeId] = useState(null);
@@ -320,7 +321,13 @@ export default function PastTrades() {
       if (typeFilter === "long" && dir !== "LONG") return false;
       if (typeFilter === "short" && dir !== "SHORT") return false;
 
-      // 4. Quick Search (Symbol, Setup, Session, Account)
+      // 4. Account Filter
+      if (selectedAccount && selectedAccount !== "All Accounts") {
+        const acc = (t.account_name || t.account || "Default Account").trim().toLowerCase();
+        if (acc !== selectedAccount.trim().toLowerCase()) return false;
+      }
+
+      // 5. Quick Search (Symbol, Setup, Session, Account)
       if (search) {
         const query = search.toLowerCase();
         const matches =
@@ -332,7 +339,7 @@ export default function PastTrades() {
         if (!matches) return false;
       }
 
-      // 5. Conditions filter
+      // 6. Conditions filter
       for (const cond of conditions) {
         if (!cond.value) continue;
         const targetVal = String(t[cond.field] || "").toLowerCase();
@@ -357,6 +364,7 @@ export default function PastTrades() {
     });
   }, [
     trades,
+    selectedAccount,
     timePeriod,
     customStartDate,
     customEndDate,
@@ -557,9 +565,17 @@ export default function PastTrades() {
     URL.revokeObjectURL(url);
   };
 
-  // Export all visible/filtered trades
+  const getExportDateSuffix = () => {
+    const d = new Date();
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${y}_${m}_${day}`;
+  };
+
+  // Export all visible/filtered trades (Matches Screenshot 3 request)
   const handleExportCSV = () => {
-    exportTradesToCSV(sortedTrades, `ForexNotes-Trades-${new Date().toISOString().slice(0, 10)}.csv`);
+    exportTradesToCSV(sortedTrades, `forexnotes_trade_history_${getExportDateSuffix()}.csv`);
   };
 
   // Bulk actions on selected rows (Screenshot 5)
@@ -597,13 +613,13 @@ export default function PastTrades() {
   const handleBulkExportCSV = () => {
     const selected = trades.filter((t) => selectedRowIds.has(t.id));
     if (selected.length === 0) return;
-    exportTradesToCSV(selected, `ForexNotes-Selected-${selected.length}-Trades.csv`);
+    exportTradesToCSV(selected, `forexnotes_trade_history_${getExportDateSuffix()}.csv`);
   };
 
   const handleBulkExportExcel = () => {
     const selected = trades.filter((t) => selectedRowIds.has(t.id));
     if (selected.length === 0) return;
-    exportTradesToCSV(selected, `ForexNotes-Selected-${selected.length}-Trades-Excel.csv`, true);
+    exportTradesToCSV(selected, `forexnotes_trade_history_${getExportDateSuffix()}.csv`, true);
   };
 
   // Toggle single column checkbox
@@ -672,37 +688,29 @@ export default function PastTrades() {
 
   return (
     <div className="w-full max-w-7xl mx-auto font-sans pb-24 px-4 sm:px-6 lg:px-8 mt-4 sm:mt-6 space-y-6">
-      {/* ── 1. TOP HEADER (Matches TradeFXBook Trades Bar Exactly) ── */}
+      {/* ── 1. TOP HEADER (Trades Title + All Accounts + Clear All + Add Trade) ── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-neutral-900 dark:text-white">
             Trades
           </h1>
-          <div className="flex items-center gap-2 mt-1">
-            <span className="w-2 h-2 rounded-full bg-neutral-400 dark:bg-neutral-500 inline-block" />
-            <span className="text-xs text-neutral-500 dark:text-neutral-400 font-medium">
-              Not connected
-            </span>
-          </div>
         </div>
 
-        {/* Action Button Row */}
+        {/* Action Button Row - Aligned cleanly */}
         <div className="flex items-center gap-2.5 flex-wrap">
-          {/* Connect MT4/MT5 Button */}
-          <button
-            type="button"
-            onClick={() => setIsConnectModalOpen(true)}
-            className="px-4 py-2.5 rounded-xl bg-[#0066FF] hover:bg-[#0052CC] text-white font-bold text-xs sm:text-sm tracking-wide shadow-md shadow-[#0066FF]/20 active:scale-[0.98] transition-all cursor-pointer flex items-center gap-1.5"
-          >
-            <span>Connect MT4/MT5</span>
-          </button>
+          {/* All Accounts Dropdown Button */}
+          <AccountFilter
+            trades={trades}
+            selectedAccount={selectedAccount}
+            onChange={setSelectedAccount}
+          />
 
           {/* Clear All Button */}
           <button
             type="button"
             onClick={() => setIsClearAllModalOpen(true)}
             disabled={trades.length === 0}
-            className="px-4 py-2.5 rounded-xl border border-rose-200 dark:border-rose-500/25 bg-white dark:bg-white/[0.03] hover:bg-rose-50 dark:hover:bg-rose-500/10 text-rose-500 dark:text-rose-400 font-bold text-xs sm:text-sm active:scale-[0.98] transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5"
+            className="h-10 px-4 rounded-xl border border-rose-200 dark:border-rose-500/25 bg-white dark:bg-white/[0.03] hover:bg-rose-50 dark:hover:bg-rose-500/10 text-rose-500 dark:text-rose-400 font-bold text-xs sm:text-sm active:scale-[0.98] transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5 shadow-xs"
           >
             <Trash2 className="w-3.5 h-3.5" />
             <span>Clear All</span>
@@ -712,7 +720,7 @@ export default function PastTrades() {
           <button
             type="button"
             onClick={() => setIsAddTradeModalOpen(true)}
-            className="px-4 py-2.5 rounded-xl bg-[#0066FF] hover:bg-[#0052CC] text-white font-bold text-xs sm:text-sm tracking-wide shadow-md shadow-[#0066FF]/20 active:scale-[0.98] transition-all cursor-pointer flex items-center gap-1.5"
+            className="h-10 px-4 rounded-xl bg-[#0066FF] hover:bg-[#0052CC] text-white font-bold text-xs sm:text-sm tracking-wide shadow-md shadow-[#0066FF]/20 active:scale-[0.98] transition-all cursor-pointer flex items-center gap-1.5"
           >
             <Plus className="w-4 h-4 stroke-[2.5]" />
             <span>Add Trade</span>
@@ -1741,7 +1749,7 @@ export default function PastTrades() {
                             {/* Psychology, Emotion & Rules */}
                             <div className="bg-white dark:bg-[#121622] rounded-2xl border border-black/[0.06] dark:border-white/[0.08] p-4 shadow-xs">
                               <h5 className="text-[11px] font-extrabold uppercase tracking-wider text-neutral-500 dark:text-neutral-400 mb-2 flex items-center gap-1.5">
-                                <Sparkles className="w-3.5 h-3.5 text-purple-500" />
+                                <Brain className="w-3.5 h-3.5 text-purple-500" />
                                 <span>Psychology & Discipline</span>
                               </h5>
                               <div className="space-y-2 text-xs">
@@ -2227,7 +2235,7 @@ export default function PastTrades() {
                 <div className="space-y-4">
                   <div className="p-4 rounded-2xl bg-black/[0.02] dark:bg-white/[0.03] border border-black/[0.05] dark:border-white/[0.08]">
                     <h3 className="text-xs font-bold text-[#0066FF] dark:text-blue-400 uppercase tracking-widest mb-2 flex items-center gap-1.5">
-                      <Sparkles className="w-3.5 h-3.5" /> Technical Reason & Execution
+                      Technical Reason & Execution
                     </h3>
                     <p className="text-xs sm:text-sm text-neutral-700 dark:text-neutral-300 leading-relaxed whitespace-pre-wrap">
                       {selectedTrade.reason || "No technical reason recorded."}

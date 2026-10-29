@@ -349,7 +349,7 @@ export default function Support() {
       {/* ── FREQUENTLY ASKED QUESTIONS SECTION (Matches Screenshot Exactly) ── */}
       <div>
         <div className="flex items-center gap-3.5 mb-6">
-          <div className="w-10 h-10 rounded-xl bg-[#F59E0B] flex items-center justify-center text-neutral-950 shadow-sm shrink-0 font-bold">
+          <div className="w-10 h-10 rounded-2xl bg-blue-500/10 dark:bg-blue-500/20 text-[#0066FF] dark:text-[#38bdf8] border border-blue-500/20 flex items-center justify-center shadow-xs shrink-0 font-bold">
             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="12" cy="12" r="9" />
               <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
@@ -380,7 +380,7 @@ export default function Support() {
                   className="flex items-start justify-between gap-3 cursor-pointer select-none"
                 >
                   <div className="flex-1">
-                    <span className="inline-block text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-[#FFF7ED] dark:bg-amber-500/10 text-[#D97706] dark:text-[#FBBF24] mb-2">
+                    <span className="inline-block text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-lg bg-blue-50 dark:bg-blue-500/10 text-[#0066FF] dark:text-blue-400 border border-blue-500/15 mb-2">
                       {faq.category}
                     </span>
                     <h3 className="text-sm font-semibold text-neutral-900 dark:text-neutral-100 leading-snug">

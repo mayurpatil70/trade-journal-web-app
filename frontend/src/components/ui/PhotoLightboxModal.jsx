@@ -148,3 +148,4 @@ export default function PhotoLightboxModal({ isOpen, onClose, src, title = "Trad
     </div>
   );
 }
+
