@@ -1,5 +1,5 @@
 // frontend/src/components/MasterclassPaywall.jsx
-// Modern macOS / iOS Apple HIG Bento Redesign for Prop Firm Masterclass
+// macOS / iOS Apple HIG Bento Redesign — Clean White & Electric Blue Theme (Matches /support)
 
 import { useState, useEffect } from "react";
 import {
@@ -98,7 +98,7 @@ export default function MasterclassPaywall() {
   if (!config) {
     return (
       <div className="p-12 flex flex-col items-center justify-center rounded-3xl bg-white/70 dark:bg-[#12151e]/70 border border-black/[0.06] dark:border-white/[0.08] backdrop-blur-xl">
-        <Loader2 className="w-8 h-8 text-amber-500 animate-spin mb-2" />
+        <Loader2 className="w-8 h-8 text-blue-500 animate-spin mb-2" />
         <span className="text-xs font-medium text-neutral-500 dark:text-neutral-400">
           Loading checkout configuration...
         </span>
@@ -110,15 +110,15 @@ export default function MasterclassPaywall() {
 
   return (
     <div className="rounded-3xl bg-white/90 dark:bg-[#12151e]/85 backdrop-blur-xl border border-black/[0.06] dark:border-white/[0.08] shadow-[0_4px_24px_rgba(0,0,0,0.03)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.35)] overflow-hidden mb-8 relative group transition-all duration-300">
-      {/* Subtle macOS Ambient Glow */}
-      <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-amber-500/10 via-yellow-500/5 to-transparent rounded-full blur-3xl pointer-events-none group-hover:from-amber-500/15 transition-all duration-500" />
+      {/* Subtle Blue Apple Ambient Glow */}
+      <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-blue-500/10 via-cyan-500/5 to-transparent rounded-full blur-3xl pointer-events-none group-hover:from-blue-500/15 transition-all duration-500" />
 
-      {/* ── STEP 1: Hero Banner Card ── */}
+      {/* ── STEP 1: Hero Banner Card (White & Blue Combo) ── */}
       <div className="p-6 sm:p-8 border-b border-black/[0.05] dark:border-white/[0.06] flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 relative z-10">
         <div className="flex-1 space-y-3">
           <div className="flex items-center gap-2.5">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20 shadow-sm">
-              <Award className="w-3.5 h-3.5 text-amber-500" />
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 shadow-sm">
+              <Award className="w-3.5 h-3.5 text-blue-500" />
               <span>VIP Masterclass Pass</span>
             </span>
             <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20">
@@ -156,7 +156,7 @@ export default function MasterclassPaywall() {
             <button
               type="button"
               onClick={() => setStep(2)}
-              className="w-full sm:w-auto px-7 py-3.5 rounded-2xl bg-amber-500 hover:bg-amber-400 text-neutral-950 font-bold text-sm tracking-wide shadow-lg shadow-amber-500/25 active:scale-[0.98] transition-all flex items-center justify-center gap-2.5 cursor-pointer group/btn"
+              className="w-full sm:w-auto px-7 py-3.5 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm tracking-wide shadow-lg shadow-blue-500/25 active:scale-[0.98] transition-all flex items-center justify-center gap-2.5 cursor-pointer group/btn"
             >
               <span>Get Access — ${PRICE.toFixed(0)}</span>
               <ArrowRight className="w-4 h-4 transition-transform group-hover/btn:translate-x-1" />
@@ -165,7 +165,7 @@ export default function MasterclassPaywall() {
         )}
       </div>
 
-      {/* ── STEP 2: Modern Apple HIG Checkout Flow ── */}
+      {/* ── STEP 2: Modern Apple HIG Checkout Flow (White & Blue Combo) ── */}
       {step === 2 && (
         <div className="p-6 sm:p-8 space-y-6 animate-in slide-in-from-top-4 duration-200 relative z-10 max-w-2xl mx-auto">
           {/* Header & Step progress */}
@@ -178,9 +178,9 @@ export default function MasterclassPaywall() {
             </p>
           </div>
 
-          {/* Amount Card */}
-          <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-center shadow-sm">
-            <span className="text-[10px] font-bold uppercase tracking-widest text-amber-700 dark:text-amber-400 block mb-1">
+          {/* Amount Card (White & Blue Theme) */}
+          <div className="p-4 rounded-2xl bg-blue-500/10 dark:bg-blue-500/15 border border-blue-500/20 text-center shadow-sm">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-blue-600 dark:text-blue-400 block mb-1">
               Send Exactly
             </span>
             <div className="flex items-center justify-center gap-3">
@@ -190,7 +190,7 @@ export default function MasterclassPaywall() {
               <button
                 type="button"
                 onClick={() => handleCopy(PRICE.toString(), "amt")}
-                className="p-2 rounded-xl bg-white dark:bg-white/10 text-amber-600 dark:text-amber-300 hover:text-neutral-900 dark:hover:text-white border border-amber-500/30 transition-colors shadow-sm cursor-pointer"
+                className="p-2 rounded-xl bg-white dark:bg-white/10 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 border border-blue-500/20 transition-colors shadow-sm cursor-pointer"
                 title="Copy amount"
               >
                 {copied === "amt" ? (
@@ -213,7 +213,7 @@ export default function MasterclassPaywall() {
 
             <div className="flex items-center gap-2 p-3 rounded-2xl bg-neutral-100/80 dark:bg-white/[0.04] border border-black/[0.06] dark:border-white/[0.08] shadow-inner">
               <span
-                className="text-xs sm:text-sm font-mono font-semibold text-neutral-900 dark:text-amber-300 truncate flex-1 select-all"
+                className="text-xs sm:text-sm font-mono font-semibold text-neutral-900 dark:text-white truncate flex-1 select-all"
                 title={PAY_ADDRESS}
               >
                 {PAY_ADDRESS}
@@ -221,7 +221,7 @@ export default function MasterclassPaywall() {
               <button
                 type="button"
                 onClick={() => handleCopy(PAY_ADDRESS, "addr")}
-                className="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-neutral-950 font-bold text-xs transition-all shadow-sm flex items-center gap-1.5 cursor-pointer shrink-0"
+                className="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs transition-all shadow-md shadow-blue-500/20 flex items-center gap-1.5 cursor-pointer shrink-0 active:scale-95"
               >
                 {copied === "addr" ? (
                   <>
@@ -253,10 +253,10 @@ export default function MasterclassPaywall() {
               />
               <label
                 htmlFor="masterclass-payment-screenshot"
-                className="w-full flex items-center justify-between p-3.5 rounded-2xl bg-neutral-100/80 dark:bg-white/[0.04] border border-dashed border-neutral-300 dark:border-white/15 hover:border-amber-500 dark:hover:border-amber-400/50 transition-all cursor-pointer group/upload"
+                className="w-full flex items-center justify-between p-3.5 rounded-2xl bg-neutral-100/80 dark:bg-white/[0.04] border border-dashed border-neutral-300 dark:border-white/15 hover:border-blue-500 dark:hover:border-blue-400/50 transition-all cursor-pointer group/upload"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+                  <div className="w-9 h-9 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
                     {selectedFile ? (
                       <FileCheck className="w-4 h-4 text-emerald-500" />
                     ) : (
@@ -274,7 +274,7 @@ export default function MasterclassPaywall() {
                     </p>
                   </div>
                 </div>
-                <span className="text-xs font-bold text-amber-600 dark:text-amber-400 group-hover/upload:underline">
+                <span className="text-xs font-bold text-blue-600 dark:text-blue-400 group-hover/upload:underline">
                   {selectedFile ? "Change file" : "Browse"}
                 </span>
               </label>
@@ -291,7 +291,7 @@ export default function MasterclassPaywall() {
               value={txHash}
               onChange={(e) => setTxHash(e.target.value)}
               placeholder="Paste 0x... transaction hash"
-              className="w-full px-4 py-3 rounded-2xl bg-neutral-100/80 dark:bg-white/[0.04] border border-black/[0.06] dark:border-white/[0.08] text-sm font-mono text-neutral-900 dark:text-white placeholder-neutral-400 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all font-medium"
+              className="w-full px-4 py-3 rounded-2xl bg-neutral-100/80 dark:bg-white/[0.04] border border-black/[0.06] dark:border-white/[0.08] text-sm font-mono text-neutral-900 dark:text-white placeholder-neutral-400 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all font-medium"
             />
           </div>
 
@@ -308,7 +308,7 @@ export default function MasterclassPaywall() {
               type="button"
               onClick={handleVerify}
               disabled={isProcessing || txHash.trim().length < 10}
-              className="flex-1 py-3 px-6 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm shadow-md shadow-emerald-500/25 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+              className="flex-1 py-3 px-6 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs sm:text-sm shadow-md shadow-blue-500/25 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
             >
               {isProcessing ? (
                 <>
@@ -329,7 +329,7 @@ export default function MasterclassPaywall() {
       {/* ── STEP 3: Pending Verification State ── */}
       {step === 3 && (
         <div className="p-8 sm:p-12 flex flex-col items-center text-center space-y-4 animate-in zoom-in-95 duration-200 relative z-10 max-w-md mx-auto">
-          <div className="w-16 h-16 rounded-3xl bg-amber-500/10 text-amber-500 flex items-center justify-center border border-amber-500/20 shadow-sm">
+          <div className="w-16 h-16 rounded-3xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center border border-blue-500/20 shadow-sm">
             <ShieldCheck className="w-8 h-8" />
           </div>
           <div>
@@ -343,7 +343,7 @@ export default function MasterclassPaywall() {
           </div>
 
           <div className="flex items-center gap-2 text-xs font-semibold text-neutral-500 dark:text-neutral-400 pt-2">
-            <Clock className="w-4 h-4 animate-pulse text-amber-500" />
+            <Clock className="w-4 h-4 animate-pulse text-blue-500" />
             <span>Average confirmation time: 10–30 minutes</span>
           </div>
 
