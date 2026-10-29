@@ -94,6 +94,7 @@ const LotSizeCalculator = safeLazy(
   () => import("./pages/TraderProblems/LotSizeCalculator.jsx"),
   "lot-size",
 );
+const Tools = safeLazy(() => import("./pages/Tools.jsx"), "tools");
 
 // Heavy / Secondary Pages (Prefetched on hover and idle)
 const Charts = safeLazy(() => import("./pages/Charts.jsx"), "charts");
@@ -183,6 +184,7 @@ registerRoutePrefetch(
   "/calculator/prop-firm",
   () => import("./pages/TraderProblems/PropFirm.jsx"),
 );
+registerRoutePrefetch("/tools", () => import("./pages/Tools.jsx"));
 registerRoutePrefetch("/profile", () => import("./pages/Profile.jsx"));
 
 const INDEXABLE_PATHS = ["/", "/privacy"];
@@ -376,6 +378,7 @@ const RouteWatcher = () => {
       "/affiliate",
       "/charts",
       "/sessions",
+      "/tools",
       "/calculator",
       "/bot-hub",
     ];
@@ -479,6 +482,8 @@ function App() {
                     element={<ConnectionsPage />}
                   />
                   <Route path="bot-hub/mt5" element={<Mt5BotPage />} />
+
+                  <Route path="tools" element={<Tools />} />
 
                   <Route path="calculator" element={<CalculatorLayout />}>
                     <Route index element={<Navigate to="lot-size" replace />} />

@@ -37,6 +37,7 @@ import {
   Calculator as CalculatorIcon,
   Search,
   Sparkles,
+  Wrench,
 } from "lucide-react";
 
 // Nav Item with Apple Squircle Geometry & Glossy Interaction
@@ -319,17 +320,10 @@ export default function MainLayout() {
     {
       label: "Tools",
       items: [
+        { to: "/tools", icon: Wrench, label: "Tools" },
         { to: "/charts", icon: Activity, label: "Live Charts" },
         { to: "/sessions", icon: Zap, label: "Setup Backtesting" },
         { to: "/news", icon: Globe, label: "Economic Calendar" },
-        { to: "/bot-hub", icon: Activity, label: "Bot Hub", isBeta: true, requiresAdmin: true },
-        { to: "/bot-hub/connections", icon: ShieldCheck, label: "Exchange Keys", requiresAdmin: true },
-        { to: "/bot-hub/mt5", icon: Zap, label: "MT5 AI Bot", isBeta: true, requiresAdmin: true },
-        {
-          to: "/calculator/lot-size",
-          icon: CalculatorIcon,
-          label: "Calculators",
-        },
       ],
     },
     {
@@ -355,10 +349,11 @@ export default function MainLayout() {
     if (p.includes("analytics")) return "Strategy Analytics";
     if (p.includes("psychology")) return "Psychology Lab";
     if (p.includes("mistakes")) return "Mistake Lab";
+    if (p.includes("tools")) return "Trading Tools";
     if (p.includes("charts")) return "Live Charts";
     if (p.includes("sessions")) return "Setup Backtesting";
     if (p.includes("news")) return "Economic Calendar";
-    if (p.includes("calculator")) return "Lot Size Calculator";
+    if (p.includes("calculator")) return "Calculators";
     if (p.includes("accounts")) return "Prop Firm Accounts";
     if (p.includes("settings")) return "Settings";
     if (p.includes("profile")) return "Profile";
@@ -377,6 +372,15 @@ export default function MainLayout() {
       iconColor: "text-emerald-500",
       bgColor: "bg-emerald-500/10",
       keywords: ["add", "trade", "log", "new", "entry", "pnl", "manual"],
+    },
+    {
+      to: "/tools",
+      label: "Trading Tools Hub",
+      sub: "Professional calculators, market hours, and utilities",
+      icon: Wrench,
+      iconColor: "text-blue-500",
+      bgColor: "bg-blue-500/10",
+      keywords: ["tools", "tool", "calculator", "position", "size", "prop", "firm", "utility"],
     },
     {
       to: "/calculator/lot-size",
