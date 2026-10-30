@@ -444,6 +444,8 @@ LANDING PAGE ANIMATIONS
 ========================================================= */
 
 /* Marquee for testimonials */
+.animate-marquee { display: flex; width: max-content; animation: marquee 50s linear infinite; }
+.animate-marquee:hover { animation-play-state: paused; }
 @keyframes marquee {
   0% {
     transform: translateX(0);

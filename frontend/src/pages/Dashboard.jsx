@@ -5,6 +5,9 @@ import TradeFXBookKpiCards from "../components/dashboard/TradeFXBookKpiCards";
 import PerformanceEquityCurve from "../components/dashboard/PerformanceEquityCurve";
 import MonthlyPnlCalendar from "../components/dashboard/MonthlyPnlCalendar";
 import TradeFXBookAddTradeModal from "../components/dashboard/TradeFXBookAddTradeModal";
+import MorningTradingQuoteModal from "../components/dashboard/MorningTradingQuoteModal";
+import SocialFollowCard from "../components/dashboard/SocialFollowCard";
+import DashboardNewsTicker from "../components/dashboard/DashboardNewsTicker";
 import OnboardingRulesModal from "../components/guardrails/OnboardingRulesModal";
 import RuleBreachAlert from "../components/guardrails/RuleBreachAlert";
 import { validateTradeAgainstRules } from "../utils/guardrailValidator";
@@ -29,6 +32,7 @@ import {
   ShieldCheck,
   ShieldAlert,
   Target,
+  Briefcase,
 } from "lucide-react";
 
 export const normalizeTradeR = (t) => {
@@ -270,6 +274,17 @@ export default function Dashboard() {
       .slice(0, 5);
   }, [trades]);
 
+  const openPositions = useMemo(() => {
+    return (trades || []).filter(
+      (t) =>
+        (t.result || "").toLowerCase() === "open" ||
+        (t.status || "").toLowerCase() === "open" ||
+        ((t.exit_price === null || t.exit_price === undefined || t.exit_price === "") &&
+          (t.exitPrice === null || t.exitPrice === undefined || t.exitPrice === "") &&
+          (t.pnl === null || t.pnl === undefined || t.pnl === ""))
+    );
+  }, [trades]);
+
   const performanceMetrics = useMemo(() => {
     return calculatePerformanceMetrics(trades, "$");
   }, [trades]);
@@ -330,11 +345,78 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* ── 4. RECENT ACTIVITY & TRADING HEALTH (Screenshots 4 & 5) ── */}
-      {/* Recent Activity relocated into 2-column slot in place of Economic Calendar feed */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* ── 4. OPEN POSITIONS & RECENT ACTIVITY (Matches TradeFXBook Screenshots 3 & 4) ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Open Positions Card */}
+        <div className="rounded-3xl p-6 bg-white dark:bg-[#121622] border border-black/[0.06] dark:border-white/[0.08] shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-sm font-bold text-neutral-900 dark:text-white flex items-center gap-2">
+                <Briefcase className="w-4 h-4 text-[#0066FF]" />
+                <span>Open Positions</span>
+              </h3>
+              <span className="text-xs text-neutral-400 font-medium font-mono">
+                {openPositions.length} open
+              </span>
+            </div>
+
+            {openPositions.length === 0 ? (
+              <div className="py-12 flex flex-col items-center justify-center text-neutral-400 dark:text-neutral-500">
+                <div className="w-12 h-12 rounded-2xl bg-black/[0.03] dark:bg-white/[0.04] border border-black/[0.04] dark:border-white/[0.05] flex items-center justify-center mb-2.5">
+                  <Briefcase className="w-5 h-5 opacity-40 text-neutral-500" />
+                </div>
+                <p className="text-xs font-semibold text-neutral-600 dark:text-neutral-400">No open positions</p>
+                <p className="text-[11px] text-neutral-400 mt-0.5">All logged trades are closed</p>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {openPositions.map((t, idx) => (
+                  <div
+                    key={idx}
+                    onClick={() => navigate("/trades")}
+                    className="p-3 rounded-2xl bg-neutral-50 dark:bg-white/[0.03] border border-black/[0.04] dark:border-white/[0.06] flex items-center justify-between hover:border-blue-500/30 transition-all cursor-pointer"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-7 h-7 rounded-full bg-blue-500/10 text-[#0066FF] dark:text-blue-400 font-black text-xs flex items-center justify-center">
+                        {t.asset?.[0] || "$"}
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <p className="text-xs font-bold text-neutral-900 dark:text-white">{t.asset}</p>
+                          <span
+                            className={`text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded ${
+                              t.direction === "LONG"
+                                ? "bg-emerald-500/10 text-emerald-600"
+                                : "bg-rose-500/10 text-rose-600"
+                            }`}
+                          >
+                            {t.direction}
+                          </span>
+                        </div>
+                        <p className="text-[10px] text-neutral-400">
+                          Entry: {t.entry || "—"} • {t.date || "Today"}
+                        </p>
+                      </div>
+                    </div>
+                    <span className="text-[11px] font-bold font-mono px-2 py-0.5 rounded-lg bg-blue-500/10 text-[#0066FF] dark:text-blue-400">
+                      Open
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+          <button
+            onClick={() => setIsAddTradeModalOpen(true)}
+            className="mt-4 pt-3 border-t border-black/[0.05] dark:border-white/[0.06] text-xs font-semibold text-[#0066FF] dark:text-blue-400 hover:text-blue-600 flex items-center gap-1 group cursor-pointer"
+          >
+            <span>+ Log New Position</span>
+            <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+          </button>
+        </div>
+
         {/* Recent Activity Card */}
-        <div className="lg:col-span-2 rounded-3xl p-6 bg-white dark:bg-[#121622] border border-black/[0.06] dark:border-white/[0.08] shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] flex flex-col justify-between">
+        <div className="rounded-3xl p-6 bg-white dark:bg-[#121622] border border-black/[0.06] dark:border-white/[0.08] shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-sm font-bold text-neutral-900 dark:text-white flex items-center gap-2">
@@ -362,13 +444,22 @@ export default function Dashboard() {
                       className="p-3 rounded-2xl bg-neutral-50 dark:bg-white/[0.03] border border-black/[0.04] dark:border-white/[0.06] flex items-center justify-between hover:border-emerald-500/25 transition-all cursor-pointer"
                     >
                       <div className="flex items-center gap-3">
-                        <span
-                          className={`w-2.5 h-2.5 rounded-full ${
-                            t.direction === "LONG" ? "bg-emerald-500" : "bg-rose-500"
-                          }`}
-                        />
+                        <div className="w-7 h-7 rounded-full bg-amber-500/20 text-amber-600 dark:text-amber-400 font-bold text-xs flex items-center justify-center">
+                          🪙
+                        </div>
                         <div>
-                          <p className="text-xs font-bold text-neutral-900 dark:text-white">{t.asset}</p>
+                          <div className="flex items-center gap-2">
+                            <p className="text-xs font-bold text-neutral-900 dark:text-white">{t.asset}</p>
+                            <span
+                              className={`text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded ${
+                                t.direction === "LONG"
+                                  ? "bg-emerald-500/10 text-emerald-600"
+                                  : "bg-rose-500/10 text-rose-600"
+                              }`}
+                            >
+                              {t.direction}
+                            </span>
+                          </div>
                           <p className="text-[10px] text-neutral-400">{t.date}</p>
                         </div>
                       </div>
@@ -396,8 +487,10 @@ export default function Dashboard() {
             <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
           </button>
         </div>
+      </div>
 
-        {/* Trading Health */}
+      {/* Trading Health */}
+      <div className="w-full">
         <TradingHealth trades={trades} />
       </div>
 
@@ -679,6 +772,15 @@ export default function Dashboard() {
           setDisciplineRules(savedRules);
         }}
       />
+
+      {/* ── 9. MORNING TRADING QUOTE 24H POP-UP MODAL (Screenshot 1) ── */}
+      <MorningTradingQuoteModal />
+
+      {/* ── 10. SOCIAL MEDIA FOLLOW CARD (Screenshots 2, 3, 4) ── */}
+      <SocialFollowCard />
+
+      {/* ── 11. HORIZONTAL BOTTOM NEWS TICKER BAR (Screenshots 3, 4, 5) ── */}
+      <DashboardNewsTicker />
     </div>
   );
 }
