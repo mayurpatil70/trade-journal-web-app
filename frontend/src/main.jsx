@@ -4,6 +4,7 @@ import "./index.css";
 import App from "./App.jsx";
 import { ThemeProvider } from "./components/theme-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { registerServiceWorker } from "./lib/pwa";
 
 // Auto-recover if Vite dynamic import fails due to a new deployment release (stale chunk hash)
 if (typeof window !== "undefined") {
@@ -18,6 +19,8 @@ if (typeof window !== "undefined") {
     }
   });
 }
+
+registerServiceWorker();
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>

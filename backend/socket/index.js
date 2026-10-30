@@ -9,6 +9,7 @@ import {
   markConversationRead,
   getOrCreateDirectConversation,
 } from "../services/loungeService.js";
+import { sendPushToUser } from "../services/pushService.js";
 
 const OFFLINE_GRACE_MS = 30_000;
 const MAX_MESSAGE_LENGTH = 4000;
@@ -82,6 +83,16 @@ function markMaybeOffline(userId, socketId) {
   );
 }
 
+function notifyOfflineRecipient(recipientId, message) {
+  const preview = message.isTradeShare ? "Shared a trade with you" : String(message.content || "").slice(0, 140);
+  sendPushToUser(recipientId, {
+    title: message.sender?.displayName || "New message",
+    body: preview || "Sent you a message",
+    url: "/lounge/chat",
+    tag: `conv-${message.conversationId}`,
+  }).catch((err) => console.warn("[Push] DM notification failed:", err.message));
+}
+
 function ack(cb, payload) {
   if (typeof cb === "function") cb(payload);
 }
@@ -127,6 +138,7 @@ function registerHandlers(socket) {
       if (!(await isPublicChannel(conversationId))) {
         for (const participantId of message.participantIds || []) {
           io.to(userRoom(participantId)).except(convRoom(conversationId)).emit("message:received", message);
+          if (String(participantId) !== userId && !isOnline(participantId)) notifyOfflineRecipient(participantId, message);
         }
       }
       ack(cb, { ok: true, message });

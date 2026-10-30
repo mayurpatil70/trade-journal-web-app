@@ -49,6 +49,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import AppleSelect from "../components/ui/AppleSelect";
+import AppNotificationsCard from "../components/AppNotificationsCard";
 const PaywallPricingGrid = lazy(() => import("../components/paywall/PaywallPricingGrid"));
 import { getPlanBadge } from "../utils/planBadge";
 import api, { logoutSession, clearSession } from "../api/axios";
@@ -1628,6 +1629,8 @@ export default function Profile({ defaultTab }) {
               </div>
             </div>
           </div>
+
+          <AppNotificationsCard />
 
           {/* ── 2. EXPORT JOURNAL DATA ── */}
           <div className="rounded-3xl p-6 bg-white dark:bg-[#121622] border border-black/[0.06] dark:border-white/[0.08] shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] space-y-4">
