@@ -104,7 +104,8 @@ function registerHandlers(socket) {
   socket.on("message:send", async (payload = {}, cb) => {
     try {
       const content = String(payload.content || "").trim().slice(0, MAX_MESSAGE_LENGTH);
-      if (!content && !payload.sharedTrade) return ack(cb, { ok: false, error: "EMPTY" });
+      const chartUrl = /^https:\/\/res\.cloudinary\.com\//.test(String(payload.chartUrl || "")) ? payload.chartUrl : null;
+      if (!content && !payload.sharedTrade && !chartUrl) return ack(cb, { ok: false, error: "EMPTY" });
 
       let conversationId = payload.roomId;
       if (!conversationId && payload.recipientId) {
@@ -119,7 +120,7 @@ function registerHandlers(socket) {
         conversationId,
         senderId: userId,
         content,
-        mediaUrl: payload.chartUrl,
+        mediaUrl: chartUrl,
         sharedTrade: payload.sharedTrade,
       });
 

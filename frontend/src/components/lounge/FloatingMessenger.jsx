@@ -67,7 +67,7 @@ export default function FloatingMessenger() {
       {!open && (
         <button
           onClick={() => setOpen(true)}
-          className="fixed z-[60] bottom-20 right-4 sm:bottom-6 sm:right-6 inline-flex items-center gap-2 pl-3.5 pr-4 py-2.5 rounded-full bg-white/80 dark:bg-[#161a24]/85 backdrop-blur-2xl border border-black/[0.08] dark:border-white/[0.1] shadow-[0_12px_40px_rgba(0,0,0,0.15)] text-sm font-semibold text-neutral-900 dark:text-white hover:scale-[1.03] active:scale-95 transition-transform"
+          className="fn-messenger-launcher fixed z-[60] bottom-[60px] right-[76px] md:bottom-[76px] md:right-[100px] inline-flex items-center gap-2 pl-3.5 pr-4 py-2.5 rounded-full bg-white/80 dark:bg-[#161a24]/85 backdrop-blur-2xl border border-black/[0.08] dark:border-white/[0.1] shadow-[0_12px_40px_rgba(0,0,0,0.15)] text-sm font-semibold text-neutral-900 dark:text-white hover:scale-[1.03] active:scale-95 transition-transform"
         >
           <span className="relative">
             <MessageCircle className="w-5 h-5 text-[#0066FF]" />

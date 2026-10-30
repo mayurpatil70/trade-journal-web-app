@@ -1,8 +1,9 @@
 // frontend/src/pages/lounge/LoungeShell.jsx
-import { NavLink, Outlet } from "react-router-dom";
-import { Trophy, MessageSquareText, MessagesSquare, Gift, Users } from "lucide-react";
+import { Link, NavLink, Outlet } from "react-router-dom";
+import { Trophy, MessageSquareText, MessagesSquare, Gift, Users, UserRound } from "lucide-react";
 import { glass } from "../../components/lounge/LoungeUI";
 import { useOnlineSet } from "../../lib/socket";
+import TraderSearch from "../../components/lounge/TraderSearch";
 
 const TABS = [
   { to: "/lounge", end: true, label: "Leaderboard", icon: Trophy },
@@ -17,6 +18,7 @@ export default function LoungeShell() {
   return (
     <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-5 pb-28">
       <div className={`${glass} p-5 sm:p-6`}>
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
           <div className="w-11 h-11 rounded-2xl bg-blue-500/10 text-[#0066FF] dark:text-sky-400 border border-blue-500/20 flex items-center justify-center">
             <Users className="w-5 h-5" />
@@ -27,6 +29,16 @@ export default function LoungeShell() {
               Verified rankings, trader thoughts, live chat and partner deals
             </p>
           </div>
+        </div>
+        <div className="flex items-center gap-2 w-full md:w-auto">
+          <TraderSearch />
+          <Link
+            to={`/lounge/trader/${localStorage.getItem("userId")}`}
+            className="shrink-0 inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-semibold bg-black/[0.04] dark:bg-white/[0.06] text-neutral-700 dark:text-neutral-200 hover:bg-black/[0.07] dark:hover:bg-white/[0.1]"
+          >
+            <UserRound className="w-4 h-4" /> My profile
+          </Link>
+        </div>
         </div>
 
         <div className="mt-5 flex flex-col-reverse md:flex-row md:items-center justify-between gap-3">

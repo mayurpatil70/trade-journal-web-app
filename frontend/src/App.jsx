@@ -24,6 +24,7 @@ import NavigationProgressBar from "./components/NavigationProgressBar";
 import ErrorBoundary from "./components/ErrorBoundary.jsx";
 import Logo3DLoader from "./components/Logo3DLoader.jsx";
 import CookieConsent from "./components/CookieConsent.jsx";
+import FloatingThemeToggle from "./components/FloatingThemeToggle.jsx";
 
 // Public Pages (eagerly loaded for SEO/LCP)
 import LandingPage from "./pages/LandingPage.jsx";
@@ -231,6 +232,10 @@ const RouteSeo = () => {
   return null;
 };
 
+// Signed-in visitors skip the landing and login pages; the guards then route to paywall or onboarding when needed.
+const PublicOnlyRoute = ({ children }) =>
+  isSessionValid() ? <Navigate to="/dashboard" replace /> : children;
+
 // GUARD 1: Authentication — checks localStorage AND session validity (24-hour window)
 const AuthGuard = () => {
   if (!isSessionValid()) {
@@ -365,6 +370,13 @@ const ScrollToTop = () => {
   return null;
 };
 
+const AUTH_FLOW_PATHS = ["/login", "/verify", "/paywall", "/link-discord", "/discord/callback"];
+
+const AuthFlowThemeToggle = () => {
+  const { pathname } = useLocation();
+  return AUTH_FLOW_PATHS.includes(pathname) ? <FloatingThemeToggle /> : null;
+};
+
 // Paywall Route: Accessible by new visitors & subscribed users managing plans
 const PaywallRoute = () => {
   return <Paywall />;
@@ -436,13 +448,13 @@ function App() {
         <ErrorBoundary>
           <Routes>
             {/* Public Landing Pages */}
-            <Route path="/" element={<LandingPage />} />
+            <Route path="/" element={<PublicOnlyRoute><LandingPage /></PublicOnlyRoute>} />
             <Route path="/privacy" element={<PrivacyPolicy />} />
             <Route path="/vs/:competitorSlug" element={<CompetitorVsPage />} />
             {SEO_PAGES.map((p) => (
               <Route key={p.path} path={p.path} element={<SeoLandingPage />} />
             ))}
-            <Route path="/login" element={<Login />} />
+            <Route path="/login" element={<PublicOnlyRoute><Login /></PublicOnlyRoute>} />
             <Route path="/verify" element={<Verify />} />
             <Route path="/paywall" element={<PaywallRoute />} />
 
@@ -538,6 +550,7 @@ function App() {
           </Routes>
         </ErrorBoundary>
       </Suspense>
+      <AuthFlowThemeToggle />
       <CookieConsent />
     </BrowserRouter>
   );

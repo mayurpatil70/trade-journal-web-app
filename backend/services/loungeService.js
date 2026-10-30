@@ -75,11 +75,19 @@ export async function getOrCreateDirectConversation(userA, userB) {
   return { id: conversation.id, created: true };
 }
 
+// users.username comes from migration 012; fall back to the older columns if it has not run yet.
+async function selectUsers(ids) {
+  const { data, error } = await supabase.from("users").select("id, email, display_name, avatar_url, username").in("id", ids);
+  if (!error) return data;
+  const { data: legacy } = await supabase.from("users").select("id, email, display_name, avatar_url").in("id", ids);
+  return legacy;
+}
+
 export async function getUserSummaries(userIds) {
   const ids = [...new Set(userIds.filter(Boolean).map(String))];
   if (!ids.length) return {};
-  const [{ data: users }, { data: profiles }] = await Promise.all([
-    supabase.from("users").select("id, email, display_name, avatar_url").in("id", ids),
+  const [users, { data: profiles }] = await Promise.all([
+    selectUsers(ids),
     supabase
       .from("trader_profiles")
       .select("user_id, handle, primary_strategy, prop_badges, is_verified, is_public")
@@ -94,7 +102,7 @@ export async function getUserSummaries(userIds) {
       ...byId[u.id],
       displayName: u.display_name || fallback,
       avatarUrl: u.avatar_url || null,
-      handle: fallback.toLowerCase().replace(/[^a-z0-9_]/g, ""),
+      handle: u.username || fallback.toLowerCase().replace(/[^a-z0-9_]/g, ""),
     };
   }
   for (const p of profiles || []) {

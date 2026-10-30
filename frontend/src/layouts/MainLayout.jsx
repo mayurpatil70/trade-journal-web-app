@@ -125,18 +125,13 @@ const NavItem = ({
 
 // Expandable Nav Item for Nested Route Groups (Matches TradeFXBook Analysis Menu)
 const ExpandableNavItem = ({ item, currentPath, closeMenu }) => {
-  const isChildActive = item.children?.some(
-    (c) => currentPath === c.to || currentPath.startsWith(c.to + "/")
-  );
-  const [isOpen, setIsOpen] = useState(
-    isChildActive || currentPath.startsWith("/analysis")
-  );
+  const inSection = item.matchPrefixes.some((p) => currentPath.startsWith(p));
+  const isChildActive = inSection;
+  const [isOpen, setIsOpen] = useState(inSection);
 
   useEffect(() => {
-    if (isChildActive || currentPath.startsWith("/analysis")) {
-      setIsOpen(true);
-    }
-  }, [currentPath, isChildActive]);
+    if (inSection) setIsOpen(true);
+  }, [inSection]);
 
   const Icon = item.icon;
 
@@ -170,7 +165,7 @@ const ExpandableNavItem = ({ item, currentPath, closeMenu }) => {
             setIsOpen((prev) => !prev);
           }}
           className="w-6 h-6 rounded-lg flex items-center justify-center bg-blue-500/10 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 transition-colors hover:bg-blue-500/20"
-          aria-label="Toggle analysis menu"
+          aria-label={`Toggle ${item.label} menu`}
         >
           {isOpen ? (
             <ChevronUp className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" strokeWidth={2.5} />
@@ -185,7 +180,9 @@ const ExpandableNavItem = ({ item, currentPath, closeMenu }) => {
         <div className="pl-3 space-y-1 pt-0.5">
           {item.children.map((sub) => {
             const isSubActive =
-              currentPath === sub.to || currentPath.startsWith(sub.to + "/");
+              currentPath === sub.to ||
+              (!sub.end && currentPath.startsWith(sub.to + "/")) ||
+              sub.alsoActive?.some((p) => currentPath.startsWith(p));
             const SubIcon = sub.icon;
             return (
               <Link
@@ -264,6 +261,15 @@ export default function MainLayout() {
   };
   const userCardRef = useRef(null);
   const location = useLocation();
+  const [pastDashboardTopBar, setPastDashboardTopBar] = useState(false);
+
+  useEffect(() => {
+    if (location.pathname !== "/dashboard") return;
+    const onScroll = () => setPastDashboardTopBar(window.scrollY > 90);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [location.pathname]);
   const navigate = useNavigate();
 
   // Support / feedback event listeners & query param sync
@@ -460,6 +466,7 @@ export default function MainLayout() {
           to: "/analysis/performance",
           icon: BarChart2,
           isExpandable: true,
+          matchPrefixes: ["/analysis"],
           children: [
             { to: "/analysis/performance", icon: TrendingUp, label: "Performance" },
             { to: "/analysis/trades", icon: FileText, label: "Trade Analysis" },
@@ -468,12 +475,21 @@ export default function MainLayout() {
       ],
     },
     {
-      label: "Traders Lounge",
+      label: "Community",
       items: [
-        { to: "/lounge", icon: Trophy, label: "Leaderboard", end: true },
-        { to: "/lounge/feed", icon: MessageSquareText, label: "Thought Stream" },
-        { to: "/messages", icon: MessagesSquare, label: "Messages" },
-        { to: "/lounge/deals", icon: Gift, label: "Partner Deals" },
+        {
+          label: "Traders Lounge",
+          to: "/lounge",
+          icon: Users,
+          isExpandable: true,
+          matchPrefixes: ["/lounge", "/messages"],
+          children: [
+            { to: "/lounge", icon: Trophy, label: "Leaderboard", end: true, alsoActive: ["/lounge/trader"] },
+            { to: "/lounge/feed", icon: MessageSquareText, label: "Thought Stream" },
+            { to: "/messages", icon: MessagesSquare, label: "Messages", alsoActive: ["/lounge/chat"] },
+            { to: "/lounge/deals", icon: Gift, label: "Partner Deals" },
+          ],
+        },
       ],
     },
     {
@@ -764,7 +780,7 @@ export default function MainLayout() {
   return (
     <div
       className="flex h-screen w-full bg-[#f8f9fc] dark:bg-[#0a0c10] text-neutral-900 dark:text-neutral-100 transition-colors duration-300 overflow-hidden font-sans relative"
-      style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif" }}
+      style={{ fontFamily: "var(--font-sans)" }}
     >
       {/* ── Ambient Background Canvas ── */}
       <div className="pointer-events-none absolute inset-0 z-0 select-none bg-gradient-to-br from-transparent via-transparent to-blue-500/[0.02]" />
@@ -801,8 +817,8 @@ export default function MainLayout() {
           document.body
         )}
 
-      {/* ── Desktop Top-Right Action Cluster (Always Visible across pages, hidden on /dashboard to avoid duplicate overlap) ── */}
-      {location.pathname !== "/dashboard" && (
+      {/* ── Desktop Top-Right Action Cluster (on /dashboard it appears once the top bar scrolls away) ── */}
+      {(location.pathname !== "/dashboard" || pastDashboardTopBar) && (
         <div className="max-md:hidden flex fixed top-3.5 right-6 z-50 items-center gap-2 p-1 rounded-2xl bg-white/75 dark:bg-[#10131b]/75 backdrop-blur-2xl border border-black/[0.08] dark:border-white/[0.12] shadow-[0_4px_20px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.5)] transition-all">
           <button
             type="button"
