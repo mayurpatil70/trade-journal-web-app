@@ -209,12 +209,20 @@ export async function unfollow(req, res) {
   }
 }
 
+// Followers, following, or mutuals: people the viewer follows who also follow this trader.
 export async function listFollows(req, res) {
   try {
     const id = String(req.params.id);
-    const ids = req.path.endsWith("/followers") ? await getFollowerIds(id) : await getFollowingIds(id);
-    const [summaries, mine] = await Promise.all([getUserSummaries(ids), getFollowingIds(req.userId)]);
+    const kind = req.path.split("/").pop();
+    const [targetFollowers, targetFollowing, mine] = await Promise.all([
+      kind === "following" ? null : getFollowerIds(id),
+      kind === "following" ? getFollowingIds(id) : null,
+      getFollowingIds(req.userId),
+    ]);
     const mineSet = new Set(mine);
+    const ids =
+      kind === "followers" ? targetFollowers : kind === "following" ? targetFollowing : targetFollowers.filter((uid) => mineSet.has(uid));
+    const summaries = await getUserSummaries(ids);
     res.json(ids.map((uid) => ({ ...summaries[uid], isFollowing: mineSet.has(uid), isOnline: isOnline(uid) })));
   } catch (err) {
     fail(res, err);
@@ -269,7 +277,7 @@ export async function createPost(req, res) {
   try {
     const body = req.body || {};
     const content = String(body.content || "").trim().slice(0, 2000);
-    if (!content) return fail(res, "Write something first.", 400);
+    if (!content && !req.files?.length) return fail(res, "Write something or add a photo first.", 400);
 
     const mediaUrls = [];
     for (const file of (req.files || []).slice(0, 4)) {
@@ -302,6 +310,15 @@ export async function createPost(req, res) {
       if (parent && parent.user_id !== req.userId) emitToUser(parent.user_id, "social:reply", post);
     }
     res.status(201).json(post);
+  } catch (err) {
+    fail(res, err);
+  }
+}
+
+export async function uploadImage(req, res) {
+  try {
+    if (!req.file) return fail(res, "Choose an image to upload.", 400);
+    res.status(201).json({ url: await uploadToCloudinary(req.file.buffer, "forex_notes_lounge") });
   } catch (err) {
     fail(res, err);
   }
@@ -446,18 +463,26 @@ export async function getMessages(req, res) {
 
 export async function searchTraders(req, res) {
   try {
-    const q = String(req.query.q || "").trim().slice(0, 40);
+    const q = String(req.query.q || "").trim().replace(/^@/, "").slice(0, 40);
     if (q.length < 2) return res.json([]);
     const like = `%${q.replace(/[%_,()]/g, "")}%`;
-    const [{ data: byName }, { data: byHandle }] = await Promise.all([
+    const [{ data: byName }, { data: byHandle }, byUsername] = await Promise.all([
       supabase.from("users").select("id").ilike("display_name", like).limit(10),
       supabase.from("trader_profiles").select("user_id").ilike("handle", like).limit(10),
+      supabase.from("users").select("id").ilike("username", like).limit(10),
     ]);
-    const ids = [...new Set([...(byName || []).map((u) => u.id), ...(byHandle || []).map((p) => p.user_id)])]
+    const ids = [
+      ...new Set([
+        ...(byUsername.data || []).map((u) => u.id),
+        ...(byHandle || []).map((p) => p.user_id),
+        ...(byName || []).map((u) => u.id),
+      ]),
+    ]
       .filter((id) => id !== req.userId)
       .slice(0, 12);
-    const summaries = await getUserSummaries(ids);
-    res.json(ids.map((id) => ({ ...summaries[id], isOnline: isOnline(id) })));
+    const [summaries, mine] = await Promise.all([getUserSummaries(ids), getFollowingIds(req.userId)]);
+    const mineSet = new Set(mine);
+    res.json(ids.map((id) => ({ ...summaries[id], isFollowing: mineSet.has(id), isOnline: isOnline(id) })));
   } catch (err) {
     fail(res, err);
   }

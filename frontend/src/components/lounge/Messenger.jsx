@@ -1,6 +1,6 @@
 // frontend/src/components/lounge/Messenger.jsx
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { ArrowLeft, Hash, Send, Search, CheckCheck, Check, Loader2, LineChart, X } from "lucide-react";
+import { ArrowLeft, Hash, Send, Search, CheckCheck, Check, Loader2, LineChart, X, ImagePlus } from "lucide-react";
 import api from "../../api/axios";
 import { getSocket, useSocketEvent, useOnlineSet, emitWithAck } from "../../lib/socket";
 import { Avatar, TraderName, RichText, timeAgo, formatMoney } from "./LoungeUI";
@@ -191,8 +191,10 @@ export function ChatThread({ conversation, me, onBack, pendingTrade, onTradeSent
   const [text, setText] = useState("");
   const [typers, setTypers] = useState({});
   const [sending, setSending] = useState(false);
+  const [uploadError, setUploadError] = useState("");
   const online = useOnlineSet();
   const scroller = useRef(null);
+  const fileRef = useRef(null);
   const stickToBottom = useRef(true);
   const lastTypingEmit = useRef(0);
   const convId = conversation.id;
@@ -281,18 +283,34 @@ export function ChatThread({ conversation, me, onBack, pendingTrade, onTradeSent
     }
   };
 
-  const send = async (sharedTrade) => {
+  const send = async (sharedTrade, chartUrl) => {
     const content = text.trim();
-    if ((!content && !sharedTrade) || sending) return;
+    if ((!content && !sharedTrade && !chartUrl) || sending) return;
     setSending(true);
     stickToBottom.current = true;
-    const res = await emitWithAck("message:send", { roomId: convId, content, sharedTrade });
+    const res = await emitWithAck("message:send", { roomId: convId, content, sharedTrade, chartUrl });
     setSending(false);
     if (res?.ok) {
       setText("");
       setMessages((list) => (list.some((m) => m.id === res.message.id) ? list : [...list, res.message]));
       getSocket()?.emit("message:typing", { targetId: convId, isRoom: true, isTyping: false });
       if (sharedTrade) onTradeSent?.();
+    }
+  };
+
+  const sendImage = async (file) => {
+    if (!file) return;
+    setUploadError("");
+    setSending(true);
+    try {
+      const fd = new FormData();
+      fd.append("image", file);
+      const { data } = await api.post("/api/social/uploads", fd, { headers: { "Content-Type": "multipart/form-data" } });
+      setSending(false);
+      await send(undefined, data.url);
+    } catch (err) {
+      setSending(false);
+      setUploadError(err.response?.data?.error || "Could not upload the photo.");
     }
   };
 
@@ -421,6 +439,26 @@ export function ChatThread({ conversation, me, onBack, pendingTrade, onTradeSent
         className="flex items-center gap-2 p-3 border-t border-black/[0.05] dark:border-white/[0.06]"
       >
         <input
+          ref={fileRef}
+          type="file"
+          accept="image/*"
+          hidden
+          onChange={(e) => {
+            sendImage(e.target.files?.[0]);
+            e.target.value = "";
+          }}
+        />
+        <button
+          type="button"
+          onClick={() => fileRef.current?.click()}
+          disabled={sending}
+          className="w-9 h-9 shrink-0 rounded-full text-[#0066FF] hover:bg-blue-500/10 flex items-center justify-center disabled:opacity-40"
+          aria-label="Send a photo"
+          title="Send a photo"
+        >
+          {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <ImagePlus className="w-4 h-4" />}
+        </button>
+        <input
           value={text}
           onChange={(e) => onType(e.target.value)}
           placeholder={isChannel ? `Message ${conversation.title}` : "Message…"}
@@ -436,6 +474,7 @@ export function ChatThread({ conversation, me, onBack, pendingTrade, onTradeSent
           <Send className="w-4 h-4" />
         </button>
       </form>
+      {uploadError && <p className="px-4 pb-2 -mt-1 text-xs text-red-500">{uploadError}</p>}
     </div>
   );
 }

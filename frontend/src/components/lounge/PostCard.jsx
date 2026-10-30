@@ -179,7 +179,7 @@ export function Composer({ me, parentId, onPosted, placeholder = "Share a though
   const fileRef = useRef(null);
 
   const submit = async () => {
-    if (!content.trim()) return;
+    if (!content.trim() && !files.length) return;
     setPosting(true);
     setError("");
     try {
@@ -245,8 +245,9 @@ export function Composer({ me, parentId, onPosted, placeholder = "Share a though
             hidden
             onChange={(e) => setFiles([...files, ...Array.from(e.target.files || [])].slice(0, 4))}
           />
-          <button type="button" onClick={() => fileRef.current?.click()} className="p-2 rounded-full text-[#0066FF] hover:bg-blue-500/10" title="Add chart (2 images = before/after)">
+          <button type="button" onClick={() => fileRef.current?.click()} className="p-2 rounded-full text-[#0066FF] hover:bg-blue-500/10" title="Add photos or charts (up to 4)">
             <ImagePlus className="w-4 h-4" />
+            <span className="sr-only">Add photo</span>
           </button>
           {!parentId && (
             <>
@@ -273,7 +274,7 @@ export function Composer({ me, parentId, onPosted, placeholder = "Share a though
           <button
             type="button"
             onClick={submit}
-            disabled={posting || !content.trim()}
+            disabled={posting || (!content.trim() && !files.length)}
             className="ml-auto rounded-full bg-[#0066FF] hover:bg-[#0052CC] text-white text-sm font-semibold px-4 py-1.5 disabled:opacity-50"
           >
             {posting ? "Posting…" : parentId ? "Reply" : "Post"}

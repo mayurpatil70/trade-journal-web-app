@@ -20,11 +20,13 @@ router.get("/leaderboard", social.getLeaderboard);
 router.get("/traders/:id", social.getTraderProfile);
 router.get("/traders/:id/followers", social.listFollows);
 router.get("/traders/:id/following", social.listFollows);
+router.get("/traders/:id/mutuals", social.listFollows);
 router.post("/follow", writeLimit, social.follow);
 router.post("/unfollow", writeLimit, social.unfollow);
 
 router.get("/feed", social.getFeed);
 router.post("/posts", writeLimit, upload.array("media", 4), social.createPost);
+router.post("/uploads", writeLimit, upload.single("image"), social.uploadImage);
 router.get("/posts/:id", social.getPost);
 router.delete("/posts/:id", social.deletePost);
 router.post("/posts/:id/:kind", writeLimit, social.toggleReaction);
