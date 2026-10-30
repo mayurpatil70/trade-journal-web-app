@@ -7,6 +7,8 @@ import MonthlyPnlCalendar from "../components/dashboard/MonthlyPnlCalendar";
 import TradeFXBookAddTradeModal from "../components/dashboard/TradeFXBookAddTradeModal";
 import MorningTradingQuoteModal from "../components/dashboard/MorningTradingQuoteModal";
 import SocialFollowCard from "../components/dashboard/SocialFollowCard";
+import NewUserWelcomeCard from "../components/dashboard/NewUserWelcomeCard";
+import { WinProPromoModal } from "../components/PromoPopup";
 import DashboardNewsTicker from "../components/dashboard/DashboardNewsTicker";
 import OnboardingRulesModal from "../components/guardrails/OnboardingRulesModal";
 import RuleBreachAlert from "../components/guardrails/RuleBreachAlert";
@@ -32,7 +34,6 @@ import {
   ShieldCheck,
   ShieldAlert,
   Target,
-  Briefcase,
 } from "lucide-react";
 
 export const normalizeTradeR = (t) => {
@@ -169,6 +170,32 @@ export default function Dashboard() {
     return !onboarded;
   });
 
+  // New users see: welcome card -> WinPro IB card -> social card, one at a time.
+  const introKey = `fn_dashboard_intro_${userId}`;
+  const [introStep, setIntroStep] = useState(() => {
+    const saved = localStorage.getItem(introKey);
+    if (saved) return saved;
+    const isNewUser =
+      localStorage.getItem("fn_new_signup") === "true" &&
+      localStorage.getItem(`fn_dashboard_visited_${userId}`) !== "true";
+    return isNewUser ? "welcome" : "done";
+  });
+
+  const advanceIntro = () => {
+    const next = introStep === "welcome" ? "ib" : "done";
+    localStorage.setItem(introKey, next);
+    if (next === "done") {
+      const now = new Date();
+      const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+      localStorage.setItem("fn_trading_day_started", today);
+      localStorage.setItem(`fn_dashboard_visited_${userId}`, "true");
+      localStorage.setItem(`fn_ib_popup_dismissed_${userId}`, "true");
+      localStorage.setItem("winpro_ib_dismissed", "true");
+      localStorage.removeItem("fn_new_signup");
+    }
+    setIntroStep(next);
+  };
+
   const [disciplineRules, setDisciplineRules] = useState(() => {
     try {
       return JSON.parse(localStorage.getItem(`trader_discipline_${userId}`) || "{}");
@@ -274,17 +301,6 @@ export default function Dashboard() {
       .slice(0, 5);
   }, [trades]);
 
-  const openPositions = useMemo(() => {
-    return (trades || []).filter(
-      (t) =>
-        (t.result || "").toLowerCase() === "open" ||
-        (t.status || "").toLowerCase() === "open" ||
-        ((t.exit_price === null || t.exit_price === undefined || t.exit_price === "") &&
-          (t.exitPrice === null || t.exitPrice === undefined || t.exitPrice === "") &&
-          (t.pnl === null || t.pnl === undefined || t.pnl === ""))
-    );
-  }, [trades]);
-
   const performanceMetrics = useMemo(() => {
     return calculatePerformanceMetrics(trades, "$");
   }, [trades]);
@@ -345,67 +361,37 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* ── 4. OPEN POSITIONS & RECENT ACTIVITY (Matches TradeFXBook Screenshots 3 & 4) ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Open Positions Card */}
-        <div className="rounded-3xl p-6 bg-white dark:bg-[#121622] border border-black/[0.06] dark:border-white/[0.08] shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] flex flex-col justify-between">
-          <div>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-bold text-neutral-900 dark:text-white flex items-center gap-2">
-                <Briefcase className="w-4 h-4 text-[#0066FF]" />
-                <span>Open Positions</span>
-              </h3>
-              <span className="text-xs text-neutral-400 font-medium font-mono">
-                {openPositions.length} open
-              </span>
+      {/* ── 4. RECENT ACTIVITY ── */}
+      <div className="rounded-3xl p-6 bg-white dark:bg-[#121622] border border-black/[0.06] dark:border-white/[0.08] shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] flex flex-col justify-between fn-card-hover">
+        <div>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-bold text-neutral-900 dark:text-white flex items-center gap-2">
+              <Clock className="w-4 h-4 text-blue-500" />
+              <span>Recent Activity</span>
+            </h3>
+            <span className="text-xs text-neutral-400 font-medium">
+              {recentActivityTrades.length} trades
+            </span>
+          </div>
+          {recentActivityTrades.length === 0 ? (
+            <div className="py-12 flex flex-col items-center justify-center text-neutral-400 dark:text-neutral-500">
+              <Clock className="w-8 h-8 mb-2 opacity-30" />
+              <p className="text-xs font-medium">No recent activity</p>
             </div>
-
-            {openPositions.length === 0 ? (
-              <div className="py-6 flex flex-col items-center justify-center text-center">
-                <div className="w-11 h-11 rounded-2xl bg-black/[0.03] dark:bg-white/[0.04] border border-black/[0.04] dark:border-white/[0.05] flex items-center justify-center mb-2">
-                  <Briefcase className="w-5 h-5 opacity-40 text-neutral-500" />
-                </div>
-                <p className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">No open positions</p>
-                <p className="text-[11px] text-neutral-400 mt-0.5 mb-3.5">All logged trades are closed</p>
-
-                {/* Discord Server Link & Badge at Empty Card */}
-                <a
-                  href="https://discord.gg/Ajaw3AjfWE"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full p-2.5 rounded-2xl bg-[#5865F2]/[0.08] dark:bg-[#5865F2]/15 border border-[#5865F2]/25 hover:border-[#5865F2]/50 hover:bg-[#5865F2]/[0.12] dark:hover:bg-[#5865F2]/20 transition-all flex items-center justify-between group/disc cursor-pointer"
-                >
-                  <div className="flex items-center gap-2.5 text-left">
-                    <div className="w-8 h-8 rounded-xl bg-[#5865F2] text-white flex items-center justify-center shrink-0 shadow-sm">
-                      <svg className="w-4 h-4 fill-white" viewBox="0 0 24 24">
-                        <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994.021-.041.001-.09-.041-.106a13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.929 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.894.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z" />
-                      </svg>
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-xs font-bold text-neutral-900 dark:text-white">ForexNotes Community</span>
-                        <span className="px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider bg-[#5865F2] text-white">VIP Badge</span>
-                      </div>
-                      <p className="text-[10px] text-neutral-500 dark:text-neutral-400">Join 10,000+ traders discussing live setups</p>
-                    </div>
-                  </div>
-                  <span className="px-2.5 py-1 rounded-xl bg-[#5865F2] text-white font-bold text-[11px] shadow-sm group-hover/disc:scale-105 transition-transform flex items-center gap-1 shrink-0">
-                    <span>Join Server</span>
-                    <ArrowRight className="w-3 h-3 text-white" />
-                  </span>
-                </a>
-              </div>
-            ) : (
-              <div className="space-y-2">
-                {openPositions.map((t, idx) => (
+          ) : (
+            <div className="space-y-2">
+              {recentActivityTrades.map((t, idx) => {
+                const r = normalizeTradeR(t);
+                const isWin = isTradeWin(t);
+                return (
                   <div
                     key={idx}
                     onClick={() => navigate("/trades")}
-                    className="p-3 rounded-2xl bg-neutral-50 dark:bg-white/[0.03] border border-black/[0.04] dark:border-white/[0.06] flex items-center justify-between hover:border-blue-500/30 transition-all cursor-pointer"
+                    className="p-3 rounded-2xl bg-neutral-50 dark:bg-white/[0.03] border border-black/[0.04] dark:border-white/[0.06] flex items-center justify-between hover:border-blue-500/25 transition-all cursor-pointer"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-7 h-7 rounded-full bg-blue-500/10 text-[#0066FF] dark:text-blue-400 font-black text-xs flex items-center justify-center">
-                        {t.asset?.[0] || "$"}
+                      <div className="w-7 h-7 rounded-full bg-amber-500/20 text-amber-600 dark:text-amber-400 font-bold text-xs flex items-center justify-center">
+                        🪙
                       </div>
                       <div>
                         <div className="flex items-center gap-2">
@@ -420,100 +406,32 @@ export default function Dashboard() {
                             {t.direction}
                           </span>
                         </div>
-                        <p className="text-[10px] text-neutral-400">
-                          Entry: {t.entry || "—"} • {t.date || "Today"}
-                        </p>
+                        <p className="text-[10px] text-neutral-400">{t.date}</p>
                       </div>
                     </div>
-                    <span className="text-[11px] font-bold font-mono px-2 py-0.5 rounded-lg bg-blue-500/10 text-[#0066FF] dark:text-blue-400">
-                      Open
+                    <span
+                      className={`text-xs font-bold font-mono px-2.5 py-1 rounded-xl ${
+                        isWin
+                          ? "text-emerald-600 dark:text-emerald-400 bg-emerald-500/10"
+                          : "text-rose-600 dark:text-rose-400 bg-rose-500/10"
+                      }`}
+                    >
+                      {r >= 0 ? "+" : ""}
+                      {r.toFixed(2)}R
                     </span>
                   </div>
-                ))}
-              </div>
-            )}
-          </div>
-          <button
-            onClick={() => setIsAddTradeModalOpen(true)}
-            className="mt-4 pt-3 border-t border-black/[0.05] dark:border-white/[0.06] text-xs font-semibold text-[#0066FF] dark:text-blue-400 hover:text-blue-600 flex items-center gap-1 group cursor-pointer"
-          >
-            <span>+ Log New Position</span>
-            <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-          </button>
-        </div>
-
-        {/* Recent Activity Card */}
-        <div className="rounded-3xl p-6 bg-white dark:bg-[#121622] border border-black/[0.06] dark:border-white/[0.08] shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] flex flex-col justify-between">
-          <div>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-bold text-neutral-900 dark:text-white flex items-center gap-2">
-                <Clock className="w-4 h-4 text-blue-500" />
-                <span>Recent Activity</span>
-              </h3>
-              <span className="text-xs text-neutral-400 font-medium">
-                {recentActivityTrades.length} trades
-              </span>
+                );
+              })}
             </div>
-            {recentActivityTrades.length === 0 ? (
-              <div className="py-12 flex flex-col items-center justify-center text-neutral-400 dark:text-neutral-500">
-                <Clock className="w-8 h-8 mb-2 opacity-30" />
-                <p className="text-xs font-medium">No recent activity</p>
-              </div>
-            ) : (
-              <div className="space-y-2">
-                {recentActivityTrades.map((t, idx) => {
-                  const r = normalizeTradeR(t);
-                  const isWin = isTradeWin(t);
-                  return (
-                    <div
-                      key={idx}
-                      onClick={() => navigate("/trades")}
-                      className="p-3 rounded-2xl bg-neutral-50 dark:bg-white/[0.03] border border-black/[0.04] dark:border-white/[0.06] flex items-center justify-between hover:border-blue-500/25 transition-all cursor-pointer"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="w-7 h-7 rounded-full bg-amber-500/20 text-amber-600 dark:text-amber-400 font-bold text-xs flex items-center justify-center">
-                          🪙
-                        </div>
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <p className="text-xs font-bold text-neutral-900 dark:text-white">{t.asset}</p>
-                            <span
-                              className={`text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded ${
-                                t.direction === "LONG"
-                                  ? "bg-emerald-500/10 text-emerald-600"
-                                  : "bg-rose-500/10 text-rose-600"
-                              }`}
-                            >
-                              {t.direction}
-                            </span>
-                          </div>
-                          <p className="text-[10px] text-neutral-400">{t.date}</p>
-                        </div>
-                      </div>
-                      <span
-                        className={`text-xs font-bold font-mono px-2.5 py-1 rounded-xl ${
-                          isWin
-                            ? "text-emerald-600 dark:text-emerald-400 bg-emerald-500/10"
-                            : "text-rose-600 dark:text-rose-400 bg-rose-500/10"
-                        }`}
-                      >
-                        {r >= 0 ? "+" : ""}
-                        {r.toFixed(2)}R
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-          <button
-            onClick={() => navigate("/trades")}
-            className="mt-4 pt-3 border-t border-black/[0.05] dark:border-white/[0.06] text-xs font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 flex items-center gap-1 group cursor-pointer"
-          >
-            <span>View All Activity</span>
-            <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-          </button>
+          )}
         </div>
+        <button
+          onClick={() => navigate("/trades")}
+          className="mt-4 pt-3 border-t border-black/[0.05] dark:border-white/[0.06] text-xs font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 flex items-center gap-1 group cursor-pointer"
+        >
+          <span>View All Activity</span>
+          <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+        </button>
       </div>
 
       {/* Trading Health */}
@@ -560,7 +478,7 @@ export default function Dashboard() {
           {/* LAB 1: Strategy Edge */}
           <div
             onClick={() => navigate("/analysis/performance")}
-            className="p-5 rounded-2xl bg-neutral-50 dark:bg-white/[0.03] border border-black/[0.04] dark:border-white/[0.05] hover:border-blue-500/30 cursor-pointer group transition-all flex flex-col justify-between"
+            className="p-5 rounded-2xl bg-neutral-50 dark:bg-white/[0.03] border border-black/[0.04] dark:border-white/[0.05] hover:border-blue-500/30 cursor-pointer group fn-card-hover flex flex-col justify-between"
           >
             <div>
               <div className="flex items-center justify-between mb-3.5 pb-2.5 border-b border-black/[0.04] dark:border-white/[0.05]">
@@ -636,7 +554,7 @@ export default function Dashboard() {
           {/* LAB 2: Psychology & Discipline */}
           <div
             onClick={() => navigate("/analysis/performance")}
-            className="p-5 rounded-2xl bg-neutral-50 dark:bg-white/[0.03] border border-black/[0.04] dark:border-white/[0.05] hover:border-blue-500/30 cursor-pointer group transition-all flex flex-col justify-between"
+            className="p-5 rounded-2xl bg-neutral-50 dark:bg-white/[0.03] border border-black/[0.04] dark:border-white/[0.05] hover:border-blue-500/30 cursor-pointer group fn-card-hover flex flex-col justify-between"
           >
             <div>
               <div className="flex items-center justify-between mb-3.5 pb-2.5 border-b border-black/[0.04] dark:border-white/[0.05]">
@@ -703,7 +621,7 @@ export default function Dashboard() {
           {/* LAB 3: Mistake Lab */}
           <div
             onClick={() => navigate("/analysis/performance")}
-            className="p-5 rounded-2xl bg-neutral-50 dark:bg-white/[0.03] border border-black/[0.04] dark:border-white/[0.05] hover:border-rose-500/30 cursor-pointer group transition-all flex flex-col justify-between"
+            className="p-5 rounded-2xl bg-neutral-50 dark:bg-white/[0.03] border border-black/[0.04] dark:border-white/[0.05] hover:border-rose-500/30 cursor-pointer group fn-card-hover flex flex-col justify-between"
           >
             <div>
               <div className="flex items-center justify-between mb-3.5 pb-2.5 border-b border-black/[0.04] dark:border-white/[0.05]">
@@ -792,7 +710,7 @@ export default function Dashboard() {
 
       {/* ── 8. MANDATORY ONBOARDING GUARDRAILS MODAL (New User First Login) ── */}
       <OnboardingRulesModal
-        isOpen={showOnboardingRules}
+        isOpen={showOnboardingRules && introStep === "done"}
         userId={userId}
         onComplete={(savedRules) => {
           setShowOnboardingRules(false);
@@ -801,10 +719,13 @@ export default function Dashboard() {
       />
 
       {/* ── 9. MORNING TRADING QUOTE 24H POP-UP MODAL (Screenshot 1) ── */}
-      <MorningTradingQuoteModal />
+      {introStep === "done" && <MorningTradingQuoteModal />}
 
-      {/* ── 10. SOCIAL MEDIA FOLLOW CARD (Screenshots 2, 3, 4) ── */}
-      <SocialFollowCard />
+      {introStep === "welcome" && <NewUserWelcomeCard onClose={advanceIntro} />}
+      {introStep === "ib" && <WinProPromoModal onClose={advanceIntro} />}
+
+      {/* ── 10. SOCIAL MEDIA FOLLOW CARD ── */}
+      <SocialFollowCard enabled={introStep === "done" && !showOnboardingRules} />
 
       {/* ── 11. HORIZONTAL BOTTOM NEWS TICKER BAR (Screenshots 3, 4, 5) ── */}
       <DashboardNewsTicker />
