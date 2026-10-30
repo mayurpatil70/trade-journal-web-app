@@ -278,13 +278,13 @@ export default function TradeFXBookTopBar({
           <PenSquare className="w-4 h-4" />
         </button>
 
-        {/* 5. Notification Bell (Right side of profile icon) */}
-        <div className="h-10 p-0.5 rounded-2xl bg-white/80 dark:bg-[#121622]/80 border border-black/[0.06] dark:border-white/[0.08] shadow-sm flex items-center justify-center">
+        {/* 5. Notification Bell (Hidden on mobile to prevent duplicate with MainLayout iOS mobile header) */}
+        <div className="hidden md:flex h-10 p-0.5 rounded-2xl bg-white/80 dark:bg-[#121622]/80 border border-black/[0.06] dark:border-white/[0.08] shadow-sm items-center justify-center">
           <NotificationBell />
         </div>
 
-        {/* 6. Theme Switcher (Right side of notification bell) */}
-        <div className="h-10 p-0.5 rounded-2xl bg-white/80 dark:bg-[#121622]/80 border border-black/[0.06] dark:border-white/[0.08] shadow-sm flex items-center justify-center">
+        {/* 6. Theme Switcher (Hidden on mobile to prevent duplicate with MainLayout iOS mobile header) */}
+        <div className="hidden md:flex h-10 p-0.5 rounded-2xl bg-white/80 dark:bg-[#121622]/80 border border-black/[0.06] dark:border-white/[0.08] shadow-sm items-center justify-center">
           <ThemeToggle />
         </div>
       </div>

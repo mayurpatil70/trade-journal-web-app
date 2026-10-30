@@ -62,15 +62,17 @@ export default function TradeShareModal({ isOpen, onClose, trade }) {
     const directionLabel = isSell ? "Sell" : "Buy";
 
     const symbol = (trade.asset || trade.symbol || "XAUUSD").toUpperCase();
-    const lots = trade.quantity || trade.lot_size || trade.lots || "0.2";
+    const rawLots = trade.quantity ?? trade.lot_size ?? trade.lots ?? trade.size ?? trade.volume ?? "0.1";
+    const lots = String(rawLots);
 
     // PnL calculation
     let pnlValue = 0;
-    if (trade.pnl !== null && trade.pnl !== undefined && !Number.isNaN(Number(trade.pnl))) {
-      pnlValue = Number(trade.pnl);
+    const directPnl = trade.pnl ?? trade.net_pnl ?? trade.profit ?? trade.realized_pnl;
+    if (directPnl !== null && directPnl !== undefined && !Number.isNaN(Number(directPnl))) {
+      pnlValue = Number(directPnl);
     } else {
-      const entry = Number(trade.entry || trade.entry_price || 0);
-      const exit = Number(trade.exit || trade.exit_price || 0);
+      const entry = Number(trade.entry || trade.entry_price || trade.entryPrice || 0);
+      const exit = Number(trade.exit || trade.exit_price || trade.exitPrice || 0);
       if (entry > 0 && exit > 0) {
         const diff = isSell ? entry - exit : exit - entry;
         pnlValue = diff * Number(lots || 1) * 100;
@@ -83,19 +85,43 @@ export default function TradeShareModal({ isOpen, onClose, trade }) {
       maximumFractionDigits: 2,
     })} USD`;
 
-    const entryPrice =
-      trade.entry || trade.entry_price
-        ? Number(trade.entry || trade.entry_price).toLocaleString("en-US", { minimumFractionDigits: 2 })
-        : "—";
-    const exitPrice =
-      trade.exit || trade.exit_price
-        ? Number(trade.exit || trade.exit_price).toLocaleString("en-US", { minimumFractionDigits: 2 })
-        : "—";
+    const rawEntry = trade.entry ?? trade.entry_price ?? trade.entryPrice ?? trade.open_price ?? trade.price;
+    const rawExit = trade.exit ?? trade.exit_price ?? trade.exitPrice ?? trade.close_price;
+
+    const formatPrice = (val) => {
+      if (val === null || val === undefined || val === "" || Number.isNaN(Number(val))) return "—";
+      const num = Number(val);
+      const isForex = /EUR|GBP|USD|AUD|NZD|CAD|CHF/i.test(symbol) && !/XAU|XAG|BTC|ETH/i.test(symbol);
+      return num.toLocaleString("en-US", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: isForex ? 5 : 2,
+      });
+    };
+
+    const entryPrice = formatPrice(rawEntry);
+    const exitPrice = formatPrice(rawExit);
+
+    // R-Multiple / Return
+    const rawR = trade.r_multiple ?? trade.rMultiple ?? trade.r;
+    let returnLabel = "";
+    if (rawR !== null && rawR !== undefined && !Number.isNaN(Number(rawR))) {
+      const rNum = Number(rawR);
+      returnLabel = `${rNum >= 0 ? "+" : ""}${rNum.toFixed(1)}R`;
+    } else if (trade.roi || trade.return_pct) {
+      const roi = Number(trade.roi || trade.return_pct);
+      returnLabel = `${roi >= 0 ? "+" : ""}${roi.toFixed(1)}%`;
+    }
+
+    // Duration
+    const rawDur = trade.duration ?? trade.hold_duration ?? (trade.hold_duration_minutes ? `${Math.floor(trade.hold_duration_minutes / 60)}h ${trade.hold_duration_minutes % 60}m` : null);
+    const durationStr = rawDur || (trade.status === "OPEN" ? "Active" : "Closed");
 
     // Timestamp formatting
     let dateStr = "Today";
-    if (trade.date) {
-      dateStr = `${trade.date} ${trade.time || "08:00:00"}`.trim();
+    const rawDate = trade.close_date || trade.exit_date || trade.date || trade.entry_date || trade.created_at;
+    const rawTime = trade.close_time || trade.exit_time || trade.time || trade.entry_time;
+    if (rawDate) {
+      dateStr = `${rawDate} ${rawTime || "08:00:00"}`.trim();
     } else {
       const d = new Date();
       const m = String(d.getMonth() + 1).padStart(2, "0");
@@ -117,6 +143,8 @@ export default function TradeShareModal({ isOpen, onClose, trade }) {
       formattedPnl,
       entryPrice,
       exitPrice,
+      returnLabel,
+      durationStr,
       dateStr,
     };
   }, [trade]);
@@ -167,29 +195,29 @@ export default function TradeShareModal({ isOpen, onClose, trade }) {
       ctx.stroke();
     }
 
-    // 3. Glowing Directional Vector Arrow in Background
+    // 3. Glowing Directional Vector Arrow in Background (Subtle & Polished, No Top-Right Clash)
     ctx.save();
     const arrowGrad = ctx.createLinearGradient(
-      targetWidth * 0.4,
-      targetHeight * 0.6,
-      targetWidth * 0.9,
-      targetHeight * 0.1
+      targetWidth * 0.35,
+      targetHeight * 0.65,
+      targetWidth * 0.82,
+      targetHeight * 0.25
     );
     if (tradeMetrics.isProfit) {
       arrowGrad.addColorStop(0, "rgba(0, 102, 255, 0.0)");
-      arrowGrad.addColorStop(0.4, "rgba(0, 102, 255, 0.16)");
-      arrowGrad.addColorStop(1, "rgba(56, 189, 248, 0.32)");
+      arrowGrad.addColorStop(0.5, "rgba(0, 102, 255, 0.06)");
+      arrowGrad.addColorStop(1, "rgba(56, 189, 248, 0.14)");
     } else {
       arrowGrad.addColorStop(0, "rgba(244, 63, 94, 0.0)");
-      arrowGrad.addColorStop(0.4, "rgba(244, 63, 94, 0.16)");
-      arrowGrad.addColorStop(1, "rgba(251, 113, 133, 0.32)");
+      arrowGrad.addColorStop(0.5, "rgba(244, 63, 94, 0.06)");
+      arrowGrad.addColorStop(1, "rgba(251, 113, 133, 0.14)");
     }
     ctx.fillStyle = arrowGrad;
 
     const isUp = tradeMetrics.isProfit;
-    const ax = targetWidth * 0.74;
-    const ay = isUp ? targetHeight * 0.28 : targetHeight * 0.62;
-    const asize = targetWidth * 0.34;
+    const ax = targetWidth * 0.70;
+    const ay = isUp ? targetHeight * 0.36 : targetHeight * 0.58;
+    const asize = targetWidth * 0.30;
 
     ctx.translate(ax, ay);
     ctx.rotate(isUp ? -Math.PI / 4 : Math.PI / 4);
@@ -263,7 +291,7 @@ export default function TradeShareModal({ isOpen, onClose, trade }) {
     ctx.textBaseline = "alphabetic";
 
     // 5. Body Section: Trade Performance
-    const bodyY = targetHeight * (aspect === "story" ? 0.30 : aspect === "landscape" ? 0.32 : 0.33);
+    const bodyY = targetHeight * (aspect === "story" ? 0.27 : aspect === "landscape" ? 0.32 : 0.33);
 
     // Category Pill / Tag
     ctx.fillStyle = tradeMetrics.isProfit ? "#38bdf8" : "#fb7185";
@@ -297,8 +325,8 @@ export default function TradeShareModal({ isOpen, onClose, trade }) {
     ctx.fillText(tradeMetrics.symbol, padX + dirW + sep1W + lotsW + sep2W, subY);
 
     // Giant Hero P&L Headline
-    const heroY = subY + targetHeight * (aspect === "story" ? 0.09 : aspect === "landscape" ? 0.15 : 0.13);
-    const heroFontSize = Math.round(baseDim * (aspect === "story" ? 0.09 : aspect === "landscape" ? 0.088 : 0.086));
+    const heroY = subY + targetHeight * (aspect === "story" ? 0.08 : aspect === "landscape" ? 0.15 : 0.13);
+    const heroFontSize = Math.round(baseDim * (aspect === "story" ? 0.086 : aspect === "landscape" ? 0.088 : 0.086));
     ctx.font = `900 ${heroFontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
     ctx.fillStyle = tradeMetrics.isProfit ? "#38bdf8" : "#fb7185";
 
@@ -308,45 +336,169 @@ export default function TradeShareModal({ isOpen, onClose, trade }) {
     ctx.fillText(tradeMetrics.formattedPnl, padX, heroY);
     ctx.shadowBlur = 0; // reset
 
-    // 6. Bento Grid Execution Details: Entry & Exit Boxes
-    const bentoY = heroY + targetHeight * (aspect === "story" ? 0.045 : aspect === "landscape" ? 0.065 : 0.06);
-    const boxHeight = targetHeight * (aspect === "story" ? 0.11 : aspect === "landscape" ? 0.16 : 0.135);
-    const boxWidth = (targetWidth - padX * 2 - (aspect === "landscape" ? 32 : 18)) / 2;
-    const box2X = padX + boxWidth + (aspect === "landscape" ? 32 : 18);
+    // 6. Bento Grid Execution Details (Responsive to Post, Story, Landscape)
+    if (aspect === "story") {
+      const boxHeight = targetHeight * 0.088;
+      const bentoY1 = heroY + targetHeight * 0.045;
+      const bentoY2 = bentoY1 + boxHeight + 16;
+      const boxWidth = (targetWidth - padX * 2 - 18) / 2;
+      const box2X = padX + boxWidth + 18;
 
-    // Draw Box 1 (Entry)
-    ctx.fillStyle = "rgba(255, 255, 255, 0.04)";
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    ctx.roundRect(padX, bentoY, boxWidth, boxHeight, 18);
-    ctx.fill();
-    ctx.stroke();
+      // Box 1: Entry Price
+      ctx.fillStyle = "rgba(255, 255, 255, 0.04)";
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.roundRect(padX, bentoY1, boxWidth, boxHeight, 18);
+      ctx.fill();
+      ctx.stroke();
 
-    ctx.fillStyle = "rgba(255, 255, 255, 0.75)";
-    ctx.font = `700 ${Math.round(baseDim * 0.018)}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
-    ctx.fillText("ENTRY PRICE", padX + 22, bentoY + boxHeight * 0.38);
+      ctx.fillStyle = "rgba(255, 255, 255, 0.75)";
+      ctx.font = `700 ${Math.round(baseDim * 0.018)}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
+      ctx.fillText("ENTRY PRICE", padX + 22, bentoY1 + boxHeight * 0.38);
+      ctx.fillStyle = "#ffffff";
+      ctx.font = `800 ${Math.round(baseDim * 0.034)}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace`;
+      ctx.fillText(tradeMetrics.entryPrice, padX + 22, bentoY1 + boxHeight * 0.80);
 
-    ctx.fillStyle = "#ffffff";
-    ctx.font = `800 ${Math.round(baseDim * 0.034)}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace`;
-    ctx.fillText(tradeMetrics.entryPrice, padX + 22, bentoY + boxHeight * 0.80);
+      // Box 2: Exit Price
+      ctx.fillStyle = "rgba(255, 255, 255, 0.04)";
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
+      ctx.beginPath();
+      ctx.roundRect(box2X, bentoY1, boxWidth, boxHeight, 18);
+      ctx.fill();
+      ctx.stroke();
 
-    // Draw Box 2 (Exit)
-    ctx.fillStyle = "rgba(255, 255, 255, 0.04)";
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    ctx.roundRect(box2X, bentoY, boxWidth, boxHeight, 18);
-    ctx.fill();
-    ctx.stroke();
+      ctx.fillStyle = "rgba(255, 255, 255, 0.75)";
+      ctx.font = `700 ${Math.round(baseDim * 0.018)}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
+      ctx.fillText("EXIT PRICE", box2X + 22, bentoY1 + boxHeight * 0.38);
+      ctx.fillStyle = "#ffffff";
+      ctx.font = `800 ${Math.round(baseDim * 0.034)}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace`;
+      ctx.fillText(tradeMetrics.exitPrice, box2X + 22, bentoY1 + boxHeight * 0.80);
 
-    ctx.fillStyle = "rgba(255, 255, 255, 0.75)";
-    ctx.font = `700 ${Math.round(baseDim * 0.018)}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
-    ctx.fillText("EXIT PRICE", box2X + 22, bentoY + boxHeight * 0.38);
+      // Box 3: Hold Duration
+      ctx.fillStyle = "rgba(255, 255, 255, 0.04)";
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
+      ctx.beginPath();
+      ctx.roundRect(padX, bentoY2, boxWidth, boxHeight, 18);
+      ctx.fill();
+      ctx.stroke();
 
-    ctx.fillStyle = "#ffffff";
-    ctx.font = `800 ${Math.round(baseDim * 0.034)}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace`;
-    ctx.fillText(tradeMetrics.exitPrice, box2X + 22, bentoY + boxHeight * 0.80);
+      ctx.fillStyle = "rgba(255, 255, 255, 0.75)";
+      ctx.font = `700 ${Math.round(baseDim * 0.018)}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
+      ctx.fillText("HOLD DURATION", padX + 22, bentoY2 + boxHeight * 0.38);
+      ctx.fillStyle = "#ffffff";
+      ctx.font = `800 ${Math.round(baseDim * 0.034)}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace`;
+      ctx.fillText(tradeMetrics.durationStr, padX + 22, bentoY2 + boxHeight * 0.80);
+
+      // Box 4: Return / R-Multiple or Status
+      ctx.fillStyle = "rgba(255, 255, 255, 0.04)";
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
+      ctx.beginPath();
+      ctx.roundRect(box2X, bentoY2, boxWidth, boxHeight, 18);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = "rgba(255, 255, 255, 0.75)";
+      ctx.font = `700 ${Math.round(baseDim * 0.018)}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
+      ctx.fillText(tradeMetrics.returnLabel ? "RETURN / R" : "EXECUTION", box2X + 22, bentoY2 + boxHeight * 0.38);
+      ctx.fillStyle = tradeMetrics.isProfit ? "#38bdf8" : "#fb7185";
+      ctx.font = `800 ${Math.round(baseDim * 0.034)}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace`;
+      ctx.fillText(tradeMetrics.returnLabel || (tradeMetrics.isProfit ? "WIN" : "LOSS"), box2X + 22, bentoY2 + boxHeight * 0.80);
+    } else if (aspect === "landscape") {
+      const boxHeight = targetHeight * 0.16;
+      const bentoY = heroY + targetHeight * 0.065;
+      const boxGap = 20;
+      const boxWidth = (targetWidth - padX * 2 - boxGap * 2) / 3;
+      const box2X = padX + boxWidth + boxGap;
+      const box3X = padX + (boxWidth + boxGap) * 2;
+
+      // Box 1: Entry
+      ctx.fillStyle = "rgba(255, 255, 255, 0.04)";
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.roundRect(padX, bentoY, boxWidth, boxHeight, 18);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = "rgba(255, 255, 255, 0.75)";
+      ctx.font = `700 ${Math.round(baseDim * 0.018)}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
+      ctx.fillText("ENTRY PRICE", padX + 22, bentoY + boxHeight * 0.38);
+      ctx.fillStyle = "#ffffff";
+      ctx.font = `800 ${Math.round(baseDim * 0.034)}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace`;
+      ctx.fillText(tradeMetrics.entryPrice, padX + 22, bentoY + boxHeight * 0.80);
+
+      // Box 2: Exit
+      ctx.fillStyle = "rgba(255, 255, 255, 0.04)";
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
+      ctx.beginPath();
+      ctx.roundRect(box2X, bentoY, boxWidth, boxHeight, 18);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = "rgba(255, 255, 255, 0.75)";
+      ctx.font = `700 ${Math.round(baseDim * 0.018)}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
+      ctx.fillText("EXIT PRICE", box2X + 22, bentoY + boxHeight * 0.38);
+      ctx.fillStyle = "#ffffff";
+      ctx.font = `800 ${Math.round(baseDim * 0.034)}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace`;
+      ctx.fillText(tradeMetrics.exitPrice, box2X + 22, bentoY + boxHeight * 0.80);
+
+      // Box 3: Return & Duration
+      ctx.fillStyle = "rgba(255, 255, 255, 0.04)";
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
+      ctx.beginPath();
+      ctx.roundRect(box3X, bentoY, boxWidth, boxHeight, 18);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = "rgba(255, 255, 255, 0.75)";
+      ctx.font = `700 ${Math.round(baseDim * 0.018)}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
+      ctx.fillText(tradeMetrics.returnLabel ? "RETURN / DURATION" : "HOLD DURATION", box3X + 22, bentoY + boxHeight * 0.38);
+      ctx.fillStyle = tradeMetrics.isProfit ? "#38bdf8" : "#ffffff";
+      ctx.font = `800 ${Math.round(baseDim * 0.034)}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace`;
+      const box3Val = tradeMetrics.returnLabel ? `${tradeMetrics.returnLabel} • ${tradeMetrics.durationStr}` : tradeMetrics.durationStr;
+      ctx.fillText(box3Val, box3X + 22, bentoY + boxHeight * 0.80);
+    } else {
+      // Post (1080x1080)
+      const bentoY = heroY + targetHeight * 0.06;
+      const boxHeight = targetHeight * 0.135;
+      const boxWidth = (targetWidth - padX * 2 - 18) / 2;
+      const box2X = padX + boxWidth + 18;
+
+      // Draw Box 1 (Entry)
+      ctx.fillStyle = "rgba(255, 255, 255, 0.04)";
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.roundRect(padX, bentoY, boxWidth, boxHeight, 18);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = "rgba(255, 255, 255, 0.75)";
+      ctx.font = `700 ${Math.round(baseDim * 0.018)}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
+      ctx.fillText("ENTRY PRICE", padX + 22, bentoY + boxHeight * 0.38);
+
+      ctx.fillStyle = "#ffffff";
+      ctx.font = `800 ${Math.round(baseDim * 0.034)}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace`;
+      ctx.fillText(tradeMetrics.entryPrice, padX + 22, bentoY + boxHeight * 0.80);
+
+      // Draw Box 2 (Exit)
+      ctx.fillStyle = "rgba(255, 255, 255, 0.04)";
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.roundRect(box2X, bentoY, boxWidth, boxHeight, 18);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = "rgba(255, 255, 255, 0.75)";
+      ctx.font = `700 ${Math.round(baseDim * 0.018)}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
+      ctx.fillText(tradeMetrics.returnLabel ? `EXIT (${tradeMetrics.returnLabel})` : "EXIT PRICE", box2X + 22, bentoY + boxHeight * 0.38);
+
+      ctx.fillStyle = "#ffffff";
+      ctx.font = `800 ${Math.round(baseDim * 0.034)}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace`;
+      ctx.fillText(tradeMetrics.exitPrice, box2X + 22, bentoY + boxHeight * 0.80);
+    }
 
     // 7. Hairline Separator Line
     const sepLineY = targetHeight * 0.85;
@@ -655,10 +807,10 @@ export default function TradeShareModal({ isOpen, onClose, trade }) {
             disabled={isGenerating || isRenderingPreview}
             onClick={handleShare}
             style={{ backgroundColor: "#0066FF", color: "#ffffff" }}
-            className="flex-1 py-3 px-4 rounded-xl bg-[#0066FF] hover:bg-[#0052cc] text-white text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50 shadow-md shadow-blue-500/25 btn-primary-blue"
+            className="flex-1 py-3 px-4 rounded-xl bg-[#0066FF] hover:bg-[#0052cc] text-white text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50 shadow-md shadow-blue-500/25 btn-primary-blue share-modal-btn-primary"
           >
-            {copied ? <Check className="w-4 h-4 text-white" /> : <Share2 className="w-4 h-4 text-white" />}
-            <span className="text-white font-bold">{copied ? "Copied!" : "Share"}</span>
+            {copied ? <Check className="w-4 h-4 text-white stroke-[2.5]" /> : <Share2 className="w-4 h-4 text-white stroke-[2.5]" />}
+            <span className="text-white font-bold" style={{ color: "#ffffff" }}>{copied ? "Copied!" : "Share"}</span>
           </button>
         </div>
 

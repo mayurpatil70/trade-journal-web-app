@@ -38,7 +38,7 @@ export default function SocialFollowCard({ className = "" }) {
   return (
     <div
       aria-label="Follow ForexNotes Socials"
-      className={`fixed bottom-24 sm:bottom-28 right-4 sm:right-6 z-40 w-[300px] rounded-2xl bg-white dark:bg-[#121622] border border-black/[0.08] dark:border-white/[0.1] shadow-[0_16px_40px_rgba(0,0,0,0.14)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.5)] p-4 overflow-hidden select-none animate-in fade-in slide-in-from-bottom-4 duration-300 ${className}`}
+      className={`fixed bottom-[140px] sm:bottom-[152px] right-4 sm:right-6 z-40 w-[300px] rounded-2xl bg-white dark:bg-[#121622] border border-black/[0.08] dark:border-white/[0.1] shadow-[0_16px_40px_rgba(0,0,0,0.14)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.5)] p-4 overflow-hidden select-none animate-in fade-in slide-in-from-bottom-4 duration-300 ${className}`}
     >
       {/* Background Grid Pattern & Stylized Upward Diagonal Arrow */}
       <div className="absolute inset-0 pointer-events-none opacity-[0.035] dark:opacity-[0.06] bg-[radial-gradient(#0066FF_1px,transparent_1px)] [background-size:12px_12px]" />

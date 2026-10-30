@@ -159,7 +159,7 @@ export default function PreTradeGate() {
 
   return (
     <div
-      className={`fixed z-50 flex flex-col items-end ${expanded && isOpen ? "inset-0 md:inset-6 md:left-auto" : "bottom-11 right-4 md:bottom-12 md:right-6"}`}
+      className={`fixed z-50 flex flex-col items-end ${expanded && isOpen ? "inset-0 md:inset-6 md:left-auto" : "bottom-14 right-4 md:bottom-16 md:right-6"}`}
       style={{ fontFamily: "'Inter', sans-serif" }}
     >
       {/* ── Chat Modal ───────────────────────────────────────────────────── */}

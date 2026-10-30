@@ -911,38 +911,35 @@ export default function PastTrades() {
         </div>
 
         {/* Action Button Row - Aligned cleanly for Mobile & Desktop */}
-        <div className="w-full sm:w-auto flex flex-col sm:flex-row sm:items-center gap-2.5">
-          <div className="flex items-center gap-2 w-full sm:w-auto">
-            {/* All Accounts Dropdown Button */}
-            <div className="flex-1 sm:flex-initial">
-              <AccountFilter
-                trades={trades}
-                selectedAccount={selectedAccount}
-                onChange={setSelectedAccount}
-              />
-            </div>
-
-            {/* Clear All Button */}
-            <button
-              type="button"
-              onClick={() => setIsClearAllModalOpen(true)}
-              disabled={trades.length === 0}
-              className="h-10 px-3.5 sm:px-4 rounded-xl border border-rose-200 dark:border-rose-500/25 bg-white dark:bg-white/[0.03] hover:bg-rose-50 dark:hover:bg-rose-500/10 text-rose-500 dark:text-rose-400 font-bold text-xs sm:text-sm active:scale-[0.98] transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5 shadow-xs shrink-0"
-            >
-              <Trash2 className="w-3.5 h-3.5" />
-              <span>Clear All</span>
-            </button>
+        <div className="w-full sm:w-auto flex flex-wrap items-center gap-2">
+          {/* All Accounts Dropdown Button */}
+          <div className="flex-1 sm:flex-initial">
+            <AccountFilter
+              trades={trades}
+              selectedAccount={selectedAccount}
+              onChange={setSelectedAccount}
+            />
           </div>
 
-          {/* + Add Trade Button (Harmonized with header buttons, guaranteed crisp white text/icon) */}
+          {/* Clear All Button */}
+          <button
+            type="button"
+            onClick={() => setIsClearAllModalOpen(true)}
+            disabled={trades.length === 0}
+            className="h-10 px-3.5 sm:px-4 rounded-xl border border-rose-200 dark:border-rose-500/25 bg-white dark:bg-white/[0.03] hover:bg-rose-50 dark:hover:bg-rose-500/10 text-rose-500 dark:text-rose-400 font-bold text-xs sm:text-sm active:scale-[0.98] transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5 shadow-xs shrink-0"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+            <span>Clear All</span>
+          </button>
+
+          {/* + Add Trade Button (Matched with other buttons in light theme: clean white card with #0066FF blue accent, and solid blue in dark theme) */}
           <button
             type="button"
             onClick={() => setIsAddTradeModalOpen(true)}
-            style={{ backgroundColor: "#0066FF", color: "#ffffff" }}
-            className="w-full sm:w-auto h-10 px-4 rounded-xl bg-[#0066FF] hover:bg-[#0052CC] text-white font-bold text-xs sm:text-sm tracking-wide shadow-md shadow-[#0066FF]/25 active:scale-[0.98] transition-all cursor-pointer flex items-center justify-center gap-1.5 btn-primary-blue shrink-0"
+            className="h-10 px-3.5 sm:px-4 rounded-xl bg-white dark:bg-[#0066FF] hover:bg-blue-50 dark:hover:bg-[#0052cc] text-[#0066FF] dark:text-white border border-[#0066FF]/30 dark:border-[#0066FF] font-bold text-xs sm:text-sm tracking-wide shadow-xs active:scale-[0.98] transition-all cursor-pointer flex items-center justify-center gap-1.5 shrink-0"
           >
-            <Plus className="w-4 h-4 stroke-[2.5]" style={{ color: "#ffffff", stroke: "#ffffff" }} />
-            <span style={{ color: "#ffffff" }} className="font-bold">Add Trade</span>
+            <Plus className="w-4 h-4 stroke-[2.5] text-[#0066FF] dark:text-white" />
+            <span>Add Trade</span>
           </button>
         </div>
       </div>

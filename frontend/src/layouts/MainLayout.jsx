@@ -10,7 +10,6 @@ import PromoPopup from "../components/PromoPopup.jsx";
 import SystemAnnouncementBanner from "../components/SystemAnnouncementBanner.jsx";
 import ProfilePhotoModal from "../components/ui/ProfilePhotoModal.jsx";
 import SupportFeedbackModal from "../components/support/SupportFeedbackModal.jsx";
-import SocialFollowPopup from "../components/support/SocialFollowPopup.jsx";
 import { prefetchRoute, prefetchAllSecondaryRoutes } from "../utils/routePrefetch";
 import api, { logoutSession } from "../api/axios";
 import {
@@ -1232,7 +1231,6 @@ export default function MainLayout() {
         onClose={() => setIsSupportModalOpen(false)}
         initialMode={supportModalMode}
       />
-      <SocialFollowPopup />
     </div>
   );
 }

@@ -1751,3 +1751,32 @@ body.fn-morning-modal-open iframe:not([class*="modal"]) {
   visibility: hidden !important;
   transition: opacity 0.2s ease-out;
 }
+
+
+/* Dark Social Button Protection (Forces solid dark slate background and white text/icon in light mode) */
+html.light body:not(.terminal) .btn-dark-social,
+html.light body:not(.terminal) a.btn-dark-social,
+html.light body:not(.terminal) button.btn-dark-social,
+.btn-dark-social {
+  background-color: #0f172a !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+}
+html.light body:not(.terminal) .btn-dark-social *,
+.btn-dark-social * {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+}
+
+/* Share Trade Modal Primary Button Protection */
+html.light body:not(.terminal) .share-modal-btn-primary,
+.share-modal-btn-primary {
+  background-color: #0066ff !important;
+  color: #ffffff !important;
+}
+html.light body:not(.terminal) .share-modal-btn-primary *,
+.share-modal-btn-primary * {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+  stroke: #ffffff !important;
+}
