@@ -169,10 +169,7 @@ export default function Onboarding() {
   const activeStepConfig = STEPS[currentStep - 1];
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] dark:bg-[#07090e] text-neutral-900 dark:text-white flex flex-col justify-between relative overflow-x-hidden selection:bg-blue-500/30 selection:text-blue-600 dark:selection:text-blue-300 font-sans transition-colors duration-200">
-      {/* ── AMBIENT BACKGROUND GLOW (macOS / iOS frosted style) ── */}
-      <div className="fixed top-0 left-1/4 w-[600px] h-[400px] bg-blue-500/[0.05] rounded-full blur-[140px] pointer-events-none" />
-      <div className="fixed bottom-0 right-1/4 w-[500px] h-[400px] bg-blue-500/[0.03] rounded-full blur-[140px] pointer-events-none" />
+    <div className="min-h-screen bg-white dark:bg-black text-neutral-900 dark:text-white flex flex-col justify-between relative overflow-x-hidden selection:bg-blue-500/30 selection:text-blue-600 dark:selection:text-blue-300 font-sans transition-colors duration-200">
 
       {/* ── TOP PROGRESS BAR (Thin emerald line with animated glow) ── */}
       <div className="fixed top-0 left-0 right-0 h-[3px] bg-black/[0.06] dark:bg-white/[0.06] z-50">
