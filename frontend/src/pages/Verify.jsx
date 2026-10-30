@@ -42,7 +42,24 @@ export default function Verify() {
 
         // Save session with persistent multi-device session caching
         saveSession({ userId, token: authToken, email, sessionId, deviceId });
-        localStorage.setItem("fn_new_signup", "true");
+
+        // Distinguish returning user from fresh signup:
+        // Returning users signing in through magic link MUST NOT have fn_new_signup set,
+        // and should have IB popup permanently dismissed so it never shows again.
+        const onboardingCompleted =
+          localStorage.getItem(`onboarding_completed_${userId}`) === "true" ||
+          localStorage.getItem("onboarding_completed") === "true";
+
+        if (onboardingCompleted) {
+          // Returning user: ensure IB promo popup is permanently marked as dismissed
+          localStorage.removeItem("fn_new_signup");
+          localStorage.setItem(`fn_ib_popup_dismissed_${userId}`, "true");
+          localStorage.setItem("winpro_ib_dismissed", "true");
+          localStorage.setItem(`fn_dashboard_visited_${userId}`, "true");
+        } else {
+          // Brand new user who has yet to finish onboarding
+          localStorage.removeItem("fn_new_signup");
+        }
 
         setStatus("success");
 
@@ -54,9 +71,6 @@ export default function Verify() {
           } else if (!hasPaid) {
             navigate("/paywall");
           } else {
-            const onboardingCompleted =
-              localStorage.getItem(`onboarding_completed_${userId}`) === "true" ||
-              localStorage.getItem("onboarding_completed") === "true";
             if (!onboardingCompleted) {
               navigate("/onboarding");
             } else {

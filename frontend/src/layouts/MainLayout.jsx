@@ -444,7 +444,7 @@ export default function MainLayout() {
         { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
         { to: "/add-trade", icon: PlusCircle, label: "Add Trade" },
         { to: "/trades", icon: List, label: "Past Trades" },
-        { to: "/calendar", icon: CalendarIcon, label: "Calendar" },
+        { to: "/news", icon: CalendarIcon, label: "Calendar" },
       ],
     },
     {
@@ -554,11 +554,11 @@ export default function MainLayout() {
           keywords: ["trader", "pov", "prop", "firm", "accounts", "challenges"],
         },
         {
-          to: "/calendar",
+          to: "/news",
           label: "Calendar",
-          sub: "Monthly calendar view of your trading sessions and PnL",
+          sub: "Economic Calendar of high-impact news & market events",
           icon: CalendarIcon,
-          keywords: ["calendar", "monthly", "days", "schedule", "pnl"],
+          keywords: ["calendar", "news", "economic", "events", "forex factory", "schedule"],
         },
       ],
     },

@@ -447,7 +447,7 @@ function App() {
                   <Route path="add-trade" element={<AddTrade />} />
                   <Route path="news" element={<EconomicCalendar />} />
                   <Route path="trades" element={<PastTrades />} />
-                  <Route path="calendar" element={<PerformanceCalendar />} />
+                  <Route path="calendar" element={<Navigate to="/news" replace />} />
                   <Route
                     path="analysis"
                     element={<Navigate to="/analysis/performance" replace />}

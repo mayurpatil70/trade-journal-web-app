@@ -1752,7 +1752,6 @@ body.fn-morning-modal-open iframe:not([class*="modal"]) {
   transition: opacity 0.2s ease-out;
 }
 
-
 /* Dark Social Button Protection (Forces solid dark slate background and white text/icon in light mode) */
 html.light body:not(.terminal) .btn-dark-social,
 html.light body:not(.terminal) a.btn-dark-social,

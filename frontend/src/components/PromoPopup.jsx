@@ -15,6 +15,7 @@ export default function PromoPopup() {
   useEffect(() => {
     // 1. STRICT ROUTE CHECK: ONLY eligible on /dashboard, NEVER on any other page
     if (location.pathname !== "/dashboard") {
+      setIsOpen(false);
       return;
     }
 
@@ -26,25 +27,18 @@ export default function PromoPopup() {
     const userDismissedKey = `fn_ib_popup_dismissed_${userId}`;
     const isGloballyDismissed = localStorage.getItem("winpro_ib_dismissed") === "true";
     const isUserDismissed = localStorage.getItem(userDismissedKey) === "true";
-
-    // 2. If already shown / dismissed for this user, NEVER show it again
-    if (isGloballyDismissed || isUserDismissed) {
-      return;
-    }
-
-    // 3. New User Verification:
-    // Only show if the user is a fresh signup ("fn_new_signup" === "true")
-    // Returning users signing in through magic link or login will NOT have "fn_new_signup" === "true"
-    const isNewSignup = localStorage.getItem("fn_new_signup") === "true";
     const hasVisitedDashboardBefore = localStorage.getItem(`fn_dashboard_visited_${userId}`) === "true";
+    const isNewSignup = localStorage.getItem("fn_new_signup") === "true";
 
-    if (!isNewSignup || hasVisitedDashboardBefore) {
-      // Mark as dismissed for returning user so it never activates
+    // 2. If already shown/dismissed, visited before, or NOT a fresh signup: NEVER show!
+    if (isGloballyDismissed || isUserDismissed || hasVisitedDashboardBefore || !isNewSignup) {
       localStorage.setItem(userDismissedKey, "true");
+      localStorage.setItem("winpro_ib_dismissed", "true");
+      localStorage.removeItem("fn_new_signup");
       return;
     }
 
-    // 4. Pop up once for new user on first dashboard entry
+    // 3. Pop up strictly once for brand-new users on their very first dashboard visit
     const timer = setTimeout(() => {
       setIsOpen(true);
       localStorage.setItem(userDismissedKey, "true");
