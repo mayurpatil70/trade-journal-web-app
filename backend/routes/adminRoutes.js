@@ -40,6 +40,8 @@ router.get("/public/announcement", (req, res) => {
 
 router.use(requireAuth, requireAdmin);
 
+router.get("/me", (req, res) => res.json({ success: true, isAdmin: true }));
+
 // High-Performance Supabase Aggregation Pipeline for Admin Metrics
 router.get("/metrics/aggregated", async (req, res) => {
   try {

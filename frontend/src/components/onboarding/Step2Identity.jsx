@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { Check, Camera, Loader2 } from "lucide-react";
 import LiveTraderCard from "./LiveTraderCard";
+import api from "../../api/axios";
 
 export default function Step2Identity({
   displayName,
@@ -17,7 +18,6 @@ export default function Step2Identity({
   const [isUploading, setIsUploading] = useState(false);
 
   const userId = localStorage.getItem("userId") || "";
-  const userEmail = localStorage.getItem("userEmail") || "";
 
   const handleFileChange = async (e) => {
     const file = e.target.files?.[0];
@@ -40,18 +40,9 @@ export default function Step2Identity({
       setIsUploading(true);
       const formData = new FormData();
       formData.append("avatar", file);
-      if (userId) formData.append("userId", userId);
-      if (userEmail) formData.append("email", userEmail);
-
-      const res = await fetch("/api/auth/avatar", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("authToken") || ""}`,
-        },
-        body: formData,
+      const { data } = await api.post("/api/auth/avatar", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
       });
-
-      const data = await res.json();
       if (data.success && data.avatarUrl) {
         // Replace with permanent Cloudinary URL
         setAvatarUrl(data.avatarUrl);

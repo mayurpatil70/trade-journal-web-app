@@ -16,14 +16,7 @@ export const getImmediateCachedStatus = () => {
 };
 
 export const getCachedAccessStatus = async (forceRefresh = false) => {
-  const userId = localStorage.getItem("userId") || "";
-  const userEmail = (localStorage.getItem("userEmail") || "").toLowerCase().trim();
-  const adminEmails = ["noballondesk@gmail.com", "noballondesk@gamil.com", "akpatil51340@gmail.com"];
-
-  // Instant admin bypass
-  if (adminEmails.includes(userEmail) || adminEmails.includes(userId.toLowerCase().trim())) {
-    return { isAdmin: true, discordVerified: true, hasPaid: true };
-  }
+  const userId = localStorage.getItem("userId") || "me";
 
   const now = Date.now();
   if (!forceRefresh && subscriptionStatusCache && now - subscriptionStatusTimestamp < STATUS_CACHE_TTL) {
@@ -31,7 +24,7 @@ export const getCachedAccessStatus = async (forceRefresh = false) => {
   }
 
   try {
-    const response = await api.get(`/api/subscriptions/status/${userId || userEmail}`);
+    const response = await api.get(`/api/subscriptions/status/${encodeURIComponent(userId)}`);
     subscriptionStatusCache = response.data || {};
     subscriptionStatusTimestamp = now;
     return subscriptionStatusCache;

@@ -31,11 +31,11 @@ router.post("/login", rateLimit({ windowMs: 15 * 60_000, max: 5 }), requestLogin
 router.post("/register", rateLimit({ windowMs: 60 * 60_000, max: 10 }), registerUser);
 router.post("/login/password", rateLimit({ windowMs: 15 * 60_000, max: 10 }), loginWithPassword);
 router.post("/verify", rateLimit({ windowMs: 15 * 60_000, max: 20 }), verifyLogin);
-router.post("/avatar", upload.single("avatar"), uploadAvatar);
-router.post("/onboarding-profile", saveOnboardingProfile);
-router.get("/profile", getProfile);
-router.put("/profile", updateProfile);
-router.post("/checklist", updateChecklist);
+router.post("/avatar", requireAuth, upload.single("avatar"), uploadAvatar);
+router.post("/onboarding-profile", requireAuth, saveOnboardingProfile);
+router.get("/profile", requireAuth, getProfile);
+router.put("/profile", requireAuth, updateProfile);
+router.post("/checklist", requireAuth, updateChecklist);
 
 // Session & Device Management Endpoints
 router.post("/logout", requireAuth, logoutUser);

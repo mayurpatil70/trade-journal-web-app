@@ -277,8 +277,7 @@ export const createTrade = async (req, res) => {
 
 export const getTrades = async (req, res) => {
   try {
-    const rawUserId = req.query?.userId || req.userId;
-    const userId = rawUserId || req.userId;
+    const userId = req.userId;
 
     if (!userId) {
       return res
@@ -1282,8 +1281,7 @@ export const exportTrades = async (req, res) => {
 
 export const getTradeAnalytics = async (req, res) => {
   try {
-    const rawUserId = req.query?.userId || req.userId;
-    const userId = rawUserId || req.userId;
+    const userId = req.userId;
     const { accountName } = req.query;
 
     if (!userId) {

@@ -1,23 +1,16 @@
 import { supabase } from "../config/supabase.js";
+import { isAdminEmail } from "../config/admin.js";
 
 export async function requireAdmin(req, res, next) {
   try {
-    const { data: user } = await supabase
+    if (!req.userId) return res.status(401).json({ error: "Please log in again." });
+    const { data: user, error } = await supabase
       .from("users")
       .select("email")
       .eq("id", req.userId)
       .maybeSingle();
-    const adminEmails = [
-      ...(process.env.ADMIN_EMAIL || "").split(","),
-      "noballondesk@gmail.com",
-      "noballondesk@gamil.com",
-      "akpatil51340@gmail.com",
-    ]
-      .map((e) => e.trim().toLowerCase())
-      .filter(Boolean);
-
-    const userEmail = (user?.email || "").trim().toLowerCase();
-    if (!user || !userEmail || !adminEmails.includes(userEmail)) {
+    if (error) throw error;
+    if (!isAdminEmail(user?.email)) {
       return res.status(403).json({ error: "Admin access required." });
     }
     next();

@@ -13,6 +13,7 @@ import SupportFeedbackModal from "../components/support/SupportFeedbackModal.jsx
 import FloatingMessenger from "../components/lounge/FloatingMessenger.jsx";
 import { prefetchRoute, prefetchAllSecondaryRoutes } from "../utils/routePrefetch";
 import api, { logoutSession } from "../api/axios";
+import { useIsAdmin } from "../hooks/useIsAdmin";
 import {
   LayoutDashboard,
   PlusCircle,
@@ -291,7 +292,6 @@ export default function MainLayout() {
     };
   }, [location.search]);
 
-  const userId = localStorage.getItem("userId") || localStorage.getItem("userEmail");
   const userEmail = localStorage.getItem("userEmail") || "Trader";
 
   const getStoredUserName = () => {
@@ -343,7 +343,7 @@ export default function MainLayout() {
     };
   }, []);
 
-  const isAdmin = userId === "noballondesk@gmail.com" || userId === "akpatil51340@gmail.com";
+  const isAdmin = useIsAdmin() === true;
 
   // System broadcast announcement
   const [announcement, setAnnouncement] = useState(null);
@@ -953,9 +953,7 @@ export default function MainLayout() {
           ))}
 
           {/* ADMIN MENU (Conditionally Rendered) */}
-          {["noballondesk@gmail.com", "akpatil51340@gmail.com"].includes(
-            localStorage.getItem("userEmail")
-          ) && (
+          {isAdmin && (
             <div className="pt-4 mt-4 border-t border-black/[0.05] dark:border-white/[0.06]">
               <p className="px-3.5 text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-2">
                 Admin

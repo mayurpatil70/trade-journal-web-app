@@ -1,30 +1,17 @@
 // backend/services/sessionService.js
 import crypto from "crypto";
 import { supabase } from "../config/supabase.js";
+import { isAdminEmail } from "../config/admin.js";
 
 // In-memory hot cache for session validation (<1ms latency)
 const sessionCache = new Map();
 const CACHE_TTL_MS = 30 * 1000; // 30 seconds hot-cache window
 
-const ADMIN_EMAILS = [
-  ...(process.env.ADMIN_EMAIL || "").split(","),
-  "noballondesk@gmail.com",
-  "noballondesk@gamil.com",
-  "akpatil51340@gmail.com",
-]
-  .map((e) => e.trim().toLowerCase())
-  .filter(Boolean);
-
 /**
  * Checks if a user is an admin by userId or email
  */
 export async function isUserAdmin(userId, userEmail = null) {
-  if (
-    userEmail &&
-    ADMIN_EMAILS.includes(String(userEmail).toLowerCase().trim())
-  ) {
-    return true;
-  }
+  if (isAdminEmail(userEmail)) return true;
   if (!userId) return false;
   try {
     const { data: user } = await supabase
@@ -33,12 +20,7 @@ export async function isUserAdmin(userId, userEmail = null) {
       .eq("id", userId)
       .maybeSingle();
 
-    if (
-      user?.email &&
-      ADMIN_EMAILS.includes(String(user.email).toLowerCase().trim())
-    ) {
-      return true;
-    }
+    if (isAdminEmail(user?.email)) return true;
   } catch (err) {
     console.warn("[Session] Admin check error:", err.message);
   }
