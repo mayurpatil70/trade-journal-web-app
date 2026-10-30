@@ -1,12 +1,30 @@
 {
-  "name": "Forex Notes",
+  "id": "/",
+  "name": "Forex Notes: Trading Journal & Backtesting",
   "short_name": "Forex Notes",
-  "icons": [
-    { "src": "/logo-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "/logo-512.png", "sizes": "512x512", "type": "image/png" }
-  ],
-  "start_url": "/",
+  "description": "Trading journal, 10-year bar replay backtesting and AI psychology coach for forex, gold and crypto traders.",
+  "start_url": "/dashboard?source=pwa",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#000000",
-  "theme_color": "#000000"
+  "orientation": "any",
+  "background_color": "#0a0a0a",
+  "theme_color": "#0a0a0a",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": ["finance", "productivity", "education"],
+  "icons": [
+    { "src": "/logo-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/logo-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Add trade", "url": "/add-trade?source=pwa", "icons": [{ "src": "/logo-192.png", "sizes": "192x192" }] },
+    { "name": "Dashboard", "url": "/dashboard?source=pwa", "icons": [{ "src": "/logo-192.png", "sizes": "192x192" }] },
+    { "name": "Messages", "url": "/lounge/chat?source=pwa", "icons": [{ "src": "/logo-192.png", "sizes": "192x192" }] }
+  ],
+  "screenshots": [
+    { "src": "/screenshots/screenshot_1_dashboard.png", "sizes": "1024x501", "type": "image/png", "form_factor": "wide", "label": "Trading dashboard" },
+    { "src": "/screenshots/screenshot_4_barreplay.png", "sizes": "1024x502", "type": "image/png", "form_factor": "wide", "label": "Bar replay backtesting" }
+  ]
 }

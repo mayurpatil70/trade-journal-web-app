@@ -5,6 +5,7 @@ import { fileURLToPath } from "url";
 import { requireAuth } from "../middlewares/requireAuth.js";
 import { requireAdmin } from "../middlewares/requireAdmin.js";
 import { supabase } from "../config/supabase.js";
+import { sendPushToAll } from "../services/pushService.js";
 
 const router = express.Router();
 
@@ -461,6 +462,7 @@ router.get("/announcement", (req, res) => {
 router.post("/announcement", (req, res) => {
   try {
     const { active, message, type = "info" } = req.body;
+    const isNewBroadcast = Boolean(active) && String(message || "").trim() && (!globalAnnouncement.active || globalAnnouncement.message !== String(message));
     globalAnnouncement = {
       active: Boolean(active),
       message: String(message || ""),
@@ -476,6 +478,11 @@ router.post("/announcement", (req, res) => {
       fs.writeFileSync(ANNOUNCEMENT_FILE, JSON.stringify(globalAnnouncement, null, 2), "utf-8");
     } catch (fsErr) {
       console.warn("Failed to write announcement file to disk:", fsErr.message);
+    }
+
+    if (isNewBroadcast) {
+      sendPushToAll({ title: "Forex Notes", body: globalAnnouncement.message.slice(0, 200), url: "/dashboard", tag: "announcement" })
+        .catch((err) => console.warn("[Push] Announcement broadcast failed:", err.message));
     }
 
     res.json({ success: true, message: "Broadcast updated successfully.", announcement: globalAnnouncement });

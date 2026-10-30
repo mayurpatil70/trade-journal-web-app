@@ -62,6 +62,16 @@ export function clearSession() {
 export async function logoutSession() {
   const sessionId = localStorage.getItem("sessionId");
   try {
+    const reg = await navigator.serviceWorker?.getRegistration?.();
+    const pushSub = await reg?.pushManager?.getSubscription();
+    if (pushSub) {
+      await api.post("/api/push/unsubscribe", { endpoint: pushSub.endpoint }).catch(() => {});
+      await pushSub.unsubscribe();
+    }
+  } catch {
+    // push cleanup is best-effort
+  }
+  try {
     if (sessionId) {
       await api.post("/api/auth/logout", { sessionId });
     }
