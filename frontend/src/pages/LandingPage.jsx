@@ -21,6 +21,7 @@ import MakoSharkSection from "../components/landing/MakoSharkSection";
 import KingfisherSection from "../components/landing/KingfisherSection";
 import LiquidGlassCarousel from "../components/landing/LiquidGlassCarousel";
 import FeaturesBento from "../components/landing/FeaturesBento";
+import LoungeShowcase from "../components/landing/LoungeShowcase";
 import RolodexReviews from "../components/landing/RolodexReviews";
 import ParticleCloakFooter from "../components/landing/ParticleCloakFooter";
 import IridescentButton from "../components/landing/IridescentButton";
@@ -422,6 +423,8 @@ export default function LandingPage() {
 
           {/* Features Bento */}
           <FeaturesBento />
+
+          <LoungeShowcase />
 
           {/* Stats Counter Row */}
           <section style={{ padding: "80px 20px", borderTop: "1px solid rgba(255, 255, 255, 0.06)" }}>

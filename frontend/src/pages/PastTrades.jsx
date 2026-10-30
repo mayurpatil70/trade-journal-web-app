@@ -9,6 +9,7 @@ import api from "../api/axios";
 import AccountFilter from "../components/AccountFilter";
 import TradeFXBookAddTradeModal from "../components/dashboard/TradeFXBookAddTradeModal";
 import TradeShareModal from "../components/dashboard/TradeShareModal";
+import { shareTradeToChat } from "../lib/socket";
 import DateTimePickerPopover from "../components/ui/DateTimePickerPopover";
 import AppleSelect from "../components/ui/AppleSelect";
 import PhotoLightboxModal from "../components/ui/PhotoLightboxModal";
@@ -32,6 +33,7 @@ import {
   Trash2,
   Pencil,
   Share2,
+  MessageCircle,
   SlidersHorizontal,
   Download,
   Globe,
@@ -1539,6 +1541,26 @@ export default function PastTrades() {
                             title="Share Trade Poster (Story, Post, Landscape)"
                           >
                             <Share2 className="w-3.5 h-3.5" />
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              shareTradeToChat({
+                                asset: t.asset,
+                                direction: t.direction,
+                                result: t.result,
+                                pnl: t.pnl,
+                                rMultiple: t.r_multiple,
+                                setup: t.setup,
+                                date: t.date,
+                              });
+                            }}
+                            className="w-7 h-7 sm:w-6 sm:h-6 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center transition-colors cursor-pointer"
+                            title="Share Trade to Chat"
+                          >
+                            <MessageCircle className="w-3.5 h-3.5" />
                           </button>
 
                           {/* Delete */}

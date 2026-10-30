@@ -10,6 +10,7 @@ import PromoPopup from "../components/PromoPopup.jsx";
 import SystemAnnouncementBanner from "../components/SystemAnnouncementBanner.jsx";
 import ProfilePhotoModal from "../components/ui/ProfilePhotoModal.jsx";
 import SupportFeedbackModal from "../components/support/SupportFeedbackModal.jsx";
+import FloatingMessenger from "../components/lounge/FloatingMessenger.jsx";
 import { prefetchRoute, prefetchAllSecondaryRoutes } from "../utils/routePrefetch";
 import api, { logoutSession } from "../api/axios";
 import {
@@ -50,6 +51,10 @@ import {
   Brain,
   AlertTriangle,
   Briefcase,
+  Trophy,
+  MessageSquareText,
+  MessagesSquare,
+  Gift,
 } from "lucide-react";
 
 // Nav Item with Apple Squircle Geometry & Glossy Interaction
@@ -63,8 +68,9 @@ const NavItem = ({
   isDisabled = false,
   isLocked = false,
   onLockedClick,
+  end = false,
 }) => {
-  const isActive = currentPath === to || (to !== "/" && currentPath.startsWith(to + "/"));
+  const isActive = currentPath === to || (!end && to !== "/" && currentPath.startsWith(to + "/"));
 
   return (
     <Link
@@ -462,6 +468,15 @@ export default function MainLayout() {
       ],
     },
     {
+      label: "Traders Lounge",
+      items: [
+        { to: "/lounge", icon: Trophy, label: "Leaderboard", end: true },
+        { to: "/lounge/feed", icon: MessageSquareText, label: "Thought Stream" },
+        { to: "/messages", icon: MessagesSquare, label: "Messages" },
+        { to: "/lounge/deals", icon: Gift, label: "Partner Deals" },
+      ],
+    },
+    {
       label: "Tools",
       items: [
         { to: "/tools", icon: Wrench, label: "Tools" },
@@ -483,6 +498,10 @@ export default function MainLayout() {
   // Route title formatting for dynamic Apple topbar
   const pathTitle = (() => {
     const p = location.pathname;
+    if (p.startsWith("/lounge/feed")) return "Thought Stream";
+    if (p.startsWith("/lounge/deals")) return "Partner Deals";
+    if (p.startsWith("/lounge/chat") || p.startsWith("/messages")) return "Messages";
+    if (p.startsWith("/lounge")) return "Traders Lounge";
     if (p.includes("dashboard")) return "Dashboard";
     if (p.includes("add-trade")) return "Add Trade";
     if (p.includes("trades")) return "Past Trades";
@@ -904,6 +923,7 @@ export default function MainLayout() {
                       icon={item.icon}
                       label={item.label}
                       isBeta={item.isBeta}
+                      end={item.end}
                       isDisabled={item.isDisabled}
                       isLocked={!isAdmin && item.requiresAdmin}
                       onLockedClick={() => setShowLockPopup(true)}
@@ -1070,6 +1090,8 @@ export default function MainLayout() {
           </div>
         </Suspense>
       </main>
+
+      <FloatingMessenger />
 
       {/* ── REACT PORTAL: TradeFXBook Spotlight Command Palette ── */}
       {isSearchOpen &&
