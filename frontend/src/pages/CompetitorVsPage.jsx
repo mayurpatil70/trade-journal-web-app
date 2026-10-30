@@ -105,6 +105,7 @@ export default function CompetitorVsPage() {
 
   return (
     <div
+      className="ios-landing"
       style={{
         minHeight: "100vh",
         background: "var(--lp-bg)",

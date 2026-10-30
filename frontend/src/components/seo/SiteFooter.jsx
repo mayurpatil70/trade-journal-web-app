@@ -17,6 +17,9 @@ const FOOTER_LINKS = [
       ['/journal/ict-strategy', 'ICT journal'],
       ['/journal/smc', 'SMC journal'],
       ['/journal/scalping', 'Scalping journal'],
+      ['/journal/gbpusd', 'GBPUSD journal'],
+      ['/journal/nas100', 'NAS100 indices journal'],
+      ['/journal/prop-firm', 'Prop firm journal'],
     ],
   },
   {
@@ -33,6 +36,14 @@ const FOOTER_LINKS = [
     ],
   },
   {
+    title: 'LEARN',
+    links: [
+      ['/learn/how-to-keep-a-trading-journal', 'How to keep a trading journal'],
+      ['/learn/trading-journal-template', 'Trading journal template'],
+      ['/learn/revenge-trading', 'Stop revenge trading'],
+    ],
+  },
+  {
     title: 'COMPARE',
     links: [
       ['/vs/tradezella', 'vs TradeZella'],
@@ -41,6 +52,7 @@ const FOOTER_LINKS = [
       ['/vs/edgewonk', 'vs Edgewonk'],
       ['/vs/tradesviz', 'vs TradesViz'],
       ['/vs/traders-casa', 'vs Traders Casa'],
+      ['/vs/myfxbook', 'vs Myfxbook'],
       ['/backtesting/btcusdt', 'BTCUSDT backtesting'],
       ['/markets/four-asset-classes', 'Four asset classes & speed'],
       ['/privacy', 'Privacy policy'],
@@ -51,6 +63,7 @@ const FOOTER_LINKS = [
 export default function SiteFooter({ copyright = true }) {
   return (
     <footer
+      className="ios-landing"
       style={{
         borderTop: '1px solid rgba(var(--lp-fg), 0.08)',
         background: 'var(--lp-bg)',
@@ -58,7 +71,7 @@ export default function SiteFooter({ copyright = true }) {
         fontFamily: "'Manrope', sans-serif",
       }}
     >
-      <div className="max-w-6xl mx-auto px-6 py-14 grid grid-cols-2 md:grid-cols-4 gap-10 text-sm">
+      <div className="max-w-6xl mx-auto px-6 py-14 grid grid-cols-2 md:grid-cols-5 gap-10 text-sm">
         {FOOTER_LINKS.map((g) => (
           <div key={g.title}>
             <h2

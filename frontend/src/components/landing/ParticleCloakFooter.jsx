@@ -21,6 +21,9 @@ const FOOTER_LINKS = [
       ['/journal/ict-strategy', 'ICT journal'],
       ['/journal/smc', 'SMC journal'],
       ['/journal/scalping', 'Scalping journal'],
+      ['/journal/gbpusd', 'GBPUSD journal'],
+      ['/journal/nas100', 'NAS100 indices journal'],
+      ['/journal/prop-firm', 'Prop firm journal'],
     ],
   },
   {
@@ -37,6 +40,14 @@ const FOOTER_LINKS = [
     ],
   },
   {
+    title: 'Learn',
+    links: [
+      ['/learn/how-to-keep-a-trading-journal', 'How to keep a trading journal'],
+      ['/learn/trading-journal-template', 'Trading journal template'],
+      ['/learn/revenge-trading', 'Stop revenge trading'],
+    ],
+  },
+  {
     title: 'Compare',
     links: [
       ['/vs/tradezella', 'vs TradeZella'],
@@ -45,6 +56,7 @@ const FOOTER_LINKS = [
       ['/vs/edgewonk', 'vs Edgewonk'],
       ['/vs/tradesviz', 'vs TradesViz'],
       ['/vs/traders-casa', 'vs Traders Casa'],
+      ['/vs/myfxbook', 'vs Myfxbook'],
       ['/backtesting/btcusdt', 'BTCUSDT backtesting'],
       ['/markets/four-asset-classes', 'Four asset classes & speed'],
       ['/privacy', 'Privacy policy'],
@@ -55,6 +67,7 @@ const FOOTER_LINKS = [
 export default function ParticleCloakFooter() {
   return (
     <footer
+      className="ios-landing"
       style={{
         position: 'relative',
         background: 'var(--lp-bg)',
@@ -151,7 +164,7 @@ export default function ParticleCloakFooter() {
         style={{
           textAlign: 'center',
           fontFamily: "'Instrument Serif', Georgia, serif",
-          fontSize: 'clamp(80px, 16vw, 240px)',
+          fontSize: 'clamp(56px, 12vw, 180px)',
           lineHeight: 0.8,
           fontWeight: 400,
           color: 'rgba(var(--lp-fg), 0.03)',

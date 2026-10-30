@@ -1,0 +1,46 @@
+# Forex Notes
+
+> Forex Notes (forexnotes.in) is a trading journal, bar replay backtester and AI psychology coach for forex, gold (XAUUSD), indices and crypto traders, with prop firm drawdown and lot size calculators. Plans are $14/month or $114/year with a free trial; card and USDT (BEP-20) payments.
+
+Forex Notes is software only. It is not a broker, does not hold funds or execute trades, and does not give investment advice.
+
+## Pages
+
+- [Best Forex Trading Journal in India for Prop Firm Traders](https://forexnotes.in/india/forex-trading-journal): Top forex trading journal for traders in India. Track XAUUSD gold and forex in IST hours, calculate FTMO drawdown in INR, and pay via USDT BEP-20.
+- [The Forex Trading Journal for High-Capital Dubai Traders](https://forexnotes.in/dubai/forex-trading-journal): Top trading journal for Dubai & UAE prop firm traders. Track multi-funded accounts, calculate AED margin & leverage, and log swap-free trades from $14/mo.
+- [The Trading Journal Built for Indian Prop Firm Traders](https://forexnotes.in/india/trading-journal): A forex, gold and crypto trading journal for traders in India. Track R-multiples, psychology and prop firm rules. From $14/mo, pay by card or USDT.
+- [Prop Firm Drawdown Calculator for Indian Traders](https://forexnotes.in/india/prop-firm-calculator): Free prop firm drawdown calculator for Indian traders. See your daily and max loss room for FTMO, FundedNext and FundingPips in USD and INR.
+- [Forex and Gold Backtesting Software with Bar Replay](https://forexnotes.in/india/forex-backtesting-software): Backtest forex, gold and crypto with bar replay on 10 years of data. Built-in journal and analytics for Indian traders, from $14/mo.
+- [A Professional Trading Journal for Dubai Traders](https://forexnotes.in/dubai/trading-journal): A professional trading journal for traders in Dubai and the UAE. Multi-account prop tracking, psychology analytics and backtesting from $14/mo.
+- [Prop Firm Risk Tools for High-Capital UAE Traders](https://forexnotes.in/uae/prop-firm-trader-tools): Free margin and leverage calculator in USD and AED, plus drawdown tracking for high-capital prop firm traders in Dubai and the UAE.
+- [A Trading Journal for Islamic Swap-Free Accounts](https://forexnotes.in/uae/islamic-trading-journal): Journal trades from Islamic swap-free accounts. Forex Notes measures performance in R-multiples with no swap or interest fields required.
+- [FTMO Daily and Maximum Drawdown Calculator](https://forexnotes.in/tools/ftmo-drawdown-calculator): Free FTMO drawdown calculator. Enter your balance to see the daily and maximum loss you have left before breaching the challenge rules.
+- [FundedNext Risk Manager](https://forexnotes.in/tools/fundednext-risk-manager): Plan risk on FundedNext accounts. Calculate daily and overall loss room and size each trade so one stop out never breaks the rules.
+- [Lot Size Calculator for Forex and Gold](https://forexnotes.in/tools/lot-size-calculator): Free lot size calculator for forex, XAUUSD and indices. Enter balance, risk % and stop loss to get the exact position size.
+- [XAUUSD Trading Journal](https://forexnotes.in/journal/xauusd): Journal and backtest XAUUSD. Track gold trades by session, setup and emotion, and replay years of gold price history bar by bar.
+- [EURUSD Trading Journal](https://forexnotes.in/journal/eurusd): Track EURUSD trades by session and setup, review mistakes with screenshots, and backtest the euro with bar replay.
+- [A Trading Journal for ICT Setups](https://forexnotes.in/journal/ict-strategy): Journal ICT setups like order blocks, FVGs and killzones. Measure which ICT concepts actually make you money with R-multiple analytics.
+- [Smart Money Concepts Trading Journal](https://forexnotes.in/journal/smc): Journal SMC trades: break of structure, change of character, supply and demand zones. See your win rate and R for each SMC setup.
+- [A Trading Journal Fast Enough for Scalpers](https://forexnotes.in/journal/scalping): A fast trading journal for scalpers. Log many small trades quickly, track overtrading and see which minutes of the session pay.
+- [Backtest BTCUSDT with Bar Replay](https://forexnotes.in/backtesting/btcusdt): Backtest Bitcoin (BTCUSDT) with bar replay from 1 minute to daily candles. Practise entries, journal every trade and measure your edge.
+- [Four Asset Classes, Infinite Edge: Built for Predator Speed](https://forexnotes.in/markets/four-asset-classes): Trade Forex Majors, Gold (XAUUSD), Global Indices, and Crypto with 10-year tick replay, AI psychology pre-check, and automated prop firm drawdown protection.
+- [Prop Firm Trading Journal](https://forexnotes.in/journal/prop-firm): A trading journal built for prop firm challenges. Track each FTMO, FundedNext or FundingPips account, its drawdown floor and profit target, and the habits that fail challenges.
+- [GBPUSD Trading Journal](https://forexnotes.in/journal/gbpusd): Journal and backtest GBPUSD. Track cable trades by session and setup, review screenshots and replay the London open bar by bar.
+- [NAS100 Trading Journal for Index Traders](https://forexnotes.in/journal/nas100): Journal index CFD trades on NAS100, US30 and SPX500. Track the New York cash open, measure R per setup and backtest indices with bar replay.
+- [How to Keep a Trading Journal](https://forexnotes.in/learn/how-to-keep-a-trading-journal): How to keep a trading journal that improves your results: what to record for every trade, how often to review it, and which statistics matter.
+- [Trading Journal Template](https://forexnotes.in/learn/trading-journal-template): A trading journal template for forex, gold and crypto traders: the fields to track, an example entry, and how to turn it into weekly statistics.
+- [How to Stop Revenge Trading](https://forexnotes.in/learn/revenge-trading): What revenge trading is, the warning signs in your own trade history, and practical rules to stop it before it breaks a prop firm challenge.
+
+## Comparisons
+
+- [Forex Notes vs FX Replay](https://forexnotes.in/vs/fx-replay): Looking for an FX Replay alternative? Forex Notes combines bar replay backtesting, a trade journal and psychology tracking from $14/mo.
+- [Forex Notes vs TradeZella](https://forexnotes.in/vs/tradezella): A TradeZella alternative with journaling, backtesting and an AI psychology coach. Plans from $14/mo with USDT payments supported.
+- [Forex Notes vs Traders Casa](https://forexnotes.in/vs/traders-casa): Comparing Traders Casa? Forex Notes gives you backtesting, journaling, prop-firm tools and an AI coach from $14/mo, with crypto payments.
+- [Forex Notes vs TradesViz](https://forexnotes.in/vs/tradesviz): Want a simpler TradesViz alternative? Forex Notes is a clean, fast trading journal and backtester for forex and crypto from $14/mo.
+- [Forex Notes vs TraderSync](https://forexnotes.in/vs/tradersync): Looking for an affordable TraderSync alternative? Forex Notes provides automated journaling, 10-year bar replay backtesting and AI psychology coach from $14/mo.
+- [Forex Notes vs Edgewonk](https://forexnotes.in/vs/edgewonk): Looking for an Edgewonk alternative? Forex Notes provides modern cloud journaling, 10-year candle bar replay and an AI psychology coach from $14/mo.
+- [Forex Notes vs Myfxbook](https://forexnotes.in/vs/myfxbook): Looking for a Myfxbook alternative? Forex Notes adds bar replay backtesting, psychology tracking and an AI coach to your trade journal, from $14/mo.
+
+## Optional
+
+- [Privacy policy](https://forexnotes.in/privacy)

@@ -414,7 +414,7 @@ export default function LandingPage() {
       <KingfisherSection />
 
       {/* ── 04 CORE APPLICATION SECTIONS WRAPPER ── */}
-      <div style={{ position: "relative", zIndex: 10, background: "var(--lp-bg)" }}>
+      <div className="ios-landing" style={{ position: "relative", zIndex: 10, background: "var(--lp-bg)" }}>
         {/* Content running above smooth dark background */}
         <div style={{ position: "relative", zIndex: 1 }}>
 
@@ -674,7 +674,7 @@ export default function LandingPage() {
                 marginBottom: "12px",
               }}>
                 Choose Your Edge.<br />
-                <span style={{ fontStyle: "italic", color: "#c9a96e" }}>Cancel Anytime.</span>
+                <span style={{ fontStyle: "italic", color: "#5AC8FA" }}>Cancel Anytime.</span>
               </h2>
 
               <p style={{

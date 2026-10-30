@@ -141,6 +141,25 @@ export const COMPETITORS = {
       ux: { text: "Spreadsheet-style web UI", ok: false },
     },
   },
+  myfxbook: {
+    name: "Myfxbook",
+    monthlyApprox: null,
+    weakness: "features",
+    title: "Myfxbook Alternative: Journal, Bar Replay & AI Coach | Forex Notes",
+    description: "Looking for a Myfxbook alternative? Forex Notes adds bar replay backtesting, psychology tracking and an AI coach to your trade journal, from $14/mo.",
+    h1: "A Myfxbook alternative built for improving, not just tracking",
+    hook: "Myfxbook is great for publishing account stats. Forex Notes is built to find and fix the habits behind them.",
+    them: {
+      pricing: { text: "Free account tracking", ok: true },
+      backtesting: { text: "No bar replay backtester", ok: false },
+      journal: { text: "Auto-synced account statistics", ok: true },
+      psychology: { text: "Notes only, no AI coach", ok: false },
+      propFirm: { text: "General calculators", ok: true },
+      markets: { text: "Whatever your MT4/MT5 broker offers", ok: true },
+      payments: { text: "Free", ok: true },
+      ux: { text: "Dense, community-style site", ok: false },
+    },
+  },
 };
 
 export const comparisonRows = (slug) =>

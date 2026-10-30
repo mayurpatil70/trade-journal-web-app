@@ -517,6 +517,193 @@ export const SEO_PAGES = [
     ],
     related: ['/journal/xauusd', '/journal/eurusd', '/backtesting/btcusdt', '/tools/ftmo-drawdown-calculator'],
   },
+  {
+    path: '/journal/prop-firm',
+    title: 'Prop Firm Trading Journal for FTMO & FundedNext | Forex Notes',
+    description: 'A trading journal built for prop firm challenges. Track each FTMO, FundedNext or FundingPips account, its drawdown floor and profit target, and the habits that fail challenges.',
+    eyebrow: 'Prop firm traders',
+    h1: 'Prop Firm Trading Journal',
+    intro: 'Most challenges are failed by one bad day, not a bad strategy. A prop firm journal keeps every account, its rules and your behaviour in one place so that day is easier to avoid.',
+    sections: [
+      {
+        h2: 'One place for every challenge',
+        body: 'Add each evaluation or funded account with its balance, profit target and maximum drawdown. Trades are journaled against the account they were taken on.',
+        bullets: [
+          'Separate stats for each challenge and funded account.',
+          'Drawdown and lot size calculators before every session.',
+          'Calendar view to spot the days that cost you the most.',
+        ],
+      },
+      {
+        h2: 'Catch rule-breaking habits early',
+        body: 'Log your emotion and any mistakes with each trade. The psychology tracker and AI coach show patterns such as oversizing after a loss or trading outside your session.',
+      },
+      {
+        h2: 'Practise the challenge before paying for it',
+        body: 'Run your strategy through the bar replay backtester with the same risk rules, and journal the practice trades, before you buy the next evaluation.',
+      },
+    ],
+    faqs: [
+      { q: 'What is a prop firm trading journal?', a: 'It is a trade log that also tracks each prop firm account, its drawdown limit and profit target, so you can see how close you are to the rules and which habits put the account at risk.' },
+      { q: 'Does Forex Notes work with FTMO and FundedNext accounts?', a: 'Yes. You add the account and its rules yourself, then journal trades against it. Forex Notes does not connect to or act for any prop firm.' },
+      PRICING_FAQ,
+    ],
+    related: ['/tools/ftmo-drawdown-calculator', '/tools/fundednext-risk-manager', '/learn/revenge-trading'],
+  },
+  {
+    path: '/journal/gbpusd',
+    title: 'GBPUSD Trading Journal & Backtesting | Forex Notes',
+    description: 'Journal and backtest GBPUSD. Track cable trades by session and setup, review screenshots and replay the London open bar by bar.',
+    eyebrow: 'Forex majors',
+    h1: 'GBPUSD Trading Journal',
+    intro: 'Cable is known for sharp moves around the London open and UK data. Journaling every GBPUSD trade shows whether that volatility is working for you or against you.',
+    sections: [
+      {
+        h2: 'Session and setup analytics',
+        body: 'Tag GBPUSD trades with session and setup, then compare win rate and average R to find the conditions where you trade the pound well.',
+      },
+      {
+        h2: 'Replay the London open',
+        body: 'Use bar replay to practise the same London session many times and tighten your entries and stops before trading live.',
+      },
+    ],
+    faqs: [PRICING_FAQ],
+    related: ['/journal/eurusd', '/journal/xauusd', '/journal/scalping'],
+  },
+  {
+    path: '/journal/nas100',
+    title: 'NAS100 & US30 Indices Trading Journal | Forex Notes',
+    description: 'Journal index CFD trades on NAS100, US30 and SPX500. Track the New York cash open, measure R per setup and backtest indices with bar replay.',
+    eyebrow: 'Index traders',
+    h1: 'NAS100 Trading Journal for Index Traders',
+    intro: 'Indices move hardest in the first hour of the New York cash session. A journal shows whether your edge lives in that hour or whether you give it back later in the day.',
+    sections: [
+      {
+        h2: 'Track the cash open separately',
+        body: 'Tag trades by time of day and setup to see how your NAS100 and US30 results change from the open to the afternoon.',
+      },
+      {
+        h2: 'Position size for index volatility',
+        body: 'Use the lot size calculator so a wide stop on NAS100 still risks the same amount as a tight stop on a forex pair.',
+      },
+    ],
+    faqs: [PRICING_FAQ],
+    related: ['/markets/four-asset-classes', '/tools/lot-size-calculator', '/journal/prop-firm'],
+  },
+  {
+    path: '/learn/how-to-keep-a-trading-journal',
+    title: 'How to Keep a Trading Journal (Step by Step) | Forex Notes',
+    description: 'How to keep a trading journal that improves your results: what to record for every trade, how often to review it, and which statistics matter.',
+    eyebrow: 'Guide',
+    h1: 'How to Keep a Trading Journal',
+    intro: 'A trading journal is a record of every trade with the reason you took it, how you managed it and how you felt. Kept consistently and reviewed weekly, it shows which setups make money and which habits lose it.',
+    sections: [
+      {
+        h2: 'What to record for every trade',
+        body: 'Write the entry before the result is known, so hindsight does not change your reasoning.',
+        bullets: [
+          'Instrument, direction, entry, stop loss, take profit and position size.',
+          'Setup name and the reason for the trade.',
+          'Session and time of entry.',
+          'Your emotion before and after the trade.',
+          'A chart screenshot and any rule you broke.',
+          'Result in money and in R (profit divided by the amount risked).',
+        ],
+      },
+      {
+        h2: 'Review it every week',
+        body: 'Once a week, group trades by setup, session and emotion. Keep the setups with positive expectancy, cut the ones without, and pick one habit to fix next week.',
+      },
+      {
+        h2: 'The statistics that matter',
+        body: 'Win rate alone is misleading. Look at win rate together with average R, profit factor and maximum drawdown, and compare them per setup rather than for all trades at once.',
+      },
+      {
+        h2: 'Spreadsheet or journal app?',
+        body: 'A spreadsheet works for a few trades a week. A journal app saves time once you trade more often, because it calculates the statistics, stores screenshots and shows patterns automatically.',
+      },
+    ],
+    faqs: [
+      { q: 'What should a trading journal include?', a: 'At minimum: instrument, direction, entry, stop, target, size, setup, reason, emotion, a screenshot and the result in R.' },
+      { q: 'How often should I review my trading journal?', a: 'Briefly after each session and in more depth once a week.' },
+      { q: 'Is a trading journal worth it?', a: 'For most traders, yes. It is the only reliable way to know which setups and habits actually make or lose money.' },
+      PRICING_FAQ,
+    ],
+    related: ['/learn/trading-journal-template', '/learn/revenge-trading', '/india/trading-journal'],
+  },
+  {
+    path: '/learn/trading-journal-template',
+    title: 'Trading Journal Template: Fields Every Trader Needs | Forex Notes',
+    description: 'A trading journal template for forex, gold and crypto traders: the fields to track, an example entry, and how to turn it into weekly statistics.',
+    eyebrow: 'Template',
+    h1: 'Trading Journal Template',
+    intro: 'Use these columns in a spreadsheet, or skip the setup and use Forex Notes, which already tracks every field below and calculates the statistics for you.',
+    sections: [
+      {
+        h2: 'Template columns',
+        body: 'One row per trade, filled in at entry and completed at exit.',
+        bullets: [
+          'Date, session and time',
+          'Instrument and direction (long or short)',
+          'Entry, stop loss, take profit and lot size',
+          'Risk in money and in percent of the account',
+          'Setup name and trade reason',
+          'Emotion before and after',
+          'Mistakes or rules broken',
+          'Exit price, result and R-multiple',
+          'Screenshot link and notes',
+        ],
+      },
+      {
+        h2: 'Example entry',
+        body: 'EURUSD, long, London session. Entry 1.1650, stop 1.1630 (20 pips), target 1.1710 (60 pips), risk 1% of the account. Setup: London breakout retest. Emotion: calm. Result: +3R, no rules broken.',
+      },
+      {
+        h2: 'Turn the template into statistics',
+        body: 'Each week, filter by setup and session and calculate win rate, average R and profit factor. Those three numbers tell you what to trade more and what to drop.',
+      },
+    ],
+    faqs: [
+      { q: 'Is there a free trading journal template?', a: 'Yes. The columns on this page work in any spreadsheet. Forex Notes has a free trial if you want the statistics calculated automatically.' },
+      { q: 'What is an R-multiple?', a: 'The result of a trade divided by the amount you risked. Risk $100 and make $300, and the trade is +3R.' },
+      PRICING_FAQ,
+    ],
+    related: ['/learn/how-to-keep-a-trading-journal', '/journal/xauusd', '/tools/lot-size-calculator'],
+  },
+  {
+    path: '/learn/revenge-trading',
+    title: 'Revenge Trading: How to Spot and Stop It | Forex Notes',
+    description: 'What revenge trading is, the warning signs in your own trade history, and practical rules to stop it before it breaks a prop firm challenge.',
+    eyebrow: 'Trading psychology',
+    h1: 'How to Stop Revenge Trading',
+    intro: 'Revenge trading is taking a trade to win back a loss rather than because your setup appeared. It usually comes with larger size and lower quality entries, and it is one of the most common reasons traders break a daily drawdown limit.',
+    sections: [
+      {
+        h2: 'Warning signs in your journal',
+        body: 'Revenge trading leaves a clear pattern in a trade log.',
+        bullets: [
+          'Several trades within minutes after a loss.',
+          'Position size larger than your normal risk.',
+          'Trades with no named setup, or outside your usual session.',
+          'Emotions logged as frustrated or angry before entry.',
+        ],
+      },
+      {
+        h2: 'Rules that stop it',
+        body: 'Set a daily loss limit and a maximum number of trades, and stop for the day when either is hit. After a loss, wait a fixed amount of time before the next entry, and never increase size to recover.',
+      },
+      {
+        h2: 'How Forex Notes helps',
+        body: 'Log emotion and mistakes with every trade, and the psychology tracker shows when losses are followed by rushed trades. The AI coach can review your own history and point out the pattern.',
+      },
+    ],
+    faqs: [
+      { q: 'What is revenge trading?', a: 'Trading to win back a loss instead of following your plan, usually with bigger size and weaker setups.' },
+      { q: 'How do I stop revenge trading?', a: 'Use a daily loss limit and a maximum trade count, take a break after each loss, and review your journal for trades taken right after losses.' },
+      PRICING_FAQ,
+    ],
+    related: ['/journal/prop-firm', '/learn/how-to-keep-a-trading-journal', '/journal/scalping'],
+  },
 ];
 
 export const LANDING_FAQS = [
