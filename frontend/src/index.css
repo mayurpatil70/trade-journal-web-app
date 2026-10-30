@@ -1182,7 +1182,7 @@ html.light .trading-bg {
     var(--paper);
 }
 
-html.light body:not(.terminal) [class~="bg-black"] {
+html.light body:not(.terminal) [class~="bg-black"]:not(.btn-dark-social):not(button):not(a) {
   background-color: var(--paper) !important;
 }
 html.light
