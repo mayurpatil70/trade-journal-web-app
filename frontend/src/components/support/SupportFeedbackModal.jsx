@@ -26,7 +26,7 @@ import api from "../../api/axios";
 
 const CATEGORIES = [
   { id: "Bug / technical issue", label: "Bug / technical issue", icon: Bug, color: "text-rose-500", bg: "bg-rose-500/10" },
-  { id: "Idea / feedback", label: "Idea / feedback", icon: Lightbulb, color: "text-purple-500", bg: "bg-purple-500/10" },
+  { id: "Idea / feedback", label: "Idea / feedback", icon: Lightbulb, color: "text-blue-500", bg: "bg-blue-500/10" },
   { id: "Billing", label: "Billing", icon: CreditCard, color: "text-emerald-500", bg: "bg-emerald-500/10" },
   { id: "Account", label: "Account", icon: User, color: "text-blue-500", bg: "bg-blue-500/10" },
   { id: "Other", label: "Other", icon: HelpCircle, color: "text-neutral-500", bg: "bg-neutral-500/10" },

@@ -121,7 +121,7 @@ export default function MasterclassPaywall() {
   return (
     <div className="rounded-3xl bg-white/90 dark:bg-[#12151e]/85 backdrop-blur-xl border border-black/[0.06] dark:border-white/[0.08] shadow-[0_4px_24px_rgba(0,0,0,0.03)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.35)] overflow-hidden mb-8 relative group transition-all duration-300">
       {/* Subtle Blue Apple Ambient Glow */}
-      <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-blue-500/10 via-cyan-500/5 to-transparent rounded-full blur-3xl pointer-events-none group-hover:from-blue-500/15 transition-all duration-500" />
+      <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-blue-500/10 via-sky-500/5 to-transparent rounded-full blur-3xl pointer-events-none group-hover:from-blue-500/15 transition-all duration-500" />
 
       {/* ── STEP 1: Hero Banner Card (White & Blue Combo) ── */}
       <div className="p-6 sm:p-8 border-b border-black/[0.05] dark:border-white/[0.06] flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 relative z-10">
@@ -131,8 +131,8 @@ export default function MasterclassPaywall() {
               <Award className="w-3.5 h-3.5 text-blue-500" />
               <span>VIP Masterclass Pass</span>
             </span>
-            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20">
-              <ShieldCheck className="w-3 h-3 text-emerald-500" />
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-blue-500/10 text-blue-700 dark:text-blue-400 border border-blue-500/20">
+              <ShieldCheck className="w-3 h-3 text-blue-500" />
               <span>Industry Certified</span>
             </span>
           </div>
@@ -204,7 +204,7 @@ export default function MasterclassPaywall() {
                 title="Copy amount"
               >
                 {copied === "amt" ? (
-                  <CheckCircle className="w-4 h-4 text-emerald-500" />
+                  <CheckCircle className="w-4 h-4 text-blue-500" />
                 ) : (
                   <Copy className="w-4 h-4" />
                 )}
@@ -268,7 +268,7 @@ export default function MasterclassPaywall() {
                 <div className="flex items-center gap-3">
                   <div className="w-9 h-9 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
                     {selectedFile ? (
-                      <FileCheck className="w-4 h-4 text-emerald-500" />
+                      <FileCheck className="w-4 h-4 text-blue-500" />
                     ) : (
                       <Upload className="w-4 h-4" />
                     )}

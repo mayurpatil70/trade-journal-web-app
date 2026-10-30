@@ -196,13 +196,13 @@ export default function AppleSelect({
                     onClick={() => handleSelect(opt.value)}
                     className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm transition-all text-left cursor-pointer ${
                       isSelected
-                        ? "bg-emerald-500/10 dark:bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 font-bold border border-emerald-500/20"
+                        ? "bg-blue-500/10 dark:bg-blue-500/15 text-blue-600 dark:text-blue-400 font-bold border border-blue-500/20"
                         : "text-neutral-700 dark:text-neutral-200 hover:bg-black/[0.04] dark:hover:bg-white/[0.08]"
                     }`}
                   >
                     <span className="truncate">{opt.label}</span>
                     {isSelected && (
-                      <Check className="w-4 h-4 text-emerald-500 shrink-0 ml-2" />
+                      <Check className="w-4 h-4 text-blue-500 shrink-0 ml-2" />
                     )}
                   </button>
                 );

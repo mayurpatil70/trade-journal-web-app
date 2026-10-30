@@ -1,7 +1,7 @@
 // frontend/src/components/landing/DotGridBackground.jsx
 import React, { useEffect, useRef } from 'react';
 
-export default function DotGridBackground({ accentColor = '#10b981' }) {
+export default function DotGridBackground({ accentColor = '#007AFF' }) {
   const canvasRef = useRef(null);
 
   useEffect(() => {

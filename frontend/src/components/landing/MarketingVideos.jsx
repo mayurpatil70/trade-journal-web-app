@@ -114,7 +114,7 @@ export default function MarketingVideos() {
             gap: '6px',
             padding: '5px 14px',
             borderRadius: '999px',
-            background: 'rgba(16,185,129,0.1)',
+            background: 'rgba(0,122,255,0.1)',
             border: '1px solid rgba(16,185,129,0.25)',
             fontSize: '10px',
             color: 'var(--l-gain)',
@@ -148,7 +148,7 @@ export default function MarketingVideos() {
               overlayIcon={BrainCircuit}
               overlayTitle="AI Psychology Pre-Check"
               overlayText="Forces you to evaluate your emotional state before you execute a trade."
-              gradient="linear-gradient(135deg, #ec4899, #8b5cf6)"
+              gradient="linear-gradient(135deg, #ec4899, #007AFF)"
             />
           </div>
           <div style={{ flex: 1, borderRadius: '20px', overflow: 'hidden', background: 'rgb(var(--l-fg) / 0.05)', border: '1px solid rgb(var(--l-fg) / 0.1)', boxShadow: '0 30px 60px rgb(var(--l-shadow) / calc(0.4 * var(--l-sh-k)))' }}>

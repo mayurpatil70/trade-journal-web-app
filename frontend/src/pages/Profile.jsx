@@ -511,8 +511,8 @@ export default function Profile({ defaultTab }) {
       <div className="rounded-3xl p-6 bg-white dark:bg-[#121622] border border-black/[0.06] dark:border-white/[0.08] shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] space-y-5">
         <div className="flex items-center justify-between pb-4 border-b border-black/[0.05] dark:border-white/10 flex-wrap gap-3">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/20 flex items-center justify-center">
-              <Shield className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+            <div className="w-8 h-8 rounded-xl bg-blue-500/10 dark:bg-blue-500/20 border border-blue-500/20 flex items-center justify-center">
+              <Shield className="w-4 h-4 text-blue-600 dark:text-blue-400" />
             </div>
             <div>
               <h2 className="text-base font-bold text-neutral-900 dark:text-white">
@@ -561,14 +561,14 @@ export default function Profile({ defaultTab }) {
 
         {loadingSessions ? (
           <div className="py-8 flex items-center justify-center text-neutral-400 text-xs gap-2">
-            <Loader2 className="w-4 h-4 animate-spin text-emerald-500" />
+            <Loader2 className="w-4 h-4 animate-spin text-blue-500" />
             <span>Loading active devices...</span>
           </div>
         ) : sessions.length === 0 ? (
           <div className="space-y-3">
-            <div className="p-4 rounded-2xl border transition-all flex items-center justify-between gap-4 flex-wrap bg-emerald-500/[0.04] dark:bg-emerald-500/[0.06] border-emerald-500/30 ring-1 ring-emerald-500/20">
+            <div className="p-4 rounded-2xl border transition-all flex items-center justify-between gap-4 flex-wrap bg-blue-500/[0.04] dark:bg-blue-500/[0.06] border-blue-500/30 ring-1 ring-blue-500/20">
               <div className="flex items-center gap-3.5">
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
                   <Laptop className="w-5 h-5" />
                 </div>
                 <div>
@@ -576,13 +576,13 @@ export default function Profile({ defaultTab }) {
                     <span className="text-sm font-bold text-neutral-900 dark:text-white">
                       {fallbackDeviceName}
                     </span>
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/15 text-blue-600 dark:text-blue-400 border border-blue-500/30">
                       This Device
                     </span>
                   </div>
                   <div className="flex items-center gap-2 text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
-                    <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-medium">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    <span className="flex items-center gap-1 text-blue-600 dark:text-blue-400 font-medium">
+                      <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
                       Active now
                     </span>
                     <span>•</span>
@@ -628,7 +628,7 @@ export default function Profile({ defaultTab }) {
                   key={s.id || index}
                   className={`p-4 rounded-2xl border transition-all flex items-center justify-between gap-4 flex-wrap ${
                     isCurrent
-                      ? "bg-emerald-500/[0.04] dark:bg-emerald-500/[0.06] border-emerald-500/30 ring-1 ring-emerald-500/20"
+                      ? "bg-blue-500/[0.04] dark:bg-blue-500/[0.06] border-blue-500/30 ring-1 ring-blue-500/20"
                       : "bg-neutral-50 dark:bg-white/[0.02] border-black/[0.06] dark:border-white/[0.06]"
                   }`}
                 >
@@ -636,7 +636,7 @@ export default function Profile({ defaultTab }) {
                     <div
                       className={`w-10 h-10 rounded-xl flex items-center justify-center ${
                         isCurrent
-                          ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20"
+                          ? "bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20"
                           : "bg-black/[0.04] dark:bg-white/[0.04] text-neutral-600 dark:text-neutral-400 border border-black/[0.06] dark:border-white/[0.08]"
                       }`}
                     >
@@ -648,15 +648,15 @@ export default function Profile({ defaultTab }) {
                           {s.deviceName || fallbackDeviceName}
                         </span>
                         {isCurrent && (
-                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/15 text-blue-600 dark:text-blue-400 border border-blue-500/30">
                             This Device
                           </span>
                         )}
                       </div>
                       <div className="flex items-center gap-2 text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
                         {isCurrent ? (
-                          <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-medium">
-                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                          <span className="flex items-center gap-1 text-blue-600 dark:text-blue-400 font-medium">
+                            <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
                             Active now
                           </span>
                         ) : (
@@ -1042,9 +1042,9 @@ export default function Profile({ defaultTab }) {
   const initialLetter = (profile.displayName || userEmail || "T").charAt(0).toUpperCase();
 
   const exportFormats = [
-    { fmt: "csv", label: "CSV", icon: Table, color: "from-emerald-500/20 to-green-500/20", border: "border-emerald-500/20", text: "text-emerald-500 dark:text-emerald-400" },
+    { fmt: "csv", label: "CSV", icon: Table, color: "from-blue-500/20 to-blue-500/20", border: "border-blue-500/20", text: "text-blue-500 dark:text-blue-400" },
     { fmt: "excel", label: "Excel", icon: Table, color: "from-emerald-500/20 to-teal-500/20", border: "border-emerald-500/20", text: "text-emerald-500 dark:text-emerald-400" },
-    { fmt: "doc", label: "Word (1 Trade / Page)", icon: FileText, color: "from-blue-500/10 to-indigo-500/10", border: "border-blue-500/20", text: "text-blue-500 dark:text-blue-400" },
+    { fmt: "doc", label: "Word (1 Trade / Page)", icon: FileText, color: "from-blue-500/10 to-blue-500/10", border: "border-blue-500/20", text: "text-blue-500 dark:text-blue-400" },
     { fmt: "pdf", label: "PDF (1 Trade / Page)", icon: FileType, color: "from-rose-500/15 to-red-500/15", border: "border-rose-500/25", text: "text-rose-500 dark:text-rose-400" },
   ];
 
@@ -1060,13 +1060,13 @@ export default function Profile({ defaultTab }) {
                 src={profile.avatarUrl}
                 alt={profile.displayName}
                 onClick={() => setIsPhotoModalOpen(true)}
-                className="w-16 h-16 rounded-full object-cover ring-2 ring-emerald-500/20 shadow-md cursor-pointer hover:ring-4 hover:ring-emerald-500/40 hover:scale-105 transition-all"
+                className="w-16 h-16 rounded-full object-cover ring-2 ring-blue-500/20 shadow-md cursor-pointer hover:ring-4 hover:ring-blue-500/40 hover:scale-105 transition-all"
                 title="Click to view & update profile photo"
               />
             ) : (
               <div
                 onClick={() => setIsPhotoModalOpen(true)}
-                className="w-16 h-16 rounded-full bg-gradient-to-tr from-emerald-500 to-teal-500 text-white flex items-center justify-center font-black text-2xl shadow-md cursor-pointer hover:ring-4 hover:ring-emerald-500/40 hover:scale-105 transition-all"
+                className="w-16 h-16 rounded-full bg-gradient-to-tr from-blue-500 to-blue-500 text-white flex items-center justify-center font-black text-2xl shadow-md cursor-pointer hover:ring-4 hover:ring-blue-500/40 hover:scale-105 transition-all"
                 title="Click to view & update profile photo"
               >
                 {initialLetter}
@@ -1110,7 +1110,7 @@ export default function Profile({ defaultTab }) {
               </span>
             </div>
             <div className="flex items-center gap-2 mt-1 text-xs font-semibold text-neutral-500 dark:text-neutral-400">
-              <span className="text-emerald-600 dark:text-emerald-400">@{profile.username}</span>
+              <span className="text-blue-600 dark:text-blue-400">@{profile.username}</span>
               <span>·</span>
               <span>Joined {profile.joinedYear}</span>
             </div>
@@ -1138,7 +1138,7 @@ export default function Profile({ defaultTab }) {
           onClick={() => handleTabChange("profile")}
           className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all cursor-pointer ${
             activeTab === "profile"
-              ? "bg-emerald-500 text-white shadow-sm shadow-emerald-500/20"
+              ? "bg-blue-500 text-white shadow-sm shadow-blue-500/20"
               : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white hover:bg-black/[0.03] dark:hover:bg-white/[0.05]"
           }`}
         >
@@ -1151,7 +1151,7 @@ export default function Profile({ defaultTab }) {
           onClick={() => handleTabChange("settings")}
           className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all cursor-pointer ${
             activeTab === "settings"
-              ? "bg-emerald-500 text-white shadow-sm shadow-emerald-500/20"
+              ? "bg-blue-500 text-white shadow-sm shadow-blue-500/20"
               : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white hover:bg-black/[0.03] dark:hover:bg-white/[0.05]"
           }`}
         >
@@ -1164,7 +1164,7 @@ export default function Profile({ defaultTab }) {
           onClick={() => handleTabChange("billing")}
           className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all cursor-pointer ${
             activeTab === "billing"
-              ? "bg-emerald-500 text-white shadow-sm shadow-emerald-500/20"
+              ? "bg-blue-500 text-white shadow-sm shadow-blue-500/20"
               : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white hover:bg-black/[0.03] dark:hover:bg-white/[0.05]"
           }`}
         >
@@ -1189,8 +1189,8 @@ export default function Profile({ defaultTab }) {
           >
             <div className="flex items-center justify-between flex-wrap gap-2">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/20 flex items-center justify-center">
-                  <Scale className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                <div className="w-8 h-8 rounded-xl bg-blue-500/10 dark:bg-blue-500/20 border border-blue-500/20 flex items-center justify-center">
+                  <Scale className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                 </div>
                 <div>
                   <h2 className="text-base font-bold text-neutral-900 dark:text-white">
@@ -1208,7 +1208,7 @@ export default function Profile({ defaultTab }) {
                   setEditRulesForm(disciplineRules);
                   setIsEditRulesOpen(true);
                 }}
-                className="px-4 py-2 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold flex items-center gap-2 transition-all shadow-sm shadow-emerald-500/25 active:scale-95 cursor-pointer"
+                className="px-4 py-2 rounded-2xl bg-blue-500 hover:bg-blue-600 text-white text-xs font-bold flex items-center gap-2 transition-all shadow-sm shadow-blue-500/25 active:scale-95 cursor-pointer"
               >
                 <Pencil className="w-3.5 h-3.5" />
                 <span>Edit Rules</span>
@@ -1219,7 +1219,7 @@ export default function Profile({ defaultTab }) {
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 pt-2">
               <div className="rounded-2xl p-4 bg-neutral-50/70 dark:bg-white/[0.025] border border-black/[0.06] dark:border-white/[0.07]">
                 <div className="flex items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-wider text-neutral-400 dark:text-neutral-500">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
                   MAX RISK / TRADE
                 </div>
                 <p className="text-xl sm:text-2xl font-black font-mono text-neutral-900 dark:text-white mt-1.5">
@@ -1229,7 +1229,7 @@ export default function Profile({ defaultTab }) {
 
               <div className="rounded-2xl p-4 bg-neutral-50/70 dark:bg-white/[0.025] border border-black/[0.06] dark:border-white/[0.07]">
                 <div className="flex items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-wider text-neutral-400 dark:text-neutral-500">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
                   MAX TRADES / DAY
                 </div>
                 <p className="text-xl sm:text-2xl font-black font-mono text-neutral-900 dark:text-white mt-1.5">
@@ -1249,7 +1249,7 @@ export default function Profile({ defaultTab }) {
 
               <div className="rounded-2xl p-4 bg-neutral-50/70 dark:bg-white/[0.025] border border-black/[0.06] dark:border-white/[0.07]">
                 <div className="flex items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-wider text-neutral-400 dark:text-neutral-500">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
                   LOSING STREAK
                 </div>
                 <p className="text-lg sm:text-xl font-black font-mono text-neutral-900 dark:text-white mt-2 truncate">
@@ -1276,8 +1276,8 @@ export default function Profile({ defaultTab }) {
               <div>
                 <div className="flex items-center justify-between flex-wrap gap-2 mb-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/20 flex items-center justify-center">
-                      <Globe className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                    <div className="w-8 h-8 rounded-xl bg-blue-500/10 dark:bg-blue-500/20 border border-blue-500/20 flex items-center justify-center">
+                      <Globe className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                     </div>
                     <div>
                       <h3 className="text-sm font-bold text-neutral-900 dark:text-white">
@@ -1308,15 +1308,15 @@ export default function Profile({ defaultTab }) {
                 <div className="space-y-4">
                   <div>
                     <p className="text-[10px] font-extrabold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 mb-2 flex items-center gap-1.5">
-                      <Clock className="w-3 h-3 text-emerald-500" /> SESSIONS
+                      <Clock className="w-3 h-3 text-blue-500" /> SESSIONS
                     </p>
                     <div className="flex flex-wrap gap-2">
                       {safeArray(disciplineRules.preferredSessions, ["London", "New York"]).map((session) => (
                         <span
                           key={session}
-                          className="px-3 py-1 rounded-xl text-xs font-semibold bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20 flex items-center gap-1.5"
+                          className="px-3 py-1 rounded-xl text-xs font-semibold bg-blue-500/10 text-blue-700 dark:text-blue-300 border border-blue-500/20 flex items-center gap-1.5"
                         >
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                          <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
                           {session}
                         </span>
                       ))}
@@ -1346,8 +1346,8 @@ export default function Profile({ defaultTab }) {
             <div className="rounded-3xl p-6 bg-white dark:bg-[#121622] border border-black/[0.06] dark:border-white/[0.08] shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] flex flex-col justify-between">
               <div>
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-8 h-8 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/20 flex items-center justify-center">
-                    <Monitor className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                  <div className="w-8 h-8 rounded-xl bg-blue-500/10 dark:bg-blue-500/20 border border-blue-500/20 flex items-center justify-center">
+                    <Monitor className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                   </div>
                   <div>
                     <h3 className="text-sm font-bold text-neutral-900 dark:text-white">
@@ -1401,8 +1401,8 @@ export default function Profile({ defaultTab }) {
           <div className="rounded-3xl p-6 bg-white dark:bg-[#121622] border border-black/[0.06] dark:border-white/[0.08] shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] space-y-4">
             <div className="flex items-center justify-between flex-wrap gap-2">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/20 flex items-center justify-center">
-                  <CheckSquare className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                <div className="w-8 h-8 rounded-xl bg-blue-500/10 dark:bg-blue-500/20 border border-blue-500/20 flex items-center justify-center">
+                  <CheckSquare className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                 </div>
                 <div>
                   <h2 className="text-base font-bold text-neutral-900 dark:text-white">
@@ -1428,7 +1428,7 @@ export default function Profile({ defaultTab }) {
                 <button
                   type="button"
                   onClick={() => setIsAddingChecklistItem(true)}
-                  className="px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold flex items-center gap-1.5 transition-all shadow-xs cursor-pointer active:scale-95"
+                  className="px-3 py-1.5 rounded-xl bg-blue-500 hover:bg-blue-600 text-white text-xs font-bold flex items-center gap-1.5 transition-all shadow-xs cursor-pointer active:scale-95"
                 >
                   <Plus className="w-3 h-3" />
                   <span>Add Step</span>
@@ -1441,7 +1441,7 @@ export default function Profile({ defaultTab }) {
               {safeChecklist.map((item, idx) => (
                 <div
                   key={item.id}
-                  className="flex items-center justify-between p-3.5 rounded-2xl bg-neutral-50/60 dark:bg-white/[0.025] border border-black/[0.05] dark:border-white/[0.06] hover:border-emerald-500/30 transition-colors group"
+                  className="flex items-center justify-between p-3.5 rounded-2xl bg-neutral-50/60 dark:bg-white/[0.025] border border-black/[0.05] dark:border-white/[0.06] hover:border-blue-500/30 transition-colors group"
                 >
                   <div
                     onClick={() => handleToggleChecklist(item.id)}
@@ -1450,8 +1450,8 @@ export default function Profile({ defaultTab }) {
                     <div
                       className={`w-5 h-5 rounded-lg border flex items-center justify-center transition-all ${
                         item.checked
-                          ? "bg-emerald-500 border-emerald-500 text-white shadow-xs"
-                          : "border-black/20 dark:border-white/20 hover:border-emerald-500"
+                          ? "bg-blue-500 border-blue-500 text-white shadow-xs"
+                          : "border-black/20 dark:border-white/20 hover:border-blue-500"
                       }`}
                     >
                       {item.checked && <Check className="w-3.5 h-3.5 stroke-[3]" />}
@@ -1502,7 +1502,7 @@ export default function Profile({ defaultTab }) {
               {isAddingChecklistItem && (
                 <form
                   onSubmit={handleAddChecklistItem}
-                  className="flex items-center gap-2 p-2 rounded-2xl border border-emerald-500/30 bg-emerald-500/[0.02]"
+                  className="flex items-center gap-2 p-2 rounded-2xl border border-blue-500/30 bg-blue-500/[0.02]"
                 >
                   <input
                     type="text"
@@ -1514,7 +1514,7 @@ export default function Profile({ defaultTab }) {
                   />
                   <button
                     type="submit"
-                    className="px-3 py-1.5 rounded-xl bg-emerald-500 text-white text-xs font-bold hover:bg-emerald-600 transition-colors cursor-pointer"
+                    className="px-3 py-1.5 rounded-xl bg-blue-500 text-white text-xs font-bold hover:bg-blue-600 transition-colors cursor-pointer"
                   >
                     Save
                   </button>
@@ -1562,8 +1562,8 @@ export default function Profile({ defaultTab }) {
           <div className="rounded-3xl p-6 bg-white dark:bg-[#121622] border border-black/[0.06] dark:border-white/[0.08] shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] space-y-5">
             <div className="flex items-center justify-between pb-4 border-b border-black/[0.05] dark:border-white/10 flex-wrap gap-2">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/20 flex items-center justify-center">
-                  <Monitor className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                <div className="w-8 h-8 rounded-xl bg-blue-500/10 dark:bg-blue-500/20 border border-blue-500/20 flex items-center justify-center">
+                  <Monitor className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                 </div>
                 <div>
                   <h2 className="text-base font-bold text-neutral-900 dark:text-white">
@@ -1576,7 +1576,7 @@ export default function Profile({ defaultTab }) {
               </div>
 
               {prefSaveNotice && (
-                <span className="flex items-center gap-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20 animate-in fade-in">
+                <span className="flex items-center gap-1.5 text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-500/10 px-3 py-1 rounded-full border border-blue-500/20 animate-in fade-in">
                   <CheckCircle2 className="w-3.5 h-3.5" />
                   {prefSaveNotice}
                 </span>
@@ -1599,7 +1599,7 @@ export default function Profile({ defaultTab }) {
                         onClick={() => handleUpdatePreference("currency", c.code)}
                         className={`p-3 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
                           isSelected
-                            ? "bg-emerald-500/10 border-emerald-500 text-emerald-600 dark:text-emerald-400 shadow-xs ring-1 ring-emerald-500/30"
+                            ? "bg-blue-500/10 border-blue-500 text-blue-600 dark:text-blue-400 shadow-xs ring-1 ring-blue-500/30"
                             : "bg-neutral-50 dark:bg-white/[0.03] border-black/[0.06] dark:border-white/[0.08] hover:border-neutral-300 dark:hover:border-white/20 text-neutral-700 dark:text-neutral-300"
                         }`}
                       >
@@ -1632,8 +1632,8 @@ export default function Profile({ defaultTab }) {
           {/* ── 2. EXPORT JOURNAL DATA ── */}
           <div className="rounded-3xl p-6 bg-white dark:bg-[#121622] border border-black/[0.06] dark:border-white/[0.08] shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] space-y-4">
             <div className="flex items-center gap-3 pb-4 border-b border-black/[0.05] dark:border-white/10">
-              <div className="w-8 h-8 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/20 flex items-center justify-center">
-                <Download className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+              <div className="w-8 h-8 rounded-xl bg-blue-500/10 dark:bg-blue-500/20 border border-blue-500/20 flex items-center justify-center">
+                <Download className="w-4 h-4 text-blue-600 dark:text-blue-400" />
               </div>
               <div>
                 <h2 className="text-base font-bold text-neutral-900 dark:text-white">
@@ -1672,8 +1672,8 @@ export default function Profile({ defaultTab }) {
           <div className="rounded-3xl p-6 bg-white dark:bg-[#121622] border border-black/[0.06] dark:border-white/[0.08] shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] space-y-4">
             <div className="flex items-center justify-between pb-4 border-b border-black/[0.05] dark:border-white/10 flex-wrap gap-2">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/20 flex items-center justify-center">
-                  <BookOpen className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                <div className="w-8 h-8 rounded-xl bg-blue-500/10 dark:bg-blue-500/20 border border-blue-500/20 flex items-center justify-center">
+                  <BookOpen className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                 </div>
                 <div>
                   <h2 className="text-base font-bold text-neutral-900 dark:text-white">
@@ -1692,7 +1692,7 @@ export default function Profile({ defaultTab }) {
             <div className="w-full overflow-x-auto">
               {loadingHistory ? (
                 <div className="flex justify-center py-10">
-                  <Loader2 className="w-6 h-6 text-emerald-500 dark:text-emerald-400 animate-spin" />
+                  <Loader2 className="w-6 h-6 text-blue-500 dark:text-blue-400 animate-spin" />
                 </div>
               ) : historyTrades.length === 0 ? (
                 <div className="text-center py-10 border border-dashed border-black/[0.08] dark:border-white/10 rounded-2xl">
@@ -1727,7 +1727,7 @@ export default function Profile({ defaultTab }) {
                         <tr
                           key={trade.id}
                           onClick={() => setSelectedTrade(trade)}
-                          className="border-b border-black/[0.03] dark:border-white/5 hover:bg-emerald-500/[0.04] dark:hover:bg-white/[0.03] transition-colors cursor-pointer group"
+                          className="border-b border-black/[0.03] dark:border-white/5 hover:bg-blue-500/[0.04] dark:hover:bg-white/[0.03] transition-colors cursor-pointer group"
                         >
                           <td className="py-4 text-xs font-semibold text-neutral-900 dark:text-white flex items-center gap-2">
                             <Calendar className="w-3.5 h-3.5 text-neutral-400" /> {trade.date}
@@ -1767,7 +1767,7 @@ export default function Profile({ defaultTab }) {
                                 e.stopPropagation();
                                 setSelectedTrade(trade);
                               }}
-                              className="p-1.5 rounded-xl bg-black/[0.04] dark:bg-white/5 hover:bg-emerald-500/15 text-neutral-700 dark:text-neutral-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors inline-flex items-center gap-1 text-xs font-semibold px-2.5 cursor-pointer"
+                              className="p-1.5 rounded-xl bg-black/[0.04] dark:bg-white/5 hover:bg-blue-500/15 text-neutral-700 dark:text-neutral-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors inline-flex items-center gap-1 text-xs font-semibold px-2.5 cursor-pointer"
                               title="View Trade Detail"
                             >
                               <Eye className="w-3.5 h-3.5" /> View
@@ -1823,8 +1823,8 @@ export default function Profile({ defaultTab }) {
           <div className="rounded-3xl p-6 bg-white dark:bg-[#121622] border border-black/[0.06] dark:border-white/[0.08] shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] space-y-6">
             <div className="flex items-center justify-between pb-4 border-b border-black/[0.05] dark:border-white/10 flex-wrap gap-2">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/20 flex items-center justify-center">
-                  <CreditCard className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                <div className="w-8 h-8 rounded-xl bg-blue-500/10 dark:bg-blue-500/20 border border-blue-500/20 flex items-center justify-center">
+                  <CreditCard className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                 </div>
                 <div>
                   <h2 className="text-base font-bold text-neutral-900 dark:text-white">
@@ -1850,7 +1850,7 @@ export default function Profile({ defaultTab }) {
               <Suspense
                 fallback={
                   <div className="py-12 flex flex-col items-center justify-center min-h-[300px]">
-                    <div className="w-8 h-8 rounded-full border-2 border-emerald-500/20 border-t-emerald-500 animate-spin mb-3" />
+                    <div className="w-8 h-8 rounded-full border-2 border-blue-500/20 border-t-blue-500 animate-spin mb-3" />
                     <p className="text-xs text-neutral-500 dark:text-neutral-400 font-medium tracking-wide">
                       Loading membership & billing options...
                     </p>
@@ -1935,7 +1935,7 @@ export default function Profile({ defaultTab }) {
                   <button
                     type="button"
                     onClick={() => navigate(`/add-trade?edit=${selectedTrade.id}`)}
-                    className="p-2 bg-black/[0.04] dark:bg-white/5 hover:bg-emerald-500/15 rounded-xl text-emerald-600 dark:text-emerald-400 transition-colors cursor-pointer"
+                    className="p-2 bg-black/[0.04] dark:bg-white/5 hover:bg-blue-500/15 rounded-xl text-blue-600 dark:text-blue-400 transition-colors cursor-pointer"
                     title="Edit Trade"
                   >
                     <Pencil className="w-4 h-4" />
@@ -2014,7 +2014,7 @@ export default function Profile({ defaultTab }) {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-4">
                     <div>
-                      <h3 className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest mb-2 flex items-center gap-2">
+                      <h3 className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-2 flex items-center gap-2">
                         <Target className="w-3.5 h-3.5" /> Analysis & Reason
                       </h3>
                       <p className="text-xs text-neutral-900 dark:text-neutral-100 leading-relaxed bg-neutral-50 dark:bg-white/[0.04] border border-black/10 dark:border-white/10 p-4 rounded-2xl min-h-[90px] whitespace-pre-wrap font-medium shadow-xs">
@@ -2022,7 +2022,7 @@ export default function Profile({ defaultTab }) {
                       </p>
                     </div>
                     <div>
-                      <h3 className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest mb-2 flex items-center gap-2">
+                      <h3 className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-2 flex items-center gap-2">
                         <TrendingUp className="w-3.5 h-3.5" /> Key Lesson
                       </h3>
                       <p className="text-xs text-neutral-900 dark:text-neutral-100 leading-relaxed bg-neutral-50 dark:bg-white/[0.04] border border-black/10 dark:border-white/10 p-4 rounded-2xl min-h-[90px] whitespace-pre-wrap font-medium shadow-xs">
@@ -2033,7 +2033,7 @@ export default function Profile({ defaultTab }) {
 
                   <div className="bg-black/[0.025] dark:bg-white/[0.04] border border-black/[0.05] dark:border-white/[0.08] p-5 rounded-2xl flex flex-col justify-between">
                     <div>
-                      <h3 className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                      <h3 className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-4 flex items-center gap-2">
                         <Brain className="w-3.5 h-3.5" /> Psychology & Discipline
                       </h3>
                       <div className="flex items-center gap-4 mb-4 pb-4 border-b border-black/[0.05] dark:border-white/[0.06]">
@@ -2134,7 +2134,7 @@ export default function Profile({ defaultTab }) {
                     onChange={(e) =>
                       setEditProfileForm({ ...editProfileForm, displayName: e.target.value })
                     }
-                    className="w-full px-3.5 py-2 rounded-xl bg-neutral-100 dark:bg-white/[0.05] border border-black/[0.08] dark:border-white/[0.1] text-xs font-semibold text-neutral-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                    className="w-full px-3.5 py-2 rounded-xl bg-neutral-100 dark:bg-white/[0.05] border border-black/[0.08] dark:border-white/[0.1] text-xs font-semibold text-neutral-900 dark:text-white focus:outline-none focus:border-blue-500"
                     required
                   />
                 </div>
@@ -2154,7 +2154,7 @@ export default function Profile({ defaultTab }) {
                           username: e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ""),
                         })
                       }
-                      className="w-full pl-7 pr-3.5 py-2 rounded-xl bg-neutral-100 dark:bg-white/[0.05] border border-black/[0.08] dark:border-white/[0.1] text-xs font-semibold text-neutral-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                      className="w-full pl-7 pr-3.5 py-2 rounded-xl bg-neutral-100 dark:bg-white/[0.05] border border-black/[0.08] dark:border-white/[0.1] text-xs font-semibold text-neutral-900 dark:text-white focus:outline-none focus:border-blue-500"
                       required
                     />
                   </div>
@@ -2170,7 +2170,7 @@ export default function Profile({ defaultTab }) {
                     onChange={(e) =>
                       setEditProfileForm({ ...editProfileForm, bio: e.target.value })
                     }
-                    className="w-full px-3.5 py-2 rounded-xl bg-neutral-100 dark:bg-white/[0.05] border border-black/[0.08] dark:border-white/[0.1] text-xs font-medium text-neutral-900 dark:text-white focus:outline-none focus:border-emerald-500 resize-none"
+                    className="w-full px-3.5 py-2 rounded-xl bg-neutral-100 dark:bg-white/[0.05] border border-black/[0.08] dark:border-white/[0.1] text-xs font-medium text-neutral-900 dark:text-white focus:outline-none focus:border-blue-500 resize-none"
                   />
                 </div>
               </div>
@@ -2185,7 +2185,7 @@ export default function Profile({ defaultTab }) {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold transition-all shadow-sm shadow-emerald-500/20 active:scale-95"
+                  className="px-4 py-2 rounded-xl bg-blue-500 hover:bg-blue-600 text-white text-xs font-bold transition-all shadow-sm shadow-blue-500/20 active:scale-95"
                 >
                   Save Profile
                 </button>
@@ -2245,7 +2245,7 @@ export default function Profile({ defaultTab }) {
                 <div className="p-3.5 rounded-2xl bg-neutral-50/80 dark:bg-white/[0.03] border border-black/[0.06] dark:border-white/[0.08] hover:border-black/15 dark:hover:border-white/15 transition-all shadow-2xs space-y-2">
                   <div className="flex items-center justify-between gap-2">
                     <label className="text-[11px] font-bold text-neutral-800 dark:text-neutral-200 flex items-center gap-1.5 uppercase tracking-wider">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0" />
                       Max Risk / Trade
                     </label>
                     <ApplePresetDropdown
@@ -2288,7 +2288,7 @@ export default function Profile({ defaultTab }) {
                 <div className="p-3.5 rounded-2xl bg-neutral-50/80 dark:bg-white/[0.03] border border-black/[0.06] dark:border-white/[0.08] hover:border-black/15 dark:hover:border-white/15 transition-all shadow-2xs space-y-2">
                   <div className="flex items-center justify-between gap-2">
                     <label className="text-[11px] font-bold text-neutral-800 dark:text-neutral-200 flex items-center gap-1.5 uppercase tracking-wider">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0" />
                       Max Trades / Day
                     </label>
                     <ApplePresetDropdown
@@ -2470,7 +2470,7 @@ export default function Profile({ defaultTab }) {
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold transition-all shadow-sm shadow-emerald-500/25 active:scale-95 cursor-pointer"
+                  className="px-5 py-2.5 rounded-xl bg-blue-500 hover:bg-blue-600 text-white text-xs font-bold transition-all shadow-sm shadow-blue-500/25 active:scale-95 cursor-pointer"
                 >
                   Save Rules
                 </button>
@@ -2494,8 +2494,8 @@ export default function Profile({ defaultTab }) {
               {/* Header */}
               <div className="flex items-center justify-between pb-3 border-b border-black/[0.06] dark:border-white/[0.08]">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/20 flex items-center justify-center">
-                    <Globe className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                  <div className="w-8 h-8 rounded-xl bg-blue-500/10 dark:bg-blue-500/20 border border-blue-500/20 flex items-center justify-center">
+                    <Globe className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                   </div>
                   <div>
                     <h3 className="text-base font-bold text-neutral-900 dark:text-white">
@@ -2518,7 +2518,7 @@ export default function Profile({ defaultTab }) {
               {/* 1. Active Trading Sessions */}
               <div className="space-y-2">
                 <p className="text-[11px] font-extrabold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 flex items-center gap-1.5">
-                  <Clock className="w-3.5 h-3.5 text-emerald-500" />
+                  <Clock className="w-3.5 h-3.5 text-blue-500" />
                   ACTIVE TRADING SESSIONS
                 </p>
                 <div className="grid grid-cols-2 gap-2">
@@ -2536,7 +2536,7 @@ export default function Profile({ defaultTab }) {
                         onClick={() => handleToggleSession(sess.id)}
                         className={`p-3 rounded-2xl border text-left transition-all cursor-pointer ${
                           isSelected
-                            ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-700 dark:text-emerald-300 shadow-xs shadow-emerald-500/10"
+                            ? "bg-blue-500/15 border-blue-500/40 text-blue-700 dark:text-blue-300 shadow-xs shadow-blue-500/10"
                             : "bg-neutral-100/70 dark:bg-white/[0.03] border-black/[0.06] dark:border-white/[0.08] text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200/60 dark:hover:bg-white/[0.06]"
                         }`}
                       >
@@ -2544,7 +2544,7 @@ export default function Profile({ defaultTab }) {
                           <span className="text-xs font-bold">{sess.name}</span>
                           <span
                             className={`w-2 h-2 rounded-full ${
-                              isSelected ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]" : "bg-neutral-300 dark:bg-white/20"
+                              isSelected ? "bg-blue-500 shadow-[0_0_8px_rgba(0,122,255,0.8)]" : "bg-neutral-300 dark:bg-white/20"
                             }`}
                           />
                         </div>
@@ -2605,12 +2605,12 @@ export default function Profile({ defaultTab }) {
                       }
                     }}
                     placeholder="Enter symbol (e.g. BTC/USD, GBPNZD, US500)..."
-                    className="flex-1 px-3.5 py-2 rounded-xl bg-neutral-100 dark:bg-white/[0.05] border border-black/[0.08] dark:border-white/[0.1] text-xs font-mono font-bold text-neutral-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                    className="flex-1 px-3.5 py-2 rounded-xl bg-neutral-100 dark:bg-white/[0.05] border border-black/[0.08] dark:border-white/[0.1] text-xs font-mono font-bold text-neutral-900 dark:text-white focus:outline-none focus:border-blue-500"
                   />
                   <button
                     type="button"
                     onClick={handleAddCustomPair}
-                    className="px-4 py-2 rounded-xl bg-neutral-200 dark:bg-white/[0.08] hover:bg-emerald-500 hover:text-white text-neutral-800 dark:text-neutral-200 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer"
+                    className="px-4 py-2 rounded-xl bg-neutral-200 dark:bg-white/[0.08] hover:bg-blue-500 hover:text-white text-neutral-800 dark:text-neutral-200 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer"
                   >
                     <Plus className="w-3.5 h-3.5" />
                     <span>Add</span>
@@ -2647,7 +2647,7 @@ export default function Profile({ defaultTab }) {
                           onClick={() => handleTogglePair(sym)}
                           className={`px-2.5 py-1 rounded-lg text-[11px] font-mono font-bold transition-all cursor-pointer ${
                             isAdded
-                              ? "bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/35"
+                              ? "bg-blue-500/20 text-blue-700 dark:text-blue-300 border border-blue-500/35"
                               : "bg-neutral-100 dark:bg-white/[0.04] text-neutral-600 dark:text-neutral-400 border border-black/[0.05] dark:border-white/[0.06] hover:bg-neutral-200 dark:hover:bg-white/[0.08]"
                           }`}
                         >
@@ -2671,7 +2671,7 @@ export default function Profile({ defaultTab }) {
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold transition-all shadow-sm shadow-emerald-500/25 active:scale-95 cursor-pointer"
+                  className="px-5 py-2.5 rounded-xl bg-blue-500 hover:bg-blue-600 text-white text-xs font-bold transition-all shadow-sm shadow-blue-500/25 active:scale-95 cursor-pointer"
                 >
                   Save Preferences
                 </button>

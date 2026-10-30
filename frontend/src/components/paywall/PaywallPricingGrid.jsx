@@ -28,6 +28,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import api from '../../api/axios';
 import { invalidateSubscriptionCache } from '../../utils/subscriptionCache';
+import { nextStepAfterPaywall } from '../../lib/authFlow';
 
 // -------------------------------------------------------------
 // BSC USDT CONTRACT & MERCHANT CONFIG
@@ -136,7 +137,7 @@ export function WalletConnectModal({ isOpen, onClose, onSelect, isConnecting }) 
         <div className="flex items-center justify-between pb-4 border-b border-white/10">
           <div>
             <h3 className="text-lg font-bold text-white flex items-center gap-2">
-              <Wallet className="w-5 h-5 text-emerald-400" />
+              <Wallet className="w-5 h-5 text-blue-400" />
               Connect Wallet
             </h3>
             <p className="text-xs text-gray-400 mt-0.5">
@@ -159,16 +160,16 @@ export function WalletConnectModal({ isOpen, onClose, onSelect, isConnecting }) 
             type="button"
             onClick={() => onSelect('walletConnect')}
             disabled={isConnecting}
-            className="w-full flex items-center justify-between p-4 rounded-xl bg-[#0f1d2e] hover:bg-[#13273d] border border-emerald-500/35 hover:border-emerald-500/70 transition-all group text-left cursor-pointer"
+            className="w-full flex items-center justify-between p-4 rounded-xl bg-[#0f1d2e] hover:bg-[#13273d] border border-blue-500/35 hover:border-blue-500/70 transition-all group text-left cursor-pointer"
           >
             <div className="flex items-center gap-3.5">
               <div className="w-11 h-11 rounded-xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-blue-400 group-hover:scale-105 transition-transform shrink-0">
-                <QrCode className="w-6 h-6 text-emerald-400" />
+                <QrCode className="w-6 h-6 text-blue-400" />
               </div>
               <div>
                 <div className="flex items-center gap-2">
                   <span className="font-bold text-sm text-white">WalletConnect</span>
-                  <span className="text-[10px] uppercase font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/35">
+                  <span className="text-[10px] uppercase font-mono font-bold px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/35">
                     QR Scanner
                   </span>
                 </div>
@@ -177,7 +178,7 @@ export function WalletConnectModal({ isOpen, onClose, onSelect, isConnecting }) 
                 </p>
               </div>
             </div>
-            <div className="text-gray-500 group-hover:text-emerald-400 text-lg transition-colors pl-2">
+            <div className="text-gray-500 group-hover:text-blue-400 text-lg transition-colors pl-2">
               →
             </div>
           </button>
@@ -225,11 +226,11 @@ export function WalletConnectModal({ isOpen, onClose, onSelect, isConnecting }) 
             type="button"
             onClick={() => onSelect('injected')}
             disabled={isConnecting}
-            className="w-full flex items-center justify-between p-4 rounded-xl bg-[#0f1d2e] hover:bg-[#13273d] border border-white/10 hover:border-purple-500/50 transition-all group text-left cursor-pointer"
+            className="w-full flex items-center justify-between p-4 rounded-xl bg-[#0f1d2e] hover:bg-[#13273d] border border-white/10 hover:border-blue-500/50 transition-all group text-left cursor-pointer"
           >
             <div className="flex items-center gap-3.5">
-              <div className="w-11 h-11 rounded-xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400 group-hover:scale-105 transition-transform shrink-0">
-                <Wallet className="w-6 h-6 text-purple-400" />
+              <div className="w-11 h-11 rounded-xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-blue-400 group-hover:scale-105 transition-transform shrink-0">
+                <Wallet className="w-6 h-6 text-blue-400" />
               </div>
               <div>
                 <div className="flex items-center gap-2">
@@ -240,7 +241,7 @@ export function WalletConnectModal({ isOpen, onClose, onSelect, isConnecting }) 
                 </p>
               </div>
             </div>
-            <div className="text-gray-500 group-hover:text-purple-400 text-lg transition-colors pl-2">
+            <div className="text-gray-500 group-hover:text-blue-400 text-lg transition-colors pl-2">
               →
             </div>
           </button>
@@ -249,10 +250,10 @@ export function WalletConnectModal({ isOpen, onClose, onSelect, isConnecting }) 
         {/* Footer info */}
         <div className="mt-5 pt-4 border-t border-white/10 flex items-center justify-between text-[11px] text-gray-400 font-mono">
           <span className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 inline-block animate-pulse" />
+            <span className="w-2 h-2 rounded-full bg-blue-400 inline-block animate-pulse" />
             BNB Smart Chain (BEP-20)
           </span>
-          <span className="flex items-center gap-1 text-emerald-400">
+          <span className="flex items-center gap-1 text-blue-400">
             <ShieldCheck className="w-3.5 h-3.5" />
             Instant Verification
           </span>
@@ -316,7 +317,7 @@ function PaywallPricingContent({ isEmbedded = false, showTopBar = true }) {
       });
       if (response.data.success) {
         invalidateSubscriptionCache();
-        navigate('/dashboard');
+        navigate(nextStepAfterPaywall());
       }
     } catch (error) {
       console.error('Start trial error:', error);
@@ -439,7 +440,7 @@ function PaywallPricingContent({ isEmbedded = false, showTopBar = true }) {
             setPaymentState('success');
             invalidateSubscriptionCache();
             setTimeout(() => {
-              navigate('/dashboard');
+              navigate(nextStepAfterPaywall());
             }, 1800);
           } else {
             setPaymentState('error');
@@ -471,7 +472,7 @@ function PaywallPricingContent({ isEmbedded = false, showTopBar = true }) {
         setPaymentState('success');
         invalidateSubscriptionCache();
         setTimeout(() => {
-          navigate('/dashboard');
+          navigate(nextStepAfterPaywall());
         }, 1500);
       } else {
         setPaymentState('error');
@@ -484,13 +485,13 @@ function PaywallPricingContent({ isEmbedded = false, showTopBar = true }) {
   };
 
   return (
-    <div className={`w-full flex flex-col items-center relative ${isEmbedded ? '' : 'text-white'}`}>
+    <div className={`w-full flex flex-col items-center relative ${isEmbedded ? '' : 'text-neutral-900 dark:text-white'}`}>
       {/* Top Bar Navigation (Rendered in full page mode) */}
       {!isEmbedded && showTopBar && (
         <div className="w-full max-w-5xl flex items-center justify-between mb-8 relative z-20">
           <button
             onClick={handleBack}
-            className="text-gray-400 hover:text-white flex items-center gap-2 text-sm font-medium transition-colors cursor-pointer group"
+            className="text-neutral-500 dark:text-gray-400 hover:text-neutral-900 dark:hover:text-white flex items-center gap-2 text-sm font-medium transition-colors cursor-pointer group"
           >
             <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
             <span>
@@ -526,7 +527,7 @@ function PaywallPricingContent({ isEmbedded = false, showTopBar = true }) {
       {isEmbedded && isConnected && address && (
         <div className="w-full max-w-4xl flex items-center justify-end mb-4">
           <div className="flex items-center gap-2 bg-neutral-100 dark:bg-[#0b131f] border border-black/[0.08] dark:border-white/10 px-3 py-1 rounded-full text-xs font-mono shadow-xs">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse" />
+            <span className="w-2 h-2 rounded-full bg-blue-500 inline-block animate-pulse" />
             <span className="text-neutral-700 dark:text-gray-300 font-semibold">
               {address.slice(0, 6)}...{address.slice(-4)}
             </span>
@@ -564,10 +565,10 @@ function PaywallPricingContent({ isEmbedded = false, showTopBar = true }) {
 
       {/* Payment In-Flight or Result Card */}
       {paymentState !== 'idle' && (
-        <div className="w-full max-w-xl mb-6 p-5 rounded-3xl bg-[#0f1d2e] text-white border border-emerald-500/40 relative z-20 shadow-2xl text-center animate-in fade-in">
+        <div className="w-full max-w-xl mb-6 p-5 rounded-3xl bg-[#0f1d2e] text-white border border-blue-500/40 relative z-20 shadow-2xl text-center animate-in fade-in">
           {paymentState === 'signing' && (
             <div className="flex flex-col items-center gap-2">
-              <Loader2 className="w-6 h-6 text-emerald-400 animate-spin" />
+              <Loader2 className="w-6 h-6 text-blue-400 animate-spin" />
               <p className="font-bold text-sm text-white">Please confirm the transfer in your wallet...</p>
               <p className="text-xs text-gray-400">Approve the USDT transfer prompt in MetaMask or your mobile wallet.</p>
             </div>
@@ -575,7 +576,7 @@ function PaywallPricingContent({ isEmbedded = false, showTopBar = true }) {
 
           {paymentState === 'confirming' && (
             <div className="flex flex-col items-center gap-2">
-              <Loader2 className="w-6 h-6 text-emerald-400 animate-spin" />
+              <Loader2 className="w-6 h-6 text-blue-400 animate-spin" />
               <p className="font-bold text-sm text-white">Transaction broadcasting on BSC blockchain...</p>
               <p className="text-xs text-gray-400">Waiting for on-chain block confirmation (typically ~3 seconds).</p>
               {hash && (
@@ -583,7 +584,7 @@ function PaywallPricingContent({ isEmbedded = false, showTopBar = true }) {
                   href={`https://bscscan.com/tx/${hash}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-xs text-emerald-400 hover:underline inline-flex items-center gap-1 font-mono mt-1"
+                  className="text-xs text-blue-400 hover:underline inline-flex items-center gap-1 font-mono mt-1"
                 >
                   View on BscScan <ExternalLink className="w-3 h-3" />
                 </a>
@@ -593,7 +594,7 @@ function PaywallPricingContent({ isEmbedded = false, showTopBar = true }) {
 
           {paymentState === 'verifying' && (
             <div className="flex flex-col items-center gap-2">
-              <Loader2 className="w-6 h-6 text-emerald-400 animate-spin" />
+              <Loader2 className="w-6 h-6 text-blue-400 animate-spin" />
               <p className="font-bold text-sm text-white">Blockchain confirmed! Verifying payment on server...</p>
               <p className="text-xs text-gray-400">Activating your Pro Trader account privileges.</p>
             </div>
@@ -616,7 +617,7 @@ function PaywallPricingContent({ isEmbedded = false, showTopBar = true }) {
                   <button
                     type="button"
                     onClick={handleRetryVerification}
-                    className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider cursor-pointer transition-colors"
+                    className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs uppercase tracking-wider cursor-pointer transition-colors"
                   >
                     Retry Verification
                   </button>
@@ -655,11 +656,11 @@ function PaywallPricingContent({ isEmbedded = false, showTopBar = true }) {
       {/* Header (Standalone Mode only) */}
       {!isEmbedded && (
         <div className="text-center relative z-10 max-w-2xl mb-8">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-mono font-bold tracking-wider uppercase mb-3">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-mono font-bold tracking-wider uppercase mb-3">
             <Zap className="w-3 h-3" />
             <span>Membership Access</span>
           </div>
-          <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white mb-3">
+          <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-neutral-900 dark:text-white mb-3">
             Select Your Trading Plan
           </h1>
           <p className="text-gray-400 text-sm sm:text-base">
@@ -671,7 +672,7 @@ function PaywallPricingContent({ isEmbedded = false, showTopBar = true }) {
       {/* Monthly / Yearly Switch Toggle */}
       <div className="relative z-10 inline-flex items-center bg-neutral-200/80 dark:bg-slate-900/80 p-1.5 rounded-full border border-black/[0.08] dark:border-white/10 mb-8 shadow-md">
         <div
-          className="absolute top-1.5 bottom-1.5 w-40 rounded-full bg-gradient-to-r from-emerald-500 to-emerald-600 shadow-md shadow-emerald-500/30 transition-transform duration-300 ease-out"
+          className="absolute top-1.5 bottom-1.5 w-40 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 shadow-md shadow-blue-500/30 transition-transform duration-300 ease-out"
           style={{
             transform: isYearly ? 'translateX(160px)' : 'translateX(0px)',
           }}
@@ -687,7 +688,7 @@ function PaywallPricingContent({ isEmbedded = false, showTopBar = true }) {
           <span>MONTHLY</span>
           <span
             className={`text-[10px] px-2 py-0.5 rounded-full font-extrabold transition-all ${
-              !isYearly ? 'bg-white/20 text-white' : 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30'
+              !isYearly ? 'bg-white/20 text-white' : 'bg-blue-500/15 text-blue-600 dark:text-blue-400 border border-blue-500/30'
             }`}
           >
             25% OFF
@@ -704,7 +705,7 @@ function PaywallPricingContent({ isEmbedded = false, showTopBar = true }) {
           <span>YEARLY</span>
           <span
             className={`text-[10px] px-2 py-0.5 rounded-full font-extrabold transition-all ${
-              isYearly ? 'bg-white/20 text-white' : 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30'
+              isYearly ? 'bg-white/20 text-white' : 'bg-blue-500/15 text-blue-600 dark:text-blue-400 border border-blue-500/30'
             }`}
           >
             50% OFF
@@ -733,15 +734,15 @@ function PaywallPricingContent({ isEmbedded = false, showTopBar = true }) {
 
           <ul className="text-xs space-y-3.5 mb-8 text-neutral-700 dark:text-gray-300 flex-1">
             <li className="flex items-start">
-              <CheckCircle2 className="w-4 h-4 text-emerald-500 dark:text-emerald-400 mr-2.5 shrink-0 mt-0.5" />
+              <CheckCircle2 className="w-4 h-4 text-blue-500 dark:text-blue-400 mr-2.5 shrink-0 mt-0.5" />
               <span>Full access to Trading Journal</span>
             </li>
             <li className="flex items-start">
-              <CheckCircle2 className="w-4 h-4 text-emerald-500 dark:text-emerald-400 mr-2.5 shrink-0 mt-0.5" />
+              <CheckCircle2 className="w-4 h-4 text-blue-500 dark:text-blue-400 mr-2.5 shrink-0 mt-0.5" />
               <span>Basic Session Analytics & Insights</span>
             </li>
             <li className="flex items-start">
-              <CheckCircle2 className="w-4 h-4 text-emerald-500 dark:text-emerald-400 mr-2.5 shrink-0 mt-0.5" />
+              <CheckCircle2 className="w-4 h-4 text-blue-500 dark:text-blue-400 mr-2.5 shrink-0 mt-0.5" />
               <span>24 Hours Unlimited Free Access</span>
             </li>
             <li className="flex items-start">
@@ -760,8 +761,8 @@ function PaywallPricingContent({ isEmbedded = false, showTopBar = true }) {
         </div>
 
         {/* Card 2: Pro Trader */}
-        <div className="bg-emerald-500/[0.03] dark:bg-[#0f1d2e] border-2 border-emerald-500 p-7 sm:p-8 rounded-3xl flex flex-col backdrop-blur-xl relative shadow-[0_0_35px_rgba(16,185,129,0.18)]">
-          <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-[10px] font-extrabold font-mono tracking-widest uppercase py-1 px-3.5 rounded-full shadow-md">
+        <div className="bg-blue-500/[0.03] dark:bg-[#0f1d2e] border-2 border-blue-500 p-7 sm:p-8 rounded-3xl flex flex-col backdrop-blur-xl relative shadow-[0_0_35px_rgba(0,122,255,0.18)]">
+          <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-blue-500 to-blue-500 text-white text-[10px] font-extrabold font-mono tracking-widest uppercase py-1 px-3.5 rounded-full shadow-md">
             MOST POPULAR
           </div>
 
@@ -787,7 +788,7 @@ function PaywallPricingContent({ isEmbedded = false, showTopBar = true }) {
           {/* Discount Pop Badge */}
           <div className="h-8 mb-4 flex items-center">
             <div
-              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-[11px] font-bold font-mono tracking-wide transition-all duration-300 bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30"
+              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-[11px] font-bold font-mono tracking-wide transition-all duration-300 bg-blue-500/10 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 border border-blue-500/30"
             >
               <span>{isYearly ? 'SAVE 50% ON YEARLY ($114)' : 'SAVE 25% ON MONTHLY ($14)'}</span>
             </div>
@@ -807,11 +808,11 @@ function PaywallPricingContent({ isEmbedded = false, showTopBar = true }) {
               <span>FTMO & Prop firm daily drawdown shield</span>
             </li>
             <li className="flex items-start">
-              <CheckCircle2 className="w-4 h-4 text-emerald-500 dark:text-emerald-400 mr-2.5 shrink-0 mt-0.5" />
+              <CheckCircle2 className="w-4 h-4 text-blue-500 dark:text-blue-400 mr-2.5 shrink-0 mt-0.5" />
               <span>Automated R-Multiple & session analytics</span>
             </li>
-            <li className="flex items-start font-semibold text-emerald-600 dark:text-emerald-400">
-              <CheckCircle2 className="w-4 h-4 text-emerald-500 dark:text-emerald-400 mr-2.5 shrink-0 mt-0.5" />
+            <li className="flex items-start font-semibold text-blue-600 dark:text-blue-400">
+              <CheckCircle2 className="w-4 h-4 text-blue-500 dark:text-blue-400 mr-2.5 shrink-0 mt-0.5" />
               <span>Private Discord Alpha community</span>
             </li>
           </ul>
@@ -821,7 +822,7 @@ function PaywallPricingContent({ isEmbedded = false, showTopBar = true }) {
             <button
               onClick={() => handleUpgradeClick(isYearly ? 'yearly' : 'monthly', isYearly ? 114 : 14)}
               disabled={paymentState !== 'idle' && paymentState !== 'error'}
-              className="w-full py-3.5 rounded-2xl font-bold text-xs tracking-wider uppercase bg-emerald-600 hover:bg-emerald-500 text-white transition-all shadow-md shadow-emerald-500/25 disabled:opacity-60 cursor-pointer flex items-center justify-center gap-2 active:scale-95"
+              className="w-full py-3.5 rounded-2xl font-bold text-xs tracking-wider uppercase bg-blue-600 hover:bg-blue-500 text-white transition-all shadow-md shadow-blue-500/25 disabled:opacity-60 cursor-pointer flex items-center justify-center gap-2 active:scale-95"
             >
               {paymentState === 'signing' || isWritePending ? (
                 <>
@@ -870,7 +871,7 @@ function PaywallPricingContent({ isEmbedded = false, showTopBar = true }) {
         <div className="mt-8 max-w-md w-full text-center">
           <button
             onClick={() => handleUpgradeClick('yearly', 114)}
-            className="text-xs text-emerald-600 dark:text-emerald-400 underline hover:text-emerald-500 transition-colors cursor-pointer"
+            className="text-xs text-blue-600 dark:text-blue-400 underline hover:text-blue-500 transition-colors cursor-pointer"
           >
             Already an active Yearly subscriber? Click here to renew your membership ($114).
           </button>
@@ -923,7 +924,7 @@ export default function PaywallPricingGrid(props) {
       <React.Suspense
         fallback={
           <div className="py-12 flex flex-col items-center justify-center min-h-[300px]">
-            <div className="w-8 h-8 rounded-full border-2 border-emerald-500/20 border-t-emerald-500 animate-spin mb-3" />
+            <div className="w-8 h-8 rounded-full border-2 border-blue-500/20 border-t-blue-500 animate-spin mb-3" />
             <p className="text-xs text-neutral-500 dark:text-neutral-400 font-medium">
               Connecting billing options...
             </p>

@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { MessageSquare, ArrowRight, Shield, AlertTriangle, Loader2 } from "lucide-react";
-import { getCachedAccessStatus } from "../utils/subscriptionCache";
+import { resolveNextStepAfterDiscord } from "../lib/authFlow";
 
 export default function DiscordGate() {
   const [searchParams] = useSearchParams();
@@ -52,14 +52,7 @@ export default function DiscordGate() {
     setIsSkipping(true);
     localStorage.setItem("discord_skipped", "true");
     try {
-      const status = await getCachedAccessStatus();
-      if (status?.hasPaid || status?.isAdmin) {
-        navigate("/dashboard");
-      } else {
-        navigate("/paywall");
-      }
-    } catch {
-      navigate("/dashboard");
+      navigate(await resolveNextStepAfterDiscord(), { replace: true });
     } finally {
       setIsSkipping(false);
     }
@@ -67,19 +60,19 @@ export default function DiscordGate() {
 
   return (
     <div
-      className="min-h-screen bg-[#020202] text-white flex flex-col items-center justify-center p-6"
+      className="min-h-screen bg-[#f2f2f7] dark:bg-[#020202] text-neutral-900 dark:text-white flex flex-col items-center justify-center p-6"
       style={{ fontFamily: "'Inter', sans-serif" }}
     >
-      <div className="w-full max-w-lg bg-[#121418] border border-white/5 rounded-2xl p-8 md:p-10 shadow-2xl text-center">
+      <div className="w-full max-w-lg bg-white/80 dark:bg-[#121418] backdrop-blur-xl border border-black/[0.08] dark:border-white/5 rounded-2xl p-8 md:p-10 shadow-2xl text-center">
         <div className="w-16 h-16 bg-[#5865F2]/10 border border-[#5865F2]/20 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-sm">
           <MessageSquare className="w-8 h-8 text-[#5865F2]" />
         </div>
 
-        <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight mb-3">
+        <h1 className="text-2xl md:text-3xl font-bold text-neutral-900 dark:text-white tracking-tight mb-3">
           Join the Community
         </h1>
 
-        <p className="text-sm text-gray-400 mb-6 leading-relaxed px-4">
+        <p className="text-sm text-neutral-600 dark:text-gray-400 mb-6 leading-relaxed px-4">
           Trade Journey is better together. Join our official Discord server to
           get support, share setups, and talk directly with other traders.
         </p>
@@ -103,7 +96,7 @@ export default function DiscordGate() {
 
           <button
             onClick={handleDiscordLogin}
-            className="w-full py-4 px-6 bg-[#1a1b20] hover:bg-[#23252b] text-white border border-white/10 font-bold rounded-2xl transition-all flex justify-center items-center gap-2 text-sm shadow-sm cursor-pointer"
+            className="w-full py-4 px-6 bg-black/[0.04] dark:bg-[#1a1b20] hover:bg-black/[0.07] dark:hover:bg-[#23252b] text-neutral-900 dark:text-white border border-black/[0.08] dark:border-white/10 font-bold rounded-2xl transition-all flex justify-center items-center gap-2 text-sm shadow-sm cursor-pointer"
           >
             2. I've joined, Verify & Take me to Dashboard{" "}
             <ArrowRight className="w-4 h-4" />
@@ -113,23 +106,23 @@ export default function DiscordGate() {
             type="button"
             onClick={handleSkip}
             disabled={isSkipping}
-            className="w-full py-3.5 px-6 bg-white/[0.04] hover:bg-white/[0.09] text-gray-300 hover:text-white border border-white/10 font-semibold rounded-2xl transition-all flex justify-center items-center gap-2 text-sm shadow-sm cursor-pointer disabled:opacity-50"
+            className="w-full py-3.5 px-6 bg-white/[0.04] hover:bg-white/[0.09] text-neutral-600 dark:text-gray-300 hover:text-neutral-900 dark:hover:text-white border border-black/[0.08] dark:border-white/10 font-semibold rounded-2xl transition-all flex justify-center items-center gap-2 text-sm shadow-sm cursor-pointer disabled:opacity-50"
           >
             {isSkipping ? (
               <>
-                <Loader2 className="w-4 h-4 animate-spin text-emerald-400" />
+                <Loader2 className="w-4 h-4 animate-spin text-blue-400" />
                 <span>Redirecting...</span>
               </>
             ) : (
               <>
                 <span>Skip for now</span>
-                <ArrowRight className="w-4 h-4 text-gray-400" />
+                <ArrowRight className="w-4 h-4 text-neutral-600 dark:text-gray-400" />
               </>
             )}
           </button>
         </div>
 
-        <div className="mt-8 pt-6 border-t border-white/5 flex items-center justify-center gap-2 text-xs text-gray-500 font-medium">
+        <div className="mt-8 pt-6 border-t border-black/[0.08] dark:border-white/5 flex items-center justify-center gap-2 text-xs text-neutral-500 dark:text-gray-500 font-medium">
           <Shield className="w-4 h-4 text-[#21d4a3]" />
           <span>Your data is completely private and secure.</span>
         </div>
@@ -140,7 +133,7 @@ export default function DiscordGate() {
           type="button"
           onClick={handleSkip}
           disabled={isSkipping}
-          className="text-xs text-gray-500 hover:text-gray-300 transition-colors underline underline-offset-4 cursor-pointer"
+          className="text-xs text-neutral-500 dark:text-gray-500 hover:text-gray-300 transition-colors underline underline-offset-4 cursor-pointer"
         >
           Skip Discord and go directly to Dashboard / Plans &rarr;
         </button>

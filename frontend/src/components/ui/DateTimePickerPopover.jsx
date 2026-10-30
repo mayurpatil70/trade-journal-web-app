@@ -63,12 +63,12 @@ export default function DateTimePickerPopover({
 
   const isBlue = accentColor === "blue";
   const accentClasses = {
-    icon: isBlue ? "text-[#0066FF]" : "text-emerald-500",
-    bgActive: isBlue ? "bg-[#0066FF] text-white shadow-md shadow-blue-500/30 font-bold" : "bg-emerald-500 text-white shadow-md shadow-emerald-500/30 font-bold",
-    todayDot: isBlue ? "bg-[#0066FF]" : "bg-emerald-500",
-    ring: isBlue ? "border-[#0066FF] ring-2 ring-[#0066FF]/20 bg-white dark:bg-[#121622]" : "border-emerald-500 ring-2 ring-emerald-500/20 bg-white dark:bg-[#121622]",
-    btnDone: isBlue ? "bg-[#0066FF] hover:bg-[#0052cc] shadow-blue-500/25" : "bg-emerald-500 hover:bg-emerald-400 shadow-emerald-500/25",
-    linkText: isBlue ? "text-[#0066FF] dark:text-blue-400" : "text-emerald-600 dark:text-emerald-400",
+    icon: isBlue ? "text-[#0066FF]" : "text-blue-500",
+    bgActive: isBlue ? "bg-[#0066FF] text-white shadow-md shadow-blue-500/30 font-bold" : "bg-blue-500 text-white shadow-md shadow-blue-500/30 font-bold",
+    todayDot: isBlue ? "bg-[#0066FF]" : "bg-blue-500",
+    ring: isBlue ? "border-[#0066FF] ring-2 ring-[#0066FF]/20 bg-white dark:bg-[#121622]" : "border-blue-500 ring-2 ring-blue-500/20 bg-white dark:bg-[#121622]",
+    btnDone: isBlue ? "bg-[#0066FF] hover:bg-[#0052cc] shadow-blue-500/25" : "bg-blue-500 hover:bg-blue-400 shadow-blue-500/25",
+    linkText: isBlue ? "text-[#0066FF] dark:text-blue-400" : "text-blue-600 dark:text-blue-400",
   };
 
   const [coords, setCoords] = useState({
@@ -461,7 +461,7 @@ export default function DateTimePickerPopover({
               className={`py-1.5 px-3 rounded-xl text-xs font-semibold bg-neutral-100 dark:bg-white/[0.06] ${
                 isBlue
                   ? "hover:bg-blue-500/10 hover:text-[#0066FF] dark:hover:bg-blue-500/20 dark:hover:text-blue-400"
-                  : "hover:bg-emerald-500/10 hover:text-emerald-600 dark:hover:bg-emerald-500/20 dark:hover:text-emerald-400"
+                  : "hover:bg-blue-500/10 hover:text-blue-600 dark:hover:bg-blue-500/20 dark:hover:text-blue-400"
               } text-neutral-700 dark:text-neutral-300 transition-colors cursor-pointer text-center`}
             >
               {mode === "date" ? "Today" : "Now"}
@@ -472,7 +472,7 @@ export default function DateTimePickerPopover({
               className={`py-1.5 px-3 rounded-xl text-xs font-semibold bg-neutral-100 dark:bg-white/[0.06] ${
                 isBlue
                   ? "hover:bg-blue-500/10 hover:text-[#0066FF] dark:hover:bg-blue-500/20 dark:hover:text-blue-400"
-                  : "hover:bg-emerald-500/10 hover:text-emerald-600 dark:hover:bg-emerald-500/20 dark:hover:text-emerald-400"
+                  : "hover:bg-blue-500/10 hover:text-blue-600 dark:hover:bg-blue-500/20 dark:hover:text-blue-400"
               } text-neutral-700 dark:text-neutral-300 transition-colors cursor-pointer text-center`}
             >
               Yesterday

@@ -6,7 +6,7 @@ const EMPTY = { symbols: "", allocatedCapital: 100, takeProfitPercentage: 2, sto
 const Field = ({ label, ...props }) => (
   <label className="block text-xs text-gray-400">
     {label}
-    <input {...props} className="mt-1 w-full rounded-lg border border-white/10 bg-[#0a0a0a] px-3 py-2 text-sm text-white outline-none focus:border-emerald-500/50" />
+    <input {...props} className="mt-1 w-full rounded-lg border border-white/10 bg-[#0a0a0a] px-3 py-2 text-sm text-white outline-none focus:border-blue-500/50" />
   </label>
 );
 

@@ -65,12 +65,12 @@ export default function Logo3DLoader({
           <svg className="fn-svg-ring" viewBox="0 0 160 160">
             <defs>
               <linearGradient id="fnGradReact" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#10b981" />
-                <stop offset="50%" stopColor="#34d399" />
-                <stop offset="100%" stopColor="#059669" />
+                <stop offset="0%" stopColor="#007AFF" />
+                <stop offset="50%" stopColor="#409CFF" />
+                <stop offset="100%" stopColor="#0066D6" />
               </linearGradient>
               <filter id="fnRingGlowReact" x="-20%" y="-20%" width="140%" height="140%">
-                <feDropShadow dx="0" dy="0" stdDeviation="4" floodColor="#10b981" floodOpacity="0.65" />
+                <feDropShadow dx="0" dy="0" stdDeviation="4" floodColor="#007AFF" floodOpacity="0.65" />
               </filter>
             </defs>
             <circle className="fn-ring-bg" cx="80" cy="80" r="70" />

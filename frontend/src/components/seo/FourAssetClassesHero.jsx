@@ -6,21 +6,21 @@ import IridescentButton from '../landing/IridescentButton';
 const ASSETS = [
   {
     num: '01 · 24/5 FX',
-    numColor: '#5FD4E8',
+    numColor: '#5AC8FA',
     title: 'Forex Majors',
     desc: 'EURUSD, GBPUSD, USDJPY tick-by-tick replay & London/NY session analytics.',
     icon: TrendingUp,
   },
   {
     num: '02 · HIGH VOL',
-    numColor: '#E8732A',
+    numColor: '#007AFF',
     title: 'Gold (XAUUSD)',
     desc: 'Track Asian, London, and NY breakouts with automated pip-level risk sizing.',
     icon: Zap,
   },
   {
     num: '03 · CASH OPEN',
-    numColor: '#5FD4E8',
+    numColor: '#5AC8FA',
     title: 'Global Indices',
     desc: 'NAS100, US30, SPX500 high-momentum execution tracking and volume alerts.',
     icon: Layers,
@@ -37,19 +37,19 @@ const ASSETS = [
 const LOGS = [
   {
     tag: 'LOG 01 · AI PSYCHOLOGY PRE-CHECK',
-    tagColor: '#5FD4E8',
+    tagColor: '#5AC8FA',
     title: 'Dermal protection against tilt',
     desc: 'Evaluates your emotional heartbeat before execution without drag.',
   },
   {
     tag: 'LOG 02 · 10-YEAR TICK DATA',
-    tagColor: '#5FD4E8',
+    tagColor: '#5AC8FA',
     title: 'A sixth sense for liquidity',
     desc: '10 full years of tick data to identify hidden algorithmic sweeps.',
   },
   {
     tag: 'LOG 03 · PROP GUARDIAN',
-    tagColor: '#E8732A',
+    tagColor: '#007AFF',
     title: 'Rules that never fail',
     desc: 'Trailing daily loss monitor ensures your prop challenge is never breached.',
   },
@@ -60,7 +60,7 @@ export default function FourAssetClassesHero() {
     <div style={{ width: '100%', marginBottom: '60px' }}>
       {/* ── EYEBROW ── */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
-        <div style={{ width: '28px', height: '2px', background: '#0E7C86' }} />
+        <div style={{ width: '28px', height: '2px', background: '#007AFF' }} />
         <span
           style={{
             fontFamily: "'JetBrains Mono', monospace",
@@ -68,7 +68,7 @@ export default function FourAssetClassesHero() {
             fontWeight: 700,
             letterSpacing: '0.16em',
             textTransform: 'uppercase',
-            color: '#5FD4E8',
+            color: '#5AC8FA',
           }}
         >
           MARKETS & SESSIONS · FOUR ASSET CLASSES & PREDATOR SPEED
@@ -81,20 +81,20 @@ export default function FourAssetClassesHero() {
           fontFamily: "'Instrument Serif', Georgia, serif",
           fontSize: 'clamp(2.5rem, 5.5vw, 4.2rem)',
           fontWeight: 400,
-          color: '#FFFFFF',
+          color: 'var(--lp-heading)',
           letterSpacing: '-0.02em',
           lineHeight: 1.05,
           marginBottom: '20px',
         }}
       >
-        Four asset classes, <span style={{ fontStyle: 'italic', color: '#0E7C86' }}>infinite edge.</span>
+        Four asset classes, <span style={{ fontStyle: 'italic', color: '#007AFF' }}>infinite edge.</span>
       </h1>
 
       {/* ── INTRO PARAGRAPH ── */}
       <p
         style={{
           fontSize: 'clamp(15px, 1.8vw, 17px)',
-          color: 'rgba(237, 234, 227, 0.76)',
+          color: 'rgba(var(--lp-fg), 0.76)',
           lineHeight: 1.7,
           maxWidth: '720px',
           marginBottom: '40px',
@@ -117,10 +117,10 @@ export default function FourAssetClassesHero() {
           <div
             key={asset.title}
             style={{
-              background: 'rgba(15, 29, 28, 0.75)',
+              background: 'rgba(var(--lp-card), 0.75)',
               backdropFilter: 'blur(16px)',
               WebkitBackdropFilter: 'blur(16px)',
-              border: '1px solid rgba(255, 255, 255, 0.08)',
+              border: '1px solid rgba(var(--lp-fg), 0.08)',
               borderRadius: '20px',
               padding: '24px 20px',
               display: 'flex',
@@ -131,12 +131,12 @@ export default function FourAssetClassesHero() {
               boxShadow: '0 10px 30px rgba(0,0,0,0.25)',
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = 'rgba(95, 212, 232, 0.35)';
+              e.currentTarget.style.borderColor = 'rgba(90, 200, 250, 0.35)';
               e.currentTarget.style.transform = 'translateY(-2px)';
-              e.currentTarget.style.boxShadow = '0 16px 36px rgba(0,0,0,0.35), 0 0 24px rgba(14, 124, 134, 0.15)';
+              e.currentTarget.style.boxShadow = '0 16px 36px rgba(0,0,0,0.35), 0 0 24px rgba(0, 122, 255, 0.15)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.08)';
+              e.currentTarget.style.borderColor = 'rgba(var(--lp-fg), 0.08)';
               e.currentTarget.style.transform = 'translateY(0)';
               e.currentTarget.style.boxShadow = '0 10px 30px rgba(0,0,0,0.25)';
             }}
@@ -160,7 +160,7 @@ export default function FourAssetClassesHero() {
                   fontFamily: "'Manrope', sans-serif",
                   fontSize: '18px',
                   fontWeight: 700,
-                  color: '#FFFFFF',
+                  color: 'var(--lp-heading)',
                   marginBottom: '8px',
                   letterSpacing: '-0.01em',
                 }}
@@ -172,7 +172,7 @@ export default function FourAssetClassesHero() {
               style={{
                 fontFamily: "'Manrope', sans-serif",
                 fontSize: '13px',
-                color: 'rgba(237, 234, 227, 0.65)',
+                color: 'rgba(var(--lp-fg), 0.65)',
                 lineHeight: 1.55,
                 margin: 0,
               }}
@@ -196,21 +196,21 @@ export default function FourAssetClassesHero() {
           <div
             key={log.tag}
             style={{
-              background: 'rgba(15, 29, 28, 0.9)',
+              background: 'rgba(var(--lp-card), 0.9)',
               backdropFilter: 'blur(20px)',
               WebkitBackdropFilter: 'blur(20px)',
-              border: '1px solid rgba(255, 255, 255, 0.08)',
+              border: '1px solid rgba(var(--lp-fg), 0.08)',
               borderRadius: '20px',
               padding: '24px 22px',
               transition: 'border-color 0.25s ease, transform 0.2s ease, box-shadow 0.25s ease',
               boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = 'rgba(232, 115, 42, 0.4)';
+              e.currentTarget.style.borderColor = 'rgba(0, 122, 255, 0.4)';
               e.currentTarget.style.transform = 'translateY(-2px)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.08)';
+              e.currentTarget.style.borderColor = 'rgba(var(--lp-fg), 0.08)';
               e.currentTarget.style.transform = 'translateY(0)';
             }}
           >
@@ -232,7 +232,7 @@ export default function FourAssetClassesHero() {
                 fontFamily: "'Manrope', sans-serif",
                 fontSize: '17px',
                 fontWeight: 700,
-                color: '#FFFFFF',
+                color: 'var(--lp-heading)',
                 marginBottom: '8px',
                 letterSpacing: '-0.01em',
               }}
@@ -243,7 +243,7 @@ export default function FourAssetClassesHero() {
               style={{
                 fontFamily: "'Manrope', sans-serif",
                 fontSize: '13px',
-                color: 'rgba(237, 234, 227, 0.68)',
+                color: 'rgba(var(--lp-fg), 0.68)',
                 lineHeight: 1.6,
                 margin: 0,
               }}
@@ -263,7 +263,7 @@ export default function FourAssetClassesHero() {
           justifyContent: 'space-between',
           gap: '20px',
           padding: '20px 0',
-          borderTop: '1px solid rgba(255, 255, 255, 0.06)',
+          borderTop: '1px solid rgba(var(--lp-fg), 0.06)',
         }}
       >
         <a
@@ -272,7 +272,7 @@ export default function FourAssetClassesHero() {
             fontFamily: "'JetBrains Mono', monospace",
             fontSize: '12px',
             fontWeight: 600,
-            color: '#5FD4E8',
+            color: '#5AC8FA',
             letterSpacing: '0.08em',
             textDecoration: 'none',
             display: 'inline-flex',
@@ -285,7 +285,7 @@ export default function FourAssetClassesHero() {
             e.currentTarget.style.transform = 'translateX(4px)';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.color = '#5FD4E8';
+            e.currentTarget.style.color = '#5AC8FA';
             e.currentTarget.style.transform = 'translateX(0)';
           }}
         >

@@ -67,11 +67,11 @@ export default function Hindsight() {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
           <div>
             <h2 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2 mb-2">
-              <SlidersHorizontal className="w-5 h-5 text-[#10b981]" /> Hindsight
+              <SlidersHorizontal className="w-5 h-5 text-[#007AFF]" /> Hindsight
               Bias Eliminator
             </h2>
             <p className="text-sm text-gray-500 flex items-start gap-2">
-              <Info className="w-4 h-4 shrink-0 mt-0.5 text-[#10b981]" />
+              <Info className="w-4 h-4 shrink-0 mt-0.5 text-[#007AFF]" />
               Compare what the chart looked like at the exact moment you
               entered, versus how it played out.
             </p>
@@ -104,7 +104,7 @@ export default function Hindsight() {
         {/* Loading State */}
         {loading && (
           <div className="flex flex-col items-center justify-center py-16">
-            <Loader2 className="w-8 h-8 text-[#10b981] animate-spin mb-3" />
+            <Loader2 className="w-8 h-8 text-[#007AFF] animate-spin mb-3" />
             <p className="text-sm text-gray-500 font-medium">
               Loading your chart history...
             </p>
@@ -187,7 +187,7 @@ export default function Hindsight() {
 
               {/* Overlay Image (Before) */}
               <div
-                className="absolute inset-0 h-full border-r-2 border-[#10b981] shadow-[5px_0_20px_rgba(0,0,0,0.8)] z-10 overflow-hidden bg-gray-900"
+                className="absolute inset-0 h-full border-r-2 border-[#007AFF] shadow-[5px_0_20px_rgba(0,0,0,0.8)] z-10 overflow-hidden bg-gray-900"
                 style={{ width: `${sliderPosition}%` }}
               >
                 <div className="absolute inset-0 w-[100vw] max-w-[1024px] h-full flex items-center justify-start">
@@ -199,7 +199,7 @@ export default function Hindsight() {
                     crossOrigin="anonymous"
                   />
                 </div>
-                <div className="absolute bottom-4 left-4 bg-emerald-600 text-white px-3 py-1.5 rounded-[2px] text-xs font-bold tracking-widest uppercase shadow-lg">
+                <div className="absolute bottom-4 left-4 bg-blue-600 text-white px-3 py-1.5 rounded-[2px] text-xs font-bold tracking-widest uppercase shadow-lg">
                   Before (Entry)
                 </div>
               </div>
@@ -216,7 +216,7 @@ export default function Hindsight() {
 
               {/* Center Drag Handle Indicator */}
               <div
-                className="absolute top-1/2 -translate-y-1/2 w-8 h-8 bg-white border-2 border-[#10b981] rounded-full flex items-center justify-center shadow-[0_0_15px_rgba(0,0,0,0.5)] z-10 pointer-events-none transition-transform"
+                className="absolute top-1/2 -translate-y-1/2 w-8 h-8 bg-white border-2 border-[#007AFF] rounded-full flex items-center justify-center shadow-[0_0_15px_rgba(0,0,0,0.5)] z-10 pointer-events-none transition-transform"
                 style={{ left: `calc(${sliderPosition}% - 16px)` }}
               >
                 <div className="flex gap-0.5">

@@ -434,7 +434,7 @@ export default function PerformanceEquityCurve({ trades = [] }) {
       <div className="flex items-start justify-between mb-4 flex-wrap gap-3">
         <div>
           <div className="flex items-center gap-2 text-[11px] font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-widest">
-            <Activity className="w-3.5 h-3.5 text-emerald-500" />
+            <Activity className="w-3.5 h-3.5 text-blue-500" />
             <span>Performance</span>
           </div>
           <div className="flex items-baseline gap-3 mt-1">
@@ -460,7 +460,7 @@ export default function PerformanceEquityCurve({ trades = [] }) {
               onClick={() => setViewMode("trades")}
               className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
                 viewMode === "trades"
-                  ? "bg-white dark:bg-[#1c2233] text-emerald-600 dark:text-emerald-400 shadow-sm border border-black/[0.04] dark:border-white/[0.08]"
+                  ? "bg-white dark:bg-[#1c2233] text-blue-600 dark:text-blue-400 shadow-sm border border-black/[0.04] dark:border-white/[0.08]"
                   : "text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
               }`}
             >
@@ -472,7 +472,7 @@ export default function PerformanceEquityCurve({ trades = [] }) {
               onClick={() => setViewMode("timeline")}
               className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
                 viewMode === "timeline"
-                  ? "bg-white dark:bg-[#1c2233] text-emerald-600 dark:text-emerald-400 shadow-sm border border-black/[0.04] dark:border-white/[0.08]"
+                  ? "bg-white dark:bg-[#1c2233] text-blue-600 dark:text-blue-400 shadow-sm border border-black/[0.04] dark:border-white/[0.08]"
                   : "text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
               }`}
             >
@@ -490,7 +490,7 @@ export default function PerformanceEquityCurve({ trades = [] }) {
                 onClick={() => setTimeframe(tf.key)}
                 className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                   timeframe === tf.key
-                    ? "bg-emerald-500 text-white shadow-sm shadow-emerald-500/25"
+                    ? "bg-blue-500 text-white shadow-sm shadow-blue-500/25"
                     : "text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
                 }`}
               >

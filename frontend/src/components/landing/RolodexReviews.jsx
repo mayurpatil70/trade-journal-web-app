@@ -19,7 +19,7 @@ const REVIEWS = [
     firm: 'Funded $300k Topstep · India',
     tag: '10-YR TICK REPLAY',
     quote: '10-year tick replay is the closest thing to live market execution. Backtested my entire London session edge in one weekend.',
-    highlightColor: '#10b981',
+    highlightColor: '#007AFF',
   },
   {
     id: 2,
@@ -163,8 +163,8 @@ export default function RolodexReviews() {
         alignItems: 'center',
         padding: 'clamp(60px, 8vh, 90px) 16px clamp(40px, 6vh, 60px)',
         overflow: 'hidden',
-        borderTop: '1px solid rgba(255, 255, 255, 0.06)',
-        backgroundColor: '#060b11',
+        borderTop: '1px solid rgba(var(--lp-fg), 0.06)',
+        backgroundColor: 'var(--lp-bg)',
       }}
     >
       {/* Background Soft Glow */}
@@ -176,7 +176,7 @@ export default function RolodexReviews() {
           transform: 'translate(-50%, -50%)',
           width: 'clamp(300px, 55vw, 650px)',
           height: 'clamp(300px, 55vw, 650px)',
-          background: 'radial-gradient(circle, rgba(16, 185, 129, 0.12) 0%, rgba(201, 169, 110, 0.05) 50%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(0, 122, 255, 0.12) 0%, rgba(201, 169, 110, 0.05) 50%, transparent 70%)',
           filter: 'blur(70px)',
           pointerEvents: 'none',
           zIndex: 0,
@@ -194,11 +194,11 @@ export default function RolodexReviews() {
             fontWeight: 700,
             letterSpacing: '0.14em',
             textTransform: 'uppercase',
-            color: '#10b981',
+            color: '#007AFF',
             padding: '5px 14px',
             borderRadius: '999px',
-            background: 'rgba(16, 185, 129, 0.08)',
-            border: '1px solid rgba(16, 185, 129, 0.22)',
+            background: 'rgba(0, 122, 255, 0.08)',
+            border: '1px solid rgba(0, 122, 255, 0.22)',
             marginBottom: '14px',
             fontFamily: "'JetBrains Mono', monospace",
           }}
@@ -214,7 +214,7 @@ export default function RolodexReviews() {
             fontWeight: 400,
             letterSpacing: '-0.02em',
             lineHeight: 1.08,
-            color: '#FFFFFF',
+            color: 'var(--lp-heading)',
             marginBottom: '10px',
           }}
         >
@@ -228,7 +228,7 @@ export default function RolodexReviews() {
               <Star key={i} size={15} color="#fbbf24" fill="#fbbf24" />
             ))}
           </div>
-          <span style={{ fontSize: '13px', color: 'rgba(255, 255, 255, 0.7)', fontFamily: "'JetBrains Mono', monospace" }}>
+          <span style={{ fontSize: '13px', color: 'rgba(var(--lp-fg), 0.7)', fontFamily: "'JetBrains Mono', monospace" }}>
             4.9 / 5.0 (128+ verified traders)
           </span>
         </div>
@@ -290,10 +290,10 @@ export default function RolodexReviews() {
                 width: '100%',
                 borderRadius: '20px',
                 padding: '20px 24px',
-                background: 'rgba(14, 23, 38, 0.94)',
-                border: '1px solid rgba(255, 255, 255, 0.09)',
+                background: 'rgba(var(--lp-card), 0.94)',
+                border: '1px solid rgba(var(--lp-fg), 0.09)',
                 boxShadow: isTop 
-                  ? '0 18px 40px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(16, 185, 129, 0.15)'
+                  ? '0 18px 40px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(0, 122, 255, 0.15)'
                   : '0 12px 28px rgba(0, 0, 0, 0.4)',
                 backdropFilter: 'blur(16px)',
                 WebkitBackdropFilter: 'blur(16px)',
@@ -315,8 +315,8 @@ export default function RolodexReviews() {
                       width: '40px',
                       height: '40px',
                       borderRadius: '11px',
-                      background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(201, 169, 110, 0.2))',
-                      border: '1.5px solid rgba(16, 185, 129, 0.45)',
+                      background: 'linear-gradient(135deg, rgba(0, 122, 255, 0.25), rgba(201, 169, 110, 0.2))',
+                      border: '1.5px solid rgba(0, 122, 255, 0.45)',
                       color: '#ffffff',
                       fontWeight: 800,
                       fontSize: '1.1rem',
@@ -329,10 +329,10 @@ export default function RolodexReviews() {
                     {review.initial}
                   </div>
                   <div>
-                    <div style={{ fontSize: '15px', fontWeight: 700, color: '#ffffff' }}>
+                    <div style={{ fontSize: '15px', fontWeight: 700, color: 'var(--lp-heading)' }}>
                       {review.name}
                     </div>
-                    <div style={{ fontSize: '11px', color: '#10b981', fontFamily: "'JetBrains Mono', monospace", fontWeight: 600 }}>
+                    <div style={{ fontSize: '11px', color: '#007AFF', fontFamily: "'JetBrains Mono', monospace", fontWeight: 600 }}>
                       {review.firm}
                     </div>
                   </div>
@@ -351,7 +351,7 @@ export default function RolodexReviews() {
                 style={{
                   fontSize: '13px',
                   lineHeight: 1.5,
-                  color: 'rgba(255, 255, 255, 0.9)',
+                  color: 'rgba(var(--lp-fg), 0.9)',
                   fontStyle: 'italic',
                   marginBottom: '12px',
                   display: '-webkit-box',
@@ -371,10 +371,10 @@ export default function RolodexReviews() {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
-                  borderTop: '1px solid rgba(255, 255, 255, 0.06)',
+                  borderTop: '1px solid rgba(var(--lp-fg), 0.06)',
                   paddingTop: '10px',
                   fontSize: '11px',
-                  color: 'rgba(255, 255, 255, 0.45)',
+                  color: 'rgba(var(--lp-fg), 0.45)',
                 }}
               >
                 <div
@@ -405,9 +405,9 @@ export default function RolodexReviews() {
           type="button"
           aria-label="Previous Review"
           style={{
-            background: 'rgba(255, 255, 255, 0.05)',
-            border: '1px solid rgba(255, 255, 255, 0.12)',
-            color: '#ffffff',
+            background: 'rgba(var(--lp-fg), 0.05)',
+            border: '1px solid rgba(var(--lp-fg), 0.12)',
+            color: 'var(--lp-heading)',
             width: '36px',
             height: '36px',
             borderRadius: '50%',
@@ -444,12 +444,12 @@ export default function RolodexReviews() {
                   width: isActive ? '22px' : '7px',
                   height: '7px',
                   borderRadius: '999px',
-                  background: isActive ? '#10b981' : 'rgba(255, 255, 255, 0.2)',
+                  background: isActive ? '#007AFF' : 'rgba(var(--lp-fg), 0.2)',
                   border: 'none',
                   cursor: 'pointer',
                   padding: 0,
                   transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
-                  boxShadow: isActive ? '0 0 8px rgba(16, 185, 129, 0.5)' : 'none',
+                  boxShadow: isActive ? '0 0 8px rgba(0, 122, 255, 0.5)' : 'none',
                 }}
               />
             );
@@ -461,9 +461,9 @@ export default function RolodexReviews() {
           type="button"
           aria-label="Next Review"
           style={{
-            background: 'rgba(255, 255, 255, 0.05)',
-            border: '1px solid rgba(255, 255, 255, 0.12)',
-            color: '#ffffff',
+            background: 'rgba(var(--lp-fg), 0.05)',
+            border: '1px solid rgba(var(--lp-fg), 0.12)',
+            color: 'var(--lp-heading)',
             width: '36px',
             height: '36px',
             borderRadius: '50%',
@@ -487,14 +487,14 @@ export default function RolodexReviews() {
           gap: '8px',
           fontSize: '11px',
           fontFamily: "'JetBrains Mono', monospace",
-          color: 'rgba(255, 255, 255, 0.4)',
+          color: 'rgba(var(--lp-fg), 0.4)',
           position: 'relative',
           zIndex: 10,
         }}
       >
         <span>Auto-shuffles every 2s · Swipe on mobile</span>
-        <div style={{ width: '50px', height: '3px', background: 'rgba(255, 255, 255, 0.1)', borderRadius: '999px', overflow: 'hidden' }}>
-          <div style={{ width: `${progress}%`, height: '100%', background: '#10b981', transition: 'width 0.06s linear' }} />
+        <div style={{ width: '50px', height: '3px', background: 'rgba(var(--lp-fg), 0.1)', borderRadius: '999px', overflow: 'hidden' }}>
+          <div style={{ width: `${progress}%`, height: '100%', background: '#007AFF', transition: 'width 0.06s linear' }} />
         </div>
       </div>
     </section>

@@ -49,7 +49,7 @@ export default function LandingDashboard() {
           gap: '6px',
           padding: '5px 14px',
           borderRadius: '999px',
-          background: 'rgba(16,185,129,0.1)',
+          background: 'rgba(0,122,255,0.1)',
           border: '1px solid rgba(16,185,129,0.25)',
           fontSize: '10px',
           color: 'var(--l-gain)',
@@ -86,7 +86,7 @@ export default function LandingDashboard() {
           <div style={{
             position: 'absolute',
             inset: '-20px',
-            background: 'radial-gradient(ellipse at 50% 100%, rgba(16,185,129,0.15) 0%, transparent 70%)',
+            background: 'radial-gradient(ellipse at 50% 100%, rgba(0,122,255,0.15) 0%, transparent 70%)',
             filter: 'blur(40px)',
             zIndex: 0,
             borderRadius: '24px',

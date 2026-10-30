@@ -7,7 +7,7 @@ export default function LiveChartMockup({
   return (
     <div className="relative w-full h-full rounded-3xl bg-white/95 dark:bg-[#0c1017]/95 border border-black/[0.08] dark:border-white/[0.1] shadow-[0_20px_50px_rgba(0,0,0,0.08)] dark:shadow-[0_25px_60px_rgba(0,0,0,0.6)] backdrop-blur-2xl p-4 sm:p-5 flex flex-col justify-between select-none overflow-hidden">
       {/* Background ambient radial glow */}
-      <div className="absolute -top-16 -left-16 w-48 h-48 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute -top-16 -left-16 w-48 h-48 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute -bottom-16 -right-16 w-48 h-48 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
 
       {/* Top macOS Window Header Bar */}
@@ -23,7 +23,7 @@ export default function LiveChartMockup({
           <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-black/[0.04] dark:bg-white/[0.06] text-neutral-600 dark:text-neutral-400 font-bold border border-black/[0.04] dark:border-white/[0.06]">
             15m
           </span>
-          <span className="text-[10px] font-mono text-emerald-600 dark:text-emerald-400 font-bold hidden sm:inline">
+          <span className="text-[10px] font-mono text-blue-600 dark:text-blue-400 font-bold hidden sm:inline">
             2,654.80
           </span>
         </div>
@@ -48,8 +48,8 @@ export default function LiveChartMockup({
         />
 
         {/* Floating In-Play Execution Badge (Clean, NO overlapping replay label) */}
-        <div className="absolute top-3 left-3 flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-black/80 dark:bg-[#121622]/90 border border-emerald-500/40 text-emerald-400 text-xs font-mono font-bold backdrop-blur-md shadow-lg shadow-emerald-500/15">
-          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+        <div className="absolute top-3 left-3 flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-black/80 dark:bg-[#121622]/90 border border-blue-500/40 text-blue-400 text-xs font-mono font-bold backdrop-blur-md shadow-lg shadow-blue-500/15">
+          <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
           <span>In play: +$620.00 (+2.1R)</span>
         </div>
 
@@ -71,7 +71,7 @@ export default function LiveChartMockup({
             <span className="text-[9px] font-bold uppercase tracking-wider text-neutral-500 dark:text-neutral-400 block">
               Max Risk
             </span>
-            <span className="font-mono font-black text-emerald-600 dark:text-emerald-400 block mt-0.5">
+            <span className="font-mono font-black text-blue-600 dark:text-blue-400 block mt-0.5">
               {maxRiskPerTrade}%
             </span>
           </div>
@@ -96,8 +96,8 @@ export default function LiveChartMockup({
 
       {/* Card Footer Summary Strip */}
       <div className="mt-3 pt-2.5 flex items-center justify-between text-[11px] text-neutral-500 dark:text-neutral-400 border-t border-black/[0.06] dark:border-white/[0.06] shrink-0">
-        <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-bold">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+        <div className="flex items-center gap-1.5 text-blue-600 dark:text-blue-400 font-bold">
+          <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
           <span>Backtest rules before risking capital</span>
         </div>
         <span className="text-[10px] font-mono text-neutral-400 hidden sm:inline">

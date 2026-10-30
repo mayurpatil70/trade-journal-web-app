@@ -187,7 +187,7 @@ export default function Support() {
                   title="Copy email to clipboard"
                 >
                   {copiedEmail ? (
-                    <Check className="w-3.5 h-3.5 text-emerald-500" />
+                    <Check className="w-3.5 h-3.5 text-blue-500" />
                   ) : (
                     <Copy className="w-3.5 h-3.5" />
                   )}
@@ -231,7 +231,7 @@ export default function Support() {
                 href={DISCORD_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-3.5 rounded-2xl bg-neutral-50/80 dark:bg-white/[0.02] border border-black/[0.04] dark:border-white/[0.05] hover:border-indigo-500/30 transition-all flex items-center gap-3 group cursor-pointer"
+                className="p-3.5 rounded-2xl bg-neutral-50/80 dark:bg-white/[0.02] border border-black/[0.04] dark:border-white/[0.05] hover:border-blue-500/30 transition-all flex items-center gap-3 group cursor-pointer"
               >
                 <div className="w-8 h-8 rounded-xl bg-[#5865F2] text-white flex items-center justify-center shrink-0 shadow-sm">
                   <svg
@@ -242,7 +242,7 @@ export default function Support() {
                   </svg>
                 </div>
                 <div>
-                  <span className="text-xs font-bold text-neutral-900 dark:text-white block group-hover:text-indigo-600 transition-colors">
+                  <span className="text-xs font-bold text-neutral-900 dark:text-white block group-hover:text-blue-600 transition-colors">
                     Discord
                   </span>
                   <span className="text-[10px] text-neutral-400">
@@ -256,8 +256,8 @@ export default function Support() {
           {/* Row 4: Status footer bar */}
           <div className="pt-3 border-t border-black/[0.05] dark:border-white/[0.06] flex items-center justify-between text-xs text-neutral-500 dark:text-neutral-400">
             <span className="flex items-center gap-2 font-medium">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="text-emerald-600 dark:text-emerald-400 font-semibold">
+              <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
+              <span className="text-blue-600 dark:text-blue-400 font-semibold">
                 All Systems Operational
               </span>
             </span>
@@ -304,7 +304,7 @@ export default function Support() {
 
               {/* Item 2: Response Times */}
               <div className="p-3 rounded-2xl bg-neutral-50/80 dark:bg-white/[0.02] border border-black/[0.04] dark:border-white/[0.05] flex items-start gap-3">
-                <Clock className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                <Clock className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" />
                 <div>
                   <h4 className="text-xs font-bold text-neutral-800 dark:text-neutral-200">
                     Response Times
@@ -317,7 +317,7 @@ export default function Support() {
 
               {/* Item 3: Secure Assistance */}
               <div className="p-3 rounded-2xl bg-neutral-50/80 dark:bg-white/[0.02] border border-black/[0.04] dark:border-white/[0.05] flex items-start gap-3">
-                <Lock className="w-4 h-4 text-purple-500 shrink-0 mt-0.5" />
+                <Lock className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" />
                 <div>
                   <h4 className="text-xs font-bold text-neutral-800 dark:text-neutral-200">
                     Secure Assistance

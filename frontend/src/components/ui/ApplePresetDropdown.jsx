@@ -125,7 +125,7 @@ export default function ApplePresetDropdown({
         onClick={toggleDropdown}
         className={`inline-flex items-center justify-between gap-1.5 px-2.5 py-1 rounded-xl text-[11px] font-semibold transition-all duration-150 cursor-pointer backdrop-blur-xl shadow-2xs select-none ${
           isOpen
-            ? "bg-white dark:bg-white/[0.12] border-emerald-500/50 ring-2 ring-emerald-500/20 text-neutral-900 dark:text-white"
+            ? "bg-white dark:bg-white/[0.12] border-blue-500/50 ring-2 ring-blue-500/20 text-neutral-900 dark:text-white"
             : "bg-neutral-100 hover:bg-neutral-200/80 dark:bg-white/[0.06] dark:hover:bg-white/[0.1] border border-black/[0.08] dark:border-white/[0.1] text-neutral-800 dark:text-neutral-200 hover:border-black/15 dark:hover:border-white/20"
         }`}
         aria-haspopup="listbox"
@@ -167,7 +167,7 @@ export default function ApplePresetDropdown({
                   onClick={() => handleSelect(opt.value)}
                   className={`w-full flex items-center justify-between px-3 py-1.5 rounded-xl text-[11px] font-medium transition-colors text-left cursor-pointer ${
                     isSelected
-                      ? "bg-emerald-500/10 dark:bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 font-bold border border-emerald-500/20"
+                      ? "bg-blue-500/10 dark:bg-blue-500/15 text-blue-600 dark:text-blue-400 font-bold border border-blue-500/20"
                       : "text-neutral-700 dark:text-neutral-200 hover:bg-black/[0.04] dark:hover:bg-white/[0.08]"
                   }`}
                   role="option"
@@ -175,7 +175,7 @@ export default function ApplePresetDropdown({
                 >
                   <span className="truncate">{opt.label}</span>
                   {isSelected && (
-                    <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0 ml-1.5" />
+                    <Check className="w-3.5 h-3.5 text-blue-500 shrink-0 ml-1.5" />
                   )}
                 </button>
               );

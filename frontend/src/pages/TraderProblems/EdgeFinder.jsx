@@ -67,7 +67,7 @@ export default function EdgeFinder() {
     <div className="space-y-6">
       <div className="bg-white dark:bg-[#121418] border border-gray-200 dark:border-white/5 rounded-[4px] p-6 shadow-sm">
         <h2 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2 mb-2">
-          <BrainCircuit className="w-5 h-5 text-[#10b981]" /> The Edge Finder
+          <BrainCircuit className="w-5 h-5 text-[#007AFF]" /> The Edge Finder
         </h2>
         <p className="text-sm text-gray-500 mb-6">
           Our AI analyzes your entire journal history to find hidden
@@ -76,7 +76,7 @@ export default function EdgeFinder() {
 
         {loading ? (
           <div className="flex flex-col items-center justify-center py-12">
-            <Loader2 className="w-8 h-8 text-[#10b981] animate-spin mb-3" />
+            <Loader2 className="w-8 h-8 text-[#007AFF] animate-spin mb-3" />
             <p className="text-sm text-gray-500 font-medium">
               Crunching your trade data with Gemini AI...
             </p>
@@ -120,9 +120,9 @@ export default function EdgeFinder() {
                 {edges.map((edge, i) => (
                   <div
                     key={i}
-                    className="p-4 bg-emerald-50 dark:bg-emerald-500/5 border border-emerald-100 dark:border-emerald-500/10 rounded-[2px] flex items-start gap-3"
+                    className="p-4 bg-blue-50 dark:bg-blue-500/5 border border-blue-100 dark:border-blue-500/10 rounded-[2px] flex items-start gap-3"
                   >
-                    <BrainCircuit className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
+                    <BrainCircuit className="w-5 h-5 text-blue-500 shrink-0 mt-0.5" />
                     <p className="text-sm text-gray-800 dark:text-gray-200 leading-relaxed font-medium">
                       {edge}
                     </p>

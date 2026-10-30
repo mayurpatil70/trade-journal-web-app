@@ -27,10 +27,10 @@ const features = [
     title: 'Live Market Charts',
     description: 'Execute trades and analyze setups with real-time, zero-latency market charting built directly into the platform.',
     tag: 'Live Data',
-    color: '#10B981',
-    bg: 'rgba(16, 185, 129, 0.1)',
-    border: 'rgba(16, 185, 129, 0.25)',
-    glow: 'rgba(16, 185, 129, 0.15)',
+    color: '#007AFF',
+    bg: 'rgba(0, 122, 255, 0.1)',
+    border: 'rgba(0, 122, 255, 0.25)',
+    glow: 'rgba(0, 122, 255, 0.15)',
     detail: 'Zero latency charts',
   },
   {
@@ -38,7 +38,7 @@ const features = [
     title: 'AI News Impact Analysis',
     description: 'Our proprietary AI scans high and low impact market news 24/7, predicting volatility before it happens so you never get caught off guard.',
     tag: 'AI Intelligence',
-    color: '#A78BFA',
+    color: '#5AC8FA',
     bg: 'rgba(167, 139, 250, 0.1)',
     border: 'rgba(167, 139, 250, 0.25)',
     glow: 'rgba(167, 139, 250, 0.15)',
@@ -74,8 +74,8 @@ const features = [
     tag: 'Earn with us',
     color: '#10B981',
     bg: 'rgba(16, 185, 129, 0.1)',
-    border: 'rgba(16, 185, 129, 0.25)',
-    glow: 'rgba(16, 185, 129, 0.15)',
+    border: 'rgba(0, 122, 255, 0.25)',
+    glow: 'rgba(0, 122, 255, 0.15)',
     detail: 'For users & influencers',
   },
   {
@@ -83,7 +83,7 @@ const features = [
     title: '24/7 Instant Support',
     description: 'Our backend team is working around the clock. Get fast, instant, and reliable support anytime you need it.',
     tag: 'We got you',
-    color: '#06B6D4',
+    color: '#5AC8FA',
     bg: 'rgba(6, 182, 212, 0.1)',
     border: 'rgba(6, 182, 212, 0.25)',
     glow: 'rgba(6, 182, 212, 0.15)',
@@ -94,10 +94,10 @@ const features = [
     title: 'Prop Firm Pass Guidance',
     description: 'End-to-end guidance to pass your prop firm challenges. We stay with you every step of the way until your first payout arrives.',
     tag: 'Get Funded',
-    color: '#10B981',
-    bg: 'rgba(16, 185, 129, 0.1)',
-    border: 'rgba(16, 185, 129, 0.25)',
-    glow: 'rgba(16, 185, 129, 0.15)',
+    color: '#007AFF',
+    bg: 'rgba(0, 122, 255, 0.1)',
+    border: 'rgba(0, 122, 255, 0.25)',
+    glow: 'rgba(0, 122, 255, 0.15)',
     detail: 'Until your first payout',
     wide: true,
   },
@@ -164,13 +164,13 @@ export default function FeaturesBento() {
       <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
         
         <div style={{ textAlign: 'center', marginBottom: '48px' }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 14px', borderRadius: '100px', background: 'rgba(232,115,42,0.1)', border: '1px solid rgba(232,115,42,0.25)', color: '#E8732A', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.16em', marginBottom: '16px', fontFamily: "'JetBrains Mono', monospace" }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 14px', borderRadius: '100px', background: 'rgba(0, 122, 255,0.1)', border: '1px solid rgba(0, 122, 255,0.25)', color: '#007AFF', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.16em', marginBottom: '16px', fontFamily: "'JetBrains Mono', monospace" }}>
             03 FIELD CAPABILITIES · UNMATCHED EDGE
           </div>
-          <h2 style={{ fontFamily: "'Instrument Serif', Georgia, serif", fontSize: 'clamp(2.2rem, 5vw, 3.8rem)', fontWeight: 400, color: '#FFFFFF', letterSpacing: '-0.02em', lineHeight: 1.05 }}>
-            Everything You Need to <span style={{ fontStyle: 'italic', color: '#0E7C86' }}>Dominate</span>
+          <h2 style={{ fontFamily: "'Instrument Serif', Georgia, serif", fontSize: 'clamp(2.2rem, 5vw, 3.8rem)', fontWeight: 400, color: 'var(--lp-heading)', letterSpacing: '-0.02em', lineHeight: 1.05 }}>
+            Everything You Need to <span style={{ fontStyle: 'italic', color: '#007AFF' }}>Dominate</span>
           </h2>
-          <p style={{ fontSize: '15px', color: 'rgba(237, 234, 227, 0.7)', maxWidth: '560px', margin: '14px auto 0', lineHeight: 1.65, fontFamily: "'Manrope', sans-serif" }}>
+          <p style={{ fontSize: '15px', color: 'rgba(var(--lp-fg), 0.7)', maxWidth: '560px', margin: '14px auto 0', lineHeight: 1.65, fontFamily: "'Manrope', sans-serif" }}>
             Institutional backtesting, algorithmic volatility analysis, and automated risk rules in one unified trading journal.
           </p>
         </div>
@@ -184,7 +184,7 @@ export default function FeaturesBento() {
                 className="feature-card"
                 style={{
                   gridColumn: item.wide ? '1 / -1' : 'auto',
-                  background: 'rgba(15, 29, 28, 0.85)',
+                  background: 'rgba(var(--lp-card), 0.85)',
                   backdropFilter: 'blur(20px)',
                   WebkitBackdropFilter: 'blur(20px)',
                   borderRadius: '22px',
@@ -220,14 +220,14 @@ export default function FeaturesBento() {
                   <div style={{ color: item.color, fontSize: '10px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.14em', marginBottom: '8px', fontFamily: "'JetBrains Mono', monospace" }}>
                     {item.tag}
                   </div>
-                  <h3 style={{ fontFamily: "'Instrument Serif', Georgia, serif", fontSize: '23px', fontWeight: 400, color: '#FFFFFF', marginBottom: '8px', letterSpacing: '0.01em' }}>
+                  <h3 style={{ fontFamily: "'Instrument Serif', Georgia, serif", fontSize: '23px', fontWeight: 400, color: 'var(--lp-heading)', marginBottom: '8px', letterSpacing: '0.01em' }}>
                     {item.title}
                   </h3>
-                  <p style={{ fontSize: '13.5px', color: 'rgba(237, 234, 227, 0.72)', lineHeight: 1.65, marginBottom: '18px', fontFamily: "'Manrope', sans-serif" }}>
+                  <p style={{ fontSize: '13.5px', color: 'rgba(var(--lp-fg), 0.72)', lineHeight: 1.65, marginBottom: '18px', fontFamily: "'Manrope', sans-serif" }}>
                     {item.description}
                   </p>
                   
-                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '5px 12px', borderRadius: '8px', background: 'rgba(255, 255, 255, 0.04)', border: '1px solid rgba(255, 255, 255, 0.08)', fontSize: '11px', color: 'rgba(237, 234, 227, 0.85)', fontWeight: 600, fontFamily: "'JetBrains Mono', monospace" }}>
+                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '5px 12px', borderRadius: '8px', background: 'rgba(var(--lp-fg), 0.04)', border: '1px solid rgba(var(--lp-fg), 0.08)', fontSize: '11px', color: 'rgba(var(--lp-fg), 0.85)', fontWeight: 600, fontFamily: "'JetBrains Mono', monospace" }}>
                     <span style={{ width: 5, height: 5, borderRadius: '50%', background: item.color, boxShadow: `0 0 6px ${item.color}`, flexShrink: 0 }} />
                     <span>{item.detail}</span>
                   </div>

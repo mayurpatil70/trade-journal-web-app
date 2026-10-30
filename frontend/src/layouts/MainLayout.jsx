@@ -89,20 +89,20 @@ const NavItem = ({
         isDisabled
           ? "opacity-40 cursor-not-allowed text-neutral-400 dark:text-neutral-600"
           : isActive
-          ? "bg-white dark:bg-white/[0.09] text-emerald-800 dark:text-white font-semibold border border-black/[0.06] dark:border-white/[0.12] shadow-[0_4px_16px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.4)]"
+          ? "bg-white dark:bg-white/[0.09] text-blue-800 dark:text-white font-semibold border border-black/[0.06] dark:border-white/[0.12] shadow-[0_4px_16px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.4)]"
           : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white hover:bg-black/[0.035] dark:hover:bg-white/[0.06] border border-transparent"
       }`}
     >
       {/* Active Left Indicator Bar */}
       {isActive && (
-        <span className="absolute left-1.5 top-2.5 bottom-2.5 w-1 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.8)]" />
+        <span className="absolute left-1.5 top-2.5 bottom-2.5 w-1 rounded-full bg-blue-500 shadow-[0_0_10px_rgba(0,122,255,0.8)]" />
       )}
 
       <div className="flex items-center gap-3 pl-1">
         <Icon
           className={`w-[18px] h-[18px] transition-all duration-300 ${
             isActive
-              ? "text-emerald-600 dark:text-emerald-400 drop-shadow-[0_0_8px_rgba(16,185,129,0.5)]"
+              ? "text-blue-600 dark:text-blue-400 drop-shadow-[0_0_8px_rgba(0,122,255,0.5)]"
               : "text-neutral-400 dark:text-neutral-500 group-hover:text-neutral-800 dark:group-hover:text-neutral-200"
           }`}
           strokeWidth={isActive ? 2.4 : 2}
@@ -112,7 +112,7 @@ const NavItem = ({
 
       <div className="flex items-center gap-2">
         {isBeta && (
-          <span className="text-[9px] uppercase tracking-wider font-extrabold bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-full">
+          <span className="text-[9px] uppercase tracking-wider font-extrabold bg-blue-500/10 text-blue-700 dark:text-blue-400 border border-blue-500/20 px-2 py-0.5 rounded-full">
             Beta
           </span>
         )}
@@ -767,7 +767,7 @@ export default function MainLayout() {
       style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif" }}
     >
       {/* ── Ambient Background Canvas ── */}
-      <div className="pointer-events-none absolute inset-0 z-0 select-none bg-gradient-to-br from-transparent via-transparent to-emerald-500/[0.02]" />
+      <div className="pointer-events-none absolute inset-0 z-0 select-none bg-gradient-to-br from-transparent via-transparent to-blue-500/[0.02]" />
 
       {/* ── REACT PORTAL: Feature Lock / Pro Popup ── */}
       {showLockPopup &&
@@ -783,8 +783,8 @@ export default function MainLayout() {
               >
                 <X className="w-5 h-5" />
               </button>
-              <div className="w-14 h-14 bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/30 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm shadow-emerald-500/20">
-                <Lock className="w-7 h-7 text-emerald-600 dark:text-emerald-400" />
+              <div className="w-14 h-14 bg-blue-500/10 dark:bg-blue-500/20 border border-blue-500/30 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm shadow-blue-500/20">
+                <Lock className="w-7 h-7 text-blue-600 dark:text-blue-400" />
               </div>
               <h3 className="text-lg font-bold text-neutral-900 dark:text-white mb-2">Coming Soon</h3>
               <p className="text-neutral-600 dark:text-neutral-400 text-xs leading-relaxed mb-6">
@@ -792,7 +792,7 @@ export default function MainLayout() {
               </p>
               <button
                 onClick={() => setShowLockPopup(false)}
-                className="w-full py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-xl transition-all shadow-lg shadow-emerald-500/25 active:scale-95"
+                className="w-full py-2.5 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-xl transition-all shadow-lg shadow-blue-500/25 active:scale-95"
               >
                 Got it
               </button>
@@ -941,7 +941,7 @@ export default function MainLayout() {
             localStorage.getItem("userEmail")
           ) && (
             <div className="pt-4 mt-4 border-t border-black/[0.05] dark:border-white/[0.06]">
-              <p className="px-3.5 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest mb-2">
+              <p className="px-3.5 text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-2">
                 Admin
               </p>
               <div className="space-y-1">
@@ -987,20 +987,20 @@ export default function MainLayout() {
                 }}
                 title="Click to view & update profile photo"
               >
-                <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 text-emerald-700 dark:text-emerald-400 flex items-center justify-center font-bold text-xs shrink-0 border border-emerald-500/30 shadow-inner group-hover/avatar:ring-2 group-hover/avatar:ring-emerald-500 transition-all overflow-hidden">
+                <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500/20 to-blue-500/20 text-blue-700 dark:text-blue-400 flex items-center justify-center font-bold text-xs shrink-0 border border-blue-500/30 shadow-inner group-hover/avatar:ring-2 group-hover/avatar:ring-blue-500 transition-all overflow-hidden">
                   {userAvatar ? (
                     <img src={userAvatar} alt="Avatar" className="w-full h-full object-cover group-hover/avatar:scale-110 transition-transform" />
                   ) : (
                     (userName || userEmail).charAt(0).toUpperCase()
                   )}
                 </div>
-                <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-500 border-2 border-white dark:border-[#10131b] rounded-full" />
+                <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-blue-500 border-2 border-white dark:border-[#10131b] rounded-full" />
               </div>
               <div className="overflow-hidden flex flex-col items-start">
                 <p className="text-[13px] font-semibold text-neutral-800 dark:text-neutral-200 leading-tight truncate max-w-[110px]">
                   {userName || userEmail}
                 </p>
-                <span className="text-[10px] font-medium text-emerald-600 dark:text-emerald-400 mt-0.5">
+                <span className="text-[10px] font-medium text-blue-600 dark:text-blue-400 mt-0.5">
                   Pro Workspace
                 </span>
               </div>
@@ -1037,7 +1037,7 @@ export default function MainLayout() {
                 onClick={closeMenu}
                 className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-neutral-700 dark:text-neutral-200 hover:bg-black/[0.04] dark:hover:bg-white/[0.08] transition-colors"
               >
-                <div className="w-6 h-6 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+                <div className="w-6 h-6 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center">
                   <User className="w-3.5 h-3.5" />
                 </div>
                 Profile Settings
@@ -1049,7 +1049,7 @@ export default function MainLayout() {
                 }}
                 className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-neutral-700 dark:text-neutral-200 hover:bg-black/[0.04] dark:hover:bg-white/[0.08] transition-colors text-left cursor-pointer"
               >
-                <div className="w-6 h-6 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+                <div className="w-6 h-6 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center">
                   <CreditCard className="w-3.5 h-3.5" />
                 </div>
                 Membership & Billing
@@ -1078,7 +1078,7 @@ export default function MainLayout() {
         <Suspense
           fallback={
             <div className="min-h-[70vh] flex flex-col items-center justify-center p-8">
-              <div className="w-8 h-8 rounded-full border-2 border-emerald-500/20 border-t-emerald-500 animate-spin mb-3" />
+              <div className="w-8 h-8 rounded-full border-2 border-blue-500/20 border-t-blue-500 animate-spin mb-3" />
               <p className="text-xs text-neutral-500 dark:text-neutral-400 font-medium tracking-wide">
                 Loading workspace view...
               </p>

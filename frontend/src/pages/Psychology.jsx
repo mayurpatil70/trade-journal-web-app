@@ -35,7 +35,7 @@ export default function Psychology() {
   if (loading) {
     return (
       <div className="flex h-full items-center justify-center p-12">
-        <Loader2 className="w-8 h-8 text-purple-400 animate-spin" />
+        <Loader2 className="w-8 h-8 text-blue-400 animate-spin" />
       </div>
     );
   }
@@ -92,11 +92,11 @@ export default function Psychology() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
         <div>
           <h1 className="text-2xl font-semibold text-white flex items-center gap-3">
-            <Brain className="w-6 h-6 text-purple-400" /> Psychology Lab
+            <Brain className="w-6 h-6 text-blue-400" /> Psychology Lab
           </h1>
           <p className="text-gray-500 mt-1 text-[13px]">
             Understand how your emotional state affects your profitability.
-            {selectedAccount && <span className="ml-2 text-purple-400 font-medium">· {selectedAccount}</span>}
+            {selectedAccount && <span className="ml-2 text-blue-400 font-medium">· {selectedAccount}</span>}
           </p>
         </div>
         <AccountFilter
@@ -143,7 +143,7 @@ export default function Psychology() {
              {/* Emotion Performance Table */}
              <div className="bg-[#101216] border border-white/5 rounded-2xl shadow-xl overflow-hidden flex flex-col">
                 <div className="p-5 border-b border-white/5 bg-[#0A0B0D]">
-                   <h2 className="text-sm font-semibold text-white flex items-center gap-2"><Activity className="w-4 h-4 text-purple-400" /> P&L by Emotional State</h2>
+                   <h2 className="text-sm font-semibold text-white flex items-center gap-2"><Activity className="w-4 h-4 text-blue-400" /> P&L by Emotional State</h2>
                 </div>
                 <div className="p-5 flex-1 overflow-y-auto">
                    {emotionArray.length === 0 ? <p className="text-sm text-gray-500">No emotional data logged.</p> : (

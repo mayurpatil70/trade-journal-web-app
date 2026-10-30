@@ -6,7 +6,62 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* iOS / macOS system palette: blue accent, green profit, red loss */
+@theme {
+  --color-blue-50: #ebf4ff;
+  --color-blue-100: #d6e9ff;
+  --color-blue-200: #add3ff;
+  --color-blue-300: #7ab8ff;
+  --color-blue-400: #409cff;
+  --color-blue-500: #007aff;
+  --color-blue-600: #0066d6;
+  --color-blue-700: #0052ad;
+  --color-blue-800: #003e85;
+  --color-blue-900: #002a5c;
+  --color-blue-950: #001a3a;
+
+  --color-sky-300: #8dd8fb;
+  --color-sky-400: #5ac8fa;
+  --color-sky-500: #32ade6;
+  --color-sky-600: #1a8fc4;
+
+  --color-emerald-50: #eafbee;
+  --color-emerald-100: #d4f5dc;
+  --color-emerald-200: #a6ebb6;
+  --color-emerald-300: #6edc8a;
+  --color-emerald-400: #30d158;
+  --color-emerald-500: #34c759;
+  --color-emerald-600: #248a3d;
+  --color-emerald-700: #1e7a34;
+  --color-emerald-800: #17602a;
+  --color-emerald-900: #10461f;
+  --color-emerald-950: #0a2b13;
+
+  --color-green-400: #30d158;
+  --color-green-500: #34c759;
+  --color-green-600: #248a3d;
+
+  --color-rose-50: #fff0ef;
+  --color-rose-100: #ffe0de;
+  --color-rose-200: #ffc2be;
+  --color-rose-300: #ff9a94;
+  --color-rose-400: #ff6961;
+  --color-rose-500: #ff3b30;
+  --color-rose-600: #d70015;
+  --color-rose-700: #b3000f;
+  --color-rose-800: #8a000c;
+  --color-rose-900: #5c0008;
+  --color-rose-950: #3a0005;
+
+  --color-red-400: #ff6961;
+  --color-red-500: #ff3b30;
+  --color-red-600: #d70015;
+}
+
 @theme inline {
+  --color-lp: rgb(var(--lp-fg));
+  --color-lp-heading: var(--lp-heading);
+
   --font-sans:
     "Instrument Sans", "Inter", ui-sans-serif, system-ui, -apple-system,
     BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -100,7 +155,7 @@ LEDGER THEME: light (default) and dark tokens
 :root {
   --radius: 0.75rem;
 
-  --background: #fbfbfa;
+  --background: #f2f2f7;
   --foreground: #14161a;
 
   --card: rgb(255 255 255 / 0.7);
@@ -109,7 +164,7 @@ LEDGER THEME: light (default) and dark tokens
   --popover: #ffffff;
   --popover-foreground: #14161a;
 
-  --primary: #15803d;
+  --primary: #007aff;
   --primary-foreground: #ffffff;
 
   --secondary: #f1f1ef;
@@ -121,28 +176,28 @@ LEDGER THEME: light (default) and dark tokens
   --accent: rgb(0 0 0 / 0.04);
   --accent-foreground: #14161a;
 
-  --destructive: #dc2626;
+  --destructive: #ff3b30;
 
   --border: rgb(0 0 0 / 0.08);
   --input: rgb(0 0 0 / 0.12);
-  --ring: #15803d;
+  --ring: #007aff;
 
-  --chart-1: #15803d;
-  --chart-2: #166534;
+  --chart-1: #007aff;
+  --chart-2: #5ac8fa;
   --chart-3: #b45309;
-  --chart-4: #7c3aed;
+  --chart-4: #34c759;
   --chart-5: #dc2626;
 
   --sidebar: rgb(255 255 255 / 0.7);
   --sidebar-foreground: #14161a;
-  --sidebar-primary: #15803d;
+  --sidebar-primary: #007aff;
   --sidebar-primary-foreground: #ffffff;
   --sidebar-accent: rgb(0 0 0 / 0.04);
   --sidebar-accent-foreground: #14161a;
   --sidebar-border: rgb(0 0 0 / 0.08);
-  --sidebar-ring: #15803d;
+  --sidebar-ring: #007aff;
 
-  --paper: #fbfbfa;
+  --paper: #f2f2f7;
   --surface: rgb(255 255 255 / 0.72);
   --surface-solid: #ffffff;
   --surface-raised: rgb(255 255 255 / 0.9);
@@ -150,9 +205,15 @@ LEDGER THEME: light (default) and dark tokens
   --ink: #14161a;
   --ink-soft: #3f4650;
   --ink-mute: #6b7280;
-  --gain: #15803d;
-  --loss: #dc2626;
+  --gain: #34c759;
+  --loss: #ff3b30;
   --glass-shadow: 0 4px 20px -4px rgb(0 0 0 / 0.07);
+
+  --lp-bg: #f5f5f7;
+  --lp-fg: 0, 0, 0;
+  --lp-card: 255, 255, 255;
+  --lp-text: #3a3a3c;
+  --lp-heading: #1c1c1e;
 }
 
 /* =========================================================
@@ -169,7 +230,7 @@ DARK MODE
   --popover: #12151b;
   --popover-foreground: #f4f5f7;
 
-  --primary: oklch(0.7 0.16 162);
+  --primary: #0a84ff;
   --primary-foreground: oklch(0.985 0 0);
 
   --secondary: #171a21;
@@ -181,26 +242,26 @@ DARK MODE
   --accent: rgb(255 255 255 / 0.06);
   --accent-foreground: #f4f5f7;
 
-  --destructive: oklch(0.62 0.22 25);
+  --destructive: #ff453a;
 
   --border: rgb(255 255 255 / 0.08);
   --input: rgb(255 255 255 / 0.12);
-  --ring: oklch(0.7 0.16 162);
+  --ring: #0a84ff;
 
-  --chart-1: oklch(0.7 0.16 162);
-  --chart-2: oklch(0.7 0.17 170);
+  --chart-1: #0a84ff;
+  --chart-2: #64d2ff;
   --chart-3: oklch(0.75 0.16 85);
-  --chart-4: oklch(0.65 0.2 320);
+  --chart-4: #30d158;
   --chart-5: oklch(0.7 0.2 35);
 
   --sidebar: rgb(18 21 27 / 0.6);
   --sidebar-foreground: #f4f5f7;
-  --sidebar-primary: oklch(0.7 0.16 162);
+  --sidebar-primary: #0a84ff;
   --sidebar-primary-foreground: oklch(0.985 0 0);
   --sidebar-accent: rgb(255 255 255 / 0.06);
   --sidebar-accent-foreground: #f4f5f7;
   --sidebar-border: rgb(255 255 255 / 0.08);
-  --sidebar-ring: oklch(0.7 0.16 162);
+  --sidebar-ring: #0a84ff;
 
   --paper: #0c0e12;
   --surface: rgb(15 23 42 / 0.6);
@@ -210,9 +271,15 @@ DARK MODE
   --ink: #f4f5f7;
   --ink-soft: #c9ced6;
   --ink-mute: #9aa1ad;
-  --gain: #34d399;
-  --loss: #f87171;
+  --gain: #30d158;
+  --loss: #ff453a;
   --glass-shadow: 0 4px 20px -4px rgb(0 0 0 / 0.35);
+
+  --lp-bg: #05090e;
+  --lp-fg: 255, 255, 255;
+  --lp-card: 18, 21, 30;
+  --lp-text: #edeae3;
+  --lp-heading: #ffffff;
 }
 
 /* =========================================================
@@ -290,7 +357,7 @@ GLOBAL RESET
   }
 
   ::selection {
-    background: rgba(16, 185, 129, 0.28);
+    background: rgba(0, 122, 255, 0.28);
     color: inherit;
   }
 
@@ -574,7 +641,7 @@ main,
   background:
     radial-gradient(
       900px 500px at 10% -10%,
-      rgba(16, 185, 129, 0.12),
+      rgba(0, 122, 255, 0.12),
       transparent 60%
     ),
     radial-gradient(
@@ -712,7 +779,7 @@ html.dark .glossy-bar {
     rgba(14, 17, 24, 0.75);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow:
-    inset 0 -1px 0 rgba(16, 185, 129, 0.06),
+    inset 0 -1px 0 rgba(0, 122, 255, 0.06),
     0 4px 25px rgba(0, 0, 0, 0.35);
 }
 
@@ -788,8 +855,8 @@ html.dark .mac-pill:hover {
     filter 0.15s ease;
 }
 .btn-glossy-green {
-  --btn-glow: rgba(16, 185, 129, 0.35);
-  background: linear-gradient(180deg, #34d399 0%, #10b981 45%, #047857 100%);
+  --btn-glow: rgba(0, 122, 255, 0.35);
+  background: linear-gradient(180deg, #409cff 0%, #007aff 45%, #0052ad 100%);
 }
 .btn-glossy-red {
   --btn-glow: rgba(239, 68, 68, 0.35);
@@ -1171,87 +1238,6 @@ html.light body:not(.terminal) .dark-luxury-card input[type="file"],
 }
 
 /* =========================================================
-   PAYWALL PAGE ISOLATION
-   Guarantees that Paywall remains perfectly dark & legible
-   regardless of whether global theme is light or dark.
-   ========================================================= */
-.paywall-container {
-  color-scheme: dark !important;
-  background-color: #060b11 !important;
-  color: #ffffff !important;
-}
-
-html.light body .paywall-container,
-html.light body:not(.terminal) .paywall-container {
-  background-color: #060b11 !important;
-  color: #ffffff !important;
-}
-
-html.light body .paywall-container h1,
-html.light body:not(.terminal) .paywall-container h1,
-html.light body .paywall-container h2,
-html.light body:not(.terminal) .paywall-container h2,
-html.light body .paywall-container .text-white,
-html.light body:not(.terminal) .paywall-container .text-white,
-html.light body .paywall-container [class*="text-white"],
-html.light body:not(.terminal) .paywall-container [class*="text-white"],
-.paywall-container .text-white,
-.paywall-container [class*="text-white"] {
-  color: #ffffff !important;
-}
-
-html.light body .paywall-container .text-gray-400,
-html.light body:not(.terminal) .paywall-container .text-gray-400,
-html.light body .paywall-container [class*="text-gray-400"],
-html.light body:not(.terminal) .paywall-container [class*="text-gray-400"],
-.paywall-container .text-gray-400,
-.paywall-container [class*="text-gray-400"] {
-  color: #9ca3af !important;
-}
-
-html.light body .paywall-container .text-gray-300,
-html.light body:not(.terminal) .paywall-container .text-gray-300,
-html.light body .paywall-container [class*="text-gray-300"],
-html.light body:not(.terminal) .paywall-container [class*="text-gray-300"],
-.paywall-container .text-gray-300,
-.paywall-container [class*="text-gray-300"] {
-  color: #d1d5db !important;
-}
-
-html.light body .paywall-container .text-gray-500,
-html.light body:not(.terminal) .paywall-container .text-gray-500,
-html.light body .paywall-container [class*="text-gray-500"],
-html.light body:not(.terminal) .paywall-container [class*="text-gray-500"],
-.paywall-container .text-gray-500,
-.paywall-container [class*="text-gray-500"] {
-  color: #6b7280 !important;
-}
-
-html.light body .paywall-container [class*="border-white"],
-html.light body:not(.terminal) .paywall-container [class*="border-white"],
-.paywall-container [class*="border-white"] {
-  border-color: rgba(255, 255, 255, 0.12) !important;
-}
-
-html.light body .paywall-container [class*="bg-[#0b131f]"],
-html.light body:not(.terminal) .paywall-container [class*="bg-[#0b131f]"],
-.paywall-container [class*="bg-[#0b131f]"] {
-  background-color: #0b131f !important;
-}
-
-html.light body .paywall-container [class*="bg-[#0f1d2e]"],
-html.light body:not(.terminal) .paywall-container [class*="bg-[#0f1d2e]"],
-.paywall-container [class*="bg-[#0f1d2e]"] {
-  background-color: #0f1d2e !important;
-}
-
-html.light body .paywall-container [class*="bg-slate-900"],
-html.light body:not(.terminal) .paywall-container [class*="bg-slate-900"],
-.paywall-container [class*="bg-slate-900"] {
-  background-color: rgba(15, 23, 42, 0.8) !important;
-}
-
-/* =========================================================
 LEDGER UTILITIES
 ========================================================= */
 
@@ -1411,30 +1397,30 @@ LANDING: theme tokens (light default, dark under .dark)
 }
 
 .landing-root .landing-faq {
-  background: rgba(15, 29, 28, 0.88) !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4) !important;
+  background: rgba(var(--lp-card), 0.88) !important;
+  border: 1px solid rgba(var(--lp-fg), 0.08) !important;
+  box-shadow: var(--glass-shadow) !important;
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
 }
 .landing-root .landing-faq details summary {
-  color: #edeae3 !important;
+  color: var(--lp-heading) !important;
 }
 .landing-root .landing-faq details summary span {
-  color: #edeae3 !important;
+  color: var(--lp-heading) !important;
   font-size: 15px !important;
   font-weight: 600 !important;
   transition: color 0.2s ease;
 }
 .landing-root .landing-faq details summary:hover span {
-  color: #5fd4e8 !important;
+  color: #007aff !important;
 }
 .landing-root .landing-faq details p {
-  color: rgba(237, 234, 227, 0.82) !important;
+  color: rgba(var(--lp-fg), 0.82) !important;
   line-height: 1.7 !important;
 }
 .landing-root .landing-faq > details + details {
-  border-top: 1px solid rgba(255, 255, 255, 0.06) !important;
+  border-top: 1px solid rgba(var(--lp-fg), 0.06) !important;
 }
 
 /* =========================================================

@@ -2,6 +2,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import api from "../api/axios";
+import { resolveNextStepAfterDiscord } from "../lib/authFlow";
 import { Loader2, CheckCircle, AlertTriangle, ArrowRight } from "lucide-react";
 
 export default function DiscordCallback() {
@@ -31,9 +32,8 @@ export default function DiscordCallback() {
         if (res.data.success) {
           localStorage.setItem("discord_verified", "true");
           setStatus("success");
-          setTimeout(() => {
-            navigate("/dashboard");
-          }, 1500);
+          const next = await resolveNextStepAfterDiscord();
+          setTimeout(() => navigate(next, { replace: true }), 1500);
         } else {
           setStatus("error");
           setErrorMsg("You are not a member of our Discord server yet!");
@@ -50,15 +50,15 @@ export default function DiscordCallback() {
   }, [searchParams, navigate]);
 
   return (
-    <div className="min-h-screen bg-[#020202] text-white flex items-center justify-center p-6">
-      <div className="w-full max-w-md bg-[#121418] border border-white/5 rounded-2xl p-8 text-center shadow-2xl">
+    <div className="min-h-screen bg-[#f2f2f7] dark:bg-[#020202] text-neutral-900 dark:text-white flex items-center justify-center p-6">
+      <div className="w-full max-w-md bg-white/80 dark:bg-[#121418] backdrop-blur-xl border border-black/[0.08] dark:border-white/5 rounded-2xl p-8 text-center shadow-2xl">
         {status === "verifying" && (
           <>
             <Loader2 className="w-12 h-12 text-[#5865F2] animate-spin mx-auto mb-4" />
             <h2 className="text-xl font-bold mb-2">
               Checking Discord Server...
             </h2>
-            <p className="text-sm text-gray-400">
+            <p className="text-sm text-neutral-600 dark:text-gray-400">
               Verifying your community membership.
             </p>
           </>
@@ -67,7 +67,7 @@ export default function DiscordCallback() {
           <>
             <CheckCircle className="w-12 h-12 text-emerald-500 mx-auto mb-4" />
             <h2 className="text-xl font-bold mb-2">Verification Successful!</h2>
-            <p className="text-sm text-gray-400">
+            <p className="text-sm text-neutral-600 dark:text-gray-400">
               Redirecting to your dashboard...
             </p>
           </>
@@ -76,7 +76,7 @@ export default function DiscordCallback() {
           <>
             <AlertTriangle className="w-12 h-12 text-red-500 mx-auto mb-4" />
             <h2 className="text-xl font-bold mb-2">Access Denied</h2>
-            <p className="text-sm text-gray-400 mb-6">{errorMsg}</p>
+            <p className="text-sm text-neutral-600 dark:text-gray-400 mb-6">{errorMsg}</p>
             <button
               onClick={() => navigate("/link-discord")}
               className="w-full py-3 bg-[#5865F2] hover:bg-[#4752C4] text-white font-bold rounded-xl transition-all cursor-pointer"
@@ -86,9 +86,9 @@ export default function DiscordCallback() {
             <button
               onClick={() => {
                 localStorage.setItem("discord_skipped", "true");
-                navigate("/dashboard");
+                resolveNextStepAfterDiscord().then((next) => navigate(next, { replace: true }));
               }}
-              className="w-full mt-3 py-3 bg-white/[0.04] hover:bg-white/[0.08] text-gray-300 hover:text-white font-medium rounded-xl transition-all border border-white/10 cursor-pointer"
+              className="w-full mt-3 py-3 bg-white/[0.04] hover:bg-white/[0.08] text-neutral-600 dark:text-gray-300 hover:text-neutral-900 dark:hover:text-white font-medium rounded-xl transition-all border border-black/[0.08] dark:border-white/10 cursor-pointer"
             >
               Skip Discord & Continue
             </button>

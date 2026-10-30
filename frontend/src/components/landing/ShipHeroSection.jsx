@@ -1075,14 +1075,14 @@ export default function ShipHeroSection() {
                 marginBottom: '16px',
               }}
             >
-              <span style={{ width: 40, height: 1.5, background: '#5FD4E8', display: 'inline-block' }} />
+              <span style={{ width: 40, height: 1.5, background: '#5AC8FA', display: 'inline-block' }} />
               <span
                 style={{
                   fontFamily: "'JetBrains Mono', monospace",
                   fontSize: '11px',
                   fontWeight: 700,
                   letterSpacing: '0.26em',
-                  color: '#5FD4E8',
+                  color: '#5AC8FA',
                   textTransform: 'uppercase',
                 }}
               >
@@ -1100,7 +1100,7 @@ export default function ShipHeroSection() {
               }}
             >
               Departing surface waters.{' '}
-              <span style={{ fontStyle: 'italic', fontWeight: 400, color: '#5FD4E8' }}>
+              <span style={{ fontStyle: 'italic', fontWeight: 400, color: '#5AC8FA' }}>
                 Descending into the deep.
               </span>
             </h2>
@@ -1146,7 +1146,7 @@ export default function ShipHeroSection() {
                   justifyContent: 'space-between',
                 }}
               >
-                <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '9px', fontWeight: 700, color: '#5FD4E8', letterSpacing: '0.15em', marginBottom: '8px' }}>
+                <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '9px', fontWeight: 700, color: '#5AC8FA', letterSpacing: '0.15em', marginBottom: '8px' }}>
                   {item.tag}
                 </div>
                 <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '24px', fontWeight: 500, color: '#F4EFE6', marginBottom: '6px' }}>
@@ -1176,7 +1176,7 @@ export default function ShipHeroSection() {
                 fontWeight: 700,
                 letterSpacing: '0.24em',
                 textTransform: 'uppercase',
-                color: '#5FD4E8',
+                color: '#5AC8FA',
                 opacity: 0.9,
               }}
             >
@@ -1208,10 +1208,10 @@ export default function ShipHeroSection() {
               Descending beneath the waves into institutional liquidity sweeps, precision tick analytics, and apex market execution.
             </p>
             <div style={{ marginTop: '8px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
-              <span style={{ fontSize: '10px', fontFamily: "'JetBrains Mono', monospace", color: '#5FD4E8', letterSpacing: '0.2em', textTransform: 'uppercase' }}>
+              <span style={{ fontSize: '10px', fontFamily: "'JetBrains Mono', monospace", color: '#5AC8FA', letterSpacing: '0.2em', textTransform: 'uppercase' }}>
                 DIVE TO STRIKE ↓
               </span>
-              <div style={{ width: 1, height: 42, background: 'linear-gradient(180deg, #5FD4E8, transparent)' }} />
+              <div style={{ width: 1, height: 42, background: 'linear-gradient(180deg, #5AC8FA, transparent)' }} />
             </div>
           </div>
         </section>

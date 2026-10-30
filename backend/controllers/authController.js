@@ -85,6 +85,7 @@ async function respondWithSession(req, res, user, message) {
     authToken,
     hasPaid,
     isAdmin,
+    onboarded: Boolean(user.rules_onboarded || user.onboarding_completed),
   });
 }
 

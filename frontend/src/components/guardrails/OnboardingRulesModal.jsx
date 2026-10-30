@@ -160,12 +160,12 @@ export default function OnboardingRulesModal({ isOpen, onComplete, userId }) {
 
   return createPortal(
     <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-black/70 dark:bg-black/85 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="relative w-full max-w-2xl bg-white dark:bg-[#121622] border-2 border-emerald-500/30 rounded-3xl shadow-[0_25px_80px_rgba(16,185,129,0.2)] p-6 sm:p-8 space-y-6 max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-200">
+      <div className="relative w-full max-w-2xl bg-white dark:bg-[#121622] border-2 border-blue-500/30 rounded-3xl shadow-[0_25px_80px_rgba(0,122,255,0.2)] p-6 sm:p-8 space-y-6 max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-200">
         
         {/* Header with High-Impact Badging */}
         <div className="space-y-2 pb-4 border-b border-black/[0.06] dark:border-white/[0.08]">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 text-xs font-black uppercase tracking-wider">
-            <ShieldCheck className="w-4 h-4 text-emerald-500" />
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 text-xs font-black uppercase tracking-wider">
+            <ShieldCheck className="w-4 h-4 text-blue-500" />
             <span>Mandatory Trader Onboarding</span>
           </div>
 
@@ -190,7 +190,7 @@ export default function OnboardingRulesModal({ isOpen, onComplete, userId }) {
             <div className="p-3.5 rounded-2xl bg-neutral-50/80 dark:bg-white/[0.03] border border-black/[0.06] dark:border-white/[0.08] hover:border-black/15 dark:hover:border-white/15 transition-all shadow-2xs space-y-2">
               <div className="flex items-center justify-between gap-2">
                 <label className="text-[11px] font-bold text-neutral-800 dark:text-neutral-200 flex items-center gap-1.5 uppercase tracking-wider">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0" />
                   MAX RISK / TRADE <span className="text-emerald-500">*</span>
                 </label>
                 <ApplePresetDropdown
@@ -230,7 +230,7 @@ export default function OnboardingRulesModal({ isOpen, onComplete, userId }) {
             <div className="p-3.5 rounded-2xl bg-neutral-50/80 dark:bg-white/[0.03] border border-black/[0.06] dark:border-white/[0.08] hover:border-black/15 dark:hover:border-white/15 transition-all shadow-2xs space-y-2">
               <div className="flex items-center justify-between gap-2">
                 <label className="text-[11px] font-bold text-neutral-800 dark:text-neutral-200 flex items-center gap-1.5 uppercase tracking-wider">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0" />
                   MAX TRADES / DAY <span className="text-emerald-500">*</span>
                 </label>
                 <ApplePresetDropdown
@@ -312,7 +312,7 @@ export default function OnboardingRulesModal({ isOpen, onComplete, userId }) {
             <div className="p-3.5 rounded-2xl bg-neutral-50/80 dark:bg-white/[0.03] border border-black/[0.06] dark:border-white/[0.08] hover:border-black/15 dark:hover:border-white/15 transition-all shadow-2xs space-y-2">
               <div className="flex items-center justify-between gap-2">
                 <label className="text-[11px] font-bold text-neutral-800 dark:text-neutral-200 flex items-center gap-1.5 uppercase tracking-wider">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0" />
                   LOSING STREAK <span className="text-emerald-500">*</span>
                 </label>
                 <ApplePresetDropdown
@@ -395,7 +395,7 @@ export default function OnboardingRulesModal({ isOpen, onComplete, userId }) {
             <button
               type="submit"
               disabled={isSaving}
-              className="w-full py-3.5 px-6 rounded-2xl bg-emerald-500 hover:bg-emerald-600 active:scale-[0.99] text-white font-extrabold text-sm transition-all shadow-lg shadow-emerald-500/25 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+              className="w-full py-3.5 px-6 rounded-2xl bg-blue-500 hover:bg-blue-600 active:scale-[0.99] text-white font-extrabold text-sm transition-all shadow-lg shadow-blue-500/25 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
             >
               <span>Lock Guardrails & Enter Dashboard</span>
               <ArrowRight className="w-4 h-4" />

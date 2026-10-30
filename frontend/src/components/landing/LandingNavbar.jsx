@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, ArrowRight, BarChart2, Shield, BookOpen, Calculator, Layers, Zap } from 'lucide-react';
 import BrandLogo from '../BrandLogo';
 import IridescentButton from './IridescentButton';
+import ThemeToggle from '../ThemeToggle';
 
 const NAV_LINKS = [
   { label: 'Markets', to: '/markets/four-asset-classes', icon: Layers },
@@ -62,7 +63,7 @@ export default function LandingNavbar({ isFixed = true }) {
           alignItems: 'center',
           justifyContent: 'space-between',
           zIndex: 60,
-          background: 'linear-gradient(180deg, rgba(7, 26, 51, 0.55) 0%, rgba(7, 26, 51, 0.18) 70%, transparent 100%)',
+          background: 'linear-gradient(180deg, rgba(var(--lp-card), 0.55) 0%, rgba(var(--lp-card), 0.18) 70%, transparent 100%)',
           backdropFilter: 'blur(16px)',
           WebkitBackdropFilter: 'blur(16px)',
           borderBottom: 'none',
@@ -82,21 +83,21 @@ export default function LandingNavbar({ isFixed = true }) {
             flexShrink: 0,
             padding: '5px 14px 5px 6px',
             borderRadius: '999px',
-            background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(95, 212, 232, 0.06) 50%, rgba(255, 255, 255, 0.02) 100%)',
-            border: '1px solid rgba(255, 255, 255, 0.2)',
-            boxShadow: 'inset 0 1px 1px 0 rgba(255, 255, 255, 0.35), 0 4px 16px rgba(0, 0, 0, 0.3)',
+            background: 'linear-gradient(135deg, rgba(var(--lp-fg), 0.12) 0%, rgba(90, 200, 250, 0.06) 50%, rgba(var(--lp-fg), 0.02) 100%)',
+            border: '1px solid rgba(var(--lp-fg), 0.2)',
+            boxShadow: 'inset 0 1px 1px 0 rgba(var(--lp-fg), 0.35), 0 4px 16px rgba(0, 0, 0, 0.3)',
             backdropFilter: 'blur(16px)',
             WebkitBackdropFilter: 'blur(16px)',
             transition: 'all 0.25s ease',
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.borderColor = 'rgba(95, 212, 232, 0.45)';
-            e.currentTarget.style.boxShadow = 'inset 0 1px 1px 0 rgba(255, 255, 255, 0.45), 0 6px 24px rgba(95, 212, 232, 0.28)';
+            e.currentTarget.style.borderColor = 'rgba(90, 200, 250, 0.45)';
+            e.currentTarget.style.boxShadow = 'inset 0 1px 1px 0 rgba(var(--lp-fg), 0.45), 0 6px 24px rgba(90, 200, 250, 0.28)';
             e.currentTarget.style.transform = 'translateY(-1px)';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.2)';
-            e.currentTarget.style.boxShadow = 'inset 0 1px 1px 0 rgba(255, 255, 255, 0.35), 0 4px 16px rgba(0, 0, 0, 0.3)';
+            e.currentTarget.style.borderColor = 'rgba(var(--lp-fg), 0.2)';
+            e.currentTarget.style.boxShadow = 'inset 0 1px 1px 0 rgba(var(--lp-fg), 0.35), 0 4px 16px rgba(0, 0, 0, 0.3)';
             e.currentTarget.style.transform = 'translateY(0)';
           }}
           onClick={() => {
@@ -120,7 +121,7 @@ export default function LandingNavbar({ isFixed = true }) {
                 fontWeight: 800,
                 letterSpacing: '0.14em',
                 textTransform: 'uppercase',
-                background: 'linear-gradient(135deg, #FFFFFF 0%, #D4F4F9 50%, #5FD4E8 100%)',
+                background: 'linear-gradient(135deg, #FFFFFF 0%, #D4F4F9 50%, #5AC8FA 100%)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
                 display: 'inline-block',
@@ -135,8 +136,8 @@ export default function LandingNavbar({ isFixed = true }) {
                 fontWeight: 400,
                 fontStyle: 'italic',
                 letterSpacing: '0.04em',
-                color: '#5FD4E8',
-                textShadow: '0 0 14px rgba(95, 212, 232, 0.5)',
+                color: '#5AC8FA',
+                textShadow: '0 0 14px rgba(90, 200, 250, 0.5)',
                 display: 'inline-block',
                 lineHeight: 1,
               }}
@@ -152,32 +153,34 @@ export default function LandingNavbar({ isFixed = true }) {
             START FREE TRIAL
           </IridescentButton>
 
+          <ThemeToggle />
+
           {/* Three-Line Menu Toggle Button (Visible on all screens) */}
           <button
             type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label="Toggle navigation menu"
             style={{
-              background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.03) 100%)',
-              border: '1px solid rgba(255, 255, 255, 0.18)',
+              background: 'linear-gradient(180deg, rgba(var(--lp-fg), 0.12) 0%, rgba(var(--lp-fg), 0.03) 100%)',
+              border: '1px solid rgba(var(--lp-fg), 0.18)',
               borderRadius: '10px',
               padding: '7px 9px',
-              color: '#EDEAE3',
+              color: 'var(--lp-text)',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 4px 12px rgba(0, 0, 0, 0.25)',
+              boxShadow: 'inset 0 1px 0 rgba(var(--lp-fg), 0.25), 0 4px 12px rgba(0, 0, 0, 0.25)',
               backdropFilter: 'blur(12px)',
               WebkitBackdropFilter: 'blur(12px)',
               transition: 'all 0.2s ease',
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = 'rgba(95, 212, 232, 0.45)';
+              e.currentTarget.style.borderColor = 'rgba(90, 200, 250, 0.45)';
               e.currentTarget.style.transform = 'translateY(-1px)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.18)';
+              e.currentTarget.style.borderColor = 'rgba(var(--lp-fg), 0.18)';
               e.currentTarget.style.transform = 'translateY(0)';
             }}
           >
@@ -196,7 +199,7 @@ export default function LandingNavbar({ isFixed = true }) {
               position: 'fixed',
               inset: 0,
               zIndex: 58,
-              background: 'rgba(3, 8, 16, 0.55)',
+              background: 'rgba(var(--lp-card), 0.55)',
               backdropFilter: 'blur(8px)',
               WebkitBackdropFilter: 'blur(8px)',
               transition: 'opacity 0.2s ease',
@@ -212,12 +215,12 @@ export default function LandingNavbar({ isFixed = true }) {
               width: 'min(400px, calc(100vw - 24px))',
               maxHeight: 'calc(100vh - 84px)',
               zIndex: 59,
-              background: 'linear-gradient(180deg, rgba(7, 26, 51, 0.94) 0%, rgba(4, 14, 30, 0.98) 100%)',
+              background: 'linear-gradient(180deg, rgba(var(--lp-card), 0.94) 0%, rgba(var(--lp-card), 0.98) 100%)',
               backdropFilter: 'blur(36px) saturate(190%)',
               WebkitBackdropFilter: 'blur(36px) saturate(190%)',
-              border: '1px solid rgba(255, 255, 255, 0.12)',
+              border: '1px solid rgba(var(--lp-fg), 0.12)',
               borderRadius: '24px',
-              boxShadow: 'inset 0 1px 0 0 rgba(255, 255, 255, 0.2), 0 24px 60px rgba(0, 0, 0, 0.65)',
+              boxShadow: 'inset 0 1px 0 0 rgba(var(--lp-fg), 0.2), 0 24px 60px rgba(0, 0, 0, 0.65)',
               padding: '24px 20px',
               overflowY: 'auto',
               display: 'flex',
@@ -244,7 +247,7 @@ export default function LandingNavbar({ isFixed = true }) {
                     fontWeight: 700,
                     letterSpacing: '0.16em',
                     textTransform: 'uppercase',
-                    color: '#5FD4E8',
+                    color: '#5AC8FA',
                   }}
                 >
                   MAIN ROUTES & PLATFORM HUBS
@@ -255,7 +258,7 @@ export default function LandingNavbar({ isFixed = true }) {
                   style={{
                     background: 'none',
                     border: 'none',
-                    color: 'rgba(237, 234, 227, 0.6)',
+                    color: 'rgba(var(--lp-fg), 0.6)',
                     cursor: 'pointer',
                     padding: '2px',
                     display: 'flex',
@@ -281,10 +284,10 @@ export default function LandingNavbar({ isFixed = true }) {
                         width: '100%',
                         padding: '12px 16px',
                         borderRadius: '14px',
-                        background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.015) 100%)',
-                        border: '1px solid rgba(255, 255, 255, 0.08)',
-                        boxShadow: 'inset 0 1px 0 0 rgba(255, 255, 255, 0.1)',
-                        color: '#EDEAE3',
+                        background: 'linear-gradient(135deg, rgba(var(--lp-fg), 0.05) 0%, rgba(var(--lp-fg), 0.015) 100%)',
+                        border: '1px solid rgba(var(--lp-fg), 0.08)',
+                        boxShadow: 'inset 0 1px 0 0 rgba(var(--lp-fg), 0.1)',
+                        color: 'var(--lp-text)',
                         fontFamily: "'Manrope', sans-serif",
                         fontSize: '14px',
                         fontWeight: 600,
@@ -293,19 +296,19 @@ export default function LandingNavbar({ isFixed = true }) {
                         transition: 'all 0.2s ease',
                       }}
                       onMouseEnter={(e) => {
-                        e.currentTarget.style.borderColor = 'rgba(95, 212, 232, 0.4)';
-                        e.currentTarget.style.color = '#5FD4E8';
+                        e.currentTarget.style.borderColor = 'rgba(90, 200, 250, 0.4)';
+                        e.currentTarget.style.color = '#5AC8FA';
                       }}
                       onMouseLeave={(e) => {
-                        e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.08)';
-                        e.currentTarget.style.color = '#EDEAE3';
+                        e.currentTarget.style.borderColor = 'rgba(var(--lp-fg), 0.08)';
+                        e.currentTarget.style.color = 'var(--lp-text)';
                       }}
                     >
                       <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <Zap size={15} color="#5FD4E8" />
+                        <Zap size={15} color="#5AC8FA" />
                         <span>{item.label}</span>
                       </div>
-                      <ArrowRight size={13} color="#5FD4E8" />
+                      <ArrowRight size={13} color="#5AC8FA" />
                     </button>
                   );
                 }
@@ -325,15 +328,15 @@ export default function LandingNavbar({ isFixed = true }) {
                       padding: '12px 16px',
                       borderRadius: '14px',
                       background: pathname === item.to
-                        ? 'linear-gradient(135deg, rgba(14, 124, 134, 0.35) 0%, rgba(95, 212, 232, 0.1) 100%)'
-                        : 'linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.015) 100%)',
+                        ? 'linear-gradient(135deg, rgba(0, 122, 255, 0.35) 0%, rgba(90, 200, 250, 0.1) 100%)'
+                        : 'linear-gradient(135deg, rgba(var(--lp-fg), 0.05) 0%, rgba(var(--lp-fg), 0.015) 100%)',
                       border: pathname === item.to
-                        ? '1px solid rgba(95, 212, 232, 0.45)'
-                        : '1px solid rgba(255, 255, 255, 0.08)',
+                        ? '1px solid rgba(90, 200, 250, 0.45)'
+                        : '1px solid rgba(var(--lp-fg), 0.08)',
                       boxShadow: pathname === item.to
-                        ? 'inset 0 1px 0 0 rgba(255, 255, 255, 0.2), 0 4px 16px rgba(14, 124, 134, 0.25)'
-                        : 'inset 0 1px 0 0 rgba(255, 255, 255, 0.1)',
-                      color: pathname === item.to ? '#5FD4E8' : '#EDEAE3',
+                        ? 'inset 0 1px 0 0 rgba(var(--lp-fg), 0.2), 0 4px 16px rgba(0, 122, 255, 0.25)'
+                        : 'inset 0 1px 0 0 rgba(var(--lp-fg), 0.1)',
+                      color: pathname === item.to ? '#5AC8FA' : 'var(--lp-text)',
                       textDecoration: 'none',
                       fontFamily: "'Manrope', sans-serif",
                       fontSize: '14px',
@@ -342,29 +345,29 @@ export default function LandingNavbar({ isFixed = true }) {
                     }}
                     onMouseEnter={(e) => {
                       if (pathname !== item.to) {
-                        e.currentTarget.style.borderColor = 'rgba(95, 212, 232, 0.4)';
-                        e.currentTarget.style.color = '#5FD4E8';
+                        e.currentTarget.style.borderColor = 'rgba(90, 200, 250, 0.4)';
+                        e.currentTarget.style.color = '#5AC8FA';
                       }
                     }}
                     onMouseLeave={(e) => {
                       if (pathname !== item.to) {
-                        e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.08)';
-                        e.currentTarget.style.color = '#EDEAE3';
+                        e.currentTarget.style.borderColor = 'rgba(var(--lp-fg), 0.08)';
+                        e.currentTarget.style.color = 'var(--lp-text)';
                       }
                     }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                      <Icon size={15} color={pathname === item.to ? '#5FD4E8' : '#0E7C86'} />
+                      <Icon size={15} color={pathname === item.to ? '#5AC8FA' : '#007AFF'} />
                       <span>{item.label}</span>
                     </div>
-                    <ArrowRight size={13} color={pathname === item.to ? '#5FD4E8' : 'rgba(237, 234, 227, 0.4)'} />
+                    <ArrowRight size={13} color={pathname === item.to ? '#5AC8FA' : 'rgba(var(--lp-fg), 0.4)'} />
                   </Link>
                 );
               })}
             </div>
 
             {/* Bottom Actions */}
-            <div style={{ paddingTop: '16px', borderTop: '1px solid rgba(255, 255, 255, 0.08)', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <div style={{ paddingTop: '16px', borderTop: '1px solid rgba(var(--lp-fg), 0.08)', display: 'flex', flexDirection: 'column', gap: '10px' }}>
               <IridescentButton
                 to="/login"
                 size="md"
@@ -383,10 +386,10 @@ export default function LandingNavbar({ isFixed = true }) {
                   justifyContent: 'center',
                   padding: '11px',
                   borderRadius: '999px',
-                  background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%)',
-                  border: '1px solid rgba(255, 255, 255, 0.14)',
-                  boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.16)',
-                  color: '#EDEAE3',
+                  background: 'linear-gradient(180deg, rgba(var(--lp-fg), 0.08) 0%, rgba(var(--lp-fg), 0.02) 100%)',
+                  border: '1px solid rgba(var(--lp-fg), 0.14)',
+                  boxShadow: 'inset 0 1px 0 rgba(var(--lp-fg), 0.16)',
+                  color: 'var(--lp-text)',
                   fontFamily: "'Manrope', sans-serif",
                   fontSize: '13px',
                   fontWeight: 600,

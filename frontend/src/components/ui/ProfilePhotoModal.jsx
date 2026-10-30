@@ -113,7 +113,7 @@ export default function ProfilePhotoModal({
         {/* Top Header */}
         <div className="flex items-center justify-between">
           <div className="flex flex-col">
-            <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+            <span className="text-[10px] font-extrabold uppercase tracking-wider text-blue-600 dark:text-blue-400">
               Trader Profile
             </span>
             <h3 className="text-base font-bold text-neutral-900 dark:text-white truncate max-w-[220px]">
@@ -137,7 +137,7 @@ export default function ProfilePhotoModal({
         </div>
 
         {/* Big Avatar Image Frame */}
-        <div className="relative w-64 h-64 sm:w-72 sm:h-72 mx-auto rounded-3xl overflow-hidden bg-gradient-to-tr from-emerald-500/10 via-teal-500/10 to-indigo-500/10 border-2 border-emerald-500/30 shadow-[0_12px_32px_rgba(0,0,0,0.15)] flex items-center justify-center group">
+        <div className="relative w-64 h-64 sm:w-72 sm:h-72 mx-auto rounded-3xl overflow-hidden bg-gradient-to-tr from-blue-500/10 via-blue-500/10 to-blue-500/10 border-2 border-blue-500/30 shadow-[0_12px_32px_rgba(0,0,0,0.15)] flex items-center justify-center group">
           {currentAvatar ? (
             <img
               src={currentAvatar}
@@ -145,7 +145,7 @@ export default function ProfilePhotoModal({
               className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             />
           ) : (
-            <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-inner">
+            <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-inner">
               <span className="text-6xl font-black">{initialLetter}</span>
               <span className="text-xs font-semibold mt-2 opacity-80">No Photo Set</span>
             </div>

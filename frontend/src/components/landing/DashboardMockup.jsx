@@ -134,7 +134,7 @@ export default function DashboardMockup({ style = {}, className = '' }) {
         }}>
           <div style={{
             width: 32, height: 32, borderRadius: '10px',
-            background: 'linear-gradient(135deg, #10b981, #059669)',
+            background: 'linear-gradient(135deg, #007AFF, #0066D6)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             marginBottom: '12px',
           }}>
@@ -150,11 +150,11 @@ export default function DashboardMockup({ style = {}, className = '' }) {
           ].map(({ icon: Icon, active, color }, i) => (
             <div key={i} style={{
               width: 32, height: 32, borderRadius: '8px',
-              background: active ? 'rgba(16,185,129,0.15)' : 'transparent',
+              background: active ? 'rgba(0,122,255,0.15)' : 'transparent',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               cursor: 'pointer',
             }}>
-              <Icon size={13} color={active ? (color || '#10b981') : 'rgb(var(--l-fg) / 0.25)'} />
+              <Icon size={13} color={active ? (color || '#007AFF') : 'rgb(var(--l-fg) / 0.25)'} />
             </div>
           ))}
         </div>
@@ -168,8 +168,8 @@ export default function DashboardMockup({ style = {}, className = '' }) {
               <div style={{ fontSize: '9px', color: 'rgb(var(--l-fg) / calc(0.5 + var(--l-ta)))', marginTop: '1px' }}>October 2024 · London Session</div>
             </div>
             <div style={{
-              background: 'rgba(16,185,129,0.12)',
-              border: '1px solid rgba(16,185,129,0.25)',
+              background: 'rgba(0,122,255,0.12)',
+              border: '1px solid rgba(0,122,255,0.25)',
               borderRadius: '20px',
               padding: '3px 10px',
               fontSize: '9px',
@@ -244,8 +244,8 @@ export default function DashboardMockup({ style = {}, className = '' }) {
               </div>
               <div style={{
                 marginTop: '8px',
-                background: 'rgba(16,185,129,0.1)',
-                border: '1px solid rgba(16,185,129,0.2)',
+                background: 'rgba(0,122,255,0.1)',
+                border: '1px solid rgba(0,122,255,0.2)',
                 borderRadius: '6px',
                 padding: '5px 8px',
                 fontSize: '8px',

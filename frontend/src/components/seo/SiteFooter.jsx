@@ -52,9 +52,9 @@ export default function SiteFooter({ copyright = true }) {
   return (
     <footer
       style={{
-        borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-        background: '#04070B',
-        color: '#EDEAE3',
+        borderTop: '1px solid rgba(var(--lp-fg), 0.08)',
+        background: 'var(--lp-bg)',
+        color: 'var(--lp-text)',
         fontFamily: "'Manrope', sans-serif",
       }}
     >
@@ -68,7 +68,7 @@ export default function SiteFooter({ copyright = true }) {
                 fontWeight: 700,
                 letterSpacing: '0.14em',
                 textTransform: 'uppercase',
-                color: '#5FD4E8',
+                color: '#5AC8FA',
                 marginBottom: '18px',
               }}
             >
@@ -85,18 +85,18 @@ export default function SiteFooter({ copyright = true }) {
                       document.body.scrollTop = 0;
                     }}
                     style={{
-                      color: 'rgba(237, 234, 227, 0.7)',
+                      color: 'rgba(var(--lp-fg), 0.7)',
                       fontSize: '13px',
                       textDecoration: 'none',
                       transition: 'color 0.2s ease, transform 0.2s ease',
                       display: 'inline-block',
                     }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.color = '#5FD4E8';
+                      e.currentTarget.style.color = '#5AC8FA';
                       e.currentTarget.style.transform = 'translateX(2px)';
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.color = 'rgba(237, 234, 227, 0.7)';
+                      e.currentTarget.style.color = 'rgba(var(--lp-fg), 0.7)';
                       e.currentTarget.style.transform = 'translateX(0px)';
                     }}
                   >
@@ -111,11 +111,11 @@ export default function SiteFooter({ copyright = true }) {
       {copyright && (
         <div
           style={{
-            borderTop: '1px solid rgba(255, 255, 255, 0.05)',
+            borderTop: '1px solid rgba(var(--lp-fg), 0.05)',
             padding: '24px 20px',
             textAlign: 'center',
             fontSize: '12px',
-            color: 'rgba(237, 234, 227, 0.45)',
+            color: 'rgba(var(--lp-fg), 0.45)',
             fontFamily: "'JetBrains Mono', monospace",
           }}
         >

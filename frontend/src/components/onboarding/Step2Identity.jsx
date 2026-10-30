@@ -83,8 +83,8 @@ export default function Step2Identity({
       {/* ── RIGHT COLUMN: Form Controls ── */}
       <div className="lg:col-span-7 space-y-6 max-w-xl animate-in fade-in duration-300">
         <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 dark:bg-emerald-500/15 border border-emerald-500/25 text-xs font-mono font-bold uppercase tracking-widest text-emerald-600 dark:text-emerald-400 mb-3 shadow-sm">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 dark:bg-blue-500/15 border border-blue-500/25 text-xs font-mono font-bold uppercase tracking-widest text-blue-600 dark:text-blue-400 mb-3 shadow-sm">
+            <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
             <span>Step 02 • Identity</span>
           </div>
 
@@ -100,7 +100,7 @@ export default function Step2Identity({
         {/* Profile Photo Upload Row - macOS / iOS Frosted Glass UI */}
         <div className="p-4 sm:p-5 rounded-3xl bg-white/95 dark:bg-[#121622]/95 border border-black/[0.08] dark:border-white/[0.1] shadow-sm flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="relative w-14 h-14 rounded-2xl overflow-hidden bg-gradient-to-tr from-emerald-600 to-teal-500 border border-black/10 dark:border-white/10 flex items-center justify-center text-white font-bold shrink-0 shadow-md shadow-emerald-500/20">
+            <div className="relative w-14 h-14 rounded-2xl overflow-hidden bg-gradient-to-tr from-blue-600 to-blue-500 border border-black/10 dark:border-white/10 flex items-center justify-center text-white font-bold shrink-0 shadow-md shadow-blue-500/20">
               {avatarUrl ? (
                 <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
               ) : (
@@ -154,7 +154,7 @@ export default function Step2Identity({
               value={displayName}
               onChange={(e) => setDisplayName(e.target.value)}
               placeholder="e.g. Mayur Patil"
-              className="w-full h-12 px-4 rounded-2xl border border-black/[0.1] dark:border-white/[0.12] bg-white dark:bg-[#121622] text-neutral-900 dark:text-white text-sm font-semibold placeholder-neutral-400 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 shadow-sm transition-all"
+              className="w-full h-12 px-4 rounded-2xl border border-black/[0.1] dark:border-white/[0.12] bg-white dark:bg-[#121622] text-neutral-900 dark:text-white text-sm font-semibold placeholder-neutral-400 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 shadow-sm transition-all"
             />
           </div>
 
@@ -172,10 +172,10 @@ export default function Step2Identity({
                 value={username.replace(/^@/, "")}
                 onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ""))}
                 placeholder="mayurpatil"
-                className="w-full h-12 pl-9 pr-10 rounded-2xl border border-black/[0.1] dark:border-white/[0.12] bg-white dark:bg-[#121622] text-neutral-900 dark:text-white text-sm font-mono font-semibold placeholder-neutral-400 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 shadow-sm transition-all"
+                className="w-full h-12 pl-9 pr-10 rounded-2xl border border-black/[0.1] dark:border-white/[0.12] bg-white dark:bg-[#121622] text-neutral-900 dark:text-white text-sm font-mono font-semibold placeholder-neutral-400 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 shadow-sm transition-all"
               />
               {isUsernameValid && (
-                <Check className="absolute right-3.5 w-4 h-4 text-emerald-500 pointer-events-none stroke-[2.5]" />
+                <Check className="absolute right-3.5 w-4 h-4 text-blue-500 pointer-events-none stroke-[2.5]" />
               )}
             </div>
             <p className="mt-1.5 text-[11px] text-neutral-500 dark:text-neutral-400 font-mono font-medium">
@@ -199,7 +199,7 @@ export default function Step2Identity({
               value={bio}
               onChange={(e) => setBio(e.target.value)}
               placeholder="A few words on your trading style, edge, or story..."
-              className="w-full p-4 rounded-2xl border border-black/[0.1] dark:border-white/[0.12] bg-white dark:bg-[#121622] text-neutral-900 dark:text-white text-sm font-medium placeholder-neutral-400 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 shadow-sm transition-all resize-none leading-relaxed"
+              className="w-full p-4 rounded-2xl border border-black/[0.1] dark:border-white/[0.12] bg-white dark:bg-[#121622] text-neutral-900 dark:text-white text-sm font-medium placeholder-neutral-400 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 shadow-sm transition-all resize-none leading-relaxed"
             />
           </div>
         </div>

@@ -57,7 +57,7 @@ const SystemAnnouncementBanner = memo(function SystemAnnouncementBanner({
                 ? "bg-gradient-to-r from-red-600 to-rose-600 shadow-[0_4px_20px_rgba(239,68,68,0.35)] border-red-400/30 text-white ring-1 ring-white/20"
                 : isSuccess
                 ? "bg-gradient-to-r from-emerald-600 to-teal-600 shadow-[0_4px_20px_rgba(16,185,129,0.35)] border-emerald-400/30 text-white ring-1 ring-white/20"
-                : "bg-gradient-to-r from-blue-600 to-indigo-600 shadow-[0_4px_20px_rgba(59,130,246,0.35)] border-blue-400/30 text-white ring-1 ring-white/20"
+                : "bg-gradient-to-r from-blue-600 to-blue-600 shadow-[0_4px_20px_rgba(59,130,246,0.35)] border-blue-400/30 text-white ring-1 ring-white/20"
               : isWarning
               ? "bg-white text-rose-950 shadow-[0_6px_25px_rgba(239,68,68,0.14)] border-red-200 ring-1 ring-red-500/20"
               : isSuccess

@@ -877,11 +877,11 @@ export default function AddTrade() {
   ];
 
   const inputClass =
-    "w-full bg-white/70 dark:bg-white/[0.05] border border-black/10 dark:border-white/10 rounded-2xl px-4 py-3.5 text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-500 backdrop-blur-xl focus:border-emerald-500/60 focus:ring-2 focus:ring-emerald-500/20 outline-none text-[15px] transition-all";
+    "w-full bg-white/70 dark:bg-white/[0.05] border border-black/10 dark:border-white/10 rounded-2xl px-4 py-3.5 text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-500 backdrop-blur-xl focus:border-blue-500/60 focus:ring-2 focus:ring-blue-500/20 outline-none text-[15px] transition-all";
   const selectClass =
-    "appearance-none w-full bg-white/70 dark:bg-white/[0.05] border border-black/10 dark:border-white/10 rounded-2xl px-4 py-3.5 text-neutral-900 dark:text-white backdrop-blur-xl focus:border-emerald-500/60 focus:ring-2 focus:ring-emerald-500/20 outline-none text-[15px] transition-all pr-10 cursor-pointer";
+    "appearance-none w-full bg-white/70 dark:bg-white/[0.05] border border-black/10 dark:border-white/10 rounded-2xl px-4 py-3.5 text-neutral-900 dark:text-white backdrop-blur-xl focus:border-blue-500/60 focus:ring-2 focus:ring-blue-500/20 outline-none text-[15px] transition-all pr-10 cursor-pointer";
   const textareaClass =
-    "w-full min-h-[120px] bg-white/70 dark:bg-white/[0.05] border border-black/10 dark:border-white/10 rounded-2xl px-4 py-3.5 text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-500 backdrop-blur-xl focus:border-emerald-500/60 focus:ring-2 focus:ring-emerald-500/20 outline-none text-[15px] resize-y transition-all";
+    "w-full min-h-[120px] bg-white/70 dark:bg-white/[0.05] border border-black/10 dark:border-white/10 rounded-2xl px-4 py-3.5 text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-500 backdrop-blur-xl focus:border-blue-500/60 focus:ring-2 focus:ring-blue-500/20 outline-none text-[15px] resize-y transition-all";
   const labelClass =
     "text-[12px] font-semibold text-neutral-500 dark:text-neutral-400 mb-2 block uppercase tracking-wider";
 
@@ -891,7 +891,7 @@ export default function AddTrade() {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-2xl font-semibold text-white flex items-center gap-2">
-            <Target className="w-6 h-6 text-emerald-400" /> {isEditing ? "Edit Trade" : "Log Trade"}
+            <Target className="w-6 h-6 text-blue-400" /> {isEditing ? "Edit Trade" : "Log Trade"}
           </h1>
           <p className="text-sm text-gray-500 mt-1">
             {isEditing ? "Update your trade parameters and outcome." : "Capture your edge efficiently."}
@@ -909,7 +909,7 @@ export default function AddTrade() {
       <div className="flex items-center justify-between mb-10 relative">
         <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-[2px] bg-white/5 z-0"></div>
         <div
-          className="absolute left-0 top-1/2 -translate-y-1/2 h-[2px] bg-emerald-500 z-0 transition-all duration-300"
+          className="absolute left-0 top-1/2 -translate-y-1/2 h-[2px] bg-blue-500 z-0 transition-all duration-300"
           style={{ width: `${((step - 1) / 5) * 100}%` }}
         ></div>
 
@@ -919,12 +919,12 @@ export default function AddTrade() {
             className="relative z-10 flex flex-col items-center gap-2"
           >
             <div
-              className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-colors duration-300 ${step >= s.num ? "bg-emerald-500 text-white" : "bg-[#15181D] border border-white/10 text-gray-500"}`}
+              className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-colors duration-300 ${step >= s.num ? "bg-blue-500 text-white" : "bg-[#15181D] border border-white/10 text-gray-500"}`}
             >
               {step > s.num ? <Check className="w-4 h-4" /> : s.num}
             </div>
             <span
-              className={`text-[10px] uppercase tracking-widest absolute -bottom-6 whitespace-nowrap font-semibold ${step >= s.num ? "text-emerald-400" : "text-gray-600"}`}
+              className={`text-[10px] uppercase tracking-widest absolute -bottom-6 whitespace-nowrap font-semibold ${step >= s.num ? "text-blue-400" : "text-gray-600"}`}
             >
               {s.title}
             </span>
@@ -963,10 +963,10 @@ export default function AddTrade() {
               </h2>
 
               {/* ── ACCOUNT SELECTOR (above Asset/Pair) ── */}
-              <div className="bg-[#0A0B0D] border border-emerald-500/15 rounded-2xl p-5">
+              <div className="bg-[#0A0B0D] border border-blue-500/15 rounded-2xl p-5">
                 <div className="flex items-center gap-2 mb-4">
-                  <div className="p-1.5 bg-emerald-500/10 rounded-lg">
-                    <Briefcase className="w-4 h-4 text-emerald-400" />
+                  <div className="p-1.5 bg-blue-500/10 rounded-lg">
+                    <Briefcase className="w-4 h-4 text-blue-400" />
                   </div>
                   <label className="text-[13px] font-semibold text-white">
                     Trading Account <span className="text-red-400">*</span>
@@ -1002,7 +1002,7 @@ export default function AddTrade() {
                       <button
                         type="button"
                         onClick={() => setAccountInputMode("select")}
-                        className="mt-2 text-[11px] text-emerald-400 hover:text-emerald-300 transition-colors flex items-center gap-1"
+                        className="mt-2 text-[11px] text-blue-400 hover:text-blue-300 transition-colors flex items-center gap-1"
                       >
                         ← Back to existing accounts
                       </button>
@@ -1043,7 +1043,7 @@ export default function AddTrade() {
                         setAccountInputMode("new");
                         setNewAccountName("");
                       }}
-                      className="mt-3 flex items-center gap-1.5 text-[11px] font-semibold text-emerald-400 hover:text-emerald-300 transition-colors border border-emerald-500/20 px-3 py-1.5 rounded-lg bg-emerald-500/5 hover:bg-emerald-500/10"
+                      className="mt-3 flex items-center gap-1.5 text-[11px] font-semibold text-blue-400 hover:text-blue-300 transition-colors border border-blue-500/20 px-3 py-1.5 rounded-lg bg-blue-500/5 hover:bg-blue-500/10"
                     >
                       <Plus className="w-3 h-3" /> Add New Account
                     </button>
@@ -1271,7 +1271,7 @@ export default function AddTrade() {
                             TAKE PROFIT
                           </span>
                           <div className="w-full h-1 bg-emerald-500/50 rounded-r-full relative">
-                            <div className="w-2 h-2 rounded-full bg-emerald-400 absolute left-0 top-1/2 -translate-y-1/2"></div>
+                            <div className="w-2 h-2 rounded-full bg-blue-400 absolute left-0 top-1/2 -translate-y-1/2"></div>
                           </div>
                           <span className="text-xs text-gray-300 mt-1">
                             {formData.tp || "---"}
@@ -1285,7 +1285,7 @@ export default function AddTrade() {
                             TAKE PROFIT
                           </span>
                           <div className="w-full h-1 bg-emerald-500/50 rounded-l-full relative">
-                            <div className="w-2 h-2 rounded-full bg-emerald-400 absolute right-0 top-1/2 -translate-y-1/2"></div>
+                            <div className="w-2 h-2 rounded-full bg-blue-400 absolute right-0 top-1/2 -translate-y-1/2"></div>
                           </div>
                           <span className="text-xs text-gray-300 mt-1">
                             {formData.tp || "---"}
@@ -1385,7 +1385,7 @@ export default function AddTrade() {
                   <div className="flex items-center justify-between">
                     <label className="text-[12px] font-semibold text-gray-300 uppercase tracking-wider flex items-center gap-1.5">
                       <span>Lot Size</span>
-                      <span className="text-[10px] text-emerald-400 font-mono bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">
+                      <span className="text-[10px] text-blue-400 font-mono bg-blue-500/10 px-1.5 py-0.5 rounded border border-blue-500/20">
                         position
                       </span>
                     </label>
@@ -1441,7 +1441,7 @@ export default function AddTrade() {
                           }}
                           className={`px-2 py-1 text-[11px] rounded font-mono transition-colors border ${
                             isSelected
-                              ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/40 font-semibold"
+                              ? "bg-blue-500/20 text-blue-400 border-blue-500/40 font-semibold"
                               : "bg-white/5 text-gray-400 border-white/10 hover:bg-white/10 hover:text-white"
                           }`}
                         >
@@ -1457,11 +1457,11 @@ export default function AddTrade() {
                   <div className="flex items-center justify-between">
                     <label className="text-[12px] font-semibold text-neutral-700 dark:text-neutral-300 uppercase tracking-wider flex items-center gap-1.5">
                       <span>Risk %</span>
-                      <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-mono bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">
+                      <span className="text-[10px] text-blue-600 dark:text-blue-400 font-mono bg-blue-500/10 px-1.5 py-0.5 rounded border border-blue-500/20">
                         account risk
                       </span>
                     </label>
-                    <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-mono font-medium bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20">
+                    <span className="text-[11px] text-blue-600 dark:text-blue-400 font-mono font-medium bg-blue-500/10 px-2 py-0.5 rounded-md border border-blue-500/20">
                       of {formattedEquity} equity
                     </span>
                   </div>
@@ -1511,7 +1511,7 @@ export default function AddTrade() {
                           }}
                           className={`px-2 py-1 text-[11px] rounded-lg font-mono transition-colors border ${
                             isSelected
-                              ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/30 font-semibold"
+                              ? "bg-blue-500/15 text-blue-600 dark:text-blue-400 border-blue-500/30 font-semibold"
                               : "bg-black/5 dark:bg-white/5 text-neutral-500 dark:text-neutral-400 border-black/10 dark:border-white/10 hover:bg-black/10 dark:hover:bg-white/10 hover:text-neutral-900 dark:hover:text-white"
                           }`}
                         >
@@ -1527,7 +1527,7 @@ export default function AddTrade() {
               <div className="bg-[#121418] border border-white/10 rounded-2xl p-5 space-y-4">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3.5 border-b border-white/5">
                   <div className="flex items-center gap-2.5">
-                    <div className="p-2 bg-emerald-500/10 text-emerald-400 rounded-xl border border-emerald-500/20">
+                    <div className="p-2 bg-blue-500/10 text-blue-400 rounded-xl border border-blue-500/20">
                       <Calculator className="w-5 h-5" />
                     </div>
                     <div>
@@ -1535,7 +1535,7 @@ export default function AddTrade() {
                         <span className="text-sm font-bold text-white tracking-wide">
                           Lot Size & Risk Calculator
                         </span>
-                        <span className="text-[10px] text-emerald-400 font-mono bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                        <span className="text-[10px] text-blue-400 font-mono bg-blue-500/10 px-2 py-0.5 rounded-full border border-blue-500/20">
                           Live Engine
                         </span>
                       </div>
@@ -1556,7 +1556,7 @@ export default function AddTrade() {
 
                   <div className="flex items-center gap-2">
                     <span className="text-xs text-gray-400 font-mono">Current Equity:</span>
-                    <span className="text-xs font-bold text-emerald-400 font-mono bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20">
+                    <span className="text-xs font-bold text-blue-400 font-mono bg-blue-500/10 px-2.5 py-1 rounded-lg border border-blue-500/20">
                       {formattedEquity}
                     </span>
                   </div>
@@ -1577,7 +1577,7 @@ export default function AddTrade() {
                         title={preset.hint}
                         className={`px-2 py-1 text-[11px] rounded-lg font-mono transition-colors border cursor-pointer ${
                           isSelected
-                            ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/40 font-bold shadow-sm"
+                            ? "bg-blue-500/20 text-blue-400 border-blue-500/40 font-bold shadow-sm"
                             : "bg-white/5 text-gray-400 border-white/10 hover:bg-white/10 hover:text-white"
                         }`}
                       >
@@ -1604,7 +1604,7 @@ export default function AddTrade() {
                       <div className="flex items-center justify-between mb-2">
                         <label className="text-[12px] font-semibold text-gray-300 uppercase tracking-wider flex items-center gap-1.5">
                           <span>Account Equity</span>
-                          <span className="text-[10px] text-emerald-400 font-mono bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">
+                          <span className="text-[10px] text-blue-400 font-mono bg-blue-500/10 px-1.5 py-0.5 rounded border border-blue-500/20">
                             capital
                           </span>
                         </label>
@@ -1642,7 +1642,7 @@ export default function AddTrade() {
                               onClick={() => applyPresetBalance(preset)}
                               className={`px-2.5 py-1 text-[11px] rounded font-mono transition-colors border ${
                                 isSelected
-                                  ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/40 font-bold"
+                                  ? "bg-blue-500/20 text-blue-400 border-blue-500/40 font-bold"
                                   : "bg-white/5 text-gray-400 border-white/10 hover:bg-white/10 hover:text-white"
                               }`}
                             >
@@ -1679,9 +1679,9 @@ export default function AddTrade() {
                     <div className="bg-[#15181D]/60 rounded-2xl p-4 border border-white/5 flex flex-col justify-between">
                       <div className="flex items-center justify-between">
                         <p className="text-[11px] text-gray-400 uppercase tracking-wider font-semibold">Target Lot</p>
-                        <span className="text-[10px] text-emerald-400/80 font-mono">position</span>
+                        <span className="text-[10px] text-blue-400/80 font-mono">position</span>
                       </div>
-                      <p className="text-base sm:text-lg font-bold text-emerald-400 font-mono mt-2">
+                      <p className="text-base sm:text-lg font-bold text-blue-400 font-mono mt-2">
                         {formData.lotSize ? `${formData.lotSize} lots` : "—"}
                       </p>
                     </div>
@@ -1691,7 +1691,7 @@ export default function AddTrade() {
                         <p className="text-[11px] text-neutral-500 dark:text-neutral-400 uppercase tracking-wider font-semibold">Account Risk %</p>
                         <span className="text-[10px] text-neutral-400 font-mono">of equity</span>
                       </div>
-                      <p className="text-base sm:text-lg font-bold text-emerald-600 dark:text-emerald-400 font-mono mt-2">
+                      <p className="text-base sm:text-lg font-bold text-blue-600 dark:text-blue-400 font-mono mt-2">
                         {formData.risk ? `${Number(formData.risk).toFixed(2)}%` : "—"}
                       </p>
                     </div>
@@ -1950,7 +1950,7 @@ export default function AddTrade() {
                               }
                               className={`px-2.5 py-1 text-[11px] rounded-lg font-mono transition-colors border cursor-pointer ${
                                 formData.rMultiple === String(calcRR)
-                                  ? "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-500/40 font-bold"
+                                  ? "bg-blue-500/20 text-blue-600 dark:text-blue-400 border-blue-500/40 font-bold"
                                   : "bg-black/[0.04] dark:bg-white/[0.05] text-neutral-600 dark:text-neutral-300 border-black/[0.06] dark:border-white/10 hover:bg-black/[0.08] dark:hover:bg-white/10"
                               }`}
                             >
@@ -1968,7 +1968,7 @@ export default function AddTrade() {
                             }
                             className={`px-2.5 py-1 text-[11px] rounded-lg font-mono transition-colors border cursor-pointer ${
                               formData.rMultiple === "1.00"
-                                ? "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-500/40 font-bold"
+                                ? "bg-blue-500/20 text-blue-600 dark:text-blue-400 border-blue-500/40 font-bold"
                                 : "bg-black/[0.04] dark:bg-white/[0.05] text-neutral-600 dark:text-neutral-300 border-black/[0.06] dark:border-white/10 hover:bg-black/[0.08] dark:hover:bg-white/10"
                             }`}
                           >
@@ -1985,7 +1985,7 @@ export default function AddTrade() {
                             }
                             className={`px-2.5 py-1 text-[11px] rounded-lg font-mono transition-colors border cursor-pointer ${
                               formData.rMultiple === "2.00"
-                                ? "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-500/40 font-bold"
+                                ? "bg-blue-500/20 text-blue-600 dark:text-blue-400 border-blue-500/40 font-bold"
                                 : "bg-black/[0.04] dark:bg-white/[0.05] text-neutral-600 dark:text-neutral-300 border-black/[0.06] dark:border-white/10 hover:bg-black/[0.08] dark:hover:bg-white/10"
                             }`}
                           >
@@ -2002,7 +2002,7 @@ export default function AddTrade() {
                             }
                             className={`px-2.5 py-1 text-[11px] rounded-lg font-mono transition-colors border cursor-pointer ${
                               formData.rMultiple === "3.00"
-                                ? "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-500/40 font-bold"
+                                ? "bg-blue-500/20 text-blue-600 dark:text-blue-400 border-blue-500/40 font-bold"
                                 : "bg-black/[0.04] dark:bg-white/[0.05] text-neutral-600 dark:text-neutral-300 border-black/[0.06] dark:border-white/10 hover:bg-black/[0.08] dark:hover:bg-white/10"
                             }`}
                           >
@@ -2161,7 +2161,7 @@ export default function AddTrade() {
                       onClick={() =>
                         setFormData({ ...formData, ruleBreak: "no" })
                       }
-                      className={`flex-1 py-3.5 rounded-2xl font-bold text-sm transition-all duration-200 border cursor-pointer ${formData.ruleBreak === "no" ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-600 dark:text-emerald-400 shadow-sm" : "bg-white/60 dark:bg-white/[0.05] border-black/10 dark:border-white/10 text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"}`}
+                      className={`flex-1 py-3.5 rounded-2xl font-bold text-sm transition-all duration-200 border cursor-pointer ${formData.ruleBreak === "no" ? "bg-blue-500/15 border-blue-500/40 text-blue-600 dark:text-blue-400 shadow-sm" : "bg-white/60 dark:bg-white/[0.05] border-black/10 dark:border-white/10 text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"}`}
                     >
                       Followed Plan
                     </button>
@@ -2184,8 +2184,8 @@ export default function AddTrade() {
           {step === 4 && (
             <div className="space-y-6 animate-in fade-in slide-in-from-right-4">
               <div className="flex items-center gap-3 mb-6">
-                <div className="p-2.5 bg-emerald-500/10 rounded-2xl border border-emerald-500/20">
-                  <Brain className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                <div className="p-2.5 bg-blue-500/10 rounded-2xl border border-blue-500/20">
+                  <Brain className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                 </div>
                 <h2 className="text-xl font-bold text-neutral-900 dark:text-white">
                   Psychology Tracker
@@ -2304,14 +2304,14 @@ export default function AddTrade() {
                   (label, idx) => (
                     <label
                       key={idx}
-                      className="border-2 border-dashed border-white/10 rounded-2xl p-8 flex flex-col items-center justify-center text-center hover:bg-white/5 hover:border-emerald-500/50 transition-all cursor-pointer group min-h-[200px] bg-[#15181D]"
+                      className="border-2 border-dashed border-white/10 rounded-2xl p-8 flex flex-col items-center justify-center text-center hover:bg-white/5 hover:border-blue-500/50 transition-all cursor-pointer group min-h-[200px] bg-[#15181D]"
                     >
                       {images[idx] ? (
                         <>
-                          <div className="w-14 h-14 rounded-full bg-emerald-500/10 flex items-center justify-center mb-4 border border-emerald-500/20">
-                            <CheckCircle className="w-6 h-6 text-emerald-400" />
+                          <div className="w-14 h-14 rounded-full bg-blue-500/10 flex items-center justify-center mb-4 border border-blue-500/20">
+                            <CheckCircle className="w-6 h-6 text-blue-400" />
                           </div>
-                          <p className="text-sm font-semibold text-emerald-400 truncate w-full px-4">
+                          <p className="text-sm font-semibold text-blue-400 truncate w-full px-4">
                             {images[idx].name}
                           </p>
                           <p className="text-xs text-gray-500 mt-2">
@@ -2320,8 +2320,8 @@ export default function AddTrade() {
                         </>
                       ) : (
                         <>
-                          <div className="w-14 h-14 rounded-full bg-emerald-500/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                            <UploadCloud className="w-6 h-6 text-emerald-400" />
+                          <div className="w-14 h-14 rounded-full bg-blue-500/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                            <UploadCloud className="w-6 h-6 text-blue-400" />
                           </div>
                           <p className="text-sm font-semibold text-gray-300 mb-1">
                             {label}
@@ -2367,7 +2367,7 @@ export default function AddTrade() {
               <button
                 type="submit"
                 disabled={isSubmitting || (!isEditing && (!images[0] || !images[1]))}
-                className="min-w-[150px] px-8 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white font-bold text-sm transition-all shadow-lg shadow-emerald-500/30 flex items-center justify-center gap-2 disabled:opacity-50 disabled:hover:bg-emerald-500 disabled:cursor-not-allowed cursor-pointer shrink-0"
+                className="min-w-[150px] px-8 py-3 rounded-xl bg-blue-500 hover:bg-blue-400 text-white font-bold text-sm transition-all shadow-lg shadow-blue-500/30 flex items-center justify-center gap-2 disabled:opacity-50 disabled:hover:bg-blue-500 disabled:cursor-not-allowed cursor-pointer shrink-0"
               >
                 {isSubmitting ? (
                   <>

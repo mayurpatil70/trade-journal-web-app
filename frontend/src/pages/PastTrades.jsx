@@ -830,8 +830,8 @@ export default function PastTrades() {
             <span
               className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[11px] font-semibold border ${
                 t.source === "MT5" || t.source === "mt5_auto"
-                  ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20"
-                  : "bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20"
+                  ? "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20"
+                  : "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20"
               }`}
             >
               {t.source === "MT5" || t.source === "mt5_auto" ? (
@@ -1557,7 +1557,7 @@ export default function PastTrades() {
                                 date: t.date,
                               });
                             }}
-                            className="w-7 h-7 sm:w-6 sm:h-6 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center transition-colors cursor-pointer"
+                            className="w-7 h-7 sm:w-6 sm:h-6 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center transition-colors cursor-pointer"
                             title="Share Trade to Chat"
                           >
                             <MessageCircle className="w-3.5 h-3.5" />
@@ -1693,19 +1693,19 @@ export default function PastTrades() {
                             {/* Psychology, Emotion & Rules */}
                             <div className="bg-white dark:bg-[#121622] rounded-2xl border border-black/[0.06] dark:border-white/[0.08] p-4 shadow-xs">
                               <h5 className="text-[11px] font-extrabold uppercase tracking-wider text-neutral-500 dark:text-neutral-400 mb-2 flex items-center gap-1.5">
-                                <Brain className="w-3.5 h-3.5 text-purple-500" />
+                                <Brain className="w-3.5 h-3.5 text-blue-500" />
                                 <span>Psychology & Discipline</span>
                               </h5>
                               <div className="space-y-2 text-xs">
                                 <div className="flex items-center gap-2">
                                   <span className="text-[10px] uppercase font-bold text-neutral-400">Mindset:</span>
-                                  <span className="px-2.5 py-0.5 rounded-md bg-purple-500/10 text-purple-600 dark:text-purple-400 font-bold text-[11px]">
+                                  <span className="px-2.5 py-0.5 rounded-md bg-blue-500/10 text-blue-600 dark:text-blue-400 font-bold text-[11px]">
                                     {t.emotion_before || t.emotion || t.psych_note || "Disciplined"}
                                   </span>
                                   {t.emotion_after && (
                                     <>
                                       <span className="text-neutral-400">→</span>
-                                      <span className="px-2.5 py-0.5 rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold text-[11px]">
+                                      <span className="px-2.5 py-0.5 rounded-md bg-blue-500/10 text-blue-600 dark:text-blue-400 font-bold text-[11px]">
                                         {t.emotion_after}
                                       </span>
                                     </>
@@ -1730,7 +1730,7 @@ export default function PastTrades() {
                           {/* 3. BEFORE & AFTER CHARTS (Interactive & Viewable Lightbox) */}
                           <div>
                             <h5 className="text-[11px] font-extrabold uppercase tracking-wider text-neutral-500 dark:text-neutral-400 mb-3 flex items-center gap-1.5">
-                              <ImageIcon className="w-3.5 h-3.5 text-emerald-500" />
+                              <ImageIcon className="w-3.5 h-3.5 text-blue-500" />
                               <span>Before & After Chart Analysis (Click photo to enlarge)</span>
                             </h5>
 
@@ -2187,7 +2187,7 @@ export default function PastTrades() {
                     </p>
                   </div>
                   <div className="p-4 rounded-2xl bg-neutral-50 dark:bg-white/[0.04] border border-black/10 dark:border-white/10 shadow-xs">
-                    <h3 className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest mb-2 flex items-center gap-1.5">
+                    <h3 className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-2 flex items-center gap-1.5">
                       <TrendingUp className="w-3.5 h-3.5" /> Key Lesson
                     </h3>
                     <p className="text-xs sm:text-sm text-neutral-900 dark:text-neutral-100 font-medium leading-relaxed whitespace-pre-wrap">
@@ -2197,7 +2197,7 @@ export default function PastTrades() {
                 </div>
 
                 <div className="p-5 rounded-2xl bg-neutral-50 dark:bg-white/[0.04] border border-black/10 dark:border-white/10 shadow-xs flex flex-col">
-                  <h3 className="text-xs font-bold text-purple-600 dark:text-purple-400 uppercase tracking-widest mb-3 flex items-center gap-1.5">
+                  <h3 className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-3 flex items-center gap-1.5">
                     <Clock className="w-3.5 h-3.5" /> Psychology & Timing
                   </h3>
                   <div className="flex items-center gap-3 mb-4 pb-3 border-b border-black/[0.05] dark:border-white/[0.06]">
@@ -2331,7 +2331,7 @@ export default function PastTrades() {
       {/* ── BULK TOAST FEEDBACK ── */}
       {bulkToast && (
         <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 text-xs font-bold px-4 py-2 rounded-2xl shadow-2xl flex items-center gap-2 animate-in fade-in slide-in-from-bottom-2 duration-150">
-          <Check className="w-3.5 h-3.5 text-emerald-500" />
+          <Check className="w-3.5 h-3.5 text-blue-500" />
           <span>{bulkToast}</span>
         </div>
       )}

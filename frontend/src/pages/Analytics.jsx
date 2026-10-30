@@ -35,7 +35,7 @@ export default function Analytics() {
   if (loading) {
     return (
       <div className="flex h-full items-center justify-center p-12">
-        <Loader2 className="w-8 h-8 text-emerald-400 animate-spin" />
+        <Loader2 className="w-8 h-8 text-blue-400 animate-spin" />
       </div>
     );
   }
@@ -99,11 +99,11 @@ export default function Analytics() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10 md:pr-28">
         <div>
           <h1 className="text-2xl font-semibold text-white flex items-center gap-3">
-            <Activity className="w-6 h-6 text-emerald-400" /> Strategy Analytics
+            <Activity className="w-6 h-6 text-blue-400" /> Strategy Analytics
           </h1>
           <p className="text-gray-500 mt-1 text-[13px]">
             Discover your statistical edge based on actual execution data.
-            {selectedAccount && <span className="ml-2 text-emerald-400 font-medium">· {selectedAccount}</span>}
+            {selectedAccount && <span className="ml-2 text-blue-400 font-medium">· {selectedAccount}</span>}
           </p>
         </div>
         <AccountFilter
@@ -134,16 +134,16 @@ export default function Analytics() {
                 <p className="text-xs text-emerald-400 mt-2 font-semibold">Over {totalTrades} executions</p>
              </div>
              <div className="bg-[#101216] border border-white/5 rounded-2xl p-6 relative overflow-hidden">
-                <div className="absolute top-0 right-0 p-6 opacity-10"><Zap className="w-16 h-16 text-emerald-400" /></div>
+                <div className="absolute top-0 right-0 p-6 opacity-10"><Zap className="w-16 h-16 text-blue-400" /></div>
                 <h3 className="text-[11px] font-bold text-gray-500 uppercase tracking-widest mb-1">Best Setup (by R)</h3>
                 <p className="text-xl font-bold text-white mt-1 truncate">{setupArray[0]?.name || "N/A"}</p>
-                <p className="text-xs text-emerald-400 mt-2 font-semibold">{setupArray[0] ? `+${setupArray[0].netR.toFixed(2)}R` : "0R"}</p>
+                <p className="text-xs text-blue-400 mt-2 font-semibold">{setupArray[0] ? `+${setupArray[0].netR.toFixed(2)}R` : "0R"}</p>
              </div>
              <div className="bg-[#101216] border border-white/5 rounded-2xl p-6 relative overflow-hidden">
-                <div className="absolute top-0 right-0 p-6 opacity-10"><Clock className="w-16 h-16 text-purple-400" /></div>
+                <div className="absolute top-0 right-0 p-6 opacity-10"><Clock className="w-16 h-16 text-blue-400" /></div>
                 <h3 className="text-[11px] font-bold text-gray-500 uppercase tracking-widest mb-1">Best Session</h3>
                 <p className="text-xl font-bold text-white mt-1 truncate">{sessionArray[0]?.name || "N/A"}</p>
-                <p className="text-xs text-purple-400 mt-2 font-semibold">{sessionArray[0] ? `+${sessionArray[0].netR.toFixed(2)}R` : "0R"}</p>
+                <p className="text-xs text-blue-400 mt-2 font-semibold">{sessionArray[0] ? `+${sessionArray[0].netR.toFixed(2)}R` : "0R"}</p>
              </div>
           </div>
 
@@ -151,7 +151,7 @@ export default function Analytics() {
              {/* Setups Table */}
              <div className="bg-[#101216] border border-white/5 rounded-2xl shadow-xl overflow-hidden">
                 <div className="p-5 border-b border-white/5 bg-[#0A0B0D]">
-                   <h2 className="text-sm font-semibold text-white flex items-center gap-2"><Zap className="w-4 h-4 text-emerald-400" /> Edge by Setup</h2>
+                   <h2 className="text-sm font-semibold text-white flex items-center gap-2"><Zap className="w-4 h-4 text-blue-400" /> Edge by Setup</h2>
                 </div>
                 <div className="p-5">
                    {setupArray.length === 0 ? <p className="text-sm text-gray-500">No setups logged.</p> : (
@@ -176,7 +176,7 @@ export default function Analytics() {
              {/* Sessions Table */}
              <div className="bg-[#101216] border border-white/5 rounded-2xl shadow-xl overflow-hidden">
                 <div className="p-5 border-b border-white/5 bg-[#0A0B0D]">
-                   <h2 className="text-sm font-semibold text-white flex items-center gap-2"><Compass className="w-4 h-4 text-purple-400" /> Edge by Session</h2>
+                   <h2 className="text-sm font-semibold text-white flex items-center gap-2"><Compass className="w-4 h-4 text-blue-400" /> Edge by Session</h2>
                 </div>
                 <div className="p-5">
                    {sessionArray.length === 0 ? <p className="text-sm text-gray-500">No sessions logged.</p> : (

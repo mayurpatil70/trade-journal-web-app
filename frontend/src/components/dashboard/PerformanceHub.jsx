@@ -167,7 +167,7 @@ export function BacktestSummary({ live }) {
     <div className="mac-bento-card rounded-3xl p-6">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-[15px] font-bold text-neutral-900 dark:text-white">Backtesting</h2>
-        <Link to="/sessions" className="text-[12px] font-semibold text-emerald-600 dark:text-emerald-400 hover:underline">Open sessions</Link>
+        <Link to="/sessions" className="text-[12px] font-semibold text-blue-600 dark:text-blue-400 hover:underline">Open sessions</Link>
       </div>
       {!s.n ? (
         <p className="text-sm text-neutral-400 dark:text-neutral-500">No saved backtest trades yet. Replay a market in Sessions to compare practice with live results.</p>
