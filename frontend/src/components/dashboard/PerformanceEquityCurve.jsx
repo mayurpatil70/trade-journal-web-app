@@ -429,7 +429,7 @@ export default function PerformanceEquityCurve({ trades = [] }) {
   }, [filteredTrades, equityData]);
 
   return (
-    <div className="rounded-3xl p-6 bg-white dark:bg-[#121622] border border-black/[0.06] dark:border-white/[0.08] shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] flex flex-col justify-between h-full relative">
+    <div className="rounded-3xl p-6 bg-white dark:bg-[#121622] border border-black/[0.06] dark:border-white/[0.08] shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] flex flex-col justify-between h-full relative fn-card-hover">
       {/* ── CARD HEADER (TradeFXBook style: Performance title + Mode Switcher + Timeframe Tabs) ── */}
       <div className="flex items-start justify-between mb-4 flex-wrap gap-3">
         <div>

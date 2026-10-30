@@ -1,12 +1,13 @@
 // frontend/src/components/dashboard/SocialFollowCard.jsx
 import React, { useState, useEffect } from "react";
-import { X, Sparkles, ExternalLink } from "lucide-react";
+import { X } from "lucide-react";
 import BrandLogo from "../BrandLogo";
 
-export default function SocialFollowCard({ className = "" }) {
+export default function SocialFollowCard({ className = "", enabled = true }) {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
+    if (!enabled) return;
     try {
       const isPermanentlyDismissed = localStorage.getItem("fn_hide_social_card") === "true";
       const isSessionDismissed = sessionStorage.getItem("fn_session_hide_social_card") === "true";
@@ -17,7 +18,7 @@ export default function SocialFollowCard({ className = "" }) {
     } catch (e) {
       setIsVisible(true);
     }
-  }, []);
+  }, [enabled]);
 
   const handleClose = () => {
     try {
@@ -33,18 +34,18 @@ export default function SocialFollowCard({ className = "" }) {
     setIsVisible(false);
   };
 
-  if (!isVisible) return null;
+  if (!enabled || !isVisible) return null;
 
   return (
     <div
       aria-label="Follow ForexNotes Socials"
-      className={`fixed bottom-[140px] sm:bottom-[152px] right-4 sm:right-6 z-40 w-[300px] rounded-2xl bg-white dark:bg-[#121622] border border-black/[0.08] dark:border-white/[0.1] shadow-[0_16px_40px_rgba(0,0,0,0.14)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.5)] p-4 overflow-hidden select-none animate-in fade-in slide-in-from-bottom-4 duration-300 ${className}`}
+      className={`fixed bottom-[76px] left-4 md:left-[276px] z-40 w-[248px] rounded-2xl bg-white dark:bg-[#121622] border border-black/[0.08] dark:border-white/[0.1] shadow-[0_16px_40px_rgba(0,0,0,0.14)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.5)] p-3.5 overflow-hidden select-none animate-in fade-in slide-in-from-bottom-4 duration-300 ${className}`}
     >
       {/* Background Grid Pattern & Stylized Upward Diagonal Arrow */}
       <div className="absolute inset-0 pointer-events-none opacity-[0.035] dark:opacity-[0.06] bg-[radial-gradient(#0066FF_1px,transparent_1px)] [background-size:12px_12px]" />
 
       <svg
-        className="absolute right-2 top-8 w-28 h-28 pointer-events-none opacity-20 dark:opacity-25"
+        className="absolute right-2 top-6 w-20 h-20 pointer-events-none opacity-20 dark:opacity-25"
         viewBox="0 0 100 100"
         fill="none"
       >
@@ -77,15 +78,14 @@ export default function SocialFollowCard({ className = "" }) {
       </div>
 
       {/* Headline & Community Tag */}
-      <div className="relative z-10 my-2">
-        <h4 className="text-[17px] font-black tracking-tight text-neutral-900 dark:text-white leading-[1.2]">
-          Follow us <br />
-          on our Socials
+      <div className="relative z-10 my-1.5">
+        <h4 className="text-sm font-bold tracking-tight text-neutral-900 dark:text-white">
+          Follow us on our socials
         </h4>
       </div>
 
       {/* Action Buttons: Instagram, Twitter / X, and Discord Server */}
-      <div className="relative z-10 space-y-2 mt-3">
+      <div className="relative z-10 space-y-2 mt-2.5">
         {/* Row 1: Instagram & Twitter / X */}
         <div className="grid grid-cols-2 gap-2">
           {/* Instagram Gradient Button */}
@@ -93,7 +93,7 @@ export default function SocialFollowCard({ className = "" }) {
             href="https://www.instagram.com/forexnotes.in"
             target="_blank"
             rel="noopener noreferrer"
-            className="h-9 px-3 rounded-xl bg-gradient-to-r from-[#F58529] via-[#DD2A7B] to-[#8134AF] hover:opacity-95 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition-all"
+            className="h-8 px-2 rounded-xl bg-gradient-to-r from-[#F58529] via-[#DD2A7B] to-[#8134AF] hover:opacity-95 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition-all"
             style={{ color: "#FFFFFF" }}
           >
             <svg className="w-3.5 h-3.5 fill-white" viewBox="0 0 24 24">
@@ -107,7 +107,7 @@ export default function SocialFollowCard({ className = "" }) {
             href="https://x.com/forexnotes"
             target="_blank"
             rel="noopener noreferrer"
-            className="btn-dark-social h-9 px-3 rounded-xl hover:opacity-90 font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition-all border border-neutral-700/30 cursor-pointer"
+            className="btn-dark-social h-8 px-2 rounded-xl hover:opacity-90 font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition-all border border-neutral-700/30 cursor-pointer"
             style={{ backgroundColor: "#0F172A", color: "#FFFFFF" }}
           >
             <svg className="w-3 h-3 fill-white" viewBox="0 0 24 24">
@@ -122,7 +122,7 @@ export default function SocialFollowCard({ className = "" }) {
           href="https://discord.gg/Ajaw3AjfWE"
           target="_blank"
           rel="noopener noreferrer"
-          className="w-full h-10 px-3 rounded-xl hover:opacity-95 font-bold text-xs flex items-center justify-between shadow-sm active:scale-98 transition-all border border-[#5865F2]/30 cursor-pointer"
+          className="w-full h-9 px-3 rounded-xl hover:opacity-95 font-bold text-xs flex items-center justify-between shadow-sm active:scale-98 transition-all border border-[#5865F2]/30 cursor-pointer"
           style={{ backgroundColor: "#5865F2", color: "#FFFFFF" }}
         >
           <div className="flex items-center gap-2">
@@ -139,7 +139,7 @@ export default function SocialFollowCard({ className = "" }) {
       </div>
 
       {/* Do Not Show Again Link */}
-      <div className="relative z-10 text-center mt-3 pt-1 border-t border-black/[0.04] dark:border-white/[0.04]">
+      <div className="relative z-10 text-center mt-2.5 pt-1 border-t border-black/[0.04] dark:border-white/[0.04]">
         <button
           type="button"
           onClick={handleDoNotShowAgain}
