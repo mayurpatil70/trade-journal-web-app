@@ -28,6 +28,8 @@ export default function Onboarding() {
     return userEmail ? userEmail.split("@")[0].replace(/[._]/g, " ") : "Trader";
   });
   const [username, setUsername] = useState(() => {
+    const registered = localStorage.getItem("fn_username");
+    if (registered) return registered;
     return userEmail ? userEmail.split("@")[0].replace(/[^a-z0-9_]/gi, "").toLowerCase() : "trader";
   });
   const [bio, setBio] = useState("");

@@ -1,8 +1,9 @@
 // frontend/src/pages/Verify.jsx
 import { useEffect, useState, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import api, { saveSession, getDeviceId } from "../api/axios";
-import { Loader2, CheckCircle, AlertTriangle, ArrowRight } from "lucide-react";
+import api, { getDeviceId } from "../api/axios";
+import { completeSignIn } from "../lib/authFlow";
+import { CheckCircle, AlertTriangle, ArrowRight } from "lucide-react";
 import Logo3DLoader from "../components/Logo3DLoader";
 
 export default function Verify() {
@@ -33,51 +34,9 @@ export default function Verify() {
         // 2. Send token, email, and device identifier to backend
         const response = await api.post("/api/auth/verify", { token, email, deviceId });
 
-        const userId =
-          response.data.userId || response.data.user?.id || response.data.id;
-        const authToken = response.data.authToken;
-        const sessionId = response.data.sessionId;
-        const discordVerified = response.data.discordVerified;
-        const hasPaid = response.data.hasPaid; // Extracted from backend response
-
-        // Save session with persistent multi-device session caching
-        saveSession({ userId, token: authToken, email, sessionId, deviceId });
-
-        // Distinguish returning user from fresh signup:
-        // Returning users signing in through magic link MUST NOT have fn_new_signup set,
-        // and should have IB popup permanently dismissed so it never shows again.
-        const onboardingCompleted =
-          localStorage.getItem(`onboarding_completed_${userId}`) === "true" ||
-          localStorage.getItem("onboarding_completed") === "true";
-
-        if (onboardingCompleted) {
-          // Returning user: ensure IB promo popup is permanently marked as dismissed
-          localStorage.removeItem("fn_new_signup");
-          localStorage.setItem(`fn_ib_popup_dismissed_${userId}`, "true");
-          localStorage.setItem("winpro_ib_dismissed", "true");
-          localStorage.setItem(`fn_dashboard_visited_${userId}`, "true");
-        } else {
-          // Brand new user who has yet to finish onboarding
-          localStorage.removeItem("fn_new_signup");
-        }
-
+        const next = completeSignIn(response.data, { email, deviceId });
         setStatus("success");
-
-        // 3. Smart Redirect: Discord (optional) -> Paywall -> Dashboard
-        const discordSkipped = localStorage.getItem("discord_skipped") === "true";
-        setTimeout(() => {
-          if (!discordVerified && !discordSkipped) {
-            navigate("/link-discord");
-          } else if (!hasPaid) {
-            navigate("/paywall");
-          } else {
-            if (!onboardingCompleted) {
-              navigate("/onboarding");
-            } else {
-              navigate("/dashboard");
-            }
-          }
-        }, 1500);
+        setTimeout(() => navigate(next), 1500);
       } catch (error) {
         setStatus("error");
         setErrorMsg(

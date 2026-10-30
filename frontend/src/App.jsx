@@ -95,6 +95,12 @@ const MarketHours = safeLazy(
   "market-hours",
 );
 const Tools = safeLazy(() => import("./pages/Tools.jsx"), "tools");
+const LoungeShell = safeLazy(() => import("./pages/lounge/LoungeShell.jsx"), "lounge");
+const LoungeLeaderboard = safeLazy(() => import("./pages/lounge/LoungeLeaderboard.jsx"), "lounge-leaderboard");
+const LoungeFeed = safeLazy(() => import("./pages/lounge/LoungeFeed.jsx"), "lounge-feed");
+const LoungeMessages = safeLazy(() => import("./pages/lounge/LoungeMessages.jsx"), "lounge-messages");
+const LoungeDeals = safeLazy(() => import("./pages/lounge/LoungeDeals.jsx"), "lounge-deals");
+const TraderProfile = safeLazy(() => import("./pages/lounge/TraderProfile.jsx"), "lounge-trader");
 
 // Heavy / Secondary Pages (Prefetched on hover and idle)
 const Charts = safeLazy(() => import("./pages/Charts.jsx"), "charts");
@@ -192,6 +198,7 @@ registerRoutePrefetch(
   () => import("./pages/TraderProblems/PropFirm.jsx"),
 );
 registerRoutePrefetch("/tools", () => import("./pages/Tools.jsx"));
+registerRoutePrefetch("/lounge", () => import("./pages/lounge/LoungeShell.jsx"));
 registerRoutePrefetch("/profile", () => import("./pages/Profile.jsx"));
 
 const INDEXABLE_PATHS = ["/", "/privacy"];
@@ -387,6 +394,8 @@ const RouteWatcher = () => {
       "/tools",
       "/calculator",
       "/bot-hub",
+      "/lounge",
+      "/messages",
     ];
 
     if (appRoutes.some((route) => pathname.startsWith(route))) {
@@ -499,6 +508,15 @@ function App() {
                   <Route path="prop-firm" element={<PropFirm />} />
                   <Route path="market-hours" element={<MarketHours />} />
                   <Route path="tools/market-hours" element={<MarketHours />} />
+
+                  <Route path="lounge" element={<LoungeShell />}>
+                    <Route index element={<LoungeLeaderboard />} />
+                    <Route path="feed" element={<LoungeFeed />} />
+                    <Route path="chat" element={<LoungeMessages />} />
+                    <Route path="deals" element={<LoungeDeals />} />
+                    <Route path="trader/:id" element={<TraderProfile />} />
+                  </Route>
+                  <Route path="messages" element={<div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6"><LoungeMessages fullscreen /></div>} />
                 </Route>
               </Route>
             </Route>

@@ -313,6 +313,10 @@ export async function revokeAllOtherSessions(userId, currentSessionId) {
   }
 }
 
+export async function revokeAllSessions(userId) {
+  return revokeAllOtherSessions(userId, null);
+}
+
 /**
  * Retrieves all active sessions for a user (formatted for Settings UI)
  */

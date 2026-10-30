@@ -4,6 +4,8 @@ import multer from "multer";
 import {
   requestLogin,
   verifyLogin,
+  registerUser,
+  loginWithPassword,
   uploadAvatar,
   saveOnboardingProfile,
   getProfile,
@@ -26,6 +28,8 @@ const upload = multer({
 const router = express.Router();
 
 router.post("/login", rateLimit({ windowMs: 15 * 60_000, max: 5 }), requestLogin);
+router.post("/register", rateLimit({ windowMs: 60 * 60_000, max: 10 }), registerUser);
+router.post("/login/password", rateLimit({ windowMs: 15 * 60_000, max: 10 }), loginWithPassword);
 router.post("/verify", rateLimit({ windowMs: 15 * 60_000, max: 20 }), verifyLogin);
 router.post("/avatar", upload.single("avatar"), uploadAvatar);
 router.post("/onboarding-profile", saveOnboardingProfile);

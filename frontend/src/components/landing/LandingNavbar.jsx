@@ -9,6 +9,7 @@ const NAV_LINKS = [
   { label: 'Backtesting', to: '/backtesting/btcusdt', icon: BarChart2 },
   { label: 'Journal', to: '/journal/xauusd', icon: BookOpen },
   { label: 'Free Tools', to: '/tools/ftmo-drawdown-calculator', icon: Calculator },
+  { label: 'Traders Lounge', to: '/#lounge', isAnchor: true },
   { label: 'Compare', to: '/vs/tradezella', icon: Shield },
   { label: 'Pricing', to: '/#pricing', isAnchor: true },
 ];
@@ -104,23 +105,13 @@ export default function LandingNavbar({ isFixed = true }) {
             }
           }}
         >
-          <div style={{
-            width: 26,
-            height: 26,
-            borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(95, 212, 232, 0.3) 0%, rgba(14, 124, 134, 0.15) 70%)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            border: '1px solid rgba(95, 212, 232, 0.3)',
-            boxShadow: '0 0 12px rgba(95, 212, 232, 0.45)',
-          }}>
-            <img
-              src="/logo3d.png"
-              alt="Forex Notes"
-              style={{ width: 18, height: 18, objectFit: 'contain', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.5))' }}
-            />
-          </div>
+          <img
+            src="/brand/fn-mark-256.webp"
+            alt="Forex Notes"
+            width={34}
+            height={34}
+            style={{ width: 34, height: 34, objectFit: 'contain', filter: 'drop-shadow(0 4px 10px rgba(34, 197, 94, 0.35))' }}
+          />
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <span
               style={{

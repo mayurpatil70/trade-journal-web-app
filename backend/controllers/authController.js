@@ -11,6 +11,7 @@ import {
   getUserSessions,
 } from "../services/sessionService.js";
 import { parseDeviceName, getClientIp } from "../utils/deviceHelper.js";
+import { hashPassword, verifyPassword } from "../utils/password.js";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -23,6 +24,207 @@ const ADMIN_EMAILS = [
 ]
   .map((e) => e.trim().toLowerCase())
   .filter(Boolean);
+
+async function respondWithSession(req, res, user, message) {
+  const userEmail = String(user.email || "").trim().toLowerCase();
+  const isAdmin = ADMIN_EMAILS.includes(userEmail);
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("trial_ends_at, subscription_ends_at, account_status")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  const now = new Date();
+  let hasActiveProfile = false;
+  if (profile) {
+    const subEnds = profile.subscription_ends_at ? new Date(profile.subscription_ends_at) : null;
+    const trialEnds = profile.trial_ends_at ? new Date(profile.trial_ends_at) : null;
+    if (
+      (subEnds && subEnds > now) ||
+      (trialEnds && trialEnds > now) ||
+      profile.account_status === "active"
+    ) {
+      hasActiveProfile = true;
+    }
+  }
+
+  const { data: subData } = await supabase
+    .from("journal_subscriptions")
+    .select("status")
+    .eq("user_id", user.id)
+    .eq("status", "paid")
+    .maybeSingle();
+
+  const hasPaid = isAdmin || hasActiveProfile || Boolean(subData);
+
+  const deviceId = req.body?.deviceId || req.headers["x-device-id"] || crypto.randomUUID();
+  const deviceName = req.body?.deviceName || parseDeviceName(req.headers["user-agent"]);
+  const ipAddress = getClientIp(req);
+
+  const session = await createSession({
+    userId: user.id,
+    deviceId,
+    deviceName,
+    ipAddress,
+  });
+
+  const authToken = signAuthToken(user.id, {
+    sessionId: session?.id,
+    deviceId,
+  });
+
+  res.json({
+    message,
+    discordVerified: user.discord_verified,
+    userId: user.id,
+    email: user.email,
+    username: user.username || null,
+    sessionId: session?.id || null,
+    deviceId,
+    authToken,
+    hasPaid,
+    isAdmin,
+  });
+}
+
+const USERNAME_RE = /^[a-z0-9_.]{3,20}$/;
+const escapeLike = (v) => v.replace(/[\\%_]/g, (c) => `\\${c}`);
+const cleanText = (v, max) => String(v || "").trim().replace(/\s+/g, " ").slice(0, max);
+
+function normalizePhone(dialCode, number) {
+  const dial = String(dialCode || "").replace(/\D/g, "");
+  const national = String(number || "").replace(/\D/g, "").replace(/^0+/, "");
+  if (!/^[1-9]\d{0,3}$/.test(dial) || national.length < 4) return null;
+  const full = dial + national;
+  return full.length >= 8 && full.length <= 15 ? `+${full}` : null;
+}
+
+function passwordProblem(password) {
+  if (typeof password !== "string" || password.length < 8) return "Password must be at least 8 characters.";
+  if (password.length > 128) return "Password must be at most 128 characters.";
+  if (!/[A-Za-z]/.test(password) || !/\d/.test(password)) return "Password must contain at least one letter and one number.";
+  return null;
+}
+
+async function findUserByEmail(email) {
+  const { data, error } = await supabase
+    .from("users")
+    .select("*")
+    .ilike("email", escapeLike(email))
+    .limit(5);
+  if (error) throw new Error(error.message);
+  const matches = (data || []).filter((u) => String(u.email).toLowerCase() === email);
+  return matches.find((u) => u.email === email) || matches[0] || null;
+}
+
+export const registerUser = async (req, res) => {
+  const email = String(req.body?.email || "").trim().toLowerCase();
+  const username = String(req.body?.username || "").trim().replace(/^@/, "").toLowerCase();
+  const password = req.body?.password;
+  const country = cleanText(req.body?.country, 60);
+  const city = cleanText(req.body?.city, 80);
+  const phone = normalizePhone(req.body?.dialCode, req.body?.phone);
+
+  if (!EMAIL_RE.test(email) || email.length > 254) return res.status(400).json({ error: "Please enter a valid email address." });
+  if (!USERNAME_RE.test(username)) {
+    return res.status(400).json({ error: "Username must be 3-20 characters: letters, numbers, dot or underscore." });
+  }
+  const pwError = passwordProblem(password);
+  if (pwError) return res.status(400).json({ error: pwError });
+  if (!country) return res.status(400).json({ error: "Please select your country." });
+  if (city.length < 2) return res.status(400).json({ error: "Please enter your city." });
+  if (!phone) return res.status(400).json({ error: "Please enter a valid phone number." });
+
+  try {
+    const existing = await findUserByEmail(email);
+    if (existing) {
+      return res.status(409).json({
+        field: "email",
+        error: existing.password_hash
+          ? "An account with this email already exists. Please sign in."
+          : "This email is already registered with email link sign-in. Use \"Email me a sign-in link\" on the Sign In card.",
+      });
+    }
+
+    const [{ data: takenUser }, { data: takenProfile }, { data: takenPhone }] = await Promise.all([
+      supabase.from("users").select("id").ilike("username", escapeLike(username)).limit(1),
+      supabase.from("profiles").select("id").ilike("username", escapeLike(username)).limit(1),
+      supabase.from("users").select("id").eq("phone", phone).limit(1),
+    ]);
+    if (takenUser?.length || takenProfile?.length) {
+      return res.status(409).json({ field: "username", error: "This username is already taken." });
+    }
+    if (takenPhone?.length) {
+      return res.status(409).json({ field: "phone", error: "This phone number is already registered." });
+    }
+
+    const { data: user, error } = await supabase
+      .from("users")
+      .insert({
+        email,
+        username,
+        password_hash: await hashPassword(password),
+        country,
+        city,
+        phone,
+        password_updated_at: new Date().toISOString(),
+      })
+      .select("*")
+      .single();
+
+    if (error) {
+      if (error.code === "23505") {
+        const field = /phone/i.test(error.message) ? "phone" : /username/i.test(error.message) ? "username" : "email";
+        return res.status(409).json({ field, error: `This ${field} is already registered.` });
+      }
+      throw new Error(error.message);
+    }
+
+    const { error: profileError } = await supabase
+      .from("profiles")
+      .upsert({ id: user.id, email, username, updated_at: new Date().toISOString() }, { onConflict: "id" });
+    if (profileError) console.warn("[Auth] Register profile notice:", profileError.message);
+
+    await respondWithSession(req, res, user, "Account created successfully");
+  } catch (error) {
+    console.error("Register Error:", error.message);
+    if (!res.headersSent) res.status(500).json({ error: "Could not create your account. Please try again." });
+  }
+};
+
+export const loginWithPassword = async (req, res) => {
+  const method = req.body?.method === "phone" ? "phone" : "email";
+  const password = req.body?.password;
+  if (typeof password !== "string" || !password || password.length > 128) {
+    return res.status(400).json({ error: "Please enter your password." });
+  }
+
+  try {
+    let user = null;
+    if (method === "email") {
+      const email = String(req.body?.email || "").trim().toLowerCase();
+      if (!EMAIL_RE.test(email)) return res.status(400).json({ error: "Please enter a valid email address." });
+      user = await findUserByEmail(email);
+    } else {
+      const phone = normalizePhone(req.body?.dialCode, req.body?.phone);
+      if (!phone) return res.status(400).json({ error: "Please enter a valid phone number." });
+      const { data, error } = await supabase.from("users").select("*").eq("phone", phone).limit(1);
+      if (error) throw new Error(error.message);
+      user = data?.[0] || null;
+    }
+
+    const ok = await verifyPassword(password, user?.password_hash);
+    if (!user || !ok) {
+      return res.status(401).json({ error: `Incorrect ${method === "phone" ? "phone number" : "email"} or password.` });
+    }
+
+    await respondWithSession(req, res, user, "Signed in successfully");
+  } catch (error) {
+    console.error("Password Login Error:", error.message);
+    if (!res.headersSent) res.status(500).json({ error: "Could not sign you in. Please try again." });
+  }
+};
 
 export const requestLogin = async (req, res) => {
   const email = String(req.body?.email || "").trim();
@@ -101,69 +303,7 @@ export const verifyLogin = async (req, res) => {
       .update({ login_token: null, token_expires: null })
       .eq("id", user.id);
 
-    // 1. Check if user is an Admin
-    const userEmail = String(user.email || "").trim().toLowerCase();
-    const isAdmin = ADMIN_EMAILS.includes(userEmail);
-
-    // 2. Check profiles table for active subscription or trial
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("trial_ends_at, subscription_ends_at, account_status")
-      .eq("id", user.id)
-      .maybeSingle();
-
-    const now = new Date();
-    let hasActiveProfile = false;
-    if (profile) {
-      const subEnds = profile.subscription_ends_at ? new Date(profile.subscription_ends_at) : null;
-      const trialEnds = profile.trial_ends_at ? new Date(profile.trial_ends_at) : null;
-      if (
-        (subEnds && subEnds > now) ||
-        (trialEnds && trialEnds > now) ||
-        profile.account_status === "active"
-      ) {
-        hasActiveProfile = true;
-      }
-    }
-
-    // 3. Check journal_subscriptions table
-    const { data: subData } = await supabase
-      .from("journal_subscriptions")
-      .select("status")
-      .eq("user_id", user.id)
-      .eq("status", "paid")
-      .maybeSingle();
-
-    // 4. Combined access check
-    const hasPaid = isAdmin || hasActiveProfile || Boolean(subData);
-
-    // 5. Per-Device Persistent Session Initialization
-    const deviceId = req.body?.deviceId || req.headers["x-device-id"] || crypto.randomUUID();
-    const deviceName = req.body?.deviceName || parseDeviceName(req.headers["user-agent"]);
-    const ipAddress = getClientIp(req);
-
-    const session = await createSession({
-      userId: user.id,
-      deviceId,
-      deviceName,
-      ipAddress,
-    });
-
-    const authToken = signAuthToken(user.id, {
-      sessionId: session?.id,
-      deviceId,
-    });
-
-    res.json({
-      message: "Verified successfully",
-      discordVerified: user.discord_verified,
-      userId: user.id,
-      sessionId: session?.id || null,
-      deviceId,
-      authToken,
-      hasPaid: hasPaid,
-      isAdmin: isAdmin,
-    });
+    await respondWithSession(req, res, user, "Verified successfully");
   } catch (error) {
     console.error("Verify Error:", error.message);
     res.status(500).json({ error: "Failed to verify login link. Please try again." });
