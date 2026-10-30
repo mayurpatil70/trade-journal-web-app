@@ -2,6 +2,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import api from "../api/axios";
+import { resolveNextStepAfterDiscord } from "../lib/authFlow";
 import { Loader2, CheckCircle, AlertTriangle, ArrowRight } from "lucide-react";
 
 export default function DiscordCallback() {
@@ -31,9 +32,8 @@ export default function DiscordCallback() {
         if (res.data.success) {
           localStorage.setItem("discord_verified", "true");
           setStatus("success");
-          setTimeout(() => {
-            navigate("/dashboard");
-          }, 1500);
+          const next = await resolveNextStepAfterDiscord();
+          setTimeout(() => navigate(next, { replace: true }), 1500);
         } else {
           setStatus("error");
           setErrorMsg("You are not a member of our Discord server yet!");
@@ -86,7 +86,7 @@ export default function DiscordCallback() {
             <button
               onClick={() => {
                 localStorage.setItem("discord_skipped", "true");
-                navigate("/dashboard");
+                resolveNextStepAfterDiscord().then((next) => navigate(next, { replace: true }));
               }}
               className="w-full mt-3 py-3 bg-white/[0.04] hover:bg-white/[0.08] text-gray-300 hover:text-white font-medium rounded-xl transition-all border border-white/10 cursor-pointer"
             >

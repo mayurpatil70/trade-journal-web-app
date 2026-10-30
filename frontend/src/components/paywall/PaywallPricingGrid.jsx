@@ -28,6 +28,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import api from '../../api/axios';
 import { invalidateSubscriptionCache } from '../../utils/subscriptionCache';
+import { nextStepAfterPaywall } from '../../lib/authFlow';
 
 // -------------------------------------------------------------
 // BSC USDT CONTRACT & MERCHANT CONFIG
@@ -316,7 +317,7 @@ function PaywallPricingContent({ isEmbedded = false, showTopBar = true }) {
       });
       if (response.data.success) {
         invalidateSubscriptionCache();
-        navigate('/dashboard');
+        navigate(nextStepAfterPaywall());
       }
     } catch (error) {
       console.error('Start trial error:', error);
@@ -439,7 +440,7 @@ function PaywallPricingContent({ isEmbedded = false, showTopBar = true }) {
             setPaymentState('success');
             invalidateSubscriptionCache();
             setTimeout(() => {
-              navigate('/dashboard');
+              navigate(nextStepAfterPaywall());
             }, 1800);
           } else {
             setPaymentState('error');
@@ -471,7 +472,7 @@ function PaywallPricingContent({ isEmbedded = false, showTopBar = true }) {
         setPaymentState('success');
         invalidateSubscriptionCache();
         setTimeout(() => {
-          navigate('/dashboard');
+          navigate(nextStepAfterPaywall());
         }, 1500);
       } else {
         setPaymentState('error');

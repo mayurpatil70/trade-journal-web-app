@@ -15,6 +15,7 @@ import {
   getImmediateCachedStatus,
 } from "./utils/subscriptionCache";
 import { markInAppNavigation } from "./utils/navigationState";
+import { isOnboardingCompleted } from "./lib/authFlow";
 import { safeLazy, registerRoutePrefetch } from "./utils/routePrefetch";
 import NavigationProgressBar from "./components/NavigationProgressBar";
 
@@ -303,7 +304,16 @@ const PaywallGuard = () => {
   return <Outlet />;
 };
 
-// GUARD 3: Admin Only
+// GUARD 3: Fresh signups finish onboarding before entering the workspace
+const OnboardingGuard = () => {
+  const isNewSignup = localStorage.getItem("fn_new_signup") === "true";
+  if (isNewSignup && !isOnboardingCompleted()) {
+    return <Navigate to="/onboarding" replace />;
+  }
+  return <Outlet />;
+};
+
+// GUARD 4: Admin Only
 const AdminGuard = () => {
   const id = (localStorage.getItem("userId") || "").toLowerCase().trim();
   const email = (localStorage.getItem("userEmail") || "").toLowerCase().trim();
@@ -449,6 +459,7 @@ function App() {
                   path="/backtest"
                   element={<Navigate to="/sessions" replace />}
                 />
+                <Route element={<OnboardingGuard />}>
                 <Route path="/" element={<MainLayout />}>
                   <Route path="dashboard" element={<Dashboard />} />
                   <Route path="add-trade" element={<AddTrade />} />
@@ -517,6 +528,7 @@ function App() {
                     <Route path="trader/:id" element={<TraderProfile />} />
                   </Route>
                   <Route path="messages" element={<div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6"><LoungeMessages fullscreen /></div>} />
+                </Route>
                 </Route>
               </Route>
             </Route>

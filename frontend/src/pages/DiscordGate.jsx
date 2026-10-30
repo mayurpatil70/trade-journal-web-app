@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { MessageSquare, ArrowRight, Shield, AlertTriangle, Loader2 } from "lucide-react";
-import { getCachedAccessStatus } from "../utils/subscriptionCache";
+import { resolveNextStepAfterDiscord } from "../lib/authFlow";
 
 export default function DiscordGate() {
   const [searchParams] = useSearchParams();
@@ -52,14 +52,7 @@ export default function DiscordGate() {
     setIsSkipping(true);
     localStorage.setItem("discord_skipped", "true");
     try {
-      const status = await getCachedAccessStatus();
-      if (status?.hasPaid || status?.isAdmin) {
-        navigate("/dashboard");
-      } else {
-        navigate("/paywall");
-      }
-    } catch {
-      navigate("/dashboard");
+      navigate(await resolveNextStepAfterDiscord(), { replace: true });
     } finally {
       setIsSkipping(false);
     }

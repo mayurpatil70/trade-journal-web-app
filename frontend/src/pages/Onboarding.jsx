@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import api from "../api/axios";
 import { ArrowRight, ArrowLeft, X } from "lucide-react";
 import BrandLogo from "../components/BrandLogo";
 import ThemeToggle from "../components/ThemeToggle";
@@ -100,29 +101,22 @@ export default function Onboarding() {
 
         // 5. Persist to Supabase Database (profiles & users tables)
         try {
-          await fetch("/api/auth/onboarding-profile", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${localStorage.getItem("authToken") || ""}`,
-            },
-            body: JSON.stringify({
-              userId: completedUserId,
-              email: userEmail,
-              displayName,
-              username: username.replace(/^@/, ""),
-              bio,
-              avatarUrl,
-              currency,
-              timezone,
-              maxRiskPerTrade,
-              dailyLossCap,
-              maxTradesPerDay,
-              lossStreakBreak,
-              targetRR,
-              preferredSessions,
-              favoritePairs,
-            }),
+          await api.post("/api/auth/onboarding-profile", {
+            userId: completedUserId,
+            email: userEmail,
+            displayName,
+            username: username.replace(/^@/, ""),
+            bio,
+            avatarUrl,
+            currency,
+            timezone,
+            maxRiskPerTrade,
+            dailyLossCap,
+            maxTradesPerDay,
+            lossStreakBreak,
+            targetRR,
+            preferredSessions,
+            favoritePairs,
           });
         } catch (apiErr) {
           console.warn("[Onboarding] Backend save profile notice:", apiErr);
