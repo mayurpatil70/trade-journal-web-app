@@ -8,6 +8,68 @@ import { glass, pill, Avatar, TraderName, PropBadges, FollowButton, EmptyState, 
 import { openChatWith, useOnlineSet } from "../../lib/socket";
 import { useMe, ThreadModal } from "./LoungeFeed";
 import LoungeProfileSheet from "./LoungeProfileSheet";
+import { ProfileLinks } from "../../components/lounge/ProfileLinks";
+
+const profileCache = new Map();
+const storageKey = (id) => `social_profile_${id}`;
+
+function readCached(id) {
+  if (profileCache.has(id)) return profileCache.get(id);
+  if (id !== localStorage.getItem("userId")) return null;
+  try {
+    return JSON.parse(localStorage.getItem(storageKey(id)) || "null");
+  } catch {
+    return null;
+  }
+}
+
+function writeCached(id, data) {
+  profileCache.set(id, data);
+  if (id === localStorage.getItem("userId")) {
+    try {
+      localStorage.setItem(storageKey(id), JSON.stringify({ ...data, posts: (data.posts || []).slice(0, 12) }));
+    } catch {
+      /* storage full */
+    }
+  }
+}
+
+// Shows the last known profile instantly, then refreshes it and the leaderboard stats in parallel.
+export function useTraderProfile(id) {
+  const [profile, setProfileState] = useState(() => (id ? readCached(id) : null));
+  const [stats, setStats] = useState(null);
+
+  useEffect(() => {
+    if (!id) return undefined;
+    let alive = true;
+    setProfileState(readCached(id));
+    setStats(null);
+    api
+      .get(`/api/social/traders/${id}`)
+      .then(({ data }) => {
+        if (!alive) return;
+        writeCached(id, data);
+        setProfileState(data);
+      })
+      .catch(() => alive && setProfileState((p) => p || { error: true }));
+    api
+      .get(`/api/social/traders/${id}/stats`)
+      .then(({ data }) => alive && setStats(data))
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, [id]);
+
+  const setProfile = (updater) =>
+    setProfileState((p) => {
+      const next = typeof updater === "function" ? updater(p) : updater;
+      if (next && !next.error) writeCached(id, next);
+      return next;
+    });
+
+  return [profile, setProfile, stats];
+}
 
 const LIST_TABS = [
   { value: "followers", label: "Followers" },
@@ -140,16 +202,11 @@ export default function TraderProfile() {
   const { id } = useParams();
   const me = useMe();
   const online = useOnlineSet();
-  const [profile, setProfile] = useState(null);
+  const [profile, setProfile, statsInfo] = useTraderProfile(id);
   const [busy, setBusy] = useState(false);
   const [listKind, setListKind] = useState(null);
   const [openId, setOpenId] = useState(null);
   const [editing, setEditing] = useState(false);
-
-  useEffect(() => {
-    setProfile(null);
-    api.get(`/api/social/traders/${id}`).then(({ data }) => setProfile(data)).catch(() => setProfile({ error: true }));
-  }, [id]);
 
   const toggleFollow = async () => {
     setBusy(true);
@@ -177,7 +234,7 @@ export default function TraderProfile() {
     );
   }
 
-  const isMe = me?.id === id;
+  const isMe = id === localStorage.getItem("userId") || me?.id === id;
   const counts = [
     { key: "posts", label: "posts", value: profile.postsCount ?? profile.posts.length },
     { key: "followers", label: "followers", value: profile.followers },
@@ -233,8 +290,8 @@ export default function TraderProfile() {
             <div className="space-y-1">
               <div className="flex items-center gap-2 flex-wrap">
                 <span className="text-sm font-semibold text-neutral-900 dark:text-white">{profile.displayName}</span>
-                {profile.rank && (
-                  <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400">Rank #{profile.rank}</span>
+                {statsInfo?.rank && (
+                  <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400">Rank #{statsInfo.rank}</span>
                 )}
                 {profile.isMutual ? (
                   <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400">Mutual</span>
@@ -246,6 +303,7 @@ export default function TraderProfile() {
               </div>
               {profile.primaryStrategy && <p className="text-sm text-neutral-500">{profile.primaryStrategy}</p>}
               {profile.bio && <p className="text-sm text-neutral-700 dark:text-neutral-300 whitespace-pre-line max-w-xl">{profile.bio}</p>}
+              <ProfileLinks links={profile.links} />
               <PropBadges badges={profile.propBadges} />
               {profile.followedBy?.length > 0 && (
                 <button onClick={() => setListKind("mutuals")} className="flex items-center gap-2 pt-1 text-xs text-neutral-500 hover:opacity-80 text-left">
@@ -264,7 +322,7 @@ export default function TraderProfile() {
           </div>
         </div>
 
-        <ProfileStatTiles stats={profile.stats} />
+        <ProfileStatTiles stats={statsInfo?.stats} />
       </div>
 
       <ProfilePostsGrid posts={profile.posts} onOpen={(post) => setOpenId(post.id)} />

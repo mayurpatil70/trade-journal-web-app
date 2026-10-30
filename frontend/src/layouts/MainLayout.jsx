@@ -11,6 +11,7 @@ import SystemAnnouncementBanner from "../components/SystemAnnouncementBanner.jsx
 import ProfilePhotoModal from "../components/ui/ProfilePhotoModal.jsx";
 import SupportFeedbackModal from "../components/support/SupportFeedbackModal.jsx";
 import FloatingMessenger from "../components/lounge/FloatingMessenger.jsx";
+import InstallAppButton from "../components/InstallAppButton.jsx";
 import { prefetchRoute, prefetchAllSecondaryRoutes } from "../utils/routePrefetch";
 import api, { logoutSession } from "../api/axios";
 import { useIsAdmin } from "../hooks/useIsAdmin";
@@ -70,8 +71,29 @@ const NavItem = ({
   isLocked = false,
   onLockedClick,
   end = false,
+  highlight = false,
 }) => {
   const isActive = currentPath === to || (!end && to !== "/" && currentPath.startsWith(to + "/"));
+
+  if (highlight) {
+    return (
+      <Link
+        to={to}
+        onMouseEnter={() => prefetchRoute(to)}
+        onFocus={() => prefetchRoute(to)}
+        onPointerDown={() => prefetchRoute(to)}
+        onClick={onClick}
+        className={`group flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-[13px] font-semibold transition-all duration-300 border ${
+          isActive
+            ? "bg-[#0066FF] text-white border-[#0066FF] shadow-[0_4px_14px_rgba(0,102,255,0.35)]"
+            : "bg-blue-500/[0.08] text-[#0066FF] dark:text-sky-400 border-blue-500/20 hover:bg-blue-500/[0.14]"
+        }`}
+      >
+        <Icon className="w-[18px] h-[18px] ml-1" strokeWidth={2.3} />
+        <span className="tracking-tight">{label}</span>
+      </Link>
+    );
+  }
 
   return (
     <Link
@@ -272,6 +294,13 @@ export default function MainLayout() {
     return () => window.removeEventListener("scroll", onScroll);
   }, [location.pathname]);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const pendingInvite = localStorage.getItem("pending_invite");
+    if (!pendingInvite) return;
+    localStorage.removeItem("pending_invite");
+    navigate(pendingInvite, { replace: true });
+  }, [navigate]);
 
   // Support / feedback event listeners & query param sync
   useEffect(() => {
@@ -477,16 +506,16 @@ export default function MainLayout() {
     {
       label: "Community",
       items: [
+        { to: "/community", icon: MessagesSquare, label: "Traders Community", highlight: true },
         {
           label: "Traders Lounge",
           to: "/lounge",
           icon: Users,
           isExpandable: true,
-          matchPrefixes: ["/lounge", "/messages"],
+          matchPrefixes: ["/lounge"],
           children: [
             { to: "/lounge", icon: Trophy, label: "Leaderboard", end: true, alsoActive: ["/lounge/trader"] },
             { to: "/lounge/feed", icon: MessageSquareText, label: "Thought Stream" },
-            { to: "/messages", icon: MessagesSquare, label: "Messages", alsoActive: ["/lounge/chat"] },
             { to: "/lounge/deals", icon: Gift, label: "Partner Deals" },
           ],
         },
@@ -516,7 +545,7 @@ export default function MainLayout() {
     const p = location.pathname;
     if (p.startsWith("/lounge/feed")) return "Thought Stream";
     if (p.startsWith("/lounge/deals")) return "Partner Deals";
-    if (p.startsWith("/lounge/chat") || p.startsWith("/messages")) return "Messages";
+    if (p.startsWith("/community") || p.startsWith("/messages")) return "Traders Community";
     if (p.startsWith("/lounge")) return "Traders Lounge";
     if (p.includes("dashboard")) return "Dashboard";
     if (p.includes("add-trade")) return "Add Trade";
@@ -940,6 +969,7 @@ export default function MainLayout() {
                       label={item.label}
                       isBeta={item.isBeta}
                       end={item.end}
+                      highlight={item.highlight}
                       isDisabled={item.isDisabled}
                       isLocked={!isAdmin && item.requiresAdmin}
                       onLockedClick={() => setShowLockPopup(true)}
@@ -984,6 +1014,10 @@ export default function MainLayout() {
             </div>
           )}
         </nav>
+
+        <div className="px-3 pt-2">
+          <InstallAppButton />
+        </div>
 
         {/* User Card with Squircle Avatar */}
         <div className="p-3 relative">

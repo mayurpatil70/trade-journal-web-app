@@ -1,9 +1,13 @@
 // frontend/src/components/lounge/Messenger.jsx
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { ArrowLeft, Hash, Send, Search, CheckCheck, Check, Loader2, LineChart, X, ImagePlus } from "lucide-react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { ArrowLeft, Hash, Send, Search, CheckCheck, Check, Loader2, LineChart, X, ImagePlus, Reply, Pencil, Forward } from "lucide-react";
 import api from "../../api/axios";
 import { getSocket, useSocketEvent, useOnlineSet, emitWithAck } from "../../lib/socket";
 import { Avatar, TraderName, RichText, timeAgo, formatMoney } from "./LoungeUI";
+import UserHover from "./UserHoverCard";
+import { MessageMenu, ReplyQuote, useMentions, MentionList, ForwardSheet } from "./MessageActions";
+
+export const channelTitle = (c) => (c?.title?.startsWith("#") || !c?.server_id ? c?.title : `# ${c.title}`);
 
 export function useConversations() {
   const [data, setData] = useState({ direct: [], channels: [] });
@@ -101,7 +105,7 @@ export function ConversationList({ direct, channels, activeId, onSelect, onStart
       key={c.id}
       onClick={() => onSelect(c)}
       className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-2xl text-left transition-colors ${
-        activeId === c.id ? "bg-[#0066FF]/10" : "hover:bg-black/[0.03] dark:hover:bg-white/[0.04]"
+        activeId === c.id ? "bg-blue-500/10" : "hover:bg-black/[0.03] dark:hover:bg-white/[0.04]"
       }`}
     >
       {icon || <Avatar user={c.peer} size={42} online={c.peer ? online.has(c.peer.id) : undefined} />}
@@ -183,7 +187,7 @@ export function ConversationList({ direct, channels, activeId, onSelect, onStart
   );
 }
 
-export function ChatThread({ conversation, me, onBack, pendingTrade, onTradeSent, onRead }) {
+export function ChatThread({ conversation, me, onBack, backMobileOnly = false, canModerate = false, pendingTrade, onTradeSent, onRead }) {
   const [messages, setMessages] = useState([]);
   const [readState, setReadState] = useState({});
   const [loading, setLoading] = useState(true);
@@ -195,10 +199,15 @@ export function ChatThread({ conversation, me, onBack, pendingTrade, onTradeSent
   const online = useOnlineSet();
   const scroller = useRef(null);
   const fileRef = useRef(null);
+  const inputRef = useRef(null);
+  const [replyTo, setReplyTo] = useState(null);
+  const [editing, setEditing] = useState(null);
+  const [forwarding, setForwarding] = useState(null);
+  const [actionError, setActionError] = useState("");
   const stickToBottom = useRef(true);
   const lastTypingEmit = useRef(0);
   const convId = conversation.id;
-  const isChannel = conversation.is_public;
+  const isChannel = Boolean(conversation.is_public || conversation.is_group);
 
   const onReadRef = useRef(onRead);
   useLayoutEffect(() => {
@@ -253,6 +262,19 @@ export function ChatThread({ conversation, me, onBack, pendingTrade, onTradeSent
     if (msg.senderId !== me?.id) markRead(msg.id);
   });
 
+  useSocketEvent("message:updated", (msg) => {
+    if (msg.conversationId !== convId) return;
+    setMessages((list) =>
+      list.map((m) => {
+        if (m.id === msg.id) return { ...msg, sender: msg.sender || m.sender };
+        if (m.replyTo?.id === msg.id) {
+          return { ...m, replyTo: { ...m.replyTo, content: msg.content.slice(0, 140), deleted: Boolean(msg.deletedAt) } };
+        }
+        return m;
+      }),
+    );
+  });
+
   useSocketEvent("message:typing_status", ({ userId, conversationId, isTyping }) => {
     if (conversationId !== convId || userId === me?.id) return;
     setTypers((t) => ({ ...t, [userId]: isTyping }));
@@ -283,15 +305,59 @@ export function ChatThread({ conversation, me, onBack, pendingTrade, onTradeSent
     }
   };
 
+  const applyUpdate = (msg) => setMessages((list) => list.map((m) => (m.id === msg.id ? { ...msg, sender: msg.sender || m.sender } : m)));
+
+  const saveEdit = async () => {
+    const content = text.trim();
+    if (!content || sending) return;
+    setSending(true);
+    const res = await emitWithAck("message:edit", { messageId: editing.id, content });
+    setSending(false);
+    if (res?.ok) {
+      applyUpdate(res.message);
+      setEditing(null);
+      setText("");
+    } else setActionError("Could not edit the message.");
+  };
+
+  const unsend = async (m) => {
+    if (!window.confirm(m.senderId === me?.id ? "Unsend this message for everyone?" : "Delete this message for everyone?")) return;
+    const res = await emitWithAck("message:delete", { messageId: m.id });
+    if (res?.ok) applyUpdate(res.message);
+    else setActionError("Could not delete the message.");
+  };
+
+  const startEdit = (m) => {
+    setReplyTo(null);
+    setEditing(m);
+    setText(m.content || "");
+    requestAnimationFrame(() => inputRef.current?.focus());
+  };
+
+  const startReply = (m) => {
+    setEditing(null);
+    setReplyTo(m);
+    requestAnimationFrame(() => inputRef.current?.focus());
+  };
+
+  const cancelCompose = () => {
+    if (editing) setText("");
+    setEditing(null);
+    setReplyTo(null);
+  };
+
   const send = async (sharedTrade, chartUrl) => {
+    if (editing && !sharedTrade && !chartUrl) return saveEdit();
     const content = text.trim();
     if ((!content && !sharedTrade && !chartUrl) || sending) return;
     setSending(true);
+    setActionError("");
     stickToBottom.current = true;
-    const res = await emitWithAck("message:send", { roomId: convId, content, sharedTrade, chartUrl });
+    const res = await emitWithAck("message:send", { roomId: convId, content, sharedTrade, chartUrl, replyToId: replyTo?.id });
     setSending(false);
     if (res?.ok) {
       setText("");
+      setReplyTo(null);
       setMessages((list) => (list.some((m) => m.id === res.message.id) ? list : [...list, res.message]));
       getSocket()?.emit("message:typing", { targetId: convId, isRoom: true, isTyping: false });
       if (sharedTrade) onTradeSent?.();
@@ -315,6 +381,13 @@ export function ChatThread({ conversation, me, onBack, pendingTrade, onTradeSent
   };
 
   const peer = conversation.peer;
+  const mentionPool = useMemo(() => {
+    const byId = new Map();
+    if (peer) byId.set(peer.id, peer);
+    for (const m of messages) if (m.sender?.id) byId.set(m.sender.id, m.sender);
+    return [...byId.values()].reverse();
+  }, [messages, peer]);
+  const mentions = useMentions({ text, setText, inputRef, localUsers: mentionPool, meId: me?.id });
   const peerReadAt = peer ? readState[peer.id] : null;
   const lastMineId = [...messages].reverse().find((m) => m.senderId === me?.id)?.id;
   const typingNames = Object.entries(typers)
@@ -325,7 +398,7 @@ export function ChatThread({ conversation, me, onBack, pendingTrade, onTradeSent
     <div className="flex flex-col h-full min-h-0">
       <div className="flex items-center gap-3 px-3 py-2.5 border-b border-black/[0.05] dark:border-white/[0.06] bg-white/60 dark:bg-white/[0.02] backdrop-blur-xl">
         {onBack && (
-          <button onClick={onBack} className="p-1.5 rounded-full hover:bg-black/[0.05] dark:hover:bg-white/[0.08]" aria-label="Back">
+          <button onClick={onBack} className={`p-1.5 rounded-full hover:bg-black/[0.05] dark:hover:bg-white/[0.08] ${backMobileOnly ? "md:hidden" : ""}`} aria-label="Back">
             <ArrowLeft className="w-4 h-4 text-neutral-600 dark:text-neutral-300" />
           </button>
         )}
@@ -334,13 +407,17 @@ export function ChatThread({ conversation, me, onBack, pendingTrade, onTradeSent
             <Hash className="w-4 h-4" />
           </span>
         ) : (
-          <Avatar user={peer} size={36} online={peer ? online.has(peer.id) : undefined} />
+          <UserHover user={peer}>
+            <Avatar user={peer} size={36} online={peer ? online.has(peer.id) : undefined} />
+          </UserHover>
         )}
         <div className="min-w-0">
           {isChannel ? (
-            <p className="text-sm font-semibold text-neutral-900 dark:text-white truncate">{conversation.title}</p>
+            <p className="text-sm font-semibold text-neutral-900 dark:text-white truncate">{channelTitle(conversation)}</p>
           ) : (
-            <TraderName user={peer} className="text-sm" />
+            <UserHover user={peer}>
+              <TraderName user={peer} link={false} className="text-sm hover:underline" />
+            </UserHover>
           )}
           <p className="text-[11px] text-neutral-500 dark:text-neutral-400 truncate">
             {isChannel ? conversation.description : peer && online.has(peer.id) ? "Active now" : "Offline"}
@@ -369,22 +446,70 @@ export function ChatThread({ conversation, me, onBack, pendingTrade, onTradeSent
         {messages.map((m, i) => {
           const mine = m.senderId === me?.id;
           const prev = messages[i - 1];
-          const grouped = prev && prev.senderId === m.senderId && new Date(m.createdAt) - new Date(prev.createdAt) < 120000;
+          const grouped =
+            prev && prev.senderId === m.senderId && !m.replyTo && new Date(m.createdAt) - new Date(prev.createdAt) < 120000;
+          const mentionsMe = !mine && m.mentions?.some((x) => x.id === me?.id);
+          const menu = (
+            <MessageMenu
+              message={m}
+              mine={mine}
+              canModerate={canModerate}
+              align={mine ? "right" : "left"}
+              onReply={() => startReply(m)}
+              onEdit={() => startEdit(m)}
+              onDelete={() => unsend(m)}
+              onForward={() => setForwarding(m)}
+            />
+          );
           return (
-            <div key={m.id} className={`flex gap-2 ${mine ? "justify-end" : "justify-start"} ${grouped ? "" : "pt-2"}`}>
-              {!mine && isChannel && (grouped ? <span className="w-7 shrink-0" /> : <Avatar user={m.sender} size={28} />)}
+            <div key={m.id} id={`msg-${m.id}`} className={`group flex gap-2 ${mine ? "justify-end" : "justify-start"} ${grouped ? "" : "pt-2"}`}>
+              {!mine &&
+                (grouped ? (
+                  <span className="w-8 shrink-0" />
+                ) : (
+                  <UserHover user={m.sender || { id: m.senderId }} className="shrink-0 self-start">
+                    <Avatar user={m.sender} size={32} className="hover:opacity-85 transition-opacity" />
+                  </UserHover>
+                ))}
               <div className={`max-w-[78%] flex flex-col ${mine ? "items-end" : "items-start"}`}>
                 {!mine && isChannel && !grouped && (
-                  <span className="text-[11px] font-semibold text-neutral-500 mb-0.5 ml-1">{m.sender?.displayName}</span>
+                  <UserHover user={m.sender || { id: m.senderId }} className="mb-0.5 ml-1">
+                    <span className="text-[12px] font-semibold text-neutral-700 dark:text-neutral-200 hover:underline">{m.sender?.displayName}</span>
+                    <span className="ml-1.5 text-[10px] text-neutral-400">{timeAgo(m.createdAt)}</span>
+                  </UserHover>
                 )}
-                <div
-                  className={`px-3.5 py-2 text-[14px] leading-snug rounded-[20px] ${
-                    mine ? "bg-[#0066FF] text-white rounded-br-md" : "bg-black/[0.05] dark:bg-white/[0.08] text-neutral-900 dark:text-neutral-100 rounded-bl-md"
-                  }`}
-                >
-                  {m.content && <RichText text={m.content} className={mine ? "[&_a]:text-white [&_span]:text-white" : ""} />}
-                  {m.isTradeShare && <TradeShareCard trade={m.sharedTrade} mine={mine} />}
-                  {m.mediaUrl && <img src={m.mediaUrl} alt="" className="mt-1 rounded-xl max-h-60" />}
+                <ReplyQuote
+                  reply={m.replyTo}
+                  mine={mine}
+                  onClick={() => document.getElementById(`msg-${m.replyTo?.id}`)?.scrollIntoView({ behavior: "smooth", block: "center" })}
+                />
+                <div className={`flex items-center gap-1 max-w-full ${mine ? "flex-row" : "flex-row-reverse"}`}>
+                  {menu}
+                  {m.deletedAt ? (
+                    <div className="px-3.5 py-2 text-[13px] italic rounded-[20px] border border-black/[0.08] dark:border-white/[0.1] text-neutral-400">
+                      {mine ? "You unsent a message" : "This message was deleted"}
+                    </div>
+                  ) : (
+                    <div
+                      className={`min-w-0 px-3.5 py-2 text-[14px] leading-snug rounded-[20px] ${
+                        mine
+                          ? "bg-[#0066FF] text-white rounded-br-md"
+                          : mentionsMe
+                            ? "bg-amber-400/15 ring-1 ring-amber-400/40 text-neutral-900 dark:text-neutral-100 rounded-bl-md"
+                            : "bg-black/[0.05] dark:bg-white/[0.08] text-neutral-900 dark:text-neutral-100 rounded-bl-md"
+                      }`}
+                    >
+                      {m.isForwarded && (
+                        <span className={`flex items-center gap-1 text-[11px] italic mb-0.5 ${mine ? "text-white/75" : "text-neutral-500"}`}>
+                          <Forward className="w-3 h-3" /> Forwarded
+                        </span>
+                      )}
+                      {m.content && <RichText text={m.content} mentions={m.mentions} className={mine ? "[&_a]:text-white [&_span]:text-white" : ""} />}
+                      {m.isTradeShare && <TradeShareCard trade={m.sharedTrade} mine={mine} />}
+                      {m.mediaUrl && <img src={m.mediaUrl} alt="" className="mt-1 rounded-xl max-h-60" />}
+                      {m.editedAt && <span className={`block text-[10px] mt-0.5 ${mine ? "text-white/70 text-right" : "text-neutral-400"}`}>edited</span>}
+                    </div>
+                  )}
                 </div>
                 {mine && m.id === lastMineId && !isChannel && (
                   <span className="text-[10px] text-neutral-400 mt-0.5 mr-1 inline-flex items-center gap-1">
@@ -431,6 +556,23 @@ export function ChatThread({ conversation, me, onBack, pendingTrade, onTradeSent
         </div>
       )}
 
+      {(replyTo || editing) && (
+        <div className="mx-3 mb-2 flex items-center gap-2.5 rounded-2xl bg-black/[0.03] dark:bg-white/[0.05] border border-black/[0.05] dark:border-white/[0.06] px-3 py-2">
+          {editing ? <Pencil className="w-4 h-4 text-[#0066FF] shrink-0" /> : <Reply className="w-4 h-4 text-[#0066FF] shrink-0" />}
+          <span className="flex-1 min-w-0 text-xs">
+            <span className="block font-semibold text-neutral-800 dark:text-neutral-100">
+              {editing ? "Editing message" : `Replying to ${replyTo.senderId === me?.id ? "yourself" : replyTo.sender?.displayName || "Trader"}`}
+            </span>
+            <span className="block truncate text-neutral-500">{(editing || replyTo).content || "Photo or trade"}</span>
+          </span>
+          <button type="button" onClick={cancelCompose} className="p-1 rounded-full hover:bg-black/[0.05] dark:hover:bg-white/[0.08]" aria-label="Cancel">
+            <X className="w-4 h-4 text-neutral-500" />
+          </button>
+        </div>
+      )}
+
+      <MentionList suggestions={mentions.suggestions} index={mentions.index} onPick={mentions.pick} />
+
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -451,7 +593,7 @@ export function ChatThread({ conversation, me, onBack, pendingTrade, onTradeSent
         <button
           type="button"
           onClick={() => fileRef.current?.click()}
-          disabled={sending}
+          disabled={sending || Boolean(editing)}
           className="w-9 h-9 shrink-0 rounded-full text-[#0066FF] hover:bg-blue-500/10 flex items-center justify-center disabled:opacity-40"
           aria-label="Send a photo"
           title="Send a photo"
@@ -459,9 +601,17 @@ export function ChatThread({ conversation, me, onBack, pendingTrade, onTradeSent
           {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <ImagePlus className="w-4 h-4" />}
         </button>
         <input
+          ref={inputRef}
           value={text}
-          onChange={(e) => onType(e.target.value)}
-          placeholder={isChannel ? `Message ${conversation.title}` : "Message…"}
+          onChange={(e) => {
+            onType(e.target.value);
+            mentions.onChange(e.target.value, e.target.selectionStart ?? e.target.value.length);
+          }}
+          onKeyDown={(e) => {
+            if (mentions.onKeyDown(e)) return;
+            if (e.key === "Escape" && (editing || replyTo)) cancelCompose();
+          }}
+          placeholder={isChannel ? `Message ${channelTitle(conversation)}` : "Message…"}
           maxLength={4000}
           className="flex-1 rounded-full bg-black/[0.04] dark:bg-white/[0.06] border border-black/[0.06] dark:border-white/[0.08] px-4 py-2 text-sm text-neutral-900 dark:text-white placeholder:text-neutral-400 outline-none focus:ring-2 focus:ring-[#0066FF]/30"
         />
@@ -474,7 +624,8 @@ export function ChatThread({ conversation, me, onBack, pendingTrade, onTradeSent
           <Send className="w-4 h-4" />
         </button>
       </form>
-      {uploadError && <p className="px-4 pb-2 -mt-1 text-xs text-red-500">{uploadError}</p>}
+      {(uploadError || actionError) && <p className="px-4 pb-2 -mt-1 text-xs text-red-500">{uploadError || actionError}</p>}
+      {forwarding && <ForwardSheet message={forwarding} onClose={() => setForwarding(null)} />}
     </div>
   );
 }

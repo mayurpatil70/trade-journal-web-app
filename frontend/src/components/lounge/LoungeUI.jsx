@@ -89,11 +89,24 @@ export const formatMoney = (n) =>
 
 const TOKEN_RE = /(@[a-zA-Z0-9_]{2,30}|\$[A-Za-z]{3,10}|\*\*[^*]+\*\*|https?:\/\/\S+)/g;
 
-export function RichText({ text = "", className = "" }) {
+export function RichText({ text = "", className = "", mentions }) {
+  const mentionIds = Object.fromEntries((mentions || []).map((m) => [m.handle.toLowerCase(), m.id]));
   return (
     <p className={`whitespace-pre-wrap break-words ${className}`}>
       {text.split(TOKEN_RE).map((part, i) => {
         if (!part) return null;
+        const mentionId = part.startsWith("@") && mentionIds[part.slice(1).toLowerCase()];
+        if (mentionId) {
+          return (
+            <Link
+              key={i}
+              to={`/lounge/trader/${mentionId}`}
+              className="font-semibold rounded px-0.5 bg-blue-500/10 text-[#0066FF] dark:text-sky-400 hover:underline"
+            >
+              {part}
+            </Link>
+          );
+        }
         if (part.startsWith("@") || part.startsWith("$")) {
           return (
             <span key={i} className="text-[#0066FF] dark:text-sky-400 font-semibold">

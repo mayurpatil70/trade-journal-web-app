@@ -101,7 +101,11 @@ const Tools = safeLazy(() => import("./pages/Tools.jsx"), "tools");
 const LoungeShell = safeLazy(() => import("./pages/lounge/LoungeShell.jsx"), "lounge");
 const LoungeLeaderboard = safeLazy(() => import("./pages/lounge/LoungeLeaderboard.jsx"), "lounge-leaderboard");
 const LoungeFeed = safeLazy(() => import("./pages/lounge/LoungeFeed.jsx"), "lounge-feed");
-const LoungeMessages = safeLazy(() => import("./pages/lounge/LoungeMessages.jsx"), "lounge-messages");
+const TradersCommunity = safeLazy(() => import("./pages/community/TradersCommunity.jsx"), "community");
+const CommunityInvite = safeLazy(
+  () => import("./pages/community/TradersCommunity.jsx").then((m) => ({ default: m.CommunityInvite })),
+  "community-invite",
+);
 const LoungeDeals = safeLazy(() => import("./pages/lounge/LoungeDeals.jsx"), "lounge-deals");
 const TraderProfile = safeLazy(() => import("./pages/lounge/TraderProfile.jsx"), "lounge-trader");
 
@@ -202,6 +206,7 @@ registerRoutePrefetch(
 );
 registerRoutePrefetch("/tools", () => import("./pages/Tools.jsx"));
 registerRoutePrefetch("/lounge", () => import("./pages/lounge/LoungeShell.jsx"));
+registerRoutePrefetch("/community", () => import("./pages/community/TradersCommunity.jsx"));
 registerRoutePrefetch("/profile", () => import("./pages/Profile.jsx"));
 
 const INDEXABLE_PATHS = ["/", "/privacy"];
@@ -238,8 +243,15 @@ const PublicOnlyRoute = ({ children }) =>
   isSessionValid() ? <Navigate to="/dashboard" replace /> : children;
 
 // GUARD 1: Authentication — checks localStorage AND session validity (24-hour window)
+const MessagesRedirect = () => {
+  const { search } = useLocation();
+  return <Navigate to={`/community${search}`} replace />;
+};
+
 const AuthGuard = () => {
+  const { pathname } = useLocation();
   if (!isSessionValid()) {
+    if (pathname.startsWith("/community/invite/")) localStorage.setItem("pending_invite", pathname);
     // Session expired or missing — clean up and redirect
     clearSession();
     return <Navigate to="/login" replace />;
@@ -413,6 +425,7 @@ const RouteWatcher = () => {
       "/bot-hub",
       "/lounge",
       "/messages",
+      "/community",
     ];
 
     if (appRoutes.some((route) => pathname.startsWith(route))) {
@@ -530,11 +543,16 @@ function App() {
                   <Route path="lounge" element={<LoungeShell />}>
                     <Route index element={<LoungeLeaderboard />} />
                     <Route path="feed" element={<LoungeFeed />} />
-                    <Route path="chat" element={<LoungeMessages />} />
+                    <Route path="chat" element={<Navigate to="/community" replace />} />
                     <Route path="deals" element={<LoungeDeals />} />
                     <Route path="trader/:id" element={<TraderProfile />} />
                   </Route>
-                  <Route path="messages" element={<div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6"><LoungeMessages fullscreen /></div>} />
+                  <Route path="messages" element={<MessagesRedirect />} />
+                  <Route path="community" element={<TradersCommunity />} />
+                  <Route path="community/discover" element={<TradersCommunity />} />
+                  <Route path="community/s/:serverId" element={<TradersCommunity />} />
+                  <Route path="community/s/:serverId/:channelId" element={<TradersCommunity />} />
+                  <Route path="community/invite/:code" element={<CommunityInvite />} />
                 </Route>
                 </Route>
               </Route>

@@ -50,7 +50,8 @@ import {
 } from "lucide-react";
 import AppleSelect from "../components/ui/AppleSelect";
 import AppNotificationsCard from "../components/AppNotificationsCard";
-import { FollowListModal, ProfileStatTiles, ProfilePostsGrid } from "./lounge/TraderProfile";
+import { FollowListModal, ProfileStatTiles, ProfilePostsGrid, useTraderProfile } from "./lounge/TraderProfile";
+import { ProfileLinks, LinksEditor, tidyLinks } from "../components/lounge/ProfileLinks";
 import { useMe, ThreadModal } from "./lounge/LoungeFeed";
 const PaywallPricingGrid = lazy(() => import("../components/paywall/PaywallPricingGrid"));
 import { getPlanBadge } from "../utils/planBadge";
@@ -318,14 +319,9 @@ export default function Profile({ defaultTab }) {
   const [revokingId, setRevokingId] = useState(null);
   const [revokingAll, setRevokingAll] = useState(false);
   const me = useMe();
-  const [social, setSocial] = useState(null);
+  const [social, setSocial, socialStats] = useTraderProfile(userId);
   const [listKind, setListKind] = useState(null);
   const [openPostId, setOpenPostId] = useState(null);
-
-  useEffect(() => {
-    if (!userId) return;
-    api.get(`/api/social/traders/${userId}`).then(({ data }) => setSocial(data)).catch(() => {});
-  }, [userId]);
 
   // ── 2. FETCH LATEST PROFILE FROM SUPABASE BACKEND ──
   useEffect(() => {
@@ -865,6 +861,14 @@ export default function Profile({ defaultTab }) {
     } catch (err) {
       console.warn("[Profile] Profile save notice:", err.message);
     }
+
+    const links = tidyLinks(editProfileForm.links);
+    try {
+      await api.put("/api/social/me", { bio: editProfileForm.bio, links });
+      setSocial((sc) => (sc && !sc.error ? { ...sc, bio: editProfileForm.bio, links } : sc));
+    } catch (err) {
+      console.warn("[Profile] Social profile save notice:", err.message);
+    }
   };
 
   // ── RULE ADJUSTMENT HELPERS (Stepper + Dropdowns) ──
@@ -1126,21 +1130,21 @@ export default function Profile({ defaultTab }) {
               <span>·</span>
               <span>Joined {profile.joinedYear}</span>
             </div>
-            {social && (
-              <div className="flex gap-5 sm:gap-8 mt-3 text-sm">
-                <span>
-                  <strong className="text-neutral-900 dark:text-white">{social.postsCount ?? social.posts.length}</strong> <span className="text-neutral-500">posts</span>
-                </span>
-                {["followers", "following"].map((k) => (
-                  <button key={k} type="button" onClick={() => setListKind(k)} className="hover:opacity-70 cursor-pointer">
-                    <strong className="text-neutral-900 dark:text-white">{social[k]}</strong> <span className="text-neutral-500">{k}</span>
-                  </button>
-                ))}
-              </div>
-            )}
+            <div className="flex gap-4 sm:gap-8 mt-3 text-sm">
+              <span>
+                <strong className="text-neutral-900 dark:text-white">{social?.posts ? social.postsCount ?? social.posts.length : "–"}</strong>{" "}
+                <span className="text-neutral-500">posts</span>
+              </span>
+              {["followers", "following"].map((k) => (
+                <button key={k} type="button" onClick={() => setListKind(k)} className="hover:opacity-70 cursor-pointer">
+                  <strong className="text-neutral-900 dark:text-white">{social?.[k] ?? "–"}</strong> <span className="text-neutral-500">{k}</span>
+                </button>
+              ))}
+            </div>
             {(social?.bio || profile.bio) && (
               <p className="mt-2 text-sm text-neutral-700 dark:text-neutral-300 whitespace-pre-line max-w-xl">{social?.bio || profile.bio}</p>
             )}
+            <ProfileLinks links={social?.links} className="mt-1" />
           </div>
         </div>
 
@@ -1148,7 +1152,7 @@ export default function Profile({ defaultTab }) {
         <button
           type="button"
           onClick={() => {
-            setEditProfileForm(profile);
+            setEditProfileForm({ ...profile, bio: social?.bio || profile.bio, links: social?.links || [] });
             setIsEditProfileOpen(true);
           }}
           className="px-4 py-2 rounded-2xl border border-black/[0.08] dark:border-white/[0.1] bg-neutral-50 dark:bg-white/[0.04] hover:bg-neutral-100 dark:hover:bg-white/[0.08] text-xs font-bold text-neutral-800 dark:text-neutral-200 flex items-center gap-2 transition-all shadow-xs active:scale-95 cursor-pointer"
@@ -1166,9 +1170,9 @@ export default function Profile({ defaultTab }) {
           </Link>
         )}
         </div>
-        {social?.stats && (
+        {socialStats?.stats && (
           <div className="w-full -mt-2">
-            <ProfileStatTiles stats={social.stats} />
+            <ProfileStatTiles stats={socialStats.stats} />
           </div>
         )}
       </div>
@@ -1220,6 +1224,18 @@ export default function Profile({ defaultTab }) {
       ══════════════════════════════════════════════════════════════ */}
       {activeTab === "profile" && (
         <div className="space-y-6">
+          {social?.posts ? (
+            <ProfilePostsGrid posts={social.posts} onOpen={(post) => setOpenPostId(post.id)} />
+          ) : (
+            <div className="rounded-3xl bg-white dark:bg-[#121622] border border-black/[0.06] dark:border-white/[0.08] overflow-hidden">
+              <div className="h-11 border-b border-black/[0.05] dark:border-white/[0.06]" />
+              <div className="grid grid-cols-3 gap-0.5 sm:gap-1">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <div key={i} className="aspect-square bg-black/[0.04] dark:bg-white/[0.05] animate-pulse" />
+                ))}
+              </div>
+            </div>
+          )}
           {/* ── TRADING RULES SECTION (5 Bento Cards + Edit Rules) ── */}
           <div
             id="trading-rules"
@@ -1593,7 +1609,6 @@ export default function Profile({ defaultTab }) {
           {/* ── ACTIVE DEVICES & SESSIONS (Prominently displayed in Profile) ── */}
           {renderActiveDevicesCard()}
 
-          {social && <ProfilePostsGrid posts={social.posts} onOpen={(post) => setOpenPostId(post.id)} />}
         </div>
       )}
 
@@ -2164,7 +2179,7 @@ export default function Profile({ defaultTab }) {
             <div className="absolute inset-0" onClick={() => setIsEditProfileOpen(false)} />
             <form
               onSubmit={handleSaveProfile}
-              className="relative w-full max-w-lg bg-white/95 dark:bg-[#121622]/95 border border-black/[0.08] dark:border-white/[0.12] rounded-3xl shadow-[0_25px_70px_rgba(0,0,0,0.2)] dark:shadow-[0_30px_80px_rgba(0,0,0,0.7)] p-6 space-y-4 backdrop-blur-2xl animate-in zoom-in-95 duration-200"
+              className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto bg-white/95 dark:bg-[#121622]/95 border border-black/[0.08] dark:border-white/[0.12] rounded-3xl shadow-[0_25px_70px_rgba(0,0,0,0.2)] dark:shadow-[0_30px_80px_rgba(0,0,0,0.7)] p-6 space-y-4 backdrop-blur-2xl animate-in zoom-in-95 duration-200"
             >
               <div className="flex items-center justify-between pb-3 border-b border-black/[0.06] dark:border-white/[0.08]">
                 <h3 className="text-base font-bold text-neutral-900 dark:text-white">
@@ -2227,6 +2242,16 @@ export default function Profile({ defaultTab }) {
                       setEditProfileForm({ ...editProfileForm, bio: e.target.value })
                     }
                     className="w-full px-3.5 py-2 rounded-xl bg-neutral-100 dark:bg-white/[0.05] border border-black/[0.08] dark:border-white/[0.1] text-xs font-medium text-neutral-900 dark:text-white focus:outline-none focus:border-blue-500 resize-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-neutral-600 dark:text-neutral-300 mb-1">
+                    Links
+                  </label>
+                  <LinksEditor
+                    links={editProfileForm.links || []}
+                    onChange={(links) => setEditProfileForm({ ...editProfileForm, links })}
                   />
                 </div>
               </div>

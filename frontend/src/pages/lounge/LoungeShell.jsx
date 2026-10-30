@@ -1,6 +1,6 @@
 // frontend/src/pages/lounge/LoungeShell.jsx
 import { Link, NavLink, Outlet } from "react-router-dom";
-import { Trophy, MessageSquareText, MessagesSquare, Gift, Users, UserRound } from "lucide-react";
+import { Trophy, MessageSquareText, Gift, Users, UserRound } from "lucide-react";
 import { glass } from "../../components/lounge/LoungeUI";
 import { useOnlineSet } from "../../lib/socket";
 import TraderSearch from "../../components/lounge/TraderSearch";
@@ -8,7 +8,6 @@ import TraderSearch from "../../components/lounge/TraderSearch";
 const TABS = [
   { to: "/lounge", end: true, label: "Leaderboard", icon: Trophy },
   { to: "/lounge/feed", label: "Thought Stream", icon: MessageSquareText },
-  { to: "/lounge/chat", label: "Messages", icon: MessagesSquare },
   { to: "/lounge/deals", label: "Partner Deals", icon: Gift },
 ];
 
@@ -26,7 +25,7 @@ export default function LoungeShell() {
           <div>
             <h1 className="text-xl font-bold text-neutral-900 dark:text-white tracking-tight">Traders Lounge</h1>
             <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 mt-0.5">
-              Verified rankings, trader thoughts, live chat and partner deals
+              Verified rankings, trader thoughts and partner deals
             </p>
           </div>
         </div>

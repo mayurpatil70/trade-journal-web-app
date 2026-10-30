@@ -7,7 +7,7 @@ import api from "../../api/axios";
 import { ChatThread, ConversationList, useConversations, openDirect } from "./Messenger";
 import { useSocketEvent } from "../../lib/socket";
 
-const HIDDEN_ON = ["/lounge/chat", "/messages"];
+const HIDDEN_ON = ["/community"];
 
 export default function FloatingMessenger() {
   const [open, setOpen] = useState(false);
@@ -91,7 +91,7 @@ export default function FloatingMessenger() {
                 <button
                   onClick={() => {
                     setOpen(false);
-                    navigate(active && !active.is_public && active.peer ? `/messages?with=${active.peer.id}` : "/messages");
+                    navigate(active && !active.is_public && active.peer ? `/community?with=${active.peer.id}` : "/community");
                   }}
                   className="p-1.5 rounded-full hover:bg-black/[0.05] dark:hover:bg-white/[0.08]"
                   aria-label="Open full screen"
