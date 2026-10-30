@@ -15,7 +15,7 @@ const LIST_TABS = [
   { value: "mutuals", label: "Mutuals" },
 ];
 
-function FollowListModal({ userId, kind, onClose, showMutuals }) {
+export function FollowListModal({ userId, kind, onClose, showMutuals }) {
   const [tab, setTab] = useState(kind);
   const [list, setList] = useState(null);
   useEffect(() => {
@@ -80,6 +80,62 @@ function PostTile({ post, onOpen }) {
   );
 }
 
+export function ProfileStatTiles({ stats }) {
+  if (!stats) return null;
+  const tiles = [
+    { label: "Total PnL", value: formatMoney(stats.total_pnl), tone: Number(stats.total_pnl) >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-red-500" },
+    { label: "Win rate", value: `${stats.win_rate ?? 0}%` },
+    { label: "Profit factor", value: stats.profit_factor ?? "∞" },
+    { label: "Consistency", value: `${stats.consistency_score ?? 0}%` },
+    { label: "Discipline", value: `${stats.discipline_pct ?? 0}%` },
+    { label: "Trades", value: stats.total_trades },
+  ];
+  return (
+    <div className="mt-6 grid grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3">
+      {tiles.map((t) => (
+        <div key={t.label} className="rounded-2xl bg-black/[0.03] dark:bg-white/[0.04] border border-black/[0.04] dark:border-white/[0.06] px-3 py-2.5">
+          <div className={`text-base font-bold font-mono ${t.tone || "text-neutral-900 dark:text-white"}`}>{t.value}</div>
+          <div className="text-[10px] uppercase tracking-wider font-semibold text-neutral-400 mt-0.5">{t.label}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export function ProfilePostsGrid({ posts, onOpen }) {
+  const [tab, setTab] = useState("posts");
+  const shownPosts = tab === "setups" ? posts.filter((p) => p.isSetup) : posts;
+  return (
+    <div className={`${glass} overflow-hidden`}>
+      <div className="flex justify-center gap-10 border-b border-black/[0.05] dark:border-white/[0.06]">
+        {[
+          { value: "posts", label: "Posts", icon: Grid3x3 },
+          { value: "setups", label: "Setups", icon: LineChart },
+        ].map(({ value, label, icon: Icon }) => (
+          <button
+            key={value}
+            onClick={() => setTab(value)}
+            className={`inline-flex items-center gap-1.5 py-3 text-xs font-bold uppercase tracking-widest border-t-2 -mt-px transition-colors ${
+              tab === value ? "border-neutral-900 dark:border-white text-neutral-900 dark:text-white" : "border-transparent text-neutral-400 hover:text-neutral-600"
+            }`}
+          >
+            <Icon className="w-3.5 h-3.5" /> {label}
+          </button>
+        ))}
+      </div>
+      {shownPosts.length === 0 ? (
+        <EmptyState title={tab === "setups" ? "No setups shared yet" : "No posts yet"} />
+      ) : (
+        <div className="grid grid-cols-3 gap-0.5 sm:gap-1">
+          {shownPosts.map((p) => (
+            <PostTile key={p.id} post={p} onOpen={onOpen} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function TraderProfile() {
   const { id } = useParams();
   const me = useMe();
@@ -88,7 +144,6 @@ export default function TraderProfile() {
   const [busy, setBusy] = useState(false);
   const [listKind, setListKind] = useState(null);
   const [openId, setOpenId] = useState(null);
-  const [tab, setTab] = useState("posts");
   const [editing, setEditing] = useState(false);
 
   useEffect(() => {
@@ -123,18 +178,6 @@ export default function TraderProfile() {
   }
 
   const isMe = me?.id === id;
-  const stats = profile.stats;
-  const tiles = stats
-    ? [
-        { label: "Total PnL", value: formatMoney(stats.total_pnl), tone: Number(stats.total_pnl) >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-red-500" },
-        { label: "Win rate", value: `${stats.win_rate ?? 0}%` },
-        { label: "Profit factor", value: stats.profit_factor ?? "∞" },
-        { label: "Consistency", value: `${stats.consistency_score ?? 0}%` },
-        { label: "Discipline", value: `${stats.discipline_pct ?? 0}%` },
-        { label: "Trades", value: stats.total_trades },
-      ]
-    : [];
-  const shownPosts = tab === "setups" ? profile.posts.filter((p) => p.isSetup) : profile.posts;
   const counts = [
     { key: "posts", label: "posts", value: profile.postsCount ?? profile.posts.length },
     { key: "followers", label: "followers", value: profile.followers },
@@ -221,45 +264,10 @@ export default function TraderProfile() {
           </div>
         </div>
 
-        {tiles.length > 0 && (
-          <div className="mt-6 grid grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3">
-            {tiles.map((t) => (
-              <div key={t.label} className="rounded-2xl bg-black/[0.03] dark:bg-white/[0.04] border border-black/[0.04] dark:border-white/[0.06] px-3 py-2.5">
-                <div className={`text-base font-bold font-mono ${t.tone || "text-neutral-900 dark:text-white"}`}>{t.value}</div>
-                <div className="text-[10px] uppercase tracking-wider font-semibold text-neutral-400 mt-0.5">{t.label}</div>
-              </div>
-            ))}
-          </div>
-        )}
+        <ProfileStatTiles stats={profile.stats} />
       </div>
 
-      <div className={`${glass} overflow-hidden`}>
-        <div className="flex justify-center gap-10 border-b border-black/[0.05] dark:border-white/[0.06]">
-          {[
-            { value: "posts", label: "Posts", icon: Grid3x3 },
-            { value: "setups", label: "Setups", icon: LineChart },
-          ].map(({ value, label, icon: Icon }) => (
-            <button
-              key={value}
-              onClick={() => setTab(value)}
-              className={`inline-flex items-center gap-1.5 py-3 text-xs font-bold uppercase tracking-widest border-t-2 -mt-px transition-colors ${
-                tab === value ? "border-neutral-900 dark:border-white text-neutral-900 dark:text-white" : "border-transparent text-neutral-400 hover:text-neutral-600"
-              }`}
-            >
-              <Icon className="w-3.5 h-3.5" /> {label}
-            </button>
-          ))}
-        </div>
-        {shownPosts.length === 0 ? (
-          <EmptyState title={tab === "setups" ? "No setups shared yet" : "No posts yet"} />
-        ) : (
-          <div className="grid grid-cols-3 gap-0.5 sm:gap-1">
-            {shownPosts.map((p) => (
-              <PostTile key={p.id} post={p} onOpen={(post) => setOpenId(post.id)} />
-            ))}
-          </div>
-        )}
-      </div>
+      <ProfilePostsGrid posts={profile.posts} onOpen={(post) => setOpenId(post.id)} />
 
       {listKind && <FollowListModal userId={id} kind={listKind} showMutuals={!isMe} onClose={() => setListKind(null)} />}
       {openId && (

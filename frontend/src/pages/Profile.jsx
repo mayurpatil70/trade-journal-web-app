@@ -1,6 +1,6 @@
 // frontend/src/pages/Profile.jsx
 import { useState, useEffect, useRef, lazy, Suspense } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { createPortal } from "react-dom";
 import ApplePresetDropdown from "../components/ui/ApplePresetDropdown";
 import ProfilePhotoModal from "../components/ui/ProfilePhotoModal";
@@ -50,6 +50,8 @@ import {
 } from "lucide-react";
 import AppleSelect from "../components/ui/AppleSelect";
 import AppNotificationsCard from "../components/AppNotificationsCard";
+import { FollowListModal, ProfileStatTiles, ProfilePostsGrid } from "./lounge/TraderProfile";
+import { useMe, ThreadModal } from "./lounge/LoungeFeed";
 const PaywallPricingGrid = lazy(() => import("../components/paywall/PaywallPricingGrid"));
 import { getPlanBadge } from "../utils/planBadge";
 import api, { logoutSession, clearSession } from "../api/axios";
@@ -315,6 +317,15 @@ export default function Profile({ defaultTab }) {
   const [loadingSessions, setLoadingSessions] = useState(false);
   const [revokingId, setRevokingId] = useState(null);
   const [revokingAll, setRevokingAll] = useState(false);
+  const me = useMe();
+  const [social, setSocial] = useState(null);
+  const [listKind, setListKind] = useState(null);
+  const [openPostId, setOpenPostId] = useState(null);
+
+  useEffect(() => {
+    if (!userId) return;
+    api.get(`/api/social/traders/${userId}`).then(({ data }) => setSocial(data)).catch(() => {});
+  }, [userId]);
 
   // ── 2. FETCH LATEST PROFILE FROM SUPABASE BACKEND ──
   useEffect(() => {
@@ -1061,13 +1072,13 @@ export default function Profile({ defaultTab }) {
                 src={profile.avatarUrl}
                 alt={profile.displayName}
                 onClick={() => setIsPhotoModalOpen(true)}
-                className="w-16 h-16 rounded-full object-cover ring-2 ring-blue-500/20 shadow-md cursor-pointer hover:ring-4 hover:ring-blue-500/40 hover:scale-105 transition-all"
+                className="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover ring-2 ring-blue-500/20 shadow-md cursor-pointer hover:ring-4 hover:ring-blue-500/40 hover:scale-105 transition-all"
                 title="Click to view & update profile photo"
               />
             ) : (
               <div
                 onClick={() => setIsPhotoModalOpen(true)}
-                className="w-16 h-16 rounded-full bg-gradient-to-tr from-blue-500 to-blue-500 text-white flex items-center justify-center font-black text-2xl shadow-md cursor-pointer hover:ring-4 hover:ring-blue-500/40 hover:scale-105 transition-all"
+                className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-tr from-blue-500 to-blue-500 text-white flex items-center justify-center font-black text-2xl shadow-md cursor-pointer hover:ring-4 hover:ring-blue-500/40 hover:scale-105 transition-all"
                 title="Click to view & update profile photo"
               >
                 {initialLetter}
@@ -1115,10 +1126,25 @@ export default function Profile({ defaultTab }) {
               <span>·</span>
               <span>Joined {profile.joinedYear}</span>
             </div>
+            {social && (
+              <div className="flex gap-5 sm:gap-8 mt-3 text-sm">
+                <span>
+                  <strong className="text-neutral-900 dark:text-white">{social.postsCount ?? social.posts.length}</strong> <span className="text-neutral-500">posts</span>
+                </span>
+                {["followers", "following"].map((k) => (
+                  <button key={k} type="button" onClick={() => setListKind(k)} className="hover:opacity-70 cursor-pointer">
+                    <strong className="text-neutral-900 dark:text-white">{social[k]}</strong> <span className="text-neutral-500">{k}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+            {(social?.bio || profile.bio) && (
+              <p className="mt-2 text-sm text-neutral-700 dark:text-neutral-300 whitespace-pre-line max-w-xl">{social?.bio || profile.bio}</p>
+            )}
           </div>
         </div>
 
-        {/* Edit Profile Button */}
+        <div className="flex items-center gap-2 flex-wrap">
         <button
           type="button"
           onClick={() => {
@@ -1130,6 +1156,21 @@ export default function Profile({ defaultTab }) {
           <Pencil className="w-3.5 h-3.5" />
           <span>Edit Profile</span>
         </button>
+        {userId && (
+          <Link
+            to={`/lounge/trader/${userId}`}
+            className="px-4 py-2 rounded-2xl border border-black/[0.08] dark:border-white/[0.1] bg-neutral-50 dark:bg-white/[0.04] hover:bg-neutral-100 dark:hover:bg-white/[0.08] text-xs font-bold text-neutral-800 dark:text-neutral-200 flex items-center gap-2 transition-all shadow-xs active:scale-95"
+          >
+            <ExternalLink className="w-3.5 h-3.5" />
+            <span>View public profile</span>
+          </Link>
+        )}
+        </div>
+        {social?.stats && (
+          <div className="w-full -mt-2">
+            <ProfileStatTiles stats={social.stats} />
+          </div>
+        )}
       </div>
 
       {/* ── 2. TABS BAR: Profile, Settings, Billing ── */}
@@ -1551,7 +1592,19 @@ export default function Profile({ defaultTab }) {
 
           {/* ── ACTIVE DEVICES & SESSIONS (Prominently displayed in Profile) ── */}
           {renderActiveDevicesCard()}
+
+          {social && <ProfilePostsGrid posts={social.posts} onOpen={(post) => setOpenPostId(post.id)} />}
         </div>
+      )}
+
+      {listKind && <FollowListModal userId={userId} kind={listKind} showMutuals={false} onClose={() => setListKind(null)} />}
+      {openPostId && (
+        <ThreadModal
+          postId={openPostId}
+          me={me}
+          onClose={() => setOpenPostId(null)}
+          onPostChange={(np) => setSocial((sc) => ({ ...sc, posts: sc.posts.map((x) => (x.id === np.id ? np : x)) }))}
+        />
       )}
 
       {/* ══════════════════════════════════════════════════════════════
