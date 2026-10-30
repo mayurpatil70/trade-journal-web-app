@@ -1,5 +1,8 @@
 // frontend/src/components/PromoPopup.jsx
 // WinProFX × Trade with Rayan Official IB Partnership Modal
+// Strictly restricted: ONLY pops up ONCE for brand NEW users entering /dashboard.
+// NEVER pops up for returning / existing users signing in via magic link or login.
+// NEVER pops up when navigating to /calendar, /news, /add-trade, /trades, etc.
 
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
@@ -10,66 +13,63 @@ export default function PromoPopup() {
   const location = useLocation();
 
   useEffect(() => {
-    // 1. DO NOT show popup on Prop Firm route (/accounts)
-    if (location.pathname === "/accounts") {
+    // 1. STRICT ROUTE CHECK: ONLY eligible on /dashboard, NEVER on any other page
+    if (location.pathname !== "/dashboard") {
       return;
     }
 
-    // 2. Track page reloads / refreshes (fallback trigger if user refreshes 2 times in session)
-    const refreshCount =
-      parseInt(sessionStorage.getItem("fn_app_refresh_count") || "0", 10) + 1;
-    sessionStorage.setItem("fn_app_refresh_count", String(refreshCount));
+    const userId =
+      localStorage.getItem("userId") ||
+      localStorage.getItem("userEmail") ||
+      "trader_user";
 
-    const refreshPopupShown =
-      sessionStorage.getItem("winpro_refresh_popup_shown") === "true";
-    if (refreshCount >= 2 && !refreshPopupShown) {
+    const userDismissedKey = `fn_ib_popup_dismissed_${userId}`;
+    const isGloballyDismissed = localStorage.getItem("winpro_ib_dismissed") === "true";
+    const isUserDismissed = localStorage.getItem(userDismissedKey) === "true";
+
+    // 2. If already shown / dismissed for this user, NEVER show it again
+    if (isGloballyDismissed || isUserDismissed) {
+      return;
+    }
+
+    // 3. New User Verification:
+    // Only show if the user is a fresh signup ("fn_new_signup" === "true")
+    // Returning users signing in through magic link or login will NOT have "fn_new_signup" === "true"
+    const isNewSignup = localStorage.getItem("fn_new_signup") === "true";
+    const hasVisitedDashboardBefore = localStorage.getItem(`fn_dashboard_visited_${userId}`) === "true";
+
+    if (!isNewSignup || hasVisitedDashboardBefore) {
+      // Mark as dismissed for returning user so it never activates
+      localStorage.setItem(userDismissedKey, "true");
+      return;
+    }
+
+    // 4. Pop up once for new user on first dashboard entry
+    const timer = setTimeout(() => {
       setIsOpen(true);
-      sessionStorage.setItem("winpro_refresh_popup_shown", "true");
-      return;
-    }
+      localStorage.setItem(userDismissedKey, "true");
+      localStorage.setItem("winpro_ib_dismissed", "true");
+      localStorage.setItem(`fn_dashboard_visited_${userId}`, "true");
+      localStorage.removeItem("fn_new_signup");
+    }, 1200);
 
-    // 3. IB Card Popup rules for /dashboard:
-    // A) Pop up when new user signs up and enters /dashboard
-    // B) Pop up when ANY user hits /dashboard for the first time in a 24-hour trading day
-    // C) Automatically reset when a new 24h trading day begins
-    if (location.pathname === "/dashboard") {
-      const isNewSignup = localStorage.getItem("fn_new_signup") === "true";
-      const lastShownDay = localStorage.getItem("winpro_ib_popup_shown_day");
-      const lastShownAt = parseInt(
-        localStorage.getItem("winpro_ib_popup_shown_at") || "0",
-        10
-      );
+    return () => clearTimeout(timer);
+  }, [location.pathname]);
 
-      const now = Date.now();
-      const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;
-      const todayStr = new Date().toLocaleDateString("en-CA"); // YYYY-MM-DD
-
-      // Is it a new trading day? Either calendar date changed OR >= 24h elapsed
-      const isNewTradingDay =
-        !lastShownDay ||
-        lastShownDay !== todayStr ||
-        now - lastShownAt >= TWENTY_FOUR_HOURS;
-
-      if (isNewSignup || isNewTradingDay) {
-        const timer = setTimeout(() => {
-          setIsOpen(true);
-          localStorage.setItem("winpro_ib_popup_shown_day", todayStr);
-          localStorage.setItem("winpro_ib_popup_shown_at", now.toString());
-          if (isNewSignup) {
-            localStorage.removeItem("fn_new_signup");
-          }
-        }, 900);
-        return () => clearTimeout(timer);
-      }
-    }
-
-    // Custom event listener if triggered programmatically
+  // Programmatic trigger (e.g. from affiliate dashboard or user click)
+  useEffect(() => {
     const handleOpenPromo = () => setIsOpen(true);
     window.addEventListener("open-winpro-promo", handleOpenPromo);
     return () => window.removeEventListener("open-winpro-promo", handleOpenPromo);
-  }, [location.pathname]);
+  }, []);
 
   const handleClose = () => {
+    const userId =
+      localStorage.getItem("userId") ||
+      localStorage.getItem("userEmail") ||
+      "trader_user";
+    localStorage.setItem(`fn_ib_popup_dismissed_${userId}`, "true");
+    localStorage.setItem("winpro_ib_dismissed", "true");
     setIsOpen(false);
   };
 
@@ -77,6 +77,8 @@ export default function PromoPopup() {
 
   return (
     <div
+      role="dialog"
+      aria-modal="true"
       className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-black/60 dark:bg-black/80 backdrop-blur-md animate-in fade-in duration-200"
       onClick={handleClose}
     >

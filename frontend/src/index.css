@@ -444,8 +444,14 @@ LANDING PAGE ANIMATIONS
 ========================================================= */
 
 /* Marquee for testimonials */
-.animate-marquee { display: flex; width: max-content; animation: marquee 50s linear infinite; }
-.animate-marquee:hover { animation-play-state: paused; }
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee 50s linear infinite;
+}
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
 @keyframes marquee {
   0% {
     transform: translateX(0);
@@ -557,7 +563,10 @@ main,
 .mac-bento-card,
 .mac-glass-panel,
 .mac-glass-card {
-  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease,
+    color 150ms ease;
 }
 
 /* Trading theme ambient mesh background */
@@ -583,16 +592,23 @@ main,
   backdrop-filter: blur(24px) saturate(180%);
   -webkit-backdrop-filter: blur(24px) saturate(180%);
   border: 1px solid rgba(0, 0, 0, 0.07);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04), inset 0 1px 0 0 rgba(255, 255, 255, 0.9);
+  box-shadow:
+    0 8px 30px rgba(0, 0, 0, 0.04),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.9);
   border-radius: 1.25rem;
-  transition: background-color 300ms ease, border-color 300ms ease, box-shadow 300ms ease;
+  transition:
+    background-color 300ms ease,
+    border-color 300ms ease,
+    box-shadow 300ms ease;
 }
 
 .dark .mac-glass-panel,
 html.dark .mac-glass-panel {
   background: rgba(18, 22, 31, 0.65);
   border: 1px solid rgba(255, 255, 255, 0.09);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45), inset 0 1px 0 0 rgba(255, 255, 255, 0.12);
+  box-shadow:
+    0 16px 40px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.12);
 }
 
 /* 2. macOS Bento Card (Cards, widgets, metrics with squircle geometry) */
@@ -603,18 +619,23 @@ html.dark .mac-glass-panel {
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   border: 1px solid rgba(0, 0, 0, 0.06);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.035), inset 0 1px 0 0 rgba(255, 255, 255, 0.95);
+  box-shadow:
+    0 8px 30px rgba(0, 0, 0, 0.035),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.95);
   border-radius: 1.25rem;
-  transition: transform 250ms cubic-bezier(0.2, 0.8, 0.2, 1),
-              box-shadow 250ms cubic-bezier(0.2, 0.8, 0.2, 1),
-              border-color 250ms ease,
-              background-color 300ms ease;
+  transition:
+    transform 250ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 250ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    border-color 250ms ease,
+    background-color 300ms ease;
 }
 
 .mac-glass-card:hover,
 .mac-bento-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.06), inset 0 1px 0 0 rgba(255, 255, 255, 1);
+  box-shadow:
+    0 14px 35px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 0 rgba(255, 255, 255, 1);
   border-color: rgba(0, 0, 0, 0.1);
 }
 
@@ -624,7 +645,9 @@ html.dark .mac-glass-card,
 html.dark .mac-bento-card {
   background: rgba(22, 26, 36, 0.68);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.4), inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 12px 35px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
 }
 
 .dark .mac-glass-card:hover,
@@ -632,7 +655,9 @@ html.dark .mac-bento-card {
 html.dark .mac-glass-card:hover,
 html.dark .mac-bento-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.55), inset 0 1px 0 0 rgba(255, 255, 255, 0.15);
+  box-shadow:
+    0 18px 45px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.15);
   border-color: rgba(255, 255, 255, 0.14);
 }
 
@@ -643,9 +668,14 @@ html.dark .mac-bento-card:hover {
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   border: 1px solid rgba(0, 0, 0, 0.07);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04), inset 0 1px 0 0 rgba(255, 255, 255, 0.95);
+  box-shadow:
+    0 8px 30px rgba(0, 0, 0, 0.04),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.95);
   border-radius: 1.25rem;
-  transition: background-color 300ms ease, border-color 300ms ease, box-shadow 300ms ease;
+  transition:
+    background-color 300ms ease,
+    border-color 300ms ease,
+    box-shadow 300ms ease;
 }
 
 .dark .glossy,
@@ -670,7 +700,9 @@ html.dark .glossy {
   -webkit-backdrop-filter: blur(24px) saturate(180%);
   border-bottom: 1px solid rgba(0, 0, 0, 0.06);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
-  transition: background-color 300ms ease, border-color 300ms ease;
+  transition:
+    background-color 300ms ease,
+    border-color 300ms ease;
 }
 
 .dark .glossy-bar,
@@ -679,7 +711,9 @@ html.dark .glossy-bar {
     linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0)),
     rgba(14, 17, 24, 0.75);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: inset 0 -1px 0 rgba(16, 185, 129, 0.06), 0 4px 25px rgba(0, 0, 0, 0.35);
+  box-shadow:
+    inset 0 -1px 0 rgba(16, 185, 129, 0.06),
+    0 4px 25px rgba(0, 0, 0, 0.35);
 }
 
 .glossy-side {
@@ -687,7 +721,9 @@ html.dark .glossy-bar {
   backdrop-filter: blur(24px) saturate(180%);
   -webkit-backdrop-filter: blur(24px) saturate(180%);
   box-shadow: inset -1px 0 0 rgba(0, 0, 0, 0.06);
-  transition: background-color 300ms ease, border-color 300ms ease;
+  transition:
+    background-color 300ms ease,
+    border-color 300ms ease;
 }
 
 .dark .glossy-side,
@@ -835,7 +871,16 @@ html.light body:not(.terminal) [class~="text-gray-100"] {
 
 html.light
   body:not(.terminal)
-  .text-white:not([class*="bg-[#0066"]):not([class*="btn-primary-blue"]):not(:is(button, a, .btn-primary-blue, [class*="bg-[#0066"], [class*="bg-blue-600"]) *):not([class~="bg-emerald-500"]):not([class~="bg-emerald-600"]):not(
+  .text-white:not([class*="bg-[#0066"]):not([class*="btn-primary-blue"]):not(
+    :is(
+        button,
+        a,
+        .btn-primary-blue,
+        [class*="bg-[#0066"],
+        [class*="bg-blue-600"]
+      )
+      *
+  ):not([class~="bg-emerald-500"]):not([class~="bg-emerald-600"]):not(
     [class~="bg-emerald-400"]
   ):not([class~="bg-green-500"]):not([class~="bg-green-600"]):not(
     [class~="bg-red-500"]
@@ -865,9 +910,9 @@ html.light
   body:not(.terminal)
   [class*="hover:text-white"]:hover:not([class*="bg-emerald"]):not(
     [class*="bg-green"]
-  ):not([class*="bg-red"]):not([class*="bg-blue"]):not([class*="bg-purple"]):not(
-    [class*="bg-black"]
-  ) {
+  ):not([class*="bg-red"]):not([class*="bg-blue"]):not(
+    [class*="bg-purple"]
+  ):not([class*="bg-black"]) {
   color: var(--ink) !important;
 }
 
@@ -893,7 +938,9 @@ html.light body:not(.terminal) .mac-glass-panel {
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   border-color: rgba(0, 0, 0, 0.07) !important;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04), inset 0 1px 0 0 rgba(255, 255, 255, 0.95) !important;
+  box-shadow:
+    0 8px 30px rgba(0, 0, 0, 0.04),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.95) !important;
 }
 
 html.light body:not(.terminal) input,
@@ -925,7 +972,9 @@ input[type="time"]::-webkit-calendar-picker-indicator:hover {
 input[type="date"]::-webkit-calendar-picker-indicator,
 input[type="time"]::-webkit-calendar-picker-indicator {
   cursor: pointer;
-  transition: opacity 0.15s ease, transform 0.15s ease;
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease;
 }
 input[type="date"]::-webkit-calendar-picker-indicator:hover,
 input[type="time"]::-webkit-calendar-picker-indicator:hover {
@@ -979,34 +1028,102 @@ html.dark input[type="time"]::-webkit-calendar-picker-indicator {
 }
 
 /* LIGHT MODE: Pickers match UI components */
-html.light body:not(.terminal) input[type="date"]:not([class*="bg-[#0A0B0D]"]):not(.dark-luxury-card input),
-html.light body:not(.terminal) input[type="time"]:not([class*="bg-[#0A0B0D]"]):not(.dark-luxury-card input) {
+html.light
+  body:not(.terminal)
+  input[type="date"]:not([class*="bg-[#0A0B0D]"]):not(.dark-luxury-card input),
+html.light
+  body:not(.terminal)
+  input[type="time"]:not([class*="bg-[#0A0B0D]"]):not(.dark-luxury-card input) {
   color-scheme: light !important;
   color: var(--ink) !important;
 }
 
-html.light body:not(.terminal) input[type="date"]:not([class*="bg-[#0A0B0D]"]):not(.dark-luxury-card input)::-webkit-datetime-edit,
-html.light body:not(.terminal) input[type="date"]:not([class*="bg-[#0A0B0D]"]):not(.dark-luxury-card input)::-webkit-datetime-edit-fields-wrapper,
-html.light body:not(.terminal) input[type="date"]:not([class*="bg-[#0A0B0D]"]):not(.dark-luxury-card input)::-webkit-datetime-edit-text,
-html.light body:not(.terminal) input[type="date"]:not([class*="bg-[#0A0B0D]"]):not(.dark-luxury-card input)::-webkit-datetime-edit-month-field,
-html.light body:not(.terminal) input[type="date"]:not([class*="bg-[#0A0B0D]"]):not(.dark-luxury-card input)::-webkit-datetime-edit-day-field,
-html.light body:not(.terminal) input[type="date"]:not([class*="bg-[#0A0B0D]"]):not(.dark-luxury-card input)::-webkit-datetime-edit-year-field,
-html.light body:not(.terminal) input[type="time"]:not([class*="bg-[#0A0B0D]"]):not(.dark-luxury-card input)::-webkit-datetime-edit,
-html.light body:not(.terminal) input[type="time"]:not([class*="bg-[#0A0B0D]"]):not(.dark-luxury-card input)::-webkit-datetime-edit-fields-wrapper,
-html.light body:not(.terminal) input[type="time"]:not([class*="bg-[#0A0B0D]"]):not(.dark-luxury-card input)::-webkit-datetime-edit-text,
-html.light body:not(.terminal) input[type="time"]:not([class*="bg-[#0A0B0D]"]):not(.dark-luxury-card input)::-webkit-datetime-edit-hour-field,
-html.light body:not(.terminal) input[type="time"]:not([class*="bg-[#0A0B0D]"]):not(.dark-luxury-card input)::-webkit-datetime-edit-minute-field,
-html.light body:not(.terminal) input[type="time"]:not([class*="bg-[#0A0B0D]"]):not(.dark-luxury-card input)::-webkit-datetime-edit-ampm-field {
+html.light
+  body:not(.terminal)
+  input[type="date"]:not([class*="bg-[#0A0B0D]"]):not(
+    .dark-luxury-card input
+  )::-webkit-datetime-edit,
+html.light
+  body:not(.terminal)
+  input[type="date"]:not([class*="bg-[#0A0B0D]"]):not(
+    .dark-luxury-card input
+  )::-webkit-datetime-edit-fields-wrapper,
+html.light
+  body:not(.terminal)
+  input[type="date"]:not([class*="bg-[#0A0B0D]"]):not(
+    .dark-luxury-card input
+  )::-webkit-datetime-edit-text,
+html.light
+  body:not(.terminal)
+  input[type="date"]:not([class*="bg-[#0A0B0D]"]):not(
+    .dark-luxury-card input
+  )::-webkit-datetime-edit-month-field,
+html.light
+  body:not(.terminal)
+  input[type="date"]:not([class*="bg-[#0A0B0D]"]):not(
+    .dark-luxury-card input
+  )::-webkit-datetime-edit-day-field,
+html.light
+  body:not(.terminal)
+  input[type="date"]:not([class*="bg-[#0A0B0D]"]):not(
+    .dark-luxury-card input
+  )::-webkit-datetime-edit-year-field,
+html.light
+  body:not(.terminal)
+  input[type="time"]:not([class*="bg-[#0A0B0D]"]):not(
+    .dark-luxury-card input
+  )::-webkit-datetime-edit,
+html.light
+  body:not(.terminal)
+  input[type="time"]:not([class*="bg-[#0A0B0D]"]):not(
+    .dark-luxury-card input
+  )::-webkit-datetime-edit-fields-wrapper,
+html.light
+  body:not(.terminal)
+  input[type="time"]:not([class*="bg-[#0A0B0D]"]):not(
+    .dark-luxury-card input
+  )::-webkit-datetime-edit-text,
+html.light
+  body:not(.terminal)
+  input[type="time"]:not([class*="bg-[#0A0B0D]"]):not(
+    .dark-luxury-card input
+  )::-webkit-datetime-edit-hour-field,
+html.light
+  body:not(.terminal)
+  input[type="time"]:not([class*="bg-[#0A0B0D]"]):not(
+    .dark-luxury-card input
+  )::-webkit-datetime-edit-minute-field,
+html.light
+  body:not(.terminal)
+  input[type="time"]:not([class*="bg-[#0A0B0D]"]):not(
+    .dark-luxury-card input
+  )::-webkit-datetime-edit-ampm-field {
   color: var(--ink) !important;
 }
 
-html.light body:not(.terminal) input[type="date"]:not([class*="bg-[#0A0B0D]"]):not(.dark-luxury-card input)::-webkit-calendar-picker-indicator,
-html.light body:not(.terminal) input[type="time"]:not([class*="bg-[#0A0B0D]"]):not(.dark-luxury-card input)::-webkit-calendar-picker-indicator {
+html.light
+  body:not(.terminal)
+  input[type="date"]:not([class*="bg-[#0A0B0D]"]):not(
+    .dark-luxury-card input
+  )::-webkit-calendar-picker-indicator,
+html.light
+  body:not(.terminal)
+  input[type="time"]:not([class*="bg-[#0A0B0D]"]):not(
+    .dark-luxury-card input
+  )::-webkit-calendar-picker-indicator {
   filter: none !important;
   opacity: 0.65;
 }
-html.light body:not(.terminal) input[type="date"]:not([class*="bg-[#0A0B0D]"]):not(.dark-luxury-card input)::-webkit-calendar-picker-indicator:hover,
-html.light body:not(.terminal) input[type="time"]:not([class*="bg-[#0A0B0D]"]):not(.dark-luxury-card input)::-webkit-calendar-picker-indicator:hover {
+html.light
+  body:not(.terminal)
+  input[type="date"]:not([class*="bg-[#0A0B0D]"]):not(
+    .dark-luxury-card input
+  )::-webkit-calendar-picker-indicator:hover,
+html.light
+  body:not(.terminal)
+  input[type="time"]:not([class*="bg-[#0A0B0D]"]):not(
+    .dark-luxury-card input
+  )::-webkit-calendar-picker-indicator:hover {
   opacity: 0.95;
 }
 
@@ -1182,7 +1299,7 @@ html.light .trading-bg {
     var(--paper);
 }
 
-html.light body:not(.terminal) [class~="bg-black"]:not(.btn-dark-social):not(button):not(a) {
+html.light body:not(.terminal) [class~="bg-black"] {
   background-color: var(--paper) !important;
 }
 html.light
@@ -1191,9 +1308,21 @@ html.light
   background-color: rgb(0 0 0 / 0.04) !important;
 }
 /* Only convert dark hex backgrounds with opacity (e.g. bg-[#101216]/50) to light surface in light mode; never touch bright blue buttons */
-html.light body:not(.terminal) :not(button):not(a):not(.share-poster-preview):not(.share-poster-preview *)[class*="bg-[#0"][class*="/"],
-html.light body:not(.terminal) :not(button):not(a):not(.share-poster-preview):not(.share-poster-preview *)[class*="bg-[#1"][class*="/"],
-html.light body:not(.terminal) :not(button):not(a):not(.share-poster-preview):not(.share-poster-preview *)[class*="bg-[#2"][class*="/"] {
+html.light
+  body:not(.terminal)
+  :not(button):not(a):not(.share-poster-preview):not(
+    .share-poster-preview *
+  )[class*="bg-[#0"][class*="/"],
+html.light
+  body:not(.terminal)
+  :not(button):not(a):not(.share-poster-preview):not(
+    .share-poster-preview *
+  )[class*="bg-[#1"][class*="/"],
+html.light
+  body:not(.terminal)
+  :not(button):not(a):not(.share-poster-preview):not(
+    .share-poster-preview *
+  )[class*="bg-[#2"][class*="/"] {
   background-color: var(--surface-raised) !important;
 }
 html.light body:not(.terminal) [class*="border-gray-"] {
@@ -1289,16 +1418,16 @@ LANDING: theme tokens (light default, dark under .dark)
   -webkit-backdrop-filter: blur(16px);
 }
 .landing-root .landing-faq details summary {
-  color: #EDEAE3 !important;
+  color: #edeae3 !important;
 }
 .landing-root .landing-faq details summary span {
-  color: #EDEAE3 !important;
+  color: #edeae3 !important;
   font-size: 15px !important;
   font-weight: 600 !important;
   transition: color 0.2s ease;
 }
 .landing-root .landing-faq details summary:hover span {
-  color: #5FD4E8 !important;
+  color: #5fd4e8 !important;
 }
 .landing-root .landing-faq details p {
   color: rgba(237, 234, 227, 0.82) !important;
@@ -1325,7 +1454,11 @@ IRIDESCENT RING PILL BUTTON
   text-decoration: none;
   cursor: pointer;
   position: relative;
-  transition: background 0.25s ease, border-color 0.25s ease, transform 0.2s ease, box-shadow 0.25s ease;
+  transition:
+    background 0.25s ease,
+    border-color 0.25s ease,
+    transform 0.2s ease,
+    box-shadow 0.25s ease;
   user-select: none;
 }
 .iridescent-pill:hover {
@@ -1359,9 +1492,19 @@ IRIDESCENT RING PILL BUTTON
     #6ef0ff 84%,
     transparent 92%
   );
-  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 2.5px), #000 calc(100% - 2.5px));
-  mask: radial-gradient(farthest-side, transparent calc(100% - 2.5px), #000 calc(100% - 2.5px));
-  animation: orbit 2.6s linear infinite, hue 7s linear infinite;
+  -webkit-mask: radial-gradient(
+    farthest-side,
+    transparent calc(100% - 2.5px),
+    #000 calc(100% - 2.5px)
+  );
+  mask: radial-gradient(
+    farthest-side,
+    transparent calc(100% - 2.5px),
+    #000 calc(100% - 2.5px)
+  );
+  animation:
+    orbit 2.6s linear infinite,
+    hue 7s linear infinite;
 }
 .iridescent-pill:hover .iridescent-ring {
   animation-play-state: paused, running;
@@ -1376,7 +1519,7 @@ IRIDESCENT RING PILL BUTTON
   transform: translateX(2px);
 }
 .iridescent-label {
-  font-family: 'JetBrains Mono', 'Space Mono', monospace;
+  font-family: "JetBrains Mono", "Space Mono", monospace;
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.16em;
@@ -1505,10 +1648,10 @@ CINEMATIC HERO & INTERACTIVE MOTION SYSTEM
 
 /* Ensure font families render correctly */
 .font-serif-display {
-  font-family: 'Cormorant Garamond', 'Instrument Serif', Georgia, serif;
+  font-family: "Cormorant Garamond", "Instrument Serif", Georgia, serif;
 }
 .font-mono-code {
-  font-family: 'JetBrains Mono', 'Space Mono', monospace;
+  font-family: "JetBrains Mono", "Space Mono", monospace;
 }
 
 /* =========================================================
@@ -1544,10 +1687,6 @@ video::-moz-media-controls {
   user-select: none !important;
 }
 
-
-
-
-
 /* Primary Blue Button & Action Buttons Protection (Light & Dark Mode) */
 html.light body:not(.terminal) button[class*="bg-[#0066"],
 html.light body:not(.terminal) button[class*="bg-[#0066"] *,
@@ -1566,14 +1705,14 @@ button[class*="bg-[#0052"],
 button[class*="bg-blue-600"],
 button.btn-primary-blue,
 .btn-primary-blue {
-  background-color: #0066FF !important;
+  background-color: #0066ff !important;
   color: #ffffff !important;
 }
 button[class*="bg-[#0066"]:hover,
 button[class*="bg-[#0052"]:hover,
 button[class*="bg-blue-600"]:hover,
 button.btn-primary-blue:hover {
-  background-color: #0052CC !important;
+  background-color: #0052cc !important;
   color: #ffffff !important;
 }
 button[class*="bg-[#0066"] *,
@@ -1601,7 +1740,6 @@ button.btn-primary-blue *,
 .winpro-partnership-card span {
   text-shadow: none;
 }
-
 
 /* Morning Trading Quote Modal Fullscreen Isolation */
 body.fn-morning-modal-open [class*="coach"],

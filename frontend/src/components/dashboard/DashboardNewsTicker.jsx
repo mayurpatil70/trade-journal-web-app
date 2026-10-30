@@ -91,7 +91,7 @@ export default function DashboardNewsTicker() {
             return (
               <Link
                 key={`${ev.title || "ev"}-${idx}`}
-                to="/calendar"
+                to="/news"
                 className="inline-flex items-center gap-1.5 px-3 py-0.5 text-neutral-700 dark:text-neutral-300 hover:text-[#0066FF] dark:hover:text-[#38BDF8] transition-colors"
                 title={`${ev.country || ""} ${ev.title || ""} (${ev.impact || "Low"} Impact)`}
               >
@@ -134,12 +134,12 @@ export default function DashboardNewsTicker() {
         </div>
       </div>
 
-      {/* ── Right: Calendar Quick Link & Dismiss Button ── */}
+      {/* ── Right: Economic Calendar Quick Link & Dismiss Button ── */}
       <div className="flex items-center gap-1.5 px-2.5 h-full bg-white dark:bg-[#0c0f17] border-l border-black/[0.08] dark:border-white/[0.08] shrink-0 z-10">
         <Link
-          to="/calendar"
+          to="/news"
           className="text-[10px] font-bold text-neutral-500 hover:text-[#0066FF] dark:text-neutral-400 dark:hover:text-blue-400 flex items-center gap-0.5 px-1.5 py-0.5 rounded hover:bg-neutral-100 dark:hover:bg-white/[0.05] transition-colors"
-          title="Open Full Economic Calendar"
+          title="Open Full Economic Calendar of News"
         >
           <span>Calendar</span>
           <ChevronRight className="w-3 h-3" />

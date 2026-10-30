@@ -1,4 +1,4 @@
-﻿// frontend/src/components/PreTradeGate.jsx
+// frontend/src/components/PreTradeGate.jsx
 import { useState, useRef, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { X, Send, ChevronRight, Loader2, ImagePlus, XCircle, Maximize2, Minimize2 } from "lucide-react";
@@ -159,7 +159,7 @@ export default function PreTradeGate() {
 
   return (
     <div
-      className={`fixed z-50 flex flex-col items-end ${expanded && isOpen ? "inset-0 md:inset-6 md:left-auto" : "bottom-4 right-4 md:bottom-6 md:right-6"}`}
+      className={`fixed z-50 flex flex-col items-end ${expanded && isOpen ? "inset-0 md:inset-6 md:left-auto" : "bottom-11 right-4 md:bottom-12 md:right-6"}`}
       style={{ fontFamily: "'Inter', sans-serif" }}
     >
       {/* ── Chat Modal ───────────────────────────────────────────────────── */}
