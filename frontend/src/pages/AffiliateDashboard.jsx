@@ -85,7 +85,7 @@ export default function AffiliateDashboard() {
   if (loading) {
     return (
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 flex flex-col items-center justify-center min-h-[50vh]">
-        <Loader2 className="w-8 h-8 text-emerald-500 animate-spin mb-3" />
+        <Loader2 className="w-8 h-8 text-blue-500 animate-spin mb-3" />
         <p className="text-xs font-medium text-neutral-500 dark:text-neutral-400">
           Loading affiliate partner hub...
         </p>
@@ -138,7 +138,7 @@ export default function AffiliateDashboard() {
       <div className="rounded-3xl bg-white dark:bg-[#12151e]/85 backdrop-blur-xl border border-black/[0.06] dark:border-white/[0.08] shadow-[0_4px_24px_rgba(0,0,0,0.03)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.35)] p-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3.5">
-            <div className="w-11 h-11 rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold shadow-sm shrink-0">
+            <div className="w-11 h-11 rounded-2xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold shadow-sm shrink-0">
               <Wallet className="w-6 h-6" />
             </div>
             <div>
@@ -146,7 +146,7 @@ export default function AffiliateDashboard() {
                 <h1 className="text-xl sm:text-2xl font-bold text-neutral-900 dark:text-white tracking-tight">
                   Affiliate Partner Hub
                 </h1>
-                <span className="inline-flex px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20">
+                <span className="inline-flex px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-blue-500/10 text-blue-700 dark:text-blue-400 border border-blue-500/20">
                   10% Recurring Share
                 </span>
               </div>
@@ -174,8 +174,8 @@ export default function AffiliateDashboard() {
                 </h2>
               </div>
 
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold text-blue-600 dark:text-blue-400 bg-blue-500/10 border border-blue-500/20">
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
                 Active Link
               </span>
             </div>
@@ -186,13 +186,13 @@ export default function AffiliateDashboard() {
 
             {/* Apple Styled Link Container */}
             <div className="p-3 sm:p-3.5 rounded-2xl bg-neutral-100/90 dark:bg-black/30 border border-black/[0.06] dark:border-white/[0.08] flex items-center justify-between gap-3 shadow-inner">
-              <span className="font-mono text-xs sm:text-sm font-semibold text-emerald-700 dark:text-emerald-400 truncate select-all flex-1">
+              <span className="font-mono text-xs sm:text-sm font-semibold text-blue-700 dark:text-blue-400 truncate select-all flex-1">
                 {referralUrl}
               </span>
               <button
                 type="button"
                 onClick={handleCopyLink}
-                className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-md shadow-emerald-500/20 active:scale-95 transition-all cursor-pointer shrink-0"
+                className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-md shadow-blue-500/20 active:scale-95 transition-all cursor-pointer shrink-0"
               >
                 {copiedLink ? (
                   <>
@@ -223,7 +223,7 @@ export default function AffiliateDashboard() {
               <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-400 block mb-0.5">
                 Monthly
               </span>
-              <span className="text-sm font-extrabold text-emerald-600 dark:text-emerald-400">
+              <span className="text-sm font-extrabold text-blue-600 dark:text-blue-400">
                 $1.40
               </span>
             </div>
@@ -231,7 +231,7 @@ export default function AffiliateDashboard() {
               <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-400 block mb-0.5">
                 Yearly
               </span>
-              <span className="text-sm font-extrabold text-emerald-600 dark:text-emerald-400">
+              <span className="text-sm font-extrabold text-blue-600 dark:text-blue-400">
                 $11.40
               </span>
             </div>
@@ -244,7 +244,7 @@ export default function AffiliateDashboard() {
             {/* Header row */}
             <div className="flex items-center justify-between pb-3 border-b border-black/[0.05] dark:border-white/[0.06]">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center">
                   <Coins className="w-4 h-4" />
                 </div>
                 <h2 className="text-sm font-bold text-neutral-900 dark:text-white">
@@ -262,7 +262,7 @@ export default function AffiliateDashboard() {
               <span className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 block mb-1">
                 Withdrawable Balance
               </span>
-              <div className="text-4xl sm:text-5xl font-mono font-extrabold text-emerald-600 dark:text-emerald-400 tracking-tight">
+              <div className="text-4xl sm:text-5xl font-mono font-extrabold text-blue-600 dark:text-blue-400 tracking-tight">
                 ${balance.toFixed(2)}
               </div>
             </div>
@@ -275,7 +275,7 @@ export default function AffiliateDashboard() {
               </div>
               <div className="w-full h-2 rounded-full bg-neutral-100 dark:bg-white/[0.06] overflow-hidden">
                 <div
-                  className="h-full bg-emerald-500 rounded-full transition-all duration-500"
+                  className="h-full bg-blue-500 rounded-full transition-all duration-500"
                   style={{ width: `${progressPercent}%` }}
                 />
               </div>
@@ -291,7 +291,7 @@ export default function AffiliateDashboard() {
                 placeholder="0x..."
                 value={withdrawAddress}
                 onChange={(e) => setWithdrawAddress(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-2xl bg-neutral-100/80 dark:bg-white/[0.04] border border-black/[0.06] dark:border-white/[0.08] text-sm font-mono text-neutral-900 dark:text-white placeholder-neutral-400 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all font-medium"
+                className="w-full px-4 py-2.5 rounded-2xl bg-neutral-100/80 dark:bg-white/[0.04] border border-black/[0.06] dark:border-white/[0.08] text-sm font-mono text-neutral-900 dark:text-white placeholder-neutral-400 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all font-medium"
               />
             </div>
           </div>
@@ -304,7 +304,7 @@ export default function AffiliateDashboard() {
               disabled={balance < minThreshold || isSubmitting}
               className={`w-full py-3 px-6 rounded-2xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all ${
                 balance >= minThreshold && !isSubmitting
-                  ? "bg-emerald-600 hover:bg-emerald-500 text-white shadow-md shadow-emerald-500/25 active:scale-[0.98] cursor-pointer"
+                  ? "bg-blue-600 hover:bg-blue-500 text-white shadow-md shadow-blue-500/25 active:scale-[0.98] cursor-pointer"
                   : "bg-neutral-100 dark:bg-white/[0.04] text-neutral-400 dark:text-neutral-500 border border-black/[0.05] dark:border-white/[0.06] cursor-not-allowed"
               }`}
             >
@@ -363,7 +363,7 @@ export default function AffiliateDashboard() {
           </div>
 
           <div className="p-4 rounded-2xl bg-neutral-50 dark:bg-white/[0.02] border border-black/[0.04] dark:border-white/[0.05] space-y-2">
-            <div className="w-8 h-8 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center font-bold text-xs">
+            <div className="w-8 h-8 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold text-xs">
               2
             </div>
             <h4 className="text-xs font-bold text-neutral-900 dark:text-white">
@@ -375,7 +375,7 @@ export default function AffiliateDashboard() {
           </div>
 
           <div className="p-4 rounded-2xl bg-neutral-50 dark:bg-white/[0.02] border border-black/[0.04] dark:border-white/[0.05] space-y-2">
-            <div className="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold text-xs">
+            <div className="w-8 h-8 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold text-xs">
               3
             </div>
             <h4 className="text-xs font-bold text-neutral-900 dark:text-white">

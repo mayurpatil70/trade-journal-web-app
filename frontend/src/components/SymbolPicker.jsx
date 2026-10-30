@@ -115,7 +115,7 @@ export default function SymbolPicker({ value, onChange, target = 'chart', label,
           </div>
           <div className="mt-2 flex gap-1 overflow-x-auto text-xs">
             {TABS.map((t) => (
-              <button key={t.id} type="button" onClick={() => { setTab(t.id); setPage(1); setItems([]); }} className={`whitespace-nowrap rounded-md px-2.5 py-1.5 font-semibold ${tab === t.id ? 'bg-emerald-500/15 text-cyan-300' : 'text-gray-400 hover:bg-white/5'}`}>
+              <button key={t.id} type="button" onClick={() => { setTab(t.id); setPage(1); setItems([]); }} className={`whitespace-nowrap rounded-md px-2.5 py-1.5 font-semibold ${tab === t.id ? 'bg-blue-500/15 text-sky-300' : 'text-gray-400 hover:bg-white/5'}`}>
                 {t.label}
               </button>
             ))}
@@ -130,11 +130,11 @@ export default function SymbolPicker({ value, onChange, target = 'chart', label,
                 </button>
               );
             })}
-            {loading && <div className="flex justify-center py-3"><Loader2 className="h-4 w-4 animate-spin text-emerald-400" /></div>}
+            {loading && <div className="flex justify-center py-3"><Loader2 className="h-4 w-4 animate-spin text-blue-400" /></div>}
             {!loading && items.length === 0 && !error && <p className="p-3 text-center text-xs text-gray-500">No symbols found.</p>}
             {error && <p className="p-3 text-center text-xs text-amber-400">{error}</p>}
             {hasMore && !loading && (
-              <button type="button" onClick={() => setPage((p) => p + 1)} className="w-full py-2 text-xs font-semibold text-emerald-400 hover:underline">Load more</button>
+              <button type="button" onClick={() => setPage((p) => p + 1)} className="w-full py-2 text-xs font-semibold text-blue-400 hover:underline">Load more</button>
             )}
           </div>
           {target === 'binance' && tab !== 'crypto' && (

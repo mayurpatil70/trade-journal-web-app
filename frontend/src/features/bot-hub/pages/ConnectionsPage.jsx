@@ -47,7 +47,7 @@ export default function ConnectionsPage() {
   };
 
   const conn = state.data[0];
-  const input = "mt-1 w-full rounded-lg border border-white/10 bg-[#0a0a0a] px-3 py-2 text-sm text-white outline-none focus:border-emerald-500/50";
+  const input = "mt-1 w-full rounded-lg border border-white/10 bg-[#0a0a0a] px-3 py-2 text-sm text-white outline-none focus:border-blue-500/50";
 
   if (state.loading) return <div className="p-8 text-center text-gray-500">Loading connections...</div>;
 
@@ -75,7 +75,7 @@ export default function ConnectionsPage() {
           </div>
           <div className="border-t border-white/5 pt-3">
             {conn.live ? (
-              <button disabled={busy} onClick={() => run(() => hubApi.setLive("binance", false), () => "Switched back to testnet. Bots were stopped.")} className="rounded-lg bg-emerald-500/10 px-3 py-1.5 text-xs text-emerald-400">Switch to testnet</button>
+              <button disabled={busy} onClick={() => run(() => hubApi.setLive("binance", false), () => "Switched back to testnet. Bots were stopped.")} className="rounded-lg bg-blue-500/10 px-3 py-1.5 text-xs text-blue-400">Switch to testnet</button>
             ) : (
               <div className="space-y-2">
                 <p className="text-xs text-gray-500">Live trading uses real funds. Use live keys only, then type ENABLE LIVE to opt in. Active bots stop when the mode changes.</p>

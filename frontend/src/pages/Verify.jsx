@@ -55,18 +55,18 @@ export default function Verify() {
 
   return (
     <div
-      className="min-h-screen bg-[#020202] text-white flex items-center justify-center p-6"
+      className="min-h-screen bg-[#f2f2f7] dark:bg-[#020202] text-neutral-900 dark:text-white flex items-center justify-center p-6"
       style={{ fontFamily: "'Inter', sans-serif" }}
     >
-      <div className="w-full max-w-md bg-[#121418] border border-white/5 rounded-2xl p-8 sm:p-10 shadow-2xl flex flex-col items-center text-center">
+      <div className="w-full max-w-md bg-white/80 dark:bg-[#121418] backdrop-blur-xl border border-black/[0.08] dark:border-white/5 rounded-2xl p-8 sm:p-10 shadow-2xl flex flex-col items-center text-center">
 
         {status === "success" && (
           <div className="flex flex-col items-center animate-in fade-in zoom-in-95 duration-300">
             <CheckCircle className="w-12 h-12 text-emerald-500 mb-6" />
-            <h2 className="text-xl font-bold text-white mb-2">
+            <h2 className="text-xl font-bold text-neutral-900 dark:text-white mb-2">
               Login Successful!
             </h2>
-            <p className="text-sm text-gray-400">
+            <p className="text-sm text-neutral-600 dark:text-gray-400">
               Redirecting you to the next step...
             </p>
           </div>
@@ -77,15 +77,15 @@ export default function Verify() {
             <div className="w-14 h-14 bg-red-500/10 border border-red-500/20 rounded-2xl flex items-center justify-center mb-6">
               <AlertTriangle className="w-7 h-7 text-red-500" />
             </div>
-            <h2 className="text-xl font-bold text-white mb-2">
+            <h2 className="text-xl font-bold text-neutral-900 dark:text-white mb-2">
               Authentication Failed
             </h2>
-            <p className="text-sm text-gray-400 mb-8 leading-relaxed">
+            <p className="text-sm text-neutral-600 dark:text-gray-400 mb-8 leading-relaxed">
               {errorMsg}
             </p>
             <button
               onClick={() => navigate("/login")}
-              className="w-full py-4 px-6 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-[2px] shadow-lg transition-all flex justify-center items-center gap-2 text-sm"
+              className="w-full py-4 px-6 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-[2px] shadow-lg transition-all flex justify-center items-center gap-2 text-sm"
             >
               Back to Login <ArrowRight className="w-4 h-4" />
             </button>

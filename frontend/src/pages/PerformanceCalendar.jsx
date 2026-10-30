@@ -99,7 +99,7 @@ export default function PerformanceCalendar() {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8 lg:pr-36 xl:pr-40">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-neutral-900 dark:text-white flex items-center gap-3">
-            <div className="w-9 h-9 rounded-2xl bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center border border-purple-500/20 shadow-xs">
+            <div className="w-9 h-9 rounded-2xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center border border-blue-500/20 shadow-xs">
               <CalendarIcon className="w-4 h-4" />
             </div>
             Performance Calendar
@@ -144,7 +144,7 @@ export default function PerformanceCalendar() {
 
       {loading ? (
         <div className="flex flex-col items-center justify-center h-96 bg-white/70 dark:bg-[#111522]/80 border border-black/[0.06] dark:border-white/[0.08] rounded-3xl backdrop-blur-xl">
-          <Loader2 className="w-7 h-7 text-purple-500 animate-spin mb-3" />
+          <Loader2 className="w-7 h-7 text-blue-500 animate-spin mb-3" />
           <p className="text-neutral-500 dark:text-neutral-400 text-xs font-medium">
             Loading performance data...
           </p>
@@ -188,7 +188,7 @@ export default function PerformanceCalendar() {
                   onClick={() => hasTrades && setSelectedDayTrades({ date: dateString, trades: dayTrades })}
                   className={`min-h-[64px] sm:min-h-[110px] rounded-xl sm:rounded-2xl p-2 sm:p-3 flex flex-col min-w-0 transition-all duration-200 relative overflow-hidden group select-none ${
                     hasTrades
-                      ? "bg-white dark:bg-[#151926] border border-black/[0.08] dark:border-white/10 cursor-pointer hover:border-purple-500/60 dark:hover:border-purple-500/60 hover:shadow-md shadow-xs"
+                      ? "bg-white dark:bg-[#151926] border border-black/[0.08] dark:border-white/10 cursor-pointer hover:border-blue-500/60 dark:hover:border-blue-500/60 hover:shadow-md shadow-xs"
                       : "bg-neutral-50/70 dark:bg-[#0c0e15] border border-black/[0.03] dark:border-white/[0.03]"
                   }`}
                 >
@@ -276,7 +276,7 @@ export default function PerformanceCalendar() {
             <div className="px-6 py-5 border-b border-black/[0.06] dark:border-white/[0.08] flex items-center justify-between">
               <div>
                 <h2 className="text-lg font-bold text-neutral-900 dark:text-white flex items-center gap-2 tracking-tight">
-                  <CalendarIcon className="w-5 h-5 text-purple-500" /> {selectedDayTrades.date}
+                  <CalendarIcon className="w-5 h-5 text-blue-500" /> {selectedDayTrades.date}
                 </h2>
                 <p className="text-neutral-500 dark:text-neutral-400 text-xs mt-0.5">
                   Daily execution breakdown ({selectedDayTrades.trades.length} trades)

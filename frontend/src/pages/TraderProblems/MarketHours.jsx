@@ -35,10 +35,10 @@ const SESSIONS = [
     volatility: "Low to Moderate",
     volatilityLevel: 1, // 1: low, 2: med, 3: high, 4: ultra
     color: "violet",
-    accentBorder: "border-purple-500/30",
-    accentBg: "bg-purple-500/10",
-    accentText: "text-purple-600 dark:text-purple-400",
-    accentGradient: "from-purple-500 to-indigo-600",
+    accentBorder: "border-blue-500/30",
+    accentBg: "bg-blue-500/10",
+    accentText: "text-blue-600 dark:text-blue-400",
+    accentGradient: "from-blue-500 to-blue-600",
     description: "Kicks off the global trading day. Relatively calm liquidity, setting initial sentiment for Asia.",
     keyPairs: ["AUD/USD", "NZD/USD", "AUD/JPY", "EUR/AUD"],
     tactics: "Range trades, initial support/resistance establishment, monitoring RBA interest rate announcements.",
@@ -58,7 +58,7 @@ const SESSIONS = [
     accentBorder: "border-blue-500/30",
     accentBg: "bg-blue-500/10",
     accentText: "text-blue-600 dark:text-blue-400",
-    accentGradient: "from-blue-500 to-cyan-600",
+    accentGradient: "from-blue-500 to-sky-600",
     description: "Driven by Asian central banks, corporate exporters, and BoJ interventions. Establishes the Asian consolidation range.",
     keyPairs: ["USD/JPY", "EUR/JPY", "GBP/JPY", "AUD/JPY"],
     tactics: "Asian range marking (high/low). Ideal for breakout-sweep setups when London opens.",
@@ -75,10 +75,10 @@ const SESSIONS = [
     volatility: "Very High",
     volatilityLevel: 4,
     color: "emerald",
-    accentBorder: "border-emerald-500/30",
-    accentBg: "bg-emerald-500/10",
-    accentText: "text-emerald-600 dark:text-emerald-400",
-    accentGradient: "from-emerald-500 to-teal-600",
+    accentBorder: "border-blue-500/30",
+    accentBg: "bg-blue-500/10",
+    accentText: "text-blue-600 dark:text-blue-400",
+    accentGradient: "from-blue-500 to-blue-600",
     description: "The financial capital of Forex. Commands the highest single volume share and initiates true daily trends.",
     keyPairs: ["EUR/USD", "GBP/USD", "EUR/GBP", "GBP/JPY"],
     tactics: "London Open Judas swings, false breakouts sweeping Asian liquidity, massive momentum follow-through.",
@@ -424,10 +424,10 @@ export default function MarketHours() {
 
       <div className="space-y-8 animate-in fade-in duration-300">
         {/* Hero Header Banner with Apple-grade frosted glass */}
-        <div className="relative rounded-3xl p-6 sm:p-8 bg-gradient-to-r from-blue-500/10 via-indigo-500/10 to-purple-500/10 border border-blue-500/20 backdrop-blur-xl shadow-[0_8px_32px_0_rgba(59,130,246,0.1)]">
+        <div className="relative rounded-3xl p-6 sm:p-8 bg-gradient-to-r from-blue-500/10 via-blue-500/10 to-blue-500/10 border border-blue-500/20 backdrop-blur-xl shadow-[0_8px_32px_0_rgba(59,130,246,0.1)]">
           <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
             <div className="flex items-center gap-4">
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-[0_0_24px_rgba(59,130,246,0.4)] shrink-0">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-blue-600 to-blue-600 flex items-center justify-center text-white shadow-[0_0_24px_rgba(59,130,246,0.4)] shrink-0">
                 <Clock className="w-7 h-7" />
               </div>
               <div>
@@ -546,7 +546,7 @@ export default function MarketHours() {
               >
                 <span
                   className={`relative inline-flex rounded-full h-2.5 w-2.5 ${
-                    isWeekend ? "bg-amber-500" : "bg-emerald-500"
+                    isWeekend ? "bg-amber-500" : "bg-blue-500"
                   }`}
                 />
               </span>
@@ -607,7 +607,7 @@ export default function MarketHours() {
               <span className="text-[11px] font-extrabold uppercase tracking-wider text-neutral-600 dark:text-neutral-300">
                 Current Time
               </span>
-              <Timer className="w-4 h-4 text-purple-500" />
+              <Timer className="w-4 h-4 text-blue-500" />
             </div>
             <div className="text-xl font-mono font-black text-neutral-900 dark:text-white tracking-wider">
               {new Intl.DateTimeFormat("en-US", {
@@ -641,7 +641,7 @@ export default function MarketHours() {
 
             <div className="flex items-center gap-4 text-xs font-semibold">
               <span className="flex items-center gap-1.5 text-neutral-600 dark:text-neutral-400">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
+                <span className="w-2.5 h-2.5 rounded-full bg-blue-500" />
                 Active Now
               </span>
               <span className="flex items-center gap-1.5 text-neutral-600 dark:text-neutral-400">
@@ -790,13 +790,13 @@ export default function MarketHours() {
                       <span
                         className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider ${
                           active
-                            ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30"
+                            ? "bg-blue-500/15 text-blue-700 dark:text-blue-400 border border-blue-500/30"
                             : "bg-neutral-100 dark:bg-white/5 text-neutral-500 dark:text-neutral-400 border border-black/[0.06] dark:border-white/10"
                         }`}
                       >
                         <span
                           className={`w-1.5 h-1.5 rounded-full ${
-                            active ? "bg-emerald-500 animate-pulse" : "bg-neutral-400"
+                            active ? "bg-blue-500 animate-pulse" : "bg-neutral-400"
                           }`}
                         />
                         {active ? "Session Open" : "Closed"}
@@ -896,7 +896,7 @@ export default function MarketHours() {
                       <span
                         className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase shrink-0 ${
                           active
-                            ? "bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30 animate-pulse"
+                            ? "bg-blue-500/20 text-blue-700 dark:text-blue-400 border border-blue-500/30 animate-pulse"
                             : "bg-black/[0.04] dark:bg-white/5 text-neutral-500 border border-black/[0.06] dark:border-white/10"
                         }`}
                       >

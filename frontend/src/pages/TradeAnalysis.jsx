@@ -595,7 +595,7 @@ export default function TradeAnalysis() {
                 {/* Strategy & Rules Card */}
                 <div className="p-5 rounded-2xl bg-neutral-50 dark:bg-white/[0.03] border border-black/[0.04] dark:border-white/[0.06]">
                   <h4 className="text-xs font-bold text-neutral-800 dark:text-neutral-200 mb-3 flex items-center gap-1.5">
-                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" /> Strategy & Discipline
+                    <ShieldCheck className="w-3.5 h-3.5 text-blue-500" /> Strategy & Discipline
                   </h4>
                   <div className="space-y-2 text-xs">
                     <div className="flex justify-between py-1 border-b border-black/[0.03] dark:border-white/[0.04]">

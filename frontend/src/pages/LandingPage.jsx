@@ -151,10 +151,10 @@ function AnimatedStat({ value, label, color }) {
       style={{
         textAlign: "center",
         padding: "32px 24px",
-        background: "rgba(15, 29, 28, 0.85)",
+        background: "rgba(var(--lp-card), 0.85)",
         backdropFilter: "blur(20px)",
         WebkitBackdropFilter: "blur(20px)",
-        border: "1px solid rgba(255, 255, 255, 0.08)",
+        border: "1px solid rgba(var(--lp-fg), 0.08)",
         borderRadius: "22px",
         opacity: 0,
         boxShadow: "0 20px 40px rgba(0,0,0,0.3)",
@@ -174,7 +174,7 @@ function AnimatedStat({ value, label, color }) {
       >
         {displayValue}
       </div>
-      <p style={{ fontSize: "13px", color: "rgba(237, 234, 227, 0.75)", lineHeight: 1.5, fontFamily: "'Manrope', sans-serif" }}>{label}</p>
+      <p style={{ fontSize: "13px", color: "rgba(var(--lp-fg), 0.75)", lineHeight: 1.5, fontFamily: "'Manrope', sans-serif" }}>{label}</p>
     </div>
   );
 }
@@ -337,8 +337,8 @@ export default function LandingPage() {
       className="landing-root"
       style={{
         minHeight: "100vh",
-        background: "#05090E",
-        color: "#F4EFE6",
+        background: "var(--lp-bg)",
+        color: "var(--lp-text)",
         fontFamily: "'Manrope', sans-serif",
         overflowX: "hidden",
         position: "relative",
@@ -375,9 +375,9 @@ export default function LandingPage() {
           animation: compCheckPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.25s both;
         }
         .comp-our-col {
-          background: linear-gradient(90deg, rgba(16, 185, 129, 0.05) 0%, rgba(16, 185, 129, 0.11) 100%);
-          border-left: 1px solid rgba(16, 185, 129, 0.32);
-          box-shadow: inset 0 0 18px rgba(16, 185, 129, 0.12);
+          background: linear-gradient(90deg, rgba(0, 122, 255, 0.05) 0%, rgba(0, 122, 255, 0.11) 100%);
+          border-left: 1px solid rgba(0, 122, 255, 0.32);
+          box-shadow: inset 0 0 18px rgba(0, 122, 255, 0.12);
         }
         @media (max-width: 640px) {
           .pricing-card {
@@ -414,7 +414,7 @@ export default function LandingPage() {
       <KingfisherSection />
 
       {/* ── 04 CORE APPLICATION SECTIONS WRAPPER ── */}
-      <div style={{ position: "relative", zIndex: 10, background: "#05090E" }}>
+      <div style={{ position: "relative", zIndex: 10, background: "var(--lp-bg)" }}>
         {/* Content running above smooth dark background */}
         <div style={{ position: "relative", zIndex: 1 }}>
 
@@ -427,11 +427,11 @@ export default function LandingPage() {
           <LoungeShowcase />
 
           {/* Stats Counter Row */}
-          <section style={{ padding: "80px 20px", borderTop: "1px solid rgba(255, 255, 255, 0.06)" }}>
+          <section style={{ padding: "80px 20px", borderTop: "1px solid rgba(var(--lp-fg), 0.06)" }}>
             <div style={{ maxWidth: "900px", margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "20px" }}>
-              <AnimatedStat value="3,200+" label="Funded traders using Forex Notes daily" color="#0E7C86" />
-              <AnimatedStat value="50% OFF" label="Massive discounts on Yearly plan available ($114)" color="#E8732A" />
-              <AnimatedStat value="94%" label="Users report fewer rule violations within 30 days" color="#5FD4E8" />
+              <AnimatedStat value="3,200+" label="Funded traders using Forex Notes daily" color="#007AFF" />
+              <AnimatedStat value="50% OFF" label="Massive discounts on Yearly plan available ($114)" color="#007AFF" />
+              <AnimatedStat value="94%" label="Users report fewer rule violations within 30 days" color="#5AC8FA" />
             </div>
           </section>
 
@@ -439,41 +439,41 @@ export default function LandingPage() {
           <section
             id="comparison"
             ref={comparisonRef}
-            style={{ padding: "100px 20px", borderTop: "1px solid rgba(255, 255, 255, 0.06)" }}
+            style={{ padding: "100px 20px", borderTop: "1px solid rgba(var(--lp-fg), 0.06)" }}
           >
             <div style={{ maxWidth: "960px", margin: "0 auto" }}>
               <div style={{ textAlign: "center", marginBottom: "56px" }}>
                 <div style={{
                   display: "inline-block",
                   fontSize: "10px", fontWeight: 700, letterSpacing: "0.16em",
-                  textTransform: "uppercase", color: "#E8732A",
+                  textTransform: "uppercase", color: "#007AFF",
                   padding: "5px 14px", borderRadius: "999px",
-                  background: "rgba(232, 115, 42, 0.1)", border: "1px solid rgba(232, 115, 42, 0.25)",
+                  background: "rgba(0, 122, 255, 0.1)", border: "1px solid rgba(0, 122, 255, 0.25)",
                   marginBottom: "16px",
                   fontFamily: "'JetBrains Mono', monospace",
                 }}>02 FIELD NOTES · DIRECT COMPARISON</div>
                 <h2 style={{
                   fontFamily: "'Instrument Serif', Georgia, serif",
                   fontSize: "clamp(2.2rem, 4.5vw, 3.2rem)", fontWeight: 400,
-                  color: "#FFFFFF", letterSpacing: "-0.02em", lineHeight: 1.05, marginBottom: "12px",
+                  color: "var(--lp-heading)", letterSpacing: "-0.02em", lineHeight: 1.05, marginBottom: "12px",
                 }}>
-                  Why Traders Ditch <span style={{ fontStyle: "italic", color: "#0E7C86" }}>Excel & Notion</span>
+                  Why Traders Ditch <span style={{ fontStyle: "italic", color: "#007AFF" }}>Excel & Notion</span>
                 </h2>
-                <p style={{ fontSize: "14px", color: "rgba(237, 234, 227, 0.7)", maxWidth: "480px", margin: "0 auto", lineHeight: 1.7 }}>
+                <p style={{ fontSize: "14px", color: "rgba(var(--lp-fg), 0.7)", maxWidth: "480px", margin: "0 auto", lineHeight: 1.7 }}>
                   Manual spreadsheets leave you blind to emotional drawdown points and prop firm rules.
                 </p>
               </div>
 
-              <div className="block sm:hidden text-center text-[11px] text-[#5FD4E8] font-mono mb-3 tracking-widest uppercase">
+              <div className="block sm:hidden text-center text-[11px] text-[#5AC8FA] font-mono mb-3 tracking-widest uppercase">
                 ← Swipe table to compare →
               </div>
 
               <div
                 className="comp-table-wrapper"
                 style={{
-                  background: "rgba(15, 29, 28, 0.88)", backdropFilter: "blur(20px)",
+                  background: "rgba(var(--lp-card), 0.88)", backdropFilter: "blur(20px)",
                   WebkitBackdropFilter: "blur(20px)",
-                  border: "1px solid rgba(255, 255, 255, 0.08)", borderRadius: "22px", overflow: "hidden",
+                  border: "1px solid rgba(var(--lp-fg), 0.08)", borderRadius: "22px", overflow: "hidden",
                   boxShadow: "0 20px 40px rgba(0,0,0,0.35)",
                 }}
               >
@@ -482,14 +482,14 @@ export default function LandingPage() {
                   <div style={{
                     display: "grid", gridTemplateColumns: "1.2fr 1.25fr 1.45fr",
                     padding: "16px 24px",
-                    background: "rgba(255, 255, 255, 0.03)",
-                    borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
+                    background: "rgba(var(--lp-fg), 0.03)",
+                    borderBottom: "1px solid rgba(var(--lp-fg), 0.08)",
                   }}>
-                    <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "10px", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(237, 234, 227, 0.6)" }}>Execution Metric</span>
-                    <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "10px", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(237, 234, 227, 0.6)" }}>Spreadsheets &amp; Notion</span>
+                    <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "10px", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(var(--lp-fg), 0.6)" }}>Execution Metric</span>
+                    <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "10px", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(var(--lp-fg), 0.6)" }}>Spreadsheets &amp; Notion</span>
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                      <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "10px", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "#10b981" }}>Forex Notes (Us) ★</span>
-                      <span style={{ fontSize: "9px", fontFamily: "'JetBrains Mono', monospace", color: "#34d399", background: "rgba(16, 185, 129, 0.15)", border: "1px solid rgba(16, 185, 129, 0.35)", padding: "2px 6px", borderRadius: "4px", textTransform: "uppercase" }}>Recommended</span>
+                      <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "10px", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "#007AFF" }}>Forex Notes (Us) ★</span>
+                      <span style={{ fontSize: "9px", fontFamily: "'JetBrains Mono', monospace", color: "#409CFF", background: "rgba(0, 122, 255, 0.15)", border: "1px solid rgba(0, 122, 255, 0.35)", padding: "2px 6px", borderRadius: "4px", textTransform: "uppercase" }}>Recommended</span>
                     </div>
                   </div>
                   {COMPARISON.map((row, i) => (
@@ -498,14 +498,14 @@ export default function LandingPage() {
                       className="comp-row"
                       style={{
                         display: "grid", gridTemplateColumns: "1.2fr 1.25fr 1.45fr",
-                        borderBottom: i < COMPARISON.length - 1 ? "1px solid rgba(255, 255, 255, 0.04)" : "none",
+                        borderBottom: i < COMPARISON.length - 1 ? "1px solid rgba(var(--lp-fg), 0.04)" : "none",
                         opacity: 0,
                       }}
                     >
                       <div style={{ padding: "16px 24px", display: "flex", alignItems: "center" }}>
-                        <span style={{ fontSize: "13px", fontWeight: 700, color: "#FFFFFF" }}>{row.metric}</span>
+                        <span style={{ fontSize: "13px", fontWeight: 700, color: "var(--lp-heading)" }}>{row.metric}</span>
                       </div>
-                      <div style={{ padding: "16px 24px", display: "flex", alignItems: "flex-start", gap: "8px", color: "rgba(237, 234, 227, 0.65)", fontSize: "12px" }}>
+                      <div style={{ padding: "16px 24px", display: "flex", alignItems: "flex-start", gap: "8px", color: "rgba(var(--lp-fg), 0.65)", fontSize: "12px" }}>
                         <span className="comp-cross-icon" style={{ color: "#ef4444", flexShrink: 0, marginTop: "2px", display: "inline-flex" }}>
                           <XCircle size={14} color="#ef4444" />
                         </span>
@@ -521,9 +521,9 @@ export default function LandingPage() {
                           justifyContent: "center",
                         }}
                       >
-                        <div style={{ fontSize: "12px", fontWeight: 700, color: "#FFFFFF", display: "flex", alignItems: "flex-start", gap: "8px" }}>
-                          <span className="comp-check-icon" style={{ color: "#10b981", flexShrink: 0, marginTop: "2px", display: "inline-flex" }}>
-                            <CheckCircle2 size={14} color="#10b981" />
+                        <div style={{ fontSize: "12px", fontWeight: 700, color: "var(--lp-heading)", display: "flex", alignItems: "flex-start", gap: "8px" }}>
+                          <span className="comp-check-icon" style={{ color: "#007AFF", flexShrink: 0, marginTop: "2px", display: "inline-flex" }}>
+                            <CheckCircle2 size={14} color="#007AFF" />
                           </span>
                           <span>{row.journal}</span>
                         </div>
@@ -532,9 +532,9 @@ export default function LandingPage() {
                             marginLeft: "22px",
                             fontSize: "9.5px",
                             fontFamily: "'JetBrains Mono', monospace",
-                            color: "#34d399",
-                            background: "rgba(16, 185, 129, 0.12)",
-                            border: "1px solid rgba(16, 185, 129, 0.3)",
+                            color: "#409CFF",
+                            background: "rgba(0, 122, 255, 0.12)",
+                            border: "1px solid rgba(0, 122, 255, 0.3)",
                             padding: "1px 6px",
                             borderRadius: "4px",
                             width: "fit-content",
@@ -552,15 +552,15 @@ export default function LandingPage() {
           </section>
 
           {/* ── THE PROP FIRM RISK & PASS RATE BRIDGE (Pushes Rolodex down so it starts cleanly on its own full screen) ── */}
-          <section style={{ padding: "80px 20px 100px", borderTop: "1px solid rgba(255, 255, 255, 0.06)" }}>
+          <section style={{ padding: "80px 20px 100px", borderTop: "1px solid rgba(var(--lp-fg), 0.06)" }}>
             <div style={{ maxWidth: "1060px", margin: "0 auto" }}>
               <div style={{ textAlign: "center", marginBottom: "40px" }}>
                 <div style={{
                   display: "inline-flex", alignItems: "center", gap: "6px",
                   fontSize: "11px", fontWeight: 700, letterSpacing: "0.16em",
-                  textTransform: "uppercase", color: "#E8732A",
+                  textTransform: "uppercase", color: "#007AFF",
                   padding: "6px 16px", borderRadius: "999px",
-                  background: "rgba(232, 115, 42, 0.1)", border: "1px solid rgba(232, 115, 42, 0.25)",
+                  background: "rgba(0, 122, 255, 0.1)", border: "1px solid rgba(0, 122, 255, 0.25)",
                   marginBottom: "14px", fontFamily: "'JetBrains Mono', monospace",
                 }}>
                   <span>03 RISK GOVERNANCE · CAPITAL PRESERVATION</span>
@@ -568,11 +568,11 @@ export default function LandingPage() {
                 <h3 style={{
                   fontFamily: "'Instrument Serif', Georgia, serif",
                   fontSize: "clamp(2rem, 4.2vw, 3.2rem)", fontWeight: 400,
-                  color: "#FFFFFF", letterSpacing: "-0.02em", lineHeight: 1.1,
+                  color: "var(--lp-heading)", letterSpacing: "-0.02em", lineHeight: 1.1,
                 }}>
-                  Built to Protect Your Funded Capital Across <span style={{ fontStyle: "italic", color: "#0E7C86" }}>Every Challenge</span>
+                  Built to Protect Your Funded Capital Across <span style={{ fontStyle: "italic", color: "#007AFF" }}>Every Challenge</span>
                 </h3>
-                <p style={{ fontSize: "14.5px", color: "rgba(237, 234, 227, 0.7)", maxWidth: "620px", margin: "14px auto 0", lineHeight: 1.65 }}>
+                <p style={{ fontSize: "14.5px", color: "rgba(var(--lp-fg), 0.7)", maxWidth: "620px", margin: "14px auto 0", lineHeight: 1.65 }}>
                   Manual spreadsheets let emotions slip through. Forex Notes acts as your automated safety net, sounding alerts before trailing drawdowns or revenge trades threaten your payouts.
                 </p>
               </div>
@@ -580,49 +580,49 @@ export default function LandingPage() {
               {/* 3 Benefit Highlight Cards */}
               <div className="risk-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "20px" }}>
                 <div style={{
-                  background: "rgba(15, 29, 28, 0.85)", backdropFilter: "blur(20px)",
-                  border: "1px solid rgba(14, 124, 134, 0.25)", borderRadius: "22px", padding: "28px",
+                  background: "rgba(var(--lp-card), 0.85)", backdropFilter: "blur(20px)",
+                  border: "1px solid rgba(0, 122, 255, 0.25)", borderRadius: "22px", padding: "28px",
                   boxShadow: "0 20px 40px rgba(0,0,0,0.35)",
                 }}>
-                  <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "10px", color: "#0E7C86", fontWeight: 800, letterSpacing: "0.14em", marginBottom: "8px" }}>
+                  <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "10px", color: "#007AFF", fontWeight: 800, letterSpacing: "0.14em", marginBottom: "8px" }}>
                     01 · PROP GUARDIAN
                   </div>
-                  <div style={{ fontFamily: "'Instrument Serif', serif", fontSize: "22px", fontWeight: 400, color: "#FFFFFF", marginBottom: "8px" }}>
+                  <div style={{ fontFamily: "'Instrument Serif', serif", fontSize: "22px", fontWeight: 400, color: "var(--lp-heading)", marginBottom: "8px" }}>
                     Real-Time Trailing Drawdown
                   </div>
-                  <p style={{ fontSize: "13px", color: "rgba(237, 234, 227, 0.7)", lineHeight: 1.6 }}>
+                  <p style={{ fontSize: "13px", color: "rgba(var(--lp-fg), 0.7)", lineHeight: 1.6 }}>
                     Live tracking against FTMO, FundedNext, and Topstep drawdown rules. Instant alerts at 70% threshold so you never violate max loss limits.
                   </p>
                 </div>
 
                 <div style={{
-                  background: "rgba(15, 29, 28, 0.85)", backdropFilter: "blur(20px)",
-                  border: "1px solid rgba(232, 115, 42, 0.25)", borderRadius: "22px", padding: "28px",
+                  background: "rgba(var(--lp-card), 0.85)", backdropFilter: "blur(20px)",
+                  border: "1px solid rgba(0, 122, 255, 0.25)", borderRadius: "22px", padding: "28px",
                   boxShadow: "0 20px 40px rgba(0,0,0,0.35)",
                 }}>
-                  <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "10px", color: "#E8732A", fontWeight: 800, letterSpacing: "0.14em", marginBottom: "8px" }}>
+                  <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "10px", color: "#007AFF", fontWeight: 800, letterSpacing: "0.14em", marginBottom: "8px" }}>
                     02 · AI PRE-TRADE CHECK
                   </div>
-                  <div style={{ fontFamily: "'Instrument Serif', serif", fontSize: "22px", fontWeight: 400, color: "#FFFFFF", marginBottom: "8px" }}>
+                  <div style={{ fontFamily: "'Instrument Serif', serif", fontSize: "22px", fontWeight: 400, color: "var(--lp-heading)", marginBottom: "8px" }}>
                     Emotional Circuit Breaker
                   </div>
-                  <p style={{ fontSize: "13px", color: "rgba(237, 234, 227, 0.7)", lineHeight: 1.6 }}>
+                  <p style={{ fontSize: "13px", color: "rgba(var(--lp-fg), 0.7)", lineHeight: 1.6 }}>
                     Blocks tilted entries after sudden loss streaks. Validates your setup against your written trading plan before allowing execution.
                   </p>
                 </div>
 
                 <div style={{
-                  background: "rgba(15, 29, 28, 0.85)", backdropFilter: "blur(20px)",
-                  border: "1px solid rgba(243, 161, 94, 0.25)", borderRadius: "22px", padding: "28px",
+                  background: "rgba(var(--lp-card), 0.85)", backdropFilter: "blur(20px)",
+                  border: "1px solid rgba(90, 200, 250, 0.25)", borderRadius: "22px", padding: "28px",
                   boxShadow: "0 20px 40px rgba(0,0,0,0.35)",
                 }}>
-                  <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "10px", color: "#F3A15E", fontWeight: 800, letterSpacing: "0.14em", marginBottom: "8px" }}>
+                  <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "10px", color: "#5AC8FA", fontWeight: 800, letterSpacing: "0.14em", marginBottom: "8px" }}>
                     03 · EXECUTION ANALYTICS
                   </div>
-                  <div style={{ fontFamily: "'Instrument Serif', serif", fontSize: "22px", fontWeight: 400, color: "#FFFFFF", marginBottom: "8px" }}>
+                  <div style={{ fontFamily: "'Instrument Serif', serif", fontSize: "22px", fontWeight: 400, color: "var(--lp-heading)", marginBottom: "8px" }}>
                     Automatic R-Multiple Calculation
                   </div>
-                  <p style={{ fontSize: "13px", color: "rgba(237, 234, 227, 0.7)", lineHeight: 1.6 }}>
+                  <p style={{ fontSize: "13px", color: "rgba(var(--lp-fg), 0.7)", lineHeight: 1.6 }}>
                     No manual formulas or broken sheet links. One-click sync computes precise risk-to-reward ratios and session profit factors instantly.
                   </p>
                 </div>
@@ -638,7 +638,7 @@ export default function LandingPage() {
             id="pricing"
             style={{
               padding: "clamp(80px, 10vh, 110px) 16px clamp(60px, 8vh, 90px)",
-              borderTop: "1px solid rgba(255, 255, 255, 0.06)",
+              borderTop: "1px solid rgba(var(--lp-fg), 0.06)",
               scrollMarginTop: "90px",
               position: "relative",
             }}
@@ -652,11 +652,11 @@ export default function LandingPage() {
                 fontWeight: 700,
                 letterSpacing: "0.16em",
                 textTransform: "uppercase",
-                color: "#10b981",
+                color: "#007AFF",
                 padding: "5px 14px",
                 borderRadius: "999px",
-                background: "rgba(16, 185, 129, 0.08)",
-                border: "1px solid rgba(16, 185, 129, 0.22)",
+                background: "rgba(0, 122, 255, 0.08)",
+                border: "1px solid rgba(0, 122, 255, 0.22)",
                 marginBottom: "16px",
                 fontFamily: "'JetBrains Mono', monospace",
               }}>
@@ -668,7 +668,7 @@ export default function LandingPage() {
                 fontFamily: "'Instrument Serif', Georgia, serif",
                 fontSize: "clamp(2.3rem, 5vw, 3.8rem)",
                 fontWeight: 400,
-                color: "#FFFFFF",
+                color: "var(--lp-heading)",
                 letterSpacing: "-0.02em",
                 lineHeight: 1.05,
                 marginBottom: "12px",
@@ -679,7 +679,7 @@ export default function LandingPage() {
 
               <p style={{
                 fontSize: "14px",
-                color: "rgba(237, 234, 227, 0.7)",
+                color: "rgba(var(--lp-fg), 0.7)",
                 marginBottom: "32px",
                 lineHeight: 1.6,
                 maxWidth: "520px",
@@ -693,8 +693,8 @@ export default function LandingPage() {
                 display: "inline-flex",
                 alignItems: "center",
                 position: "relative",
-                background: "rgba(15, 23, 42, 0.7)",
-                border: "1px solid rgba(255, 255, 255, 0.1)",
+                background: "rgba(var(--lp-card), 0.7)",
+                border: "1px solid rgba(var(--lp-fg), 0.1)",
                 borderRadius: "999px",
                 padding: "4px",
                 marginBottom: "48px",
@@ -708,8 +708,8 @@ export default function LandingPage() {
                     bottom: "4px",
                     width: "148px",
                     borderRadius: "999px",
-                    background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
-                    boxShadow: "0 4px 18px rgba(16, 185, 129, 0.35)",
+                    background: "linear-gradient(135deg, #007AFF 0%, #0066D6 100%)",
+                    boxShadow: "0 4px 18px rgba(0, 122, 255, 0.35)",
                     transition: "transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
                     transform: billingCycle === "yearly" ? "translateX(148px)" : "translateX(0px)",
                   }}
@@ -734,7 +734,7 @@ export default function LandingPage() {
                     alignItems: "center",
                     justifyContent: "center",
                     gap: "6px",
-                    color: billingCycle === "monthly" ? "#ffffff" : "rgba(255, 255, 255, 0.5)",
+                    color: billingCycle === "monthly" ? "#ffffff" : "rgba(var(--lp-fg), 0.5)",
                     transition: "color 0.2s",
                   }}
                 >
@@ -744,9 +744,9 @@ export default function LandingPage() {
                     fontWeight: 800,
                     padding: "1px 6px",
                     borderRadius: "999px",
-                    background: billingCycle === "monthly" ? "rgba(255, 255, 255, 0.22)" : "rgba(16, 185, 129, 0.15)",
-                    color: billingCycle === "monthly" ? "#ffffff" : "#34d399",
-                    border: billingCycle === "monthly" ? "none" : "1px solid rgba(16, 185, 129, 0.35)",
+                    background: billingCycle === "monthly" ? "rgba(var(--lp-fg), 0.22)" : "rgba(0, 122, 255, 0.15)",
+                    color: billingCycle === "monthly" ? "#ffffff" : "#409CFF",
+                    border: billingCycle === "monthly" ? "none" : "1px solid rgba(0, 122, 255, 0.35)",
                   }}>
                     25% OFF
                   </span>
@@ -771,7 +771,7 @@ export default function LandingPage() {
                     alignItems: "center",
                     justifyContent: "center",
                     gap: "6px",
-                    color: billingCycle === "yearly" ? "#ffffff" : "rgba(255, 255, 255, 0.5)",
+                    color: billingCycle === "yearly" ? "#ffffff" : "rgba(var(--lp-fg), 0.5)",
                     transition: "color 0.2s",
                   }}
                 >
@@ -781,9 +781,9 @@ export default function LandingPage() {
                     fontWeight: 800,
                     padding: "1px 6px",
                     borderRadius: "999px",
-                    background: billingCycle === "yearly" ? "rgba(255, 255, 255, 0.22)" : "rgba(16, 185, 129, 0.15)",
-                    color: billingCycle === "yearly" ? "#ffffff" : "#34d399",
-                    border: billingCycle === "yearly" ? "none" : "1px solid rgba(16, 185, 129, 0.35)",
+                    background: billingCycle === "yearly" ? "rgba(var(--lp-fg), 0.22)" : "rgba(0, 122, 255, 0.15)",
+                    color: billingCycle === "yearly" ? "#ffffff" : "#409CFF",
+                    border: billingCycle === "yearly" ? "none" : "1px solid rgba(0, 122, 255, 0.35)",
                   }}>
                     50% OFF
                   </span>
@@ -805,10 +805,10 @@ export default function LandingPage() {
                 <div
                   className="pricing-card"
                   style={{
-                    background: "rgba(15, 29, 28, 0.88)",
+                    background: "rgba(var(--lp-card), 0.88)",
                     backdropFilter: "blur(24px)",
                     WebkitBackdropFilter: "blur(24px)",
-                    border: "1px solid rgba(255, 255, 255, 0.1)",
+                    border: "1px solid rgba(var(--lp-fg), 0.1)",
                     borderRadius: "24px",
                     padding: "32px",
                     position: "relative",
@@ -817,42 +817,42 @@ export default function LandingPage() {
                     boxShadow: "0 20px 50px rgba(0,0,0,0.4)",
                   }}
                 >
-                  <div style={{ marginBottom: "20px", paddingBottom: "20px", borderBottom: "1px solid rgba(255, 255, 255, 0.08)" }}>
-                    <h3 style={{ fontFamily: "'Instrument Serif', serif", fontSize: "26px", color: "#FFFFFF", marginBottom: "4px" }}>
+                  <div style={{ marginBottom: "20px", paddingBottom: "20px", borderBottom: "1px solid rgba(var(--lp-fg), 0.08)" }}>
+                    <h3 style={{ fontFamily: "'Instrument Serif', serif", fontSize: "26px", color: "var(--lp-heading)", marginBottom: "4px" }}>
                       Starter
                     </h3>
-                    <p style={{ fontSize: "12px", color: "rgba(237, 234, 227, 0.6)" }}>
+                    <p style={{ fontSize: "12px", color: "rgba(var(--lp-fg), 0.6)" }}>
                       24 hours full test drive
                     </p>
                   </div>
 
                   <div style={{ marginBottom: "20px" }}>
                     <div style={{ display: "flex", alignItems: "baseline", gap: "4px" }}>
-                      <span style={{ fontSize: "24px", fontWeight: 700, color: "#FFFFFF" }}>$</span>
+                      <span style={{ fontSize: "24px", fontWeight: 700, color: "var(--lp-heading)" }}>$</span>
                       <OdometerPrice value="0" height={42} />
-                      <span style={{ fontSize: "11px", fontFamily: "'JetBrains Mono', monospace", color: "rgba(237, 234, 227, 0.55)" }}>/forever</span>
+                      <span style={{ fontSize: "11px", fontFamily: "'JetBrains Mono', monospace", color: "rgba(var(--lp-fg), 0.55)" }}>/forever</span>
                     </div>
-                    <div style={{ fontSize: "11px", color: "rgba(237, 234, 227, 0.45)", fontFamily: "'JetBrains Mono', monospace", marginTop: "2px" }}>
+                    <div style={{ fontSize: "11px", color: "rgba(var(--lp-fg), 0.45)", fontFamily: "'JetBrains Mono', monospace", marginTop: "2px" }}>
                       No credit card needed
                     </div>
                     <div style={{ height: "26px", marginTop: "10px" }} />
                   </div>
 
                   <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginBottom: "32px", flex: 1 }}>
-                    <div style={{ display: "flex", alignItems: "flex-start", gap: "8px", fontSize: "12px", color: "rgba(237, 234, 227, 0.75)" }}>
-                      <CheckCircle2 size={14} color="#10b981" style={{ flexShrink: 0, marginTop: "1px" }} />
+                    <div style={{ display: "flex", alignItems: "flex-start", gap: "8px", fontSize: "12px", color: "rgba(var(--lp-fg), 0.75)" }}>
+                      <CheckCircle2 size={14} color="#007AFF" style={{ flexShrink: 0, marginTop: "1px" }} />
                       <span>Full access to Trading Journal</span>
                     </div>
-                    <div style={{ display: "flex", alignItems: "flex-start", gap: "8px", fontSize: "12px", color: "rgba(237, 234, 227, 0.75)" }}>
-                      <CheckCircle2 size={14} color="#10b981" style={{ flexShrink: 0, marginTop: "1px" }} />
+                    <div style={{ display: "flex", alignItems: "flex-start", gap: "8px", fontSize: "12px", color: "rgba(var(--lp-fg), 0.75)" }}>
+                      <CheckCircle2 size={14} color="#007AFF" style={{ flexShrink: 0, marginTop: "1px" }} />
                       <span>Basic Session Analytics & Insights</span>
                     </div>
-                    <div style={{ display: "flex", alignItems: "flex-start", gap: "8px", fontSize: "12px", color: "rgba(237, 234, 227, 0.75)" }}>
-                      <CheckCircle2 size={14} color="#10b981" style={{ flexShrink: 0, marginTop: "1px" }} />
+                    <div style={{ display: "flex", alignItems: "flex-start", gap: "8px", fontSize: "12px", color: "rgba(var(--lp-fg), 0.75)" }}>
+                      <CheckCircle2 size={14} color="#007AFF" style={{ flexShrink: 0, marginTop: "1px" }} />
                       <span>24 Hours Free Replay Access</span>
                     </div>
-                    <div style={{ display: "flex", alignItems: "flex-start", gap: "8px", fontSize: "12px", color: "rgba(237, 234, 227, 0.75)" }}>
-                      <CheckCircle2 size={14} color="#10b981" style={{ flexShrink: 0, marginTop: "1px" }} />
+                    <div style={{ display: "flex", alignItems: "flex-start", gap: "8px", fontSize: "12px", color: "rgba(var(--lp-fg), 0.75)" }}>
+                      <CheckCircle2 size={14} color="#007AFF" style={{ flexShrink: 0, marginTop: "1px" }} />
                       <span>Prop Firm Drawdown Calculator</span>
                     </div>
                   </div>
@@ -867,9 +867,9 @@ export default function LandingPage() {
                       padding: "13px",
                       borderRadius: "999px",
                       marginTop: "auto",
-                      background: "rgba(255, 255, 255, 0.06)",
-                      border: "1px solid rgba(255, 255, 255, 0.16)",
-                      color: "#FFFFFF",
+                      background: "rgba(var(--lp-fg), 0.06)",
+                      border: "1px solid rgba(var(--lp-fg), 0.16)",
+                      color: "var(--lp-heading)",
                       fontSize: "12px",
                       fontWeight: 700,
                       fontFamily: "'JetBrains Mono', monospace",
@@ -877,8 +877,8 @@ export default function LandingPage() {
                       letterSpacing: "0.04em",
                       transition: "all 0.2s",
                     }}
-                    onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255, 255, 255, 0.12)"; e.currentTarget.style.borderColor = "#10b981"; }}
-                    onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255, 255, 255, 0.06)"; e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.16)"; }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(var(--lp-fg), 0.12)"; e.currentTarget.style.borderColor = "#007AFF"; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(var(--lp-fg), 0.06)"; e.currentTarget.style.borderColor = "rgba(var(--lp-fg), 0.16)"; }}
                   >
                     START FREE TRIAL
                   </Link>
@@ -888,16 +888,16 @@ export default function LandingPage() {
                 <div
                   className="pricing-card"
                   style={{
-                    background: "rgba(16, 36, 35, 0.95)",
+                    background: "rgba(var(--lp-card), 0.95)",
                     backdropFilter: "blur(24px)",
                     WebkitBackdropFilter: "blur(24px)",
-                    border: "2px solid #10b981",
+                    border: "2px solid #007AFF",
                     borderRadius: "24px",
                     padding: "32px",
                     position: "relative",
                     display: "flex",
                     flexDirection: "column",
-                    boxShadow: "0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(16, 185, 129, 0.18)",
+                    boxShadow: "0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(0, 122, 255, 0.18)",
                   }}
                 >
                   <div
@@ -905,7 +905,7 @@ export default function LandingPage() {
                       position: "absolute",
                       top: 0,
                       right: 0,
-                      background: "linear-gradient(135deg, #10b981, #059669)",
+                      background: "linear-gradient(135deg, #007AFF, #0066D6)",
                       color: "white",
                       fontSize: "9px",
                       fontWeight: 900,
@@ -919,24 +919,24 @@ export default function LandingPage() {
                     MOST POPULAR
                   </div>
 
-                  <div style={{ marginBottom: "20px", paddingBottom: "20px", borderBottom: "1px solid rgba(255, 255, 255, 0.08)" }}>
-                    <h3 style={{ fontFamily: "'Instrument Serif', serif", fontSize: "26px", color: "#FFFFFF", marginBottom: "4px" }}>
+                  <div style={{ marginBottom: "20px", paddingBottom: "20px", borderBottom: "1px solid rgba(var(--lp-fg), 0.08)" }}>
+                    <h3 style={{ fontFamily: "'Instrument Serif', serif", fontSize: "26px", color: "var(--lp-heading)", marginBottom: "4px" }}>
                       Pro Trader
                     </h3>
-                    <p style={{ fontSize: "12px", color: "rgba(237, 234, 227, 0.6)" }}>
+                    <p style={{ fontSize: "12px", color: "rgba(var(--lp-fg), 0.6)" }}>
                       Full 10-year replay & AI coach suite
                     </p>
                   </div>
 
                   <div style={{ marginBottom: "20px" }}>
                     <div style={{ display: "flex", alignItems: "baseline", gap: "4px" }}>
-                      <span style={{ fontSize: "24px", fontWeight: 700, color: "#FFFFFF" }}>$</span>
+                      <span style={{ fontSize: "24px", fontWeight: 700, color: "var(--lp-heading)" }}>$</span>
                       <OdometerPrice value={billingCycle === "yearly" ? 114 : 14} height={42} />
-                      <span style={{ fontSize: "11px", fontFamily: "'JetBrains Mono', monospace", color: "rgba(237, 234, 227, 0.55)" }}>
+                      <span style={{ fontSize: "11px", fontFamily: "'JetBrains Mono', monospace", color: "rgba(var(--lp-fg), 0.55)" }}>
                         {billingCycle === "yearly" ? "/year" : "/month"}
                       </span>
                     </div>
-                    <div style={{ fontSize: "11px", color: "rgba(237, 234, 227, 0.4)", textDecoration: "line-through", fontFamily: "'JetBrains Mono', monospace", marginTop: "2px" }}>
+                    <div style={{ fontSize: "11px", color: "rgba(var(--lp-fg), 0.4)", textDecoration: "line-through", fontFamily: "'JetBrains Mono', monospace", marginTop: "2px" }}>
                       {billingCycle === "yearly" ? "$228/year" : "$19/month"}
                     </div>
                     {/* Pop-in Save Badge */}
@@ -948,9 +948,9 @@ export default function LandingPage() {
                           gap: "4px",
                           padding: "3px 9px",
                           borderRadius: "6px",
-                          background: "rgba(16, 185, 129, 0.2)",
-                          border: "1px solid rgba(16, 185, 129, 0.35)",
-                          color: "#34d399",
+                          background: "rgba(0, 122, 255, 0.2)",
+                          border: "1px solid rgba(0, 122, 255, 0.35)",
+                          color: "#409CFF",
                           fontSize: "10px",
                           fontFamily: "'JetBrains Mono', monospace",
                           fontWeight: 700,
@@ -963,24 +963,24 @@ export default function LandingPage() {
                   </div>
 
                   <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginBottom: "32px", flex: 1 }}>
-                    <div style={{ display: "flex", alignItems: "flex-start", gap: "8px", fontSize: "12px", color: "rgba(237, 234, 227, 0.85)" }}>
-                      <CheckCircle2 size={14} color="#10b981" style={{ flexShrink: 0, marginTop: "1px" }} />
+                    <div style={{ display: "flex", alignItems: "flex-start", gap: "8px", fontSize: "12px", color: "rgba(var(--lp-fg), 0.85)" }}>
+                      <CheckCircle2 size={14} color="#007AFF" style={{ flexShrink: 0, marginTop: "1px" }} />
                       <span><strong>10 Years</strong> of historical tick replay data</span>
                     </div>
-                    <div style={{ display: "flex", alignItems: "flex-start", gap: "8px", fontSize: "12px", color: "rgba(237, 234, 227, 0.85)" }}>
-                      <CheckCircle2 size={14} color="#10b981" style={{ flexShrink: 0, marginTop: "1px" }} />
+                    <div style={{ display: "flex", alignItems: "flex-start", gap: "8px", fontSize: "12px", color: "rgba(var(--lp-fg), 0.85)" }}>
+                      <CheckCircle2 size={14} color="#007AFF" style={{ flexShrink: 0, marginTop: "1px" }} />
                       <span><strong>AI Psychology Coach</strong> (Pre-Trade Guard)</span>
                     </div>
-                    <div style={{ display: "flex", alignItems: "flex-start", gap: "8px", fontSize: "12px", color: "rgba(237, 234, 227, 0.85)" }}>
-                      <CheckCircle2 size={14} color="#10b981" style={{ flexShrink: 0, marginTop: "1px" }} />
+                    <div style={{ display: "flex", alignItems: "flex-start", gap: "8px", fontSize: "12px", color: "rgba(var(--lp-fg), 0.85)" }}>
+                      <CheckCircle2 size={14} color="#007AFF" style={{ flexShrink: 0, marginTop: "1px" }} />
                       <span>FTMO & Prop firm daily drawdown shield</span>
                     </div>
-                    <div style={{ display: "flex", alignItems: "flex-start", gap: "8px", fontSize: "12px", color: "rgba(237, 234, 227, 0.85)" }}>
-                      <CheckCircle2 size={14} color="#10b981" style={{ flexShrink: 0, marginTop: "1px" }} />
+                    <div style={{ display: "flex", alignItems: "flex-start", gap: "8px", fontSize: "12px", color: "rgba(var(--lp-fg), 0.85)" }}>
+                      <CheckCircle2 size={14} color="#007AFF" style={{ flexShrink: 0, marginTop: "1px" }} />
                       <span>Automated R-Multiple & session analytics</span>
                     </div>
-                    <div style={{ display: "flex", alignItems: "flex-start", gap: "8px", fontSize: "12px", color: "rgba(237, 234, 227, 0.85)" }}>
-                      <CheckCircle2 size={14} color="#10b981" style={{ flexShrink: 0, marginTop: "1px" }} />
+                    <div style={{ display: "flex", alignItems: "flex-start", gap: "8px", fontSize: "12px", color: "rgba(var(--lp-fg), 0.85)" }}>
+                      <CheckCircle2 size={14} color="#007AFF" style={{ flexShrink: 0, marginTop: "1px" }} />
                       <span>Private Discord Alpha community</span>
                     </div>
                   </div>
@@ -999,33 +999,33 @@ export default function LandingPage() {
           </section>
 
           {/* Frequently Asked Questions */}
-          <section id="faq" className="px-5 py-20" style={{ borderTop: "1px solid rgba(255, 255, 255, 0.06)" }}>
+          <section id="faq" className="px-5 py-20" style={{ borderTop: "1px solid rgba(var(--lp-fg), 0.06)" }}>
             <div className="max-w-3xl mx-auto">
               <div style={{ textAlign: "center", marginBottom: "36px" }}>
                 <div style={{
                   display: "inline-block", fontSize: "10px", fontWeight: 700, letterSpacing: "0.16em",
-                  textTransform: "uppercase", color: "#E8732A",
+                  textTransform: "uppercase", color: "#007AFF",
                   padding: "5px 14px", borderRadius: "999px",
-                  background: "rgba(232, 115, 42, 0.1)", border: "1px solid rgba(232, 115, 42, 0.25)",
+                  background: "rgba(0, 122, 255, 0.1)", border: "1px solid rgba(0, 122, 255, 0.25)",
                   marginBottom: "14px",
                   fontFamily: "'JetBrains Mono', monospace",
                 }}>05 INQUIRIES · FREQUENTLY ASKED</div>
                 <h2 style={{
                   fontFamily: "'Instrument Serif', Georgia, serif",
                   fontSize: "clamp(2rem, 4.2vw, 3.2rem)", fontWeight: 400,
-                  color: "#FFFFFF", letterSpacing: "-0.02em", lineHeight: 1.1,
+                  color: "var(--lp-heading)", letterSpacing: "-0.02em", lineHeight: 1.1,
                 }}>
-                  Frequently Asked <span style={{ fontStyle: "italic", color: "#0E7C86" }}>Questions</span>
+                  Frequently Asked <span style={{ fontStyle: "italic", color: "#007AFF" }}>Questions</span>
                 </h2>
               </div>
-              <div className="landing-faq" style={{ background: 'rgba(15, 29, 28, 0.88)', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '22px', overflow: 'hidden', boxShadow: '0 20px 40px rgba(0,0,0,0.35)' }}>
+              <div className="landing-faq" style={{ background: 'rgba(var(--lp-card), 0.88)', border: '1px solid rgba(var(--lp-fg), 0.08)', borderRadius: '22px', overflow: 'hidden', boxShadow: '0 20px 40px rgba(0,0,0,0.35)' }}>
                 {LANDING_FAQS.map((f) => (
-                  <details key={f.q} className="group px-6 py-5" style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.06)' }}>
-                    <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-semibold" style={{ color: "#EDEAE3", fontSize: "16px", cursor: "pointer" }}>
-                      <span style={{ color: "#EDEAE3", fontWeight: 600, fontSize: "15px" }}>{f.q}</span>
-                      <ChevronRight size={18} className="shrink-0 transition-transform group-open:rotate-90" style={{ color: "#0E7C86" }} />
+                  <details key={f.q} className="group px-6 py-5" style={{ borderBottom: '1px solid rgba(var(--lp-fg), 0.06)' }}>
+                    <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-semibold" style={{ color: "var(--lp-text)", fontSize: "16px", cursor: "pointer" }}>
+                      <span style={{ color: "var(--lp-text)", fontWeight: 600, fontSize: "15px" }}>{f.q}</span>
+                      <ChevronRight size={18} className="shrink-0 transition-transform group-open:rotate-90" style={{ color: "#007AFF" }} />
                     </summary>
-                    <p className="mt-3 text-sm leading-relaxed" style={{ color: "rgba(237, 234, 227, 0.82)", fontSize: "14px", lineHeight: 1.7 }}>{f.a}</p>
+                    <p className="mt-3 text-sm leading-relaxed" style={{ color: "rgba(var(--lp-fg), 0.82)", fontSize: "14px", lineHeight: 1.7 }}>{f.a}</p>
                   </details>
                 ))}
               </div>
@@ -1033,50 +1033,50 @@ export default function LandingPage() {
           </section>
 
           {/* Discord Community CTA */}
-          <section style={{ padding: "80px 20px", borderTop: "1px solid rgba(255, 255, 255, 0.06)" }}>
+          <section style={{ padding: "80px 20px", borderTop: "1px solid rgba(var(--lp-fg), 0.06)" }}>
             <div
               className="discord-cta-box"
               style={{
                 maxWidth: "800px", margin: "0 auto",
-                background: "rgba(15, 29, 28, 0.92)",
+                background: "rgba(var(--lp-card), 0.92)",
                 backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)",
-                border: "1px solid rgba(255, 255, 255, 0.1)", borderRadius: "24px",
+                border: "1px solid rgba(var(--lp-fg), 0.1)", borderRadius: "24px",
                 padding: "clamp(36px, 6vw, 56px) clamp(20px, 4vw, 40px)", textAlign: "center",
                 position: "relative", overflow: "hidden",
-                boxShadow: "0 20px 60px rgba(0,0,0,0.4), 0 0 40px rgba(14, 124, 134, 0.15)",
+                boxShadow: "0 20px 60px rgba(0,0,0,0.4), 0 0 40px rgba(0, 122, 255, 0.15)",
               }}
             >
               <div style={{
                 position: "absolute", top: "-40px", left: "50%", transform: "translateX(-50%)",
                 width: "300px", height: "200px",
-                background: "radial-gradient(ellipse, rgba(14, 124, 134, 0.2) 0%, transparent 70%)",
+                background: "radial-gradient(ellipse, rgba(0, 122, 255, 0.2) 0%, transparent 70%)",
                 pointerEvents: "none",
               }} />
               <div style={{
                 width: 56, height: 56, borderRadius: "16px",
-                background: "rgba(14, 124, 134, 0.2)", display: "flex", alignItems: "center", justifyContent: "center",
+                background: "rgba(0, 122, 255, 0.2)", display: "flex", alignItems: "center", justifyContent: "center",
                 margin: "0 auto 20px",
-                border: "1px solid rgba(14, 124, 134, 0.4)",
-                boxShadow: "0 8px 32px rgba(14, 124, 134, 0.25)",
+                border: "1px solid rgba(0, 122, 255, 0.4)",
+                boxShadow: "0 8px 32px rgba(0, 122, 255, 0.25)",
               }}>
-                <MessageSquare size={26} color="#5FD4E8" />
+                <MessageSquare size={26} color="#5AC8FA" />
               </div>
               <div style={{
                 display: "inline-block", fontSize: "10px", fontWeight: 700, letterSpacing: "0.16em",
-                textTransform: "uppercase", color: "#5FD4E8",
+                textTransform: "uppercase", color: "#5AC8FA",
                 padding: "5px 14px", borderRadius: "999px",
-                background: "rgba(95, 212, 232, 0.1)", border: "1px solid rgba(95, 212, 232, 0.25)",
+                background: "rgba(90, 200, 250, 0.1)", border: "1px solid rgba(90, 200, 250, 0.25)",
                 marginBottom: "14px",
                 fontFamily: "'JetBrains Mono', monospace",
               }}>06 TRADER SANCTUARY · DISCORD NETWORK</div>
               <h2 style={{
                 fontFamily: "'Instrument Serif', Georgia, serif",
                 fontSize: "clamp(1.8rem,3.6vw,2.8rem)", fontWeight: 400,
-                color: "#FFFFFF", letterSpacing: "-0.02em", marginBottom: "12px",
+                color: "var(--lp-heading)", letterSpacing: "-0.02em", marginBottom: "12px",
               }}>
-                Join the Official Forex Notes <span style={{ fontStyle: "italic", color: "#E8732A" }}>Community</span>
+                Join the Official Forex Notes <span style={{ fontStyle: "italic", color: "#007AFF" }}>Community</span>
               </h2>
-              <p style={{ fontSize: "14px", color: "rgba(237, 234, 227, 0.7)", maxWidth: "500px", margin: "0 auto 28px", lineHeight: 1.7 }}>
+              <p style={{ fontSize: "14px", color: "rgba(var(--lp-fg), 0.7)", maxWidth: "500px", margin: "0 auto 28px", lineHeight: 1.7 }}>
                 Network with funded traders, share playbook setups, discuss daily market outlooks, and get direct technical support.
               </p>
               <IridescentButton

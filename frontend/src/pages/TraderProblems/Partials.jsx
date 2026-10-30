@@ -47,7 +47,7 @@ export default function Partials() {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
           <div>
             <h2 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2 mb-2">
-              <Calculator className="w-5 h-5 text-emerald-500" /> Partials
+              <Calculator className="w-5 h-5 text-blue-500" /> Partials
               Calculator
             </h2>
             <p className="text-sm text-gray-500">
@@ -57,7 +57,7 @@ export default function Partials() {
           </div>
           <button
             onClick={addExecution}
-            className="px-4 py-2 bg-[#10b981]/10 text-[#10b981] hover:bg-[#10b981]/20 border border-[#10b981]/20 font-bold text-xs rounded-[2px] transition-colors flex items-center gap-2 shrink-0"
+            className="px-4 py-2 bg-[#007AFF]/10 text-[#007AFF] hover:bg-[#007AFF]/20 border border-[#007AFF]/20 font-bold text-xs rounded-[2px] transition-colors flex items-center gap-2 shrink-0"
           >
             <Plus className="w-4 h-4" /> Add Execution
           </button>
@@ -90,7 +90,7 @@ export default function Partials() {
                         e.target.value,
                       )
                     }
-                    className="w-full bg-white dark:bg-[#0d0e12] border border-gray-200 dark:border-white/10 rounded-[2px] pl-3 pr-8 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-[#10b981]"
+                    className="w-full bg-white dark:bg-[#0d0e12] border border-gray-200 dark:border-white/10 rounded-[2px] pl-3 pr-8 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-[#007AFF]"
                   />
                   <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-bold">
                     %
@@ -104,7 +104,7 @@ export default function Partials() {
                     onChange={(e) =>
                       updateExecution(exe.id, "rMultiple", e.target.value)
                     }
-                    className="w-full bg-white dark:bg-[#0d0e12] border border-gray-200 dark:border-white/10 rounded-[2px] pl-3 pr-8 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-[#10b981]"
+                    className="w-full bg-white dark:bg-[#0d0e12] border border-gray-200 dark:border-white/10 rounded-[2px] pl-3 pr-8 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-[#007AFF]"
                   />
                   <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-bold">
                     R
@@ -133,7 +133,7 @@ export default function Partials() {
                   Total Position Accounted
                 </p>
                 <p
-                  className={`text-2xl font-bold ${totalPercentage === 100 ? "text-emerald-500" : "text-amber-500 dark:text-amber-400"}`}
+                  className={`text-2xl font-bold ${totalPercentage === 100 ? "text-blue-500" : "text-amber-500 dark:text-amber-400"}`}
                 >
                   {totalPercentage}%
                 </p>

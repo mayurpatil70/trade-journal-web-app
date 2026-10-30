@@ -333,7 +333,7 @@ export default function PropFirm() {
                 ? "bg-white border-red-500/40 dark:bg-gradient-to-b dark:from-red-950 dark:via-[#180a0a] dark:to-[#121418] dark:border-red-500/60 dark:shadow-[0_0_40px_rgba(239,68,68,0.3)]"
                 : isCritical
                   ? "bg-white border-amber-500/40 dark:bg-gradient-to-b dark:from-amber-950 dark:via-[#1a140a] dark:to-[#121418] dark:border-amber-500/60 dark:shadow-[0_0_40px_rgba(245,158,11,0.25)]"
-                  : "bg-white border-emerald-500/30 dark:bg-gradient-to-b dark:from-emerald-950/60 dark:via-[#0a1812] dark:to-[#121418] dark:border-emerald-500/40 dark:shadow-[0_8px_40px_rgba(16,185,129,0.25)]"
+                  : "bg-white border-blue-500/30 dark:bg-gradient-to-b dark:from-blue-950/60 dark:via-[#0a1812] dark:to-[#121418] dark:border-blue-500/40 dark:shadow-[0_8px_40px_rgba(0,122,255,0.25)]"
             }`}
           >
             <div className="flex justify-between items-center">
@@ -346,7 +346,7 @@ export default function PropFirm() {
                     ? "bg-red-500/10 dark:bg-red-500/20 text-red-600 dark:text-red-400 border-red-500/30 dark:border-red-500/40"
                     : isCritical
                       ? "bg-amber-500/10 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 border-amber-500/30 dark:border-amber-500/40"
-                      : "bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-500/30 dark:border-emerald-500/40"
+                      : "bg-blue-500/10 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 border-blue-500/30 dark:border-blue-500/40"
                 }`}
               >
                 {isDailyBreached
@@ -370,7 +370,7 @@ export default function PropFirm() {
                     ? "text-red-600 dark:text-red-500"
                     : isCritical
                       ? "text-amber-600 dark:text-amber-400"
-                      : "text-emerald-600 dark:text-emerald-400"
+                      : "text-blue-600 dark:text-blue-400"
                 }`}
               >
                 ${dailyBufferRemaining.toLocaleString(undefined, {
@@ -411,7 +411,7 @@ export default function PropFirm() {
               </div>
               <div className="flex justify-between items-center text-xs">
                 <span className="text-gray-500 dark:text-gray-400 font-medium">Total Buffer to Termination:</span>
-                <span className="font-bold text-emerald-600 dark:text-emerald-400">${overallBufferRemaining.toLocaleString()}</span>
+                <span className="font-bold text-blue-600 dark:text-blue-400">${overallBufferRemaining.toLocaleString()}</span>
               </div>
             </div>
 

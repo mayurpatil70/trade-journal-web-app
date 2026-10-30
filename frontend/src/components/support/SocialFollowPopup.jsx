@@ -89,7 +89,7 @@ export default function SocialFollowPopup() {
           </div>
 
           {/* Glowing Apple Blue Diagonal Arrow */}
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 to-cyan-400 flex items-center justify-center shadow-lg shadow-blue-500/30">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 to-sky-400 flex items-center justify-center shadow-lg shadow-blue-500/30">
             <ArrowUpRight className="w-7 h-7 text-white stroke-[2.5]" />
           </div>
         </div>

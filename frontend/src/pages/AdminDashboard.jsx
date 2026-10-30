@@ -540,7 +540,7 @@ export default function AdminDashboard() {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[80vh] bg-white dark:bg-[#0a0a0a]">
-        <Loader2 className="w-10 h-10 text-[#10b981] animate-spin mb-4" />
+        <Loader2 className="w-10 h-10 text-[#007AFF] animate-spin mb-4" />
         <p className="text-sm text-gray-700 dark:text-gray-300 font-medium">Connecting to Admin Command Center...</p>
         <p className="text-xs text-gray-500 dark:text-gray-600 mt-1">Retrieving user database and Supabase records</p>
       </div>
@@ -552,13 +552,13 @@ export default function AdminDashboard() {
       {/* Top Header */}
       <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-[#10b981]/10 border border-[#10b981]/25 flex items-center justify-center shadow-lg shadow-[#10b981]/5">
-            <ShieldCheck className="w-6 h-6 text-[#10b981]" />
+          <div className="w-12 h-12 rounded-2xl bg-[#007AFF]/10 border border-[#007AFF]/25 flex items-center justify-center shadow-lg shadow-[#007AFF]/5">
+            <ShieldCheck className="w-6 h-6 text-[#007AFF]" />
           </div>
           <div>
             <h1 className="text-2xl md:text-3xl font-black text-gray-900 dark:text-white tracking-tight flex items-center gap-3">
               Admin Command Center
-              <span className="text-[10px] font-bold bg-[#10b981]/15 text-[#10b981] border border-[#10b981]/30 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+              <span className="text-[10px] font-bold bg-[#007AFF]/15 text-[#007AFF] border border-[#007AFF]/30 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
                 Live Supabase
               </span>
             </h1>
@@ -571,7 +571,7 @@ export default function AdminDashboard() {
         <div className="flex items-center gap-2.5 flex-wrap">
           <button
             onClick={() => setShowAddUserModal(true)}
-            className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#10b981] hover:bg-[#0ea371] text-black font-bold text-xs shadow-md shadow-[#10b981]/20 transition-all cursor-pointer"
+            className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#007AFF] hover:bg-[#0ea371] text-black font-bold text-xs shadow-md shadow-[#007AFF]/20 transition-all cursor-pointer"
           >
             <UserPlus className="w-3.5 h-3.5" />
             Provision / Add User
@@ -590,7 +590,7 @@ export default function AdminDashboard() {
             disabled={refreshing}
             className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-white/5 dark:hover:bg-white/10 border border-gray-300 dark:border-white/10 text-xs font-semibold text-gray-800 dark:text-white transition-all disabled:opacity-50 cursor-pointer"
           >
-            <RefreshCw className={`w-3.5 h-3.5 text-[#10b981] ${refreshing ? "animate-spin" : ""}`} />
+            <RefreshCw className={`w-3.5 h-3.5 text-[#007AFF] ${refreshing ? "animate-spin" : ""}`} />
             {refreshing ? "Refreshing..." : "Refresh"}
           </button>
         </div>
@@ -617,7 +617,7 @@ export default function AdminDashboard() {
           onClick={() => setActiveTab("overview")}
           className={`text-xs md:text-sm font-bold uppercase tracking-wider transition-colors pb-1 flex items-center gap-2 whitespace-nowrap cursor-pointer ${
             activeTab === "overview"
-              ? "text-[#10b981] border-b-2 border-[#10b981]"
+              ? "text-[#007AFF] border-b-2 border-[#007AFF]"
               : "text-gray-500 hover:text-gray-900 dark:hover:text-white"
           }`}
         >
@@ -629,7 +629,7 @@ export default function AdminDashboard() {
           onClick={() => setActiveTab("trades")}
           className={`text-xs md:text-sm font-bold uppercase tracking-wider transition-colors pb-1 flex items-center gap-2 whitespace-nowrap cursor-pointer ${
             activeTab === "trades"
-              ? "text-[#10b981] border-b-2 border-[#10b981]"
+              ? "text-[#007AFF] border-b-2 border-[#007AFF]"
               : "text-gray-500 hover:text-gray-900 dark:hover:text-white"
           }`}
         >
@@ -641,7 +641,7 @@ export default function AdminDashboard() {
           onClick={() => setActiveTab("affiliates")}
           className={`text-xs md:text-sm font-bold uppercase tracking-wider transition-colors pb-1 flex items-center gap-2 whitespace-nowrap cursor-pointer ${
             activeTab === "affiliates"
-              ? "text-[#10b981] border-b-2 border-[#10b981]"
+              ? "text-[#007AFF] border-b-2 border-[#007AFF]"
               : "text-gray-500 hover:text-gray-900 dark:hover:text-white"
           }`}
         >
@@ -653,12 +653,12 @@ export default function AdminDashboard() {
           onClick={() => setActiveTab("broadcast")}
           className={`text-xs md:text-sm font-bold uppercase tracking-wider transition-colors pb-1 flex items-center gap-2 whitespace-nowrap cursor-pointer ${
             activeTab === "broadcast"
-              ? "text-[#10b981] border-b-2 border-[#10b981]"
+              ? "text-[#007AFF] border-b-2 border-[#007AFF]"
               : "text-gray-500 hover:text-gray-900 dark:hover:text-white"
           }`}
         >
           <Megaphone className="w-4 h-4" />
-          Broadcast Banner {broadcastActive && <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>}
+          Broadcast Banner {broadcastActive && <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>}
         </button>
       </div>
 
@@ -671,8 +671,8 @@ export default function AdminDashboard() {
             <div className="bg-white dark:bg-[#0a0a0a]/80 backdrop-blur-xl border border-gray-200 dark:border-white/10 rounded-2xl p-4 shadow-sm dark:shadow-xl">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-[9px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">Revenue</span>
-                <div className="w-6 h-6 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
-                  <DollarSign className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                <div className="w-6 h-6 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
+                  <DollarSign className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
                 </div>
               </div>
               <p className="text-xl md:text-2xl font-black text-gray-900 dark:text-white">${(metrics.totalRevenue || 0).toFixed(2)}</p>
@@ -683,8 +683,8 @@ export default function AdminDashboard() {
             <div className="bg-white dark:bg-[#0a0a0a]/80 backdrop-blur-xl border border-gray-200 dark:border-white/10 rounded-2xl p-4 shadow-sm dark:shadow-xl">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-[9px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">Users</span>
-                <div className="w-6 h-6 rounded-lg bg-[#10b981]/10 border border-[#10b981]/20 flex items-center justify-center">
-                  <Users className="w-3.5 h-3.5 text-[#10b981]" />
+                <div className="w-6 h-6 rounded-lg bg-[#007AFF]/10 border border-[#007AFF]/20 flex items-center justify-center">
+                  <Users className="w-3.5 h-3.5 text-[#007AFF]" />
                 </div>
               </div>
               <p className="text-xl md:text-2xl font-black text-gray-900 dark:text-white">{totalRegistered}</p>
@@ -731,8 +731,8 @@ export default function AdminDashboard() {
             <div className="bg-white dark:bg-[#0a0a0a]/80 backdrop-blur-xl border border-gray-200 dark:border-white/10 rounded-2xl p-4 shadow-sm dark:shadow-xl">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-[9px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">Trades</span>
-                <div className="w-6 h-6 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center">
-                  <Activity className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
+                <div className="w-6 h-6 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
+                  <Activity className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
                 </div>
               </div>
               <p className="text-xl md:text-2xl font-black text-gray-900 dark:text-white">{trades.length || metrics.totalTrades || 0}</p>
@@ -799,7 +799,7 @@ export default function AdminDashboard() {
                               href={ord.payment_screenshot}
                               target="_blank"
                               rel="noreferrer"
-                              className="flex items-center gap-1 text-[#10b981] hover:underline text-[11px] font-bold"
+                              className="flex items-center gap-1 text-[#007AFF] hover:underline text-[11px] font-bold"
                             >
                               View Proof <ExternalLink className="w-3 h-3" />
                             </a>
@@ -827,7 +827,7 @@ export default function AdminDashboard() {
                               <button
                                 onClick={() => handleVerifyOrder(ord.id)}
                                 disabled={actionLoadingId === ord.id}
-                                className="bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-500 hover:text-white border border-emerald-500/30 px-3 py-1.5 rounded-xl text-[10px] uppercase font-bold transition-all disabled:opacity-50 cursor-pointer"
+                                className="bg-blue-500/20 text-blue-700 dark:text-blue-400 hover:bg-blue-500 hover:text-white border border-blue-500/30 px-3 py-1.5 rounded-xl text-[10px] uppercase font-bold transition-all disabled:opacity-50 cursor-pointer"
                               >
                                 {actionLoadingId === ord.id ? "Verifying..." : "Approve & Verify"}
                               </button>
@@ -879,7 +879,7 @@ export default function AdminDashboard() {
               <div>
                 <h2 className="text-base md:text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
                   Active Members Database ({filteredUsers.length} of {upperAccounts.length})
-                  <span className="text-[10px] font-semibold bg-[#10b981]/15 text-[#10b981] border border-[#10b981]/30 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                  <span className="text-[10px] font-semibold bg-[#007AFF]/15 text-[#007AFF] border border-[#007AFF]/30 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
                     {showAllInUpperTable ? "All Records" : "Subscribed & Linked"}
                   </span>
                 </h2>
@@ -918,7 +918,7 @@ export default function AdminDashboard() {
                       setUsersPage(1);
                     }}
                     placeholder="Search by email, ID or referral..."
-                    className="w-56 sm:w-64 bg-gray-50 dark:bg-white/5 border border-gray-300 dark:border-white/10 rounded-xl pl-9 pr-3 py-1.5 text-xs text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-[#10b981] transition-colors"
+                    className="w-56 sm:w-64 bg-gray-50 dark:bg-white/5 border border-gray-300 dark:border-white/10 rounded-xl pl-9 pr-3 py-1.5 text-xs text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-[#007AFF] transition-colors"
                   />
                 </div>
 
@@ -927,7 +927,7 @@ export default function AdminDashboard() {
                   <button
                     type="button"
                     onClick={() => setIsFilterDropdownOpen((prev) => !prev)}
-                    className="flex items-center justify-between gap-2 bg-gray-50 dark:bg-white/5 hover:bg-gray-100 dark:hover:bg-white/10 border border-gray-300 dark:border-white/10 rounded-xl px-3 py-1.5 text-xs text-gray-900 dark:text-white font-medium focus:outline-none focus:border-[#10b981] cursor-pointer shadow-sm transition-all min-w-[170px]"
+                    className="flex items-center justify-between gap-2 bg-gray-50 dark:bg-white/5 hover:bg-gray-100 dark:hover:bg-white/10 border border-gray-300 dark:border-white/10 rounded-xl px-3 py-1.5 text-xs text-gray-900 dark:text-white font-medium focus:outline-none focus:border-[#007AFF] cursor-pointer shadow-sm transition-all min-w-[170px]"
                   >
                     <span className="truncate flex items-center gap-2">
                       <span className={`inline-block w-2 h-2 rounded-full ${
@@ -967,13 +967,13 @@ export default function AdminDashboard() {
                             }}
                             className={`w-full flex items-center justify-between px-3 py-2 text-xs transition-colors cursor-pointer ${
                               isSelected
-                                ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold"
+                                ? "bg-blue-500/10 text-blue-600 dark:text-blue-400 font-bold"
                                 : "text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-white/5"
                             }`}
                           >
                             <span className="flex items-center gap-2">
                               {isSelected ? (
-                                <Check className="w-3.5 h-3.5 text-emerald-500" />
+                                <Check className="w-3.5 h-3.5 text-blue-500" />
                               ) : (
                                 <span className="w-3.5 h-3.5" />
                               )}
@@ -1094,7 +1094,7 @@ export default function AdminDashboard() {
                             <span
                               className={`px-2 py-0.5 rounded-md text-[11px] font-bold ${
                                 tradeCount > 0
-                                  ? "bg-purple-500/10 text-purple-700 dark:text-purple-300 border border-purple-500/20"
+                                  ? "bg-blue-500/10 text-blue-700 dark:text-blue-300 border border-blue-500/20"
                                   : "text-gray-400"
                               }`}
                             >
@@ -1107,7 +1107,7 @@ export default function AdminDashboard() {
                               <span
                                 className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
                                   acc.discord_verified
-                                    ? "bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 border border-indigo-500/30"
+                                    ? "bg-blue-500/10 text-blue-700 dark:text-blue-400 border border-blue-500/30"
                                     : "bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/30"
                                 }`}
                               >
@@ -1155,7 +1155,7 @@ export default function AdminDashboard() {
                                 onClick={() => handleGrantAccess(acc.id, "paid", 30)}
                                 disabled={actionLoadingId === acc.id}
                                 title="Grant 30 days active subscription"
-                                className="px-2 py-1 rounded-lg bg-emerald-500/10 hover:bg-emerald-500 hover:text-white border border-emerald-500/20 text-emerald-700 dark:text-emerald-400 text-[10px] font-bold transition-all disabled:opacity-50 cursor-pointer"
+                                className="px-2 py-1 rounded-lg bg-blue-500/10 hover:bg-blue-500 hover:text-white border border-blue-500/20 text-blue-700 dark:text-blue-400 text-[10px] font-bold transition-all disabled:opacity-50 cursor-pointer"
                               >
                                 +30d Pro
                               </button>
@@ -1164,7 +1164,7 @@ export default function AdminDashboard() {
                                 onClick={() => handleGrantAccess(acc.id, "paid", 365)}
                                 disabled={actionLoadingId === acc.id}
                                 title="Grant 1 Year active subscription"
-                                className="px-2 py-1 rounded-lg bg-[#10b981]/15 hover:bg-[#10b981] hover:text-black border border-[#10b981]/30 text-[#0d9468] dark:text-[#10b981] text-[10px] font-bold transition-all disabled:opacity-50 cursor-pointer"
+                                className="px-2 py-1 rounded-lg bg-[#007AFF]/15 hover:bg-[#007AFF] hover:text-black border border-[#007AFF]/30 text-[#0d9468] dark:text-[#007AFF] text-[10px] font-bold transition-all disabled:opacity-50 cursor-pointer"
                               >
                                 +1y Pro
                               </button>
@@ -1185,7 +1185,7 @@ export default function AdminDashboard() {
                                   setCustomDaysType("paid");
                                 }}
                                 title="Custom days access"
-                                className="px-2 py-1 rounded-lg bg-purple-500/10 hover:bg-purple-500 hover:text-white border border-purple-500/20 text-purple-700 dark:text-purple-400 text-[10px] font-bold transition-all cursor-pointer"
+                                className="px-2 py-1 rounded-lg bg-blue-500/10 hover:bg-blue-500 hover:text-white border border-blue-500/20 text-blue-700 dark:text-blue-400 text-[10px] font-bold transition-all cursor-pointer"
                               >
                                 Custom
                               </button>
@@ -1221,7 +1221,7 @@ export default function AdminDashboard() {
                                 setShowAllInUpperTable(true);
                                 setUsersPage(1);
                               }}
-                              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#10b981] hover:bg-[#0ea371] text-black text-xs font-bold transition-all cursor-pointer shadow-sm"
+                              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#007AFF] hover:bg-[#0ea371] text-black text-xs font-bold transition-all cursor-pointer shadow-sm"
                             >
                               Show All {accounts.length} Users in Upper Table
                             </button>
@@ -1403,7 +1403,7 @@ export default function AdminDashboard() {
                               <span
                                 className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
                                   acc.discord_verified
-                                    ? "bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 border border-indigo-500/20"
+                                    ? "bg-blue-500/10 text-blue-700 dark:text-blue-400 border border-blue-500/20"
                                     : "bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20"
                                 }`}
                               >
@@ -1563,10 +1563,10 @@ export default function AdminDashboard() {
             </div>
             <div className="bg-white dark:bg-[#0a0a0a]/80 backdrop-blur-xl border border-gray-200 dark:border-white/10 rounded-2xl p-4 shadow-sm">
               <span className="text-[9px] font-bold text-gray-500 uppercase tracking-widest">Active Traders</span>
-              <p className="text-xl md:text-2xl font-black text-purple-600 dark:text-purple-400 mt-1">
+              <p className="text-xl md:text-2xl font-black text-blue-600 dark:text-blue-400 mt-1">
                 {new Set(trades.map((t) => t.user_id).filter(Boolean)).size}
               </p>
-              <p className="text-[10px] text-purple-600/80 mt-0.5">Traders with recorded trades</p>
+              <p className="text-[10px] text-blue-600/80 mt-0.5">Traders with recorded trades</p>
             </div>
           </div>
 
@@ -1593,7 +1593,7 @@ export default function AdminDashboard() {
                       setTradesPage(1);
                     }}
                     placeholder="Search asset, pair or user ID..."
-                    className="w-48 sm:w-56 bg-gray-50 dark:bg-white/5 border border-gray-300 dark:border-white/10 rounded-xl pl-9 pr-3 py-1.5 text-xs text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:border-[#10b981]"
+                    className="w-48 sm:w-56 bg-gray-50 dark:bg-white/5 border border-gray-300 dark:border-white/10 rounded-xl pl-9 pr-3 py-1.5 text-xs text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:border-[#007AFF]"
                   />
                 </div>
 
@@ -1607,7 +1607,7 @@ export default function AdminDashboard() {
                       }}
                       className={`px-2.5 py-1 rounded-lg font-bold uppercase text-[10px] transition-colors cursor-pointer ${
                         tradeResultFilter === res
-                          ? "bg-[#10b981] text-black"
+                          ? "bg-[#007AFF] text-black"
                           : "text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white"
                       }`}
                     >
@@ -1778,7 +1778,7 @@ export default function AdminDashboard() {
                     withdrawals.map((w) => (
                       <tr key={w.id} className="hover:bg-gray-50 dark:hover:bg-white/[0.02] transition-colors">
                         <td className="py-3 pr-4 font-medium text-gray-900 dark:text-white">{w.users?.email || w.email || "Unknown"}</td>
-                        <td className="py-3 pr-4 text-emerald-600 dark:text-emerald-400 font-bold">${w.amount} USDT</td>
+                        <td className="py-3 pr-4 text-blue-600 dark:text-blue-400 font-bold">${w.amount} USDT</td>
                         <td className="py-3 pr-4 font-mono text-gray-500 dark:text-gray-400 text-[10px] break-all max-w-[200px]">
                           {w.wallet_address}
                         </td>
@@ -1804,7 +1804,7 @@ export default function AdminDashboard() {
                                   "_blank"
                                 )
                               }
-                              className="bg-[#10b981]/10 text-[#10b981] hover:bg-[#10b981] hover:text-white border border-[#10b981]/20 px-3 py-1.5 rounded-xl text-[10px] uppercase font-bold transition-all cursor-pointer"
+                              className="bg-[#007AFF]/10 text-[#007AFF] hover:bg-[#007AFF] hover:text-white border border-[#007AFF]/20 px-3 py-1.5 rounded-xl text-[10px] uppercase font-bold transition-all cursor-pointer"
                             >
                               Email
                             </button>
@@ -1864,7 +1864,7 @@ export default function AdminDashboard() {
                             {a.referral_code || "None"}
                           </span>
                         </td>
-                        <td className="py-3 text-right font-bold text-emerald-600 dark:text-emerald-400 font-mono text-sm">
+                        <td className="py-3 text-right font-bold text-blue-600 dark:text-blue-400 font-mono text-sm">
                           ${Number(a.wallet_balance || 0).toFixed(2)} USDT
                         </td>
                       </tr>
@@ -1887,8 +1887,8 @@ export default function AdminDashboard() {
       {activeTab === "broadcast" && (
         <div className="max-w-2xl bg-white dark:bg-[#0a0a0a]/80 backdrop-blur-xl border border-gray-200 dark:border-white/10 rounded-2xl p-6 shadow-sm dark:shadow-xl">
           <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center">
-              <Megaphone className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+            <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
+              <Megaphone className="w-5 h-5 text-blue-600 dark:text-blue-400" />
             </div>
             <div>
               <h2 className="text-base font-bold text-gray-900 dark:text-white">Global System Broadcast Banner</h2>
@@ -1905,8 +1905,8 @@ export default function AdminDashboard() {
                 <div className="flex items-center gap-2">
                   <span className="text-xs font-bold text-gray-900 dark:text-white block">Banner Visibility</span>
                   {broadcastActive ? (
-                    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/15 text-blue-700 dark:text-blue-400 border border-blue-500/30">
+                      <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
                       Live on Platform
                     </span>
                   ) : (
@@ -1924,7 +1924,7 @@ export default function AdminDashboard() {
                   onChange={(e) => setBroadcastActive(e.target.checked)}
                   className="sr-only peer"
                 />
-                <div className="w-11 h-6 bg-gray-300 dark:bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#10b981]"></div>
+                <div className="w-11 h-6 bg-gray-300 dark:bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#007AFF]"></div>
               </label>
             </div>
 
@@ -1943,7 +1943,7 @@ export default function AdminDashboard() {
                     onClick={() => setBroadcastType(type.id)}
                     className={`py-2 px-3 text-xs font-bold rounded-xl border transition-all cursor-pointer ${
                       broadcastType === type.id
-                        ? `${type.color} ring-2 ring-emerald-500/30`
+                        ? `${type.color} ring-2 ring-blue-500/30`
                         : "bg-gray-50 dark:bg-white/5 border-gray-200 dark:border-white/10 text-gray-600 dark:text-gray-400"
                     }`}
                   >
@@ -1961,7 +1961,7 @@ export default function AdminDashboard() {
                 onChange={(e) => setBroadcastMessage(e.target.value)}
                 placeholder="e.g. 🚨 Scheduled system maintenance at 10 PM UTC. Live trading sessions will remain unaffected."
                 rows={3}
-                className="w-full bg-gray-50 dark:bg-white/5 border border-gray-300 dark:border-white/10 rounded-xl p-3 text-xs text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:border-[#10b981]"
+                className="w-full bg-gray-50 dark:bg-white/5 border border-gray-300 dark:border-white/10 rounded-xl p-3 text-xs text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:border-[#007AFF]"
               />
             </div>
 
@@ -1987,7 +1987,7 @@ export default function AdminDashboard() {
                   type="button"
                   onClick={handleSaveBroadcast}
                   disabled={broadcastSaving}
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#10b981] hover:bg-[#0ea371] text-black font-bold text-xs shadow-md transition-all cursor-pointer disabled:opacity-50"
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#007AFF] hover:bg-[#0ea371] text-black font-bold text-xs shadow-md transition-all cursor-pointer disabled:opacity-50"
                 >
                   {broadcastSaving ? "Saving Announcement..." : "Save & Update Broadcast"}
                 </button>
@@ -2026,7 +2026,7 @@ export default function AdminDashboard() {
             </button>
 
             <div className="flex items-center gap-3 mb-5">
-              <div className="w-10 h-10 rounded-xl bg-[#10b981]/15 text-[#10b981] flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-[#007AFF]/15 text-[#007AFF] flex items-center justify-center">
                 <UserPlus className="w-5 h-5" />
               </div>
               <div>
@@ -2044,7 +2044,7 @@ export default function AdminDashboard() {
                   value={newUserEmail}
                   onChange={(e) => setNewUserEmail(e.target.value)}
                   placeholder="trader@example.com"
-                  className="w-full bg-gray-50 dark:bg-white/5 border border-gray-300 dark:border-white/10 rounded-xl px-3 py-2 text-xs text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:border-[#10b981]"
+                  className="w-full bg-gray-50 dark:bg-white/5 border border-gray-300 dark:border-white/10 rounded-xl px-3 py-2 text-xs text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:border-[#007AFF]"
                 />
               </div>
 
@@ -2086,7 +2086,7 @@ export default function AdminDashboard() {
                       onClick={() => setNewUserDays(d)}
                       className={`text-xs px-2.5 py-1 rounded-lg border font-bold cursor-pointer ${
                         newUserDays === d
-                          ? "bg-emerald-500 text-black border-emerald-500"
+                          ? "bg-blue-500 text-black border-blue-500"
                           : "bg-gray-100 dark:bg-white/5 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-white/10"
                       }`}
                     >
@@ -2100,7 +2100,7 @@ export default function AdminDashboard() {
                   max="3650"
                   value={newUserDays}
                   onChange={(e) => setNewUserDays(e.target.value)}
-                  className="w-full bg-gray-50 dark:bg-white/5 border border-gray-300 dark:border-white/10 rounded-xl px-3 py-2 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#10b981]"
+                  className="w-full bg-gray-50 dark:bg-white/5 border border-gray-300 dark:border-white/10 rounded-xl px-3 py-2 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#007AFF]"
                 />
               </div>
 
@@ -2115,7 +2115,7 @@ export default function AdminDashboard() {
                 <button
                   type="submit"
                   disabled={addUserSubmitting}
-                  className="px-5 py-2 rounded-xl bg-[#10b981] hover:bg-[#0ea371] text-black font-bold text-xs shadow-md transition-all cursor-pointer disabled:opacity-50"
+                  className="px-5 py-2 rounded-xl bg-[#007AFF] hover:bg-[#0ea371] text-black font-bold text-xs shadow-md transition-all cursor-pointer disabled:opacity-50"
                 >
                   {addUserSubmitting ? "Provisioning..." : "Provision User"}
                 </button>
@@ -2176,7 +2176,7 @@ export default function AdminDashboard() {
                   max="3650"
                   value={customDaysVal}
                   onChange={(e) => setCustomDaysVal(e.target.value)}
-                  className="w-full bg-gray-50 dark:bg-white/5 border border-gray-300 dark:border-white/10 rounded-xl px-3 py-2 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#10b981]"
+                  className="w-full bg-gray-50 dark:bg-white/5 border border-gray-300 dark:border-white/10 rounded-xl px-3 py-2 text-xs text-gray-900 dark:text-white focus:outline-none focus:border-[#007AFF]"
                 />
               </div>
 
@@ -2191,7 +2191,7 @@ export default function AdminDashboard() {
                 <button
                   type="button"
                   onClick={handleCustomDaysSubmit}
-                  className="px-5 py-2 rounded-xl bg-[#10b981] hover:bg-[#0ea371] text-black font-bold text-xs shadow-md transition-all cursor-pointer"
+                  className="px-5 py-2 rounded-xl bg-[#007AFF] hover:bg-[#0ea371] text-black font-bold text-xs shadow-md transition-all cursor-pointer"
                 >
                   Grant {customDaysVal} Days
                 </button>
@@ -2214,7 +2214,7 @@ export default function AdminDashboard() {
 
             {/* User Profile Header */}
             <div className="flex items-start gap-4 mb-6">
-              <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold text-lg shrink-0">
+              <div className="w-12 h-12 rounded-2xl bg-blue-500/10 border border-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold text-lg shrink-0">
                 {selectedUserForModal.email ? selectedUserForModal.email.charAt(0).toUpperCase() : "U"}
               </div>
               <div className="flex-1 overflow-hidden">
@@ -2251,7 +2251,7 @@ export default function AdminDashboard() {
                   <span
                     className={`px-2 py-0.5 rounded-md text-[10px] font-semibold border ${
                       selectedUserForModal.discord_verified
-                        ? "bg-indigo-500/15 text-indigo-700 dark:text-indigo-400 border-indigo-500/30"
+                        ? "bg-blue-500/15 text-blue-700 dark:text-blue-400 border-blue-500/30"
                         : "bg-amber-500/15 text-amber-700 dark:text-amber-400 border-amber-500/30"
                     }`}
                   >
@@ -2303,7 +2303,7 @@ export default function AdminDashboard() {
               </button>
               <button
                 onClick={() => handleToggleDiscord(selectedUserForModal.id, selectedUserForModal.discord_verified)}
-                className="px-2.5 py-1 bg-indigo-500/10 hover:bg-indigo-600 hover:text-white text-indigo-600 dark:text-indigo-400 text-xs font-bold rounded-lg border border-indigo-500/20 transition-all cursor-pointer"
+                className="px-2.5 py-1 bg-blue-500/10 hover:bg-blue-600 hover:text-white text-blue-600 dark:text-blue-400 text-xs font-bold rounded-lg border border-blue-500/20 transition-all cursor-pointer"
               >
                 {selectedUserForModal.discord_verified ? "Unlink Discord" : "Verify Discord"}
               </button>

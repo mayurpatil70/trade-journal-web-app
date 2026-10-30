@@ -101,15 +101,15 @@ export default function TradeFXBookKpiCards({ stats, trades = [] }) {
         </div>
 
         {/* 3. AVERAGE RRR (Optimised from old duplicate Realized) */}
-        <div className="rounded-3xl p-5 bg-white dark:bg-[#121622] border border-black/[0.06] dark:border-white/[0.08] shadow-[0_4px_20px_rgb(0,0,0,0.03)] dark:shadow-[0_4px_25px_rgba(0,0,0,0.4)] flex items-start gap-4 transition-all hover:border-emerald-500/30">
-          <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 dark:bg-emerald-500/15 border border-emerald-500/20 text-emerald-500 flex items-center justify-center shrink-0">
+        <div className="rounded-3xl p-5 bg-white dark:bg-[#121622] border border-black/[0.06] dark:border-white/[0.08] shadow-[0_4px_20px_rgb(0,0,0,0.03)] dark:shadow-[0_4px_25px_rgba(0,0,0,0.4)] flex items-start gap-4 transition-all hover:border-blue-500/30">
+          <div className="w-12 h-12 rounded-2xl bg-blue-500/10 dark:bg-blue-500/15 border border-blue-500/20 text-blue-500 flex items-center justify-center shrink-0">
             <Target className="w-6 h-6" />
           </div>
           <div className="overflow-hidden">
             <p className="text-[11px] font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-wider">
               AVERAGE RRR
             </p>
-            <p className="text-2xl font-extrabold font-mono mt-0.5 tracking-tight text-emerald-500 dark:text-emerald-400">
+            <p className="text-2xl font-extrabold font-mono mt-0.5 tracking-tight text-blue-500 dark:text-blue-400">
               1:{avgRRR}
             </p>
             <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1 font-medium">
@@ -158,8 +158,8 @@ export default function TradeFXBookKpiCards({ stats, trades = [] }) {
         </div>
 
         {/* 2. AVERAGE R */}
-        <div className="rounded-3xl p-5 bg-white dark:bg-[#121622] border border-black/[0.06] dark:border-white/[0.08] shadow-[0_4px_20px_rgb(0,0,0,0.03)] dark:shadow-[0_4px_25px_rgba(0,0,0,0.4)] flex items-start gap-4 transition-all hover:border-emerald-500/30">
-          <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 dark:bg-emerald-500/15 border border-emerald-500/20 text-emerald-500 flex items-center justify-center shrink-0">
+        <div className="rounded-3xl p-5 bg-white dark:bg-[#121622] border border-black/[0.06] dark:border-white/[0.08] shadow-[0_4px_20px_rgb(0,0,0,0.03)] dark:shadow-[0_4px_25px_rgba(0,0,0,0.4)] flex items-start gap-4 transition-all hover:border-blue-500/30">
+          <div className="w-12 h-12 rounded-2xl bg-blue-500/10 dark:bg-blue-500/15 border border-blue-500/20 text-blue-500 flex items-center justify-center shrink-0">
             <BarChart2 className="w-6 h-6" />
           </div>
           <div className="overflow-hidden">

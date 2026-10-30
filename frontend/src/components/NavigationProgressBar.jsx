@@ -73,7 +73,7 @@ export default function NavigationProgressBar() {
       aria-hidden="true"
     >
       <div
-        className="h-full bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.85)] transition-all ease-out"
+        className="h-full bg-gradient-to-r from-blue-500 via-blue-400 to-blue-300 shadow-[0_0_12px_rgba(0,122,255,0.85)] transition-all ease-out"
         style={{
           width: `${progress}%`,
           transitionDuration: progress === 100 ? "150ms" : "250ms",

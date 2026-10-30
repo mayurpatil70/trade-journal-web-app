@@ -817,7 +817,7 @@ export default function TradeShareModal({ isOpen, onClose, trade }) {
         {/* Animated Toast Feedback */}
         {toastMessage && (
           <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[10001] bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 text-xs font-bold px-4 py-2 rounded-2xl shadow-2xl flex items-center gap-2 animate-in fade-in slide-in-from-bottom-2 duration-150">
-            <Check className="w-3.5 h-3.5 text-emerald-500" />
+            <Check className="w-3.5 h-3.5 text-blue-500" />
             <span>{toastMessage}</span>
           </div>
         )}

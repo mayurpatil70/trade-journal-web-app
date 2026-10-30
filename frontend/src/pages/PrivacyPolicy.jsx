@@ -15,8 +15,8 @@ export default function PrivacyPolicy() {
     <div
       style={{
         minHeight: '100vh',
-        background: '#05090E',
-        color: '#EDEAE3',
+        background: 'var(--lp-bg)',
+        color: 'var(--lp-text)',
         fontFamily: "'Manrope', sans-serif",
       }}
     >
@@ -29,7 +29,7 @@ export default function PrivacyPolicy() {
           style={{
             fontFamily: "'JetBrains Mono', monospace",
             fontSize: '12px',
-            color: '#5FD4E8',
+            color: '#5AC8FA',
             textDecoration: 'none',
             display: 'inline-flex',
             alignItems: 'center',
@@ -47,11 +47,11 @@ export default function PrivacyPolicy() {
             fontWeight: 700,
             letterSpacing: '0.14em',
             textTransform: 'uppercase',
-            color: '#E8732A',
+            color: '#007AFF',
             padding: '5px 14px',
             borderRadius: '999px',
-            background: 'rgba(232, 115, 42, 0.1)',
-            border: '1px solid rgba(232, 115, 42, 0.25)',
+            background: 'rgba(0, 122, 255, 0.1)',
+            border: '1px solid rgba(0, 122, 255, 0.25)',
             marginBottom: '16px',
             fontFamily: "'JetBrains Mono', monospace",
           }}
@@ -64,18 +64,18 @@ export default function PrivacyPolicy() {
             fontFamily: "'Instrument Serif', Georgia, serif",
             fontSize: 'clamp(2.5rem, 5vw, 3.8rem)',
             fontWeight: 400,
-            color: '#FFFFFF',
+            color: 'var(--lp-heading)',
             letterSpacing: '-0.02em',
             marginBottom: '12px',
           }}
         >
-          Privacy <span style={{ fontStyle: 'italic', color: '#0E7C86' }}>Policy</span>
+          Privacy <span style={{ fontStyle: 'italic', color: '#007AFF' }}>Policy</span>
         </h1>
         <p
           style={{
             fontFamily: "'JetBrains Mono', monospace",
             fontSize: '12px',
-            color: 'rgba(237, 234, 227, 0.5)',
+            color: 'rgba(var(--lp-fg), 0.5)',
             marginBottom: '40px',
           }}
         >
@@ -85,35 +85,35 @@ export default function PrivacyPolicy() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
           <section
             style={{
-              background: 'rgba(15, 29, 28, 0.75)',
-              border: '1px solid rgba(255, 255, 255, 0.08)',
+              background: 'rgba(var(--lp-card), 0.75)',
+              border: '1px solid rgba(var(--lp-fg), 0.08)',
               borderRadius: '20px',
               padding: '28px',
             }}
           >
-            <h2 style={{ fontSize: '18px', fontWeight: 700, color: '#FFFFFF', marginBottom: '12px' }}>
+            <h2 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--lp-heading)', marginBottom: '12px' }}>
               1. Information We Collect
             </h2>
-            <p style={{ fontSize: '14px', color: 'rgba(237, 234, 227, 0.75)', lineHeight: 1.7, margin: 0 }}>
+            <p style={{ fontSize: '14px', color: 'rgba(var(--lp-fg), 0.75)', lineHeight: 1.7, margin: 0 }}>
               We collect information you provide directly to us, such as when you create an account, log a trade, or communicate with our team. This includes your email address, Discord ID, trading journal parameters (e.g., pairs traded like XAUUSD, profit/loss, R-multiples), and prop firm rules you configure.
             </p>
           </section>
 
           <section
             style={{
-              background: 'rgba(15, 29, 28, 0.75)',
-              border: '1px solid rgba(255, 255, 255, 0.08)',
+              background: 'rgba(var(--lp-card), 0.75)',
+              border: '1px solid rgba(var(--lp-fg), 0.08)',
               borderRadius: '20px',
               padding: '28px',
             }}
           >
-            <h2 style={{ fontSize: '18px', fontWeight: 700, color: '#FFFFFF', marginBottom: '12px' }}>
+            <h2 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--lp-heading)', marginBottom: '12px' }}>
               2. How We Use Your Information
             </h2>
-            <p style={{ fontSize: '14px', color: 'rgba(237, 234, 227, 0.75)', lineHeight: 1.7, marginBottom: '12px' }}>
+            <p style={{ fontSize: '14px', color: 'rgba(var(--lp-fg), 0.75)', lineHeight: 1.7, marginBottom: '12px' }}>
               We use the collected information exclusively to:
             </p>
-            <ul style={{ listStyle: 'disc', paddingLeft: '20px', color: 'rgba(237, 234, 227, 0.75)', fontSize: '14px', lineHeight: 1.7 }}>
+            <ul style={{ listStyle: 'disc', paddingLeft: '20px', color: 'rgba(var(--lp-fg), 0.75)', fontSize: '14px', lineHeight: 1.7 }}>
               <li>Provide, maintain, and continuously calibrate our AI-powered trading journal.</li>
               <li>Analyze your trade executions to deliver real-time psychology insights and revenge trading tilt detection.</li>
               <li>Monitor your prop firm trailing drawdown limits to sound automated breach warnings.</li>
@@ -122,32 +122,32 @@ export default function PrivacyPolicy() {
 
           <section
             style={{
-              background: 'rgba(15, 29, 28, 0.75)',
-              border: '1px solid rgba(255, 255, 255, 0.08)',
+              background: 'rgba(var(--lp-card), 0.75)',
+              border: '1px solid rgba(var(--lp-fg), 0.08)',
               borderRadius: '20px',
               padding: '28px',
             }}
           >
-            <h2 style={{ fontSize: '18px', fontWeight: 700, color: '#FFFFFF', marginBottom: '12px' }}>
+            <h2 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--lp-heading)', marginBottom: '12px' }}>
               3. Data Security & Encryption
             </h2>
-            <p style={{ fontSize: '14px', color: 'rgba(237, 234, 227, 0.75)', lineHeight: 1.7, margin: 0 }}>
+            <p style={{ fontSize: '14px', color: 'rgba(var(--lp-fg), 0.75)', lineHeight: 1.7, margin: 0 }}>
               We implement industry-standard encryption protocols to protect your personal information and trading logs. Your financial and journaling data remains strictly confidential and is never sold to brokers or third-party marketers.
             </p>
           </section>
 
           <section
             style={{
-              background: 'rgba(15, 29, 28, 0.75)',
-              border: '1px solid rgba(255, 255, 255, 0.08)',
+              background: 'rgba(var(--lp-card), 0.75)',
+              border: '1px solid rgba(var(--lp-fg), 0.08)',
               borderRadius: '20px',
               padding: '28px',
             }}
           >
-            <h2 style={{ fontSize: '18px', fontWeight: 700, color: '#FFFFFF', marginBottom: '12px' }}>
+            <h2 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--lp-heading)', marginBottom: '12px' }}>
               4. Contact & Inquiries
             </h2>
-            <p style={{ fontSize: '14px', color: 'rgba(237, 234, 227, 0.75)', lineHeight: 1.7, margin: 0 }}>
+            <p style={{ fontSize: '14px', color: 'rgba(var(--lp-fg), 0.75)', lineHeight: 1.7, margin: 0 }}>
               If you have any questions or data requests regarding this Privacy Policy, please contact our team via our official Discord community network.
             </p>
           </section>

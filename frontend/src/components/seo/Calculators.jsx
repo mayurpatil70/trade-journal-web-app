@@ -11,15 +11,15 @@ const fmt = (n, cur = 'USD') => {
 const Field = ({ label, value, onChange, step = 'any', suffix }) => (
   <label className="block">
     <span className="text-xs text-gray-400">{label}</span>
-    <div className="mt-1 flex items-center rounded-xl bg-black/40 border border-white/10 focus-within:border-emerald-500">
+    <div className="mt-1 flex items-center rounded-xl bg-black/40 border border-lp/10 focus-within:border-emerald-500">
       <input type="number" inputMode="decimal" step={step} value={value} onChange={(e) => onChange(e.target.value)} className="w-full bg-transparent px-3 py-2.5 text-white outline-none" />
       {suffix && <span className="pr-3 text-xs text-gray-500">{suffix}</span>}
     </div>
   </label>
 );
 
-const Result = ({ label, value, tone = 'text-white', sub }) => (
-  <div className="rounded-xl bg-black/30 border border-white/5 p-4">
+const Result = ({ label, value, tone = 'text-[var(--lp-heading)]', sub }) => (
+  <div className="rounded-xl bg-black/30 border border-lp/5 p-4">
     <div className="text-xs text-gray-400">{label}</div>
     <div className={`mt-1 text-xl font-bold ${tone}`}>{value}</div>
     {sub && <div className="text-xs text-gray-500 mt-0.5">{sub}</div>}
@@ -78,7 +78,7 @@ export function LeverageCalculator() {
       <p className="mt-2 text-xs text-gray-500">Forex lot = 100,000 units, XAUUSD lot = 100 oz. Converted at the AED peg of {AED_PER_USD}.</p>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-5">
         <Result label="Position value" value={fmt(notional)} sub={fmt(notional * AED_PER_USD, 'AED')} />
-        <Result label="Margin required" value={fmt(margin)} tone="text-emerald-400" sub={fmt(margin * AED_PER_USD, 'AED')} />
+        <Result label="Margin required" value={fmt(margin)} tone="text-blue-400" sub={fmt(margin * AED_PER_USD, 'AED')} />
       </div>
     </div>
   );
@@ -100,7 +100,7 @@ export function LotSizeCalculator() {
     <div className="glossy rounded-2xl p-5 md:p-6">
       <label className="block mb-3">
         <span className="text-xs text-gray-400">Instrument</span>
-        <select value={s.kind} onChange={(e) => set('kind')(e.target.value)} className="mt-1 w-full rounded-xl bg-black/40 border border-white/10 px-3 py-2.5 text-white outline-none">
+        <select value={s.kind} onChange={(e) => set('kind')(e.target.value)} className="mt-1 w-full rounded-xl bg-black/40 border border-lp/10 px-3 py-2.5 text-white outline-none">
           {Object.entries(INSTRUMENTS).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
         </select>
       </label>

@@ -224,7 +224,7 @@ export default function DashboardNewsTicker() {
 
                       {/* Actual vs Forecast if present */}
                       {ev.actual && (
-                        <span className="font-mono text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
+                        <span className="font-mono text-[10px] font-bold text-blue-600 dark:text-blue-400">
                           Act: {ev.actual}
                         </span>
                       )}

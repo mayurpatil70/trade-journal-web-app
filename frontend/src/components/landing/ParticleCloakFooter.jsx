@@ -57,9 +57,9 @@ export default function ParticleCloakFooter() {
     <footer
       style={{
         position: 'relative',
-        background: '#04070B',
-        color: '#FFFFFF',
-        borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+        background: 'var(--lp-bg)',
+        color: 'var(--lp-heading)',
+        borderTop: '1px solid rgba(var(--lp-fg), 0.08)',
         overflow: 'hidden',
       }}
     >
@@ -98,7 +98,7 @@ export default function ParticleCloakFooter() {
           justifyContent: 'center',
           padding: 'clamp(50px, 8vh, 80px) 20px',
           overflow: 'hidden',
-          background: 'radial-gradient(ellipse at 50% 40%, rgba(16, 185, 129, 0.08) 0%, transparent 70%)',
+          background: 'radial-gradient(ellipse at 50% 40%, rgba(0, 122, 255, 0.08) 0%, transparent 70%)',
         }}
       >
         <div
@@ -117,7 +117,7 @@ export default function ParticleCloakFooter() {
               fontWeight: 700,
               letterSpacing: '0.24em',
               textTransform: 'uppercase',
-              color: '#E8732A',
+              color: '#007AFF',
               marginBottom: '16px',
             }}
           >
@@ -131,11 +131,11 @@ export default function ParticleCloakFooter() {
               fontWeight: 400,
               letterSpacing: '-0.02em',
               lineHeight: 1.02,
-              color: '#FFFFFF',
+              color: 'var(--lp-heading)',
               marginBottom: '28px',
             }}
           >
-            Trade Without Regret.<br /><span style={{ fontStyle: 'italic', color: '#0E7C86' }}>Master Every Session.</span>
+            Trade Without Regret.<br /><span style={{ fontStyle: 'italic', color: '#007AFF' }}>Master Every Session.</span>
           </h2>
 
           <div style={{ display: 'inline-block' }}>
@@ -154,7 +154,7 @@ export default function ParticleCloakFooter() {
           fontSize: 'clamp(80px, 16vw, 240px)',
           lineHeight: 0.8,
           fontWeight: 400,
-          color: 'rgba(244, 239, 230, 0.03)',
+          color: 'rgba(var(--lp-fg), 0.03)',
           userSelect: 'none',
           pointerEvents: 'none',
           overflow: 'hidden',
@@ -172,14 +172,14 @@ export default function ParticleCloakFooter() {
           maxWidth: '1100px',
           margin: '0 auto',
           padding: '60px 24px 36px',
-          borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+          borderTop: '1px solid rgba(var(--lp-fg), 0.08)',
           position: 'relative',
           zIndex: 5,
         }}
       >
         <div style={{ marginBottom: '28px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
-            <span style={{ width: 24, height: 2, background: '#0E7C86' }} />
+            <span style={{ width: 24, height: 2, background: '#007AFF' }} />
             <span
               style={{
                 fontFamily: "'JetBrains Mono', monospace",
@@ -187,7 +187,7 @@ export default function ParticleCloakFooter() {
                 fontWeight: 700,
                 letterSpacing: '0.18em',
                 textTransform: 'uppercase',
-                color: '#0E7C86',
+                color: '#007AFF',
               }}
             >
               MARKETS & SESSIONS · FOUR ASSET CLASSES & PREDATOR SPEED
@@ -199,52 +199,52 @@ export default function ParticleCloakFooter() {
               fontFamily: "'Instrument Serif', Georgia, serif",
               fontSize: 'clamp(30px, 4.4vw, 50px)',
               fontWeight: 400,
-              color: '#FFFFFF',
+              color: 'var(--lp-heading)',
               letterSpacing: '-0.02em',
               marginBottom: '12px',
             }}
           >
             Four asset classes,{' '}
-            <span style={{ fontStyle: 'italic', color: '#0E7C86' }}>
+            <span style={{ fontStyle: 'italic', color: '#007AFF' }}>
               infinite edge.
             </span>
           </h2>
 
-          <p style={{ fontSize: '14.5px', color: 'rgba(237, 234, 227, 0.7)', maxWidth: '720px', lineHeight: 1.65, marginBottom: '24px', fontFamily: "'Manrope', sans-serif" }}>
+          <p style={{ fontSize: '14.5px', color: 'rgba(var(--lp-fg), 0.7)', maxWidth: '720px', lineHeight: 1.65, marginBottom: '24px', fontFamily: "'Manrope', sans-serif" }}>
             Trade the coastline nobody else can reach. Your AI coach plans your risk around market sessions, news events and your emotional state. High probability setups at dawn, disciplined risk at dusk, and zero revenge trading in between.
           </p>
         </div>
 
         {/* 4 Asset Class Tiles */}
         <div className="footer-assets-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '14px', marginBottom: '28px' }}>
-          <div style={{ background: 'rgba(15, 29, 28, 0.85)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '18px', padding: '20px' }}>
-            <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '10px', color: '#0E7C86', marginBottom: '6px', fontWeight: 700, letterSpacing: '0.12em' }}>01 · 24/5 FX</div>
-            <div style={{ fontFamily: "'Instrument Serif', serif", fontSize: '20px', fontWeight: 400, color: '#FFF', marginBottom: '6px' }}>Forex Majors</div>
-            <div style={{ fontSize: '12.5px', color: 'rgba(237,234,227,0.7)', lineHeight: 1.5, fontFamily: "'Manrope', sans-serif" }}>
+          <div style={{ background: 'rgba(var(--lp-card), 0.85)', border: '1px solid rgba(var(--lp-fg),0.08)', borderRadius: '18px', padding: '20px' }}>
+            <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '10px', color: '#007AFF', marginBottom: '6px', fontWeight: 700, letterSpacing: '0.12em' }}>01 · 24/5 FX</div>
+            <div style={{ fontFamily: "'Instrument Serif', serif", fontSize: '20px', fontWeight: 400, color: 'var(--lp-heading)', marginBottom: '6px' }}>Forex Majors</div>
+            <div style={{ fontSize: '12.5px', color: 'rgba(var(--lp-fg),0.7)', lineHeight: 1.5, fontFamily: "'Manrope', sans-serif" }}>
               EURUSD, GBPUSD, USDJPY tick-by-tick replay & London/NY session analytics.
             </div>
           </div>
 
-          <div style={{ background: 'rgba(15, 29, 28, 0.85)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '18px', padding: '20px' }}>
-            <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '10px', color: '#E8732A', marginBottom: '6px', fontWeight: 700, letterSpacing: '0.12em' }}>02 · HIGH VOL</div>
-            <div style={{ fontFamily: "'Instrument Serif', serif", fontSize: '20px', fontWeight: 400, color: '#FFF', marginBottom: '6px' }}>Gold (XAUUSD)</div>
-            <div style={{ fontSize: '12.5px', color: 'rgba(237,234,227,0.7)', lineHeight: 1.5, fontFamily: "'Manrope', sans-serif" }}>
+          <div style={{ background: 'rgba(var(--lp-card), 0.85)', border: '1px solid rgba(var(--lp-fg),0.08)', borderRadius: '18px', padding: '20px' }}>
+            <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '10px', color: '#007AFF', marginBottom: '6px', fontWeight: 700, letterSpacing: '0.12em' }}>02 · HIGH VOL</div>
+            <div style={{ fontFamily: "'Instrument Serif', serif", fontSize: '20px', fontWeight: 400, color: 'var(--lp-heading)', marginBottom: '6px' }}>Gold (XAUUSD)</div>
+            <div style={{ fontSize: '12.5px', color: 'rgba(var(--lp-fg),0.7)', lineHeight: 1.5, fontFamily: "'Manrope', sans-serif" }}>
               Track Asian, London, and NY breakouts with automated pip-level risk sizing.
             </div>
           </div>
 
-          <div style={{ background: 'rgba(15, 29, 28, 0.85)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '18px', padding: '20px' }}>
-            <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '10px', color: '#5FD4E8', marginBottom: '6px', fontWeight: 700, letterSpacing: '0.12em' }}>03 · CASH OPEN</div>
-            <div style={{ fontFamily: "'Instrument Serif', serif", fontSize: '20px', fontWeight: 400, color: '#FFF', marginBottom: '6px' }}>Global Indices</div>
-            <div style={{ fontSize: '12.5px', color: 'rgba(237,234,227,0.7)', lineHeight: 1.5, fontFamily: "'Manrope', sans-serif" }}>
+          <div style={{ background: 'rgba(var(--lp-card), 0.85)', border: '1px solid rgba(var(--lp-fg),0.08)', borderRadius: '18px', padding: '20px' }}>
+            <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '10px', color: '#5AC8FA', marginBottom: '6px', fontWeight: 700, letterSpacing: '0.12em' }}>03 · CASH OPEN</div>
+            <div style={{ fontFamily: "'Instrument Serif', serif", fontSize: '20px', fontWeight: 400, color: 'var(--lp-heading)', marginBottom: '6px' }}>Global Indices</div>
+            <div style={{ fontSize: '12.5px', color: 'rgba(var(--lp-fg),0.7)', lineHeight: 1.5, fontFamily: "'Manrope', sans-serif" }}>
               NAS100, US30, SPX500 high-momentum execution tracking and volume alerts.
             </div>
           </div>
 
-          <div style={{ background: 'rgba(16, 27, 37, 0.65)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '16px', padding: '18px' }}>
+          <div style={{ background: 'rgba(var(--lp-card), 0.65)', border: '1px solid rgba(var(--lp-fg),0.08)', borderRadius: '16px', padding: '18px' }}>
             <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '10px', color: '#8B5CF6', marginBottom: '6px' }}>04 · 24/7 DEEP</div>
-            <div style={{ fontSize: '17px', fontWeight: 700, color: '#FFF', marginBottom: '6px' }}>Crypto Assets</div>
-            <div style={{ fontSize: '12.5px', color: 'rgba(255,255,255,0.65)', lineHeight: 1.5 }}>
+            <div style={{ fontSize: '17px', fontWeight: 700, color: 'var(--lp-heading)', marginBottom: '6px' }}>Crypto Assets</div>
+            <div style={{ fontSize: '12.5px', color: 'rgba(var(--lp-fg),0.65)', lineHeight: 1.5 }}>
               BTCUSDT, ETHUSDT 10-year bar replay and weekend volatility filters.
             </div>
           </div>
@@ -252,32 +252,32 @@ export default function ParticleCloakFooter() {
 
         {/* 3 Dive Log / Predator Speed Pillars */}
         <div className="footer-pillars-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '14px', marginBottom: '22px' }}>
-          <div style={{ background: 'rgba(7, 26, 51, 0.5)', border: '1px solid rgba(95,212,232,0.15)', borderRadius: '16px', padding: '18px' }}>
-            <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '9px', color: '#5FD4E8', letterSpacing: '0.12em', marginBottom: '6px' }}>
+          <div style={{ background: 'rgba(var(--lp-card), 0.5)', border: '1px solid rgba(90, 200, 250,0.15)', borderRadius: '16px', padding: '18px' }}>
+            <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '9px', color: '#5AC8FA', letterSpacing: '0.12em', marginBottom: '6px' }}>
               LOG 01 · AI PSYCHOLOGY PRE-CHECK
             </div>
-            <div style={{ fontSize: '15px', fontWeight: 700, color: '#EDEAE3', marginBottom: '6px' }}>Dermal protection against tilt</div>
-            <div style={{ fontSize: '12.5px', color: 'rgba(237,234,227,0.7)', lineHeight: 1.5 }}>
+            <div style={{ fontSize: '15px', fontWeight: 700, color: 'var(--lp-text)', marginBottom: '6px' }}>Dermal protection against tilt</div>
+            <div style={{ fontSize: '12.5px', color: 'rgba(var(--lp-fg),0.7)', lineHeight: 1.5 }}>
               Evaluates your emotional heartbeat before execution without drag.
             </div>
           </div>
 
-          <div style={{ background: 'rgba(7, 26, 51, 0.5)', border: '1px solid rgba(95,212,232,0.15)', borderRadius: '16px', padding: '18px' }}>
-            <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '9px', color: '#5FD4E8', letterSpacing: '0.12em', marginBottom: '6px' }}>
+          <div style={{ background: 'rgba(var(--lp-card), 0.5)', border: '1px solid rgba(90, 200, 250,0.15)', borderRadius: '16px', padding: '18px' }}>
+            <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '9px', color: '#5AC8FA', letterSpacing: '0.12em', marginBottom: '6px' }}>
               LOG 02 · 10-YEAR TICK DATA
             </div>
-            <div style={{ fontSize: '15px', fontWeight: 700, color: '#EDEAE3', marginBottom: '6px' }}>A sixth sense for liquidity</div>
-            <div style={{ fontSize: '12.5px', color: 'rgba(237,234,227,0.7)', lineHeight: 1.5 }}>
+            <div style={{ fontSize: '15px', fontWeight: 700, color: 'var(--lp-text)', marginBottom: '6px' }}>A sixth sense for liquidity</div>
+            <div style={{ fontSize: '12.5px', color: 'rgba(var(--lp-fg),0.7)', lineHeight: 1.5 }}>
               10 full years of tick data to identify hidden algorithmic sweeps.
             </div>
           </div>
 
-          <div style={{ background: 'rgba(7, 26, 51, 0.5)', border: '1px solid rgba(95,212,232,0.15)', borderRadius: '16px', padding: '18px' }}>
+          <div style={{ background: 'rgba(var(--lp-card), 0.5)', border: '1px solid rgba(90, 200, 250,0.15)', borderRadius: '16px', padding: '18px' }}>
             <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '9px', color: '#F0524A', letterSpacing: '0.12em', marginBottom: '6px' }}>
               LOG 03 · PROP GUARDIAN
             </div>
-            <div style={{ fontSize: '15px', fontWeight: 700, color: '#EDEAE3', marginBottom: '6px' }}>Rules that never fail</div>
-            <div style={{ fontSize: '12.5px', color: 'rgba(237,234,227,0.7)', lineHeight: 1.5 }}>
+            <div style={{ fontSize: '15px', fontWeight: 700, color: 'var(--lp-text)', marginBottom: '6px' }}>Rules that never fail</div>
+            <div style={{ fontSize: '12.5px', color: 'rgba(var(--lp-fg),0.7)', lineHeight: 1.5 }}>
               Trailing daily loss monitor ensures your prop challenge is never breached.
             </div>
           </div>
@@ -291,7 +291,7 @@ export default function ParticleCloakFooter() {
               fontSize: '11px',
               fontWeight: 700,
               letterSpacing: '0.08em',
-              color: '#10B981',
+              color: '#007AFF',
               textDecoration: 'none',
               display: 'inline-flex',
               alignItems: 'center',
@@ -310,7 +310,7 @@ export default function ParticleCloakFooter() {
           maxWidth: '1100px',
           margin: '0 auto',
           padding: '40px 24px 60px',
-          borderTop: '1px solid rgba(255, 255, 255, 0.06)',
+          borderTop: '1px solid rgba(var(--lp-fg), 0.06)',
           position: 'relative',
           zIndex: 5,
         }}
@@ -325,7 +325,7 @@ export default function ParticleCloakFooter() {
                   fontWeight: 700,
                   textTransform: 'uppercase',
                   letterSpacing: '0.14em',
-                  color: '#5FD4E8',
+                  color: '#5AC8FA',
                   marginBottom: '16px',
                 }}
               >
@@ -343,17 +343,17 @@ export default function ParticleCloakFooter() {
                       }}
                       style={{
                         fontSize: '13px',
-                        color: 'rgba(237, 234, 227, 0.72)',
+                        color: 'rgba(var(--lp-fg), 0.72)',
                         textDecoration: 'none',
                         transition: 'color 0.2s ease, transform 0.2s ease',
                         display: 'inline-block',
                       }}
                       onMouseEnter={(e) => {
-                        e.currentTarget.style.color = '#5FD4E8';
+                        e.currentTarget.style.color = '#5AC8FA';
                         e.currentTarget.style.transform = 'translateX(2px)';
                       }}
                       onMouseLeave={(e) => {
-                        e.currentTarget.style.color = 'rgba(237, 234, 227, 0.72)';
+                        e.currentTarget.style.color = 'rgba(var(--lp-fg), 0.72)';
                         e.currentTarget.style.transform = 'translateX(0)';
                       }}
                     >
@@ -375,12 +375,12 @@ export default function ParticleCloakFooter() {
             justifyContent: 'space-between',
             gap: '16px',
             paddingTop: '24px',
-            borderTop: '1px solid rgba(255, 255, 255, 0.06)',
+            borderTop: '1px solid rgba(var(--lp-fg), 0.06)',
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <BrandLogo style={{ height: '36px', width: 'auto', objectFit: 'contain' }} />
-            <span style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.45)', fontFamily: "'JetBrains Mono', monospace" }}>
+            <span style={{ fontSize: '12px', color: 'rgba(var(--lp-fg), 0.45)', fontFamily: "'JetBrains Mono', monospace" }}>
               © {new Date().getFullYear()} Forex Notes. All rights reserved.
             </span>
           </div>
@@ -390,9 +390,9 @@ export default function ParticleCloakFooter() {
               href="https://discord.gg/Ajaw3AjfWE"
               target="_blank"
               rel="noopener noreferrer"
-              style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.6)', textDecoration: 'none' }}
+              style={{ fontSize: '12px', color: 'rgba(var(--lp-fg), 0.6)', textDecoration: 'none' }}
               onMouseEnter={(e) => (e.currentTarget.style.color = '#5865F2')}
-              onMouseLeave={(e) => (e.currentTarget.style.color = 'rgba(255, 255, 255, 0.6)')}
+              onMouseLeave={(e) => (e.currentTarget.style.color = 'rgba(var(--lp-fg), 0.6)')}
             >
               Discord
             </a>
@@ -400,17 +400,17 @@ export default function ParticleCloakFooter() {
               href="https://instagram.com/forexnotes.in"
               target="_blank"
               rel="noopener noreferrer"
-              style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.6)', textDecoration: 'none' }}
+              style={{ fontSize: '12px', color: 'rgba(var(--lp-fg), 0.6)', textDecoration: 'none' }}
               onMouseEnter={(e) => (e.currentTarget.style.color = '#E1306C')}
-              onMouseLeave={(e) => (e.currentTarget.style.color = 'rgba(255, 255, 255, 0.6)')}
+              onMouseLeave={(e) => (e.currentTarget.style.color = 'rgba(var(--lp-fg), 0.6)')}
             >
               Instagram
             </a>
             <Link
               to="/privacy"
-              style={{ fontSize: '12px', color: 'rgba(237, 234, 227, 0.65)', textDecoration: 'none', transition: 'color 0.2s ease' }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = '#5FD4E8')}
-              onMouseLeave={(e) => (e.currentTarget.style.color = 'rgba(237, 234, 227, 0.65)')}
+              style={{ fontSize: '12px', color: 'rgba(var(--lp-fg), 0.65)', textDecoration: 'none', transition: 'color 0.2s ease' }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = '#5AC8FA')}
+              onMouseLeave={(e) => (e.currentTarget.style.color = 'rgba(var(--lp-fg), 0.65)')}
             >
               Privacy Policy
             </Link>

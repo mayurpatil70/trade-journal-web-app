@@ -11,8 +11,8 @@ export default function LiveTraderCard({
   return (
     <div className="relative w-full max-w-[420px] mx-auto rounded-3xl bg-white/95 dark:bg-[#0c1017]/95 border border-black/[0.08] dark:border-white/[0.1] shadow-[0_20px_50px_rgba(0,0,0,0.08)] dark:shadow-[0_25px_60px_rgba(0,0,0,0.6)] backdrop-blur-2xl p-6 overflow-hidden select-none">
       {/* Background ambient radial glow */}
-      <div className="absolute -top-16 -right-16 w-48 h-48 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-16 -left-16 w-48 h-48 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute -top-16 -right-16 w-48 h-48 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute -bottom-16 -left-16 w-48 h-48 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
 
       {/* Header Pill */}
       <div className="flex items-center justify-between mb-6">
@@ -26,20 +26,20 @@ export default function LiveTraderCard({
 
       {/* Avatar & Identifiers (Instant render of uploaded image) */}
       <div className="flex items-center gap-4 mb-5">
-        <div className="relative w-16 h-16 rounded-2xl overflow-hidden border border-black/10 dark:border-white/10 bg-gradient-to-tr from-emerald-600 to-teal-500 flex items-center justify-center shrink-0 shadow-lg shadow-emerald-500/15">
+        <div className="relative w-16 h-16 rounded-2xl overflow-hidden border border-black/10 dark:border-white/10 bg-gradient-to-tr from-blue-600 to-blue-500 flex items-center justify-center shrink-0 shadow-lg shadow-blue-500/15">
           {avatarUrl ? (
             <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
           ) : (
             <span className="text-2xl font-black text-white">{displayInitial}</span>
           )}
-          <span className="absolute bottom-1 right-1 w-3.5 h-3.5 rounded-full bg-emerald-400 border-2 border-white dark:border-[#0c1017]" />
+          <span className="absolute bottom-1 right-1 w-3.5 h-3.5 rounded-full bg-blue-400 border-2 border-white dark:border-[#0c1017]" />
         </div>
 
         <div className="min-w-0 flex-1">
           <h3 className="text-lg font-black text-neutral-900 dark:text-white tracking-tight truncate">
             {displayName.trim() || "Trader Name"}
           </h3>
-          <p className="text-xs font-mono font-bold text-emerald-600 dark:text-emerald-400 truncate mt-0.5">
+          <p className="text-xs font-mono font-bold text-blue-600 dark:text-blue-400 truncate mt-0.5">
             {cleanUsername}
           </p>
         </div>
@@ -64,7 +64,7 @@ export default function LiveTraderCard({
         </div>
         <div>
           <span className="text-[9px] font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider block">R : R</span>
-          <span className="text-xs font-mono font-bold text-emerald-600 dark:text-emerald-400 mt-0.5 block">{targetRR}</span>
+          <span className="text-xs font-mono font-bold text-blue-600 dark:text-blue-400 mt-0.5 block">{targetRR}</span>
         </div>
       </div>
     </div>

@@ -21,7 +21,7 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const USERNAME_RE = /^[a-z0-9_.]{3,20}$/;
 
 const inputCls =
-  "w-full h-12 px-4 rounded-xl bg-black/[0.04] dark:bg-white/[0.06] border border-black/[0.08] dark:border-white/10 text-[15px] text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 outline-none transition-all focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/15 disabled:opacity-60";
+  "w-full h-12 px-4 rounded-xl bg-black/[0.04] dark:bg-white/[0.06] border border-black/[0.08] dark:border-white/10 text-[15px] text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 outline-none transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/15 disabled:opacity-60";
 
 function errorText(error, fallback) {
   const serverError = error.response?.data?.error;
@@ -104,7 +104,7 @@ function PasswordInput({ value, onChange, disabled, autoComplete, invalid }) {
 function PhoneInput({ iso, onIsoChange, number, onNumberChange, disabled, invalid }) {
   const country = COUNTRIES.find((c) => c.iso === iso);
   return (
-    <div className={`flex rounded-xl border bg-black/[0.04] dark:bg-white/[0.06] transition-all focus-within:border-emerald-500 focus-within:ring-4 focus-within:ring-emerald-500/15 ${invalid ? "border-red-500/70" : "border-black/[0.08] dark:border-white/10"}`}>
+    <div className={`flex rounded-xl border bg-black/[0.04] dark:bg-white/[0.06] transition-all focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-500/15 ${invalid ? "border-red-500/70" : "border-black/[0.08] dark:border-white/10"}`}>
       <div className="relative shrink-0 border-r border-black/[0.08] dark:border-white/10">
         <div className="h-12 pl-3 pr-7 flex items-center gap-1.5 text-[15px] text-gray-900 dark:text-white pointer-events-none">
           <span>{country?.flag}</span>
@@ -248,7 +248,7 @@ function SignInCard({ onSignedIn, onMagicLink, defaultIso }) {
       <button
         type="button"
         onClick={onMagicLink}
-        className="w-full text-[13px] font-medium text-emerald-600 dark:text-emerald-400 hover:underline"
+        className="w-full text-[13px] font-medium text-blue-600 dark:text-blue-400 hover:underline"
       >
         Email me a sign-in link instead
       </button>
@@ -474,14 +474,14 @@ function MagicLinkCard({ onBack }) {
   if (status === "success") {
     return (
       <div className="text-center py-4 animate-in fade-in duration-300">
-        <CheckCircle className="w-9 h-9 text-emerald-500 mx-auto mb-3" />
+        <CheckCircle className="w-9 h-9 text-blue-500 mx-auto mb-3" />
         <h3 className="text-[17px] font-semibold text-gray-900 dark:text-white mb-1">Check your inbox</h3>
         <p className="text-[14px] text-gray-500 dark:text-gray-400">
           We sent a secure link to
           <br />
           <span className="font-semibold text-gray-900 dark:text-white">{email}</span>
         </p>
-        <button type="button" onClick={onBack} className="mt-6 text-[13px] font-medium text-emerald-600 dark:text-emerald-400 hover:underline">
+        <button type="button" onClick={onBack} className="mt-6 text-[13px] font-medium text-blue-600 dark:text-blue-400 hover:underline">
           Back to sign in
         </button>
       </div>
@@ -509,7 +509,7 @@ function MagicLinkCard({ onBack }) {
       <SubmitButton loading={status === "loading"} loadingText="Sending...">
         Send Sign-in Link
       </SubmitButton>
-      <button type="button" onClick={onBack} className="w-full text-[13px] font-medium text-emerald-600 dark:text-emerald-400 hover:underline">
+      <button type="button" onClick={onBack} className="w-full text-[13px] font-medium text-blue-600 dark:text-blue-400 hover:underline">
         Use password instead
       </button>
     </form>
@@ -537,7 +537,7 @@ export default function Login() {
       className="relative min-h-screen overflow-hidden bg-[#f5f5f7] dark:bg-[#0a0c10] flex items-center justify-center px-4 py-10"
       style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', sans-serif" }}
     >
-      <div className="pointer-events-none absolute -top-40 -left-32 w-[520px] h-[520px] rounded-full bg-emerald-400/20 dark:bg-emerald-500/10 blur-3xl" />
+      <div className="pointer-events-none absolute -top-40 -left-32 w-[520px] h-[520px] rounded-full bg-blue-400/20 dark:bg-blue-500/10 blur-3xl" />
       <div className="pointer-events-none absolute -bottom-40 -right-32 w-[480px] h-[480px] rounded-full bg-sky-400/15 dark:bg-red-500/[0.06] blur-3xl" />
 
       <div className="relative w-full max-w-[440px]">
@@ -577,7 +577,7 @@ export default function Login() {
 
         <p className="mt-5 px-6 text-center text-[12px] leading-relaxed text-gray-500">
           We never share your details with third parties. By continuing you agree to our{" "}
-          <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-emerald-600 dark:text-emerald-400 hover:underline">
+          <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 hover:underline">
             Privacy Policy
           </a>
           .

@@ -62,13 +62,13 @@ export default function Sessions() {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4 md:pr-28">
         <div>
           <h1 className="text-2xl font-semibold text-white flex items-center gap-3">
-            <FolderClock className="w-6 h-6 text-emerald-400" /> Your Sessions
+            <FolderClock className="w-6 h-6 text-blue-400" /> Your Sessions
           </h1>
           <p className="text-gray-500 mt-1 text-[13px]">
             Manage and resume your backtesting environments.
           </p>
         </div>
-        <Button onClick={() => setCreating((c) => !c)} className="bg-emerald-500 hover:bg-emerald-400 text-black font-bold flex items-center gap-2">
+        <Button onClick={() => setCreating((c) => !c)} className="bg-blue-500 hover:bg-blue-400 text-black font-bold flex items-center gap-2">
           <Plus className="w-4 h-4" /> New Session
         </Button>
       </div>
@@ -91,7 +91,7 @@ export default function Sessions() {
           <label className="block text-xs text-gray-400">Starting balance
             <input type="number" min="1" value={draft.balance} onChange={(e) => setDraft((d) => ({ ...d, balance: e.target.value }))} className="mt-1 w-full rounded-lg border border-white/10 bg-[#0a0a0a] px-3 py-2 text-sm text-white outline-none" />
           </label>
-          <Button onClick={createNewSession} className="bg-emerald-500 hover:bg-emerald-400 text-black font-bold">Start</Button>
+          <Button onClick={createNewSession} className="bg-blue-500 hover:bg-blue-400 text-black font-bold">Start</Button>
         </div>
       )}
 
@@ -119,7 +119,7 @@ export default function Sessions() {
                 <span className="text-white text-right font-medium">{s.pair}</span>
                 
                 <span className="text-gray-500 font-bold">Balance:</span>
-                <span className="text-emerald-400 text-right font-mono font-bold">${Number(s.balance).toFixed(2)}</span>
+                <span className="text-blue-400 text-right font-mono font-bold">${Number(s.balance).toFixed(2)}</span>
                 
                 <span className="text-gray-500 font-bold">Date:</span>
                 <span className="text-gray-400 text-right">{s.date}</span>
@@ -132,7 +132,7 @@ export default function Sessions() {
                   <Eye className="w-4 h-4" />
                 </button>
               )}
-              <button onClick={() => navigate(`/backtest/${s.id}`)} className="w-8 h-8 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-400 hover:bg-emerald-500 hover:text-black transition-colors">
+              <button onClick={() => navigate(`/backtest/${s.id}`)} className="w-8 h-8 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-400 hover:bg-blue-500 hover:text-black transition-colors">
                 <Play className="w-4 h-4 ml-0.5" fill="currentColor" />
               </button>
             </div>

@@ -47,7 +47,7 @@ export default function MarketClock({ timezone = "UTC" }) {
       {/* Luxury Swiss / Apple macOS Clock Dial */}
       <div className="relative w-64 h-64 sm:w-72 sm:h-72 rounded-full bg-white dark:bg-[#0a0d14] border-2 border-black/[0.12] dark:border-white/[0.12] shadow-[0_20px_60px_rgba(0,0,0,0.12),inset_0_0_30px_rgba(0,0,0,0.03)] dark:shadow-[0_20px_60px_rgba(0,0,0,0.8),inset_0_0_40px_rgba(0,0,0,0.9)] flex items-center justify-center">
         {/* Subtle radial ambient glow */}
-        <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-emerald-500/10 via-transparent to-black/[0.02] dark:to-white/[0.03] pointer-events-none" />
+        <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-blue-500/10 via-transparent to-black/[0.02] dark:to-white/[0.03] pointer-events-none" />
 
         {/* 12 Cardinal Ticks and Minor Hashes */}
         {Array.from({ length: 60 }).map((_, i) => {
@@ -105,11 +105,11 @@ export default function MarketClock({ timezone = "UTC" }) {
           }}
         >
           {/* Circular Counterweight below pivot */}
-          <div className="absolute -bottom-4 -left-[3px] w-2 h-2 rounded-full bg-emerald-500 dark:bg-emerald-400" />
+          <div className="absolute -bottom-4 -left-[3px] w-2 h-2 rounded-full bg-blue-500 dark:bg-blue-400" />
         </div>
 
         {/* Center Pivot Metallic Pin */}
-        <div className="w-3.5 h-3.5 rounded-full bg-neutral-900 dark:bg-neutral-100 border-2 border-emerald-500 shadow-md z-20" />
+        <div className="w-3.5 h-3.5 rounded-full bg-neutral-900 dark:bg-neutral-100 border-2 border-blue-500 shadow-md z-20" />
       </div>
 
       {/* Digital Time Readout */}
@@ -118,7 +118,7 @@ export default function MarketClock({ timezone = "UTC" }) {
           {formattedDigital}
         </h2>
         <div className="mt-2 inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-black/[0.04] dark:bg-white/[0.04] border border-black/[0.08] dark:border-white/[0.08] text-xs font-mono font-bold text-neutral-800 dark:text-neutral-200 shadow-xs">
-          <span className="text-emerald-600 dark:text-emerald-400">{timezone.split("/").pop().replace("_", " ")}</span>
+          <span className="text-blue-600 dark:text-blue-400">{timezone.split("/").pop().replace("_", " ")}</span>
           <span className="text-neutral-400 dark:text-neutral-500">•</span>
           <span className="text-neutral-600 dark:text-neutral-400">Market Sync</span>
         </div>

@@ -61,7 +61,7 @@ class ErrorBoundary extends React.Component {
                 sessionStorage.removeItem("chunk_reload_retry");
                 window.location.reload();
               }}
-              className="w-full py-4 px-6 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg shadow-emerald-500/25 transition-all flex justify-center items-center gap-2 cursor-pointer"
+              className="w-full py-4 px-6 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-xl shadow-lg shadow-blue-500/25 transition-all flex justify-center items-center gap-2 cursor-pointer"
             >
               <RefreshCcw className="w-4 h-4" /> Reload Application
             </button>

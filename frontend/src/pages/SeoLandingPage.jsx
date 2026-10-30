@@ -38,8 +38,8 @@ export default function SeoLandingPage() {
     <div
       style={{
         minHeight: '100vh',
-        background: '#05090E',
-        color: '#EDEAE3',
+        background: 'var(--lp-bg)',
+        color: 'var(--lp-text)',
         fontFamily: "'Manrope', sans-serif",
         overflowX: 'hidden',
       }}
@@ -62,11 +62,11 @@ export default function SeoLandingPage() {
                 fontWeight: 700,
                 letterSpacing: '0.14em',
                 textTransform: 'uppercase',
-                color: '#5FD4E8',
+                color: '#5AC8FA',
                 padding: '6px 16px',
                 borderRadius: '999px',
-                background: 'rgba(14, 124, 134, 0.12)',
-                border: '1px solid rgba(95, 212, 232, 0.25)',
+                background: 'rgba(0, 122, 255, 0.12)',
+                border: '1px solid rgba(90, 200, 250, 0.25)',
                 marginBottom: '18px',
                 fontFamily: "'JetBrains Mono', monospace",
               }}
@@ -80,7 +80,7 @@ export default function SeoLandingPage() {
                 fontFamily: "'Instrument Serif', Georgia, serif",
                 fontSize: 'clamp(2.4rem, 5vw, 4rem)',
                 fontWeight: 400,
-                color: '#FFFFFF',
+                color: 'var(--lp-heading)',
                 letterSpacing: '-0.02em',
                 lineHeight: 1.08,
                 maxWidth: '850px',
@@ -94,7 +94,7 @@ export default function SeoLandingPage() {
             <p
               style={{
                 fontSize: 'clamp(16px, 1.8vw, 18px)',
-                color: 'rgba(237, 234, 227, 0.78)',
+                color: 'rgba(var(--lp-fg), 0.78)',
                 lineHeight: 1.7,
                 maxWidth: '760px',
                 marginBottom: '28px',
@@ -112,16 +112,16 @@ export default function SeoLandingPage() {
                   gap: '8px',
                   padding: '7px 16px',
                   borderRadius: '999px',
-                  background: 'rgba(232, 115, 42, 0.1)',
-                  border: '1px solid rgba(232, 115, 42, 0.28)',
-                  color: '#E8732A',
+                  background: 'rgba(0, 122, 255, 0.1)',
+                  border: '1px solid rgba(0, 122, 255, 0.28)',
+                  color: '#007AFF',
                   fontSize: '12px',
                   fontWeight: 600,
                   fontFamily: "'JetBrains Mono', monospace",
                   marginBottom: '32px',
                 }}
               >
-                <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#E8732A', boxShadow: '0 0 8px #E8732A', flexShrink: 0 }} />
+                <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#007AFF', boxShadow: '0 0 8px #007AFF', flexShrink: 0 }} />
                 {page.hook}
               </div>
             )}
@@ -139,9 +139,9 @@ export default function SeoLandingPage() {
                   gap: '8px',
                   padding: '12px 24px',
                   borderRadius: '999px',
-                  background: 'rgba(15, 29, 28, 0.8)',
-                  border: '1px solid rgba(255, 255, 255, 0.12)',
-                  color: '#EDEAE3',
+                  background: 'rgba(var(--lp-card), 0.8)',
+                  border: '1px solid rgba(var(--lp-fg), 0.12)',
+                  color: 'var(--lp-text)',
                   fontSize: '14px',
                   fontWeight: 600,
                   textDecoration: 'none',
@@ -159,10 +159,10 @@ export default function SeoLandingPage() {
           <section aria-label="Interactive Calculator" style={{ marginBottom: '56px' }}>
             <div
               style={{
-                background: 'rgba(15, 29, 28, 0.85)',
+                background: 'rgba(var(--lp-card), 0.85)',
                 backdropFilter: 'blur(20px)',
                 WebkitBackdropFilter: 'blur(20px)',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
+                border: '1px solid rgba(var(--lp-fg), 0.08)',
                 borderRadius: '24px',
                 padding: '32px 28px',
                 boxShadow: '0 20px 40px rgba(0,0,0,0.3)',
@@ -175,7 +175,7 @@ export default function SeoLandingPage() {
                   fontWeight: 700,
                   letterSpacing: '0.14em',
                   textTransform: 'uppercase',
-                  color: '#5FD4E8',
+                  color: '#5AC8FA',
                   marginBottom: '16px',
                 }}
               >
@@ -192,10 +192,10 @@ export default function SeoLandingPage() {
             <section
               key={s.h2}
               style={{
-                background: 'rgba(15, 29, 28, 0.75)',
+                background: 'rgba(var(--lp-card), 0.75)',
                 backdropFilter: 'blur(16px)',
                 WebkitBackdropFilter: 'blur(16px)',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
+                border: '1px solid rgba(var(--lp-fg), 0.08)',
                 borderRadius: '22px',
                 padding: '36px 32px',
                 boxShadow: '0 16px 36px rgba(0,0,0,0.25)',
@@ -208,7 +208,7 @@ export default function SeoLandingPage() {
                   fontWeight: 700,
                   letterSpacing: '0.14em',
                   textTransform: 'uppercase',
-                  color: idx % 2 === 0 ? '#5FD4E8' : '#E8732A',
+                  color: idx % 2 === 0 ? '#5AC8FA' : '#007AFF',
                   marginBottom: '12px',
                 }}
               >
@@ -219,7 +219,7 @@ export default function SeoLandingPage() {
                   fontFamily: "'Instrument Serif', Georgia, serif",
                   fontSize: 'clamp(1.8rem, 3.5vw, 2.6rem)',
                   fontWeight: 400,
-                  color: '#FFFFFF',
+                  color: 'var(--lp-heading)',
                   letterSpacing: '-0.01em',
                   lineHeight: 1.15,
                   marginBottom: '16px',
@@ -230,7 +230,7 @@ export default function SeoLandingPage() {
               <p
                 style={{
                   fontSize: '15px',
-                  color: 'rgba(237, 234, 227, 0.78)',
+                  color: 'rgba(var(--lp-fg), 0.78)',
                   lineHeight: 1.7,
                   maxWidth: '850px',
                   marginBottom: s.bullets || s.h3s ? '24px' : '0',
@@ -249,11 +249,11 @@ export default function SeoLandingPage() {
                         alignItems: 'flex-start',
                         gap: '12px',
                         fontSize: '14px',
-                        color: 'rgba(237, 234, 227, 0.88)',
+                        color: 'rgba(var(--lp-fg), 0.88)',
                         lineHeight: 1.6,
                       }}
                     >
-                      <Check size={16} color="#0E7C86" style={{ marginTop: '3px', shrink: 0 }} />
+                      <Check size={16} color="#007AFF" style={{ marginTop: '3px', shrink: 0 }} />
                       <span>{b}</span>
                     </li>
                   ))}
@@ -273,8 +273,8 @@ export default function SeoLandingPage() {
                     <div
                       key={h.h3}
                       style={{
-                        background: 'rgba(10, 20, 19, 0.65)',
-                        border: '1px solid rgba(255, 255, 255, 0.06)',
+                        background: 'rgba(var(--lp-card), 0.65)',
+                        border: '1px solid rgba(var(--lp-fg), 0.06)',
                         borderRadius: '16px',
                         padding: '20px',
                       }}
@@ -283,13 +283,13 @@ export default function SeoLandingPage() {
                         style={{
                           fontSize: '16px',
                           fontWeight: 700,
-                          color: '#FFFFFF',
+                          color: 'var(--lp-heading)',
                           marginBottom: '8px',
                         }}
                       >
                         {h.h3}
                       </h3>
-                      <p style={{ fontSize: '13px', color: 'rgba(237, 234, 227, 0.65)', lineHeight: 1.6, margin: 0 }}>
+                      <p style={{ fontSize: '13px', color: 'rgba(var(--lp-fg), 0.65)', lineHeight: 1.6, margin: 0 }}>
                         {h.body}
                       </p>
                     </div>
@@ -303,10 +303,10 @@ export default function SeoLandingPage() {
         {/* ── PRICING CALLOUT CARD ── */}
         <section
           style={{
-            background: 'rgba(15, 29, 28, 0.92)',
+            background: 'rgba(var(--lp-card), 0.92)',
             backdropFilter: 'blur(20px)',
             WebkitBackdropFilter: 'blur(20px)',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
+            border: '1px solid rgba(var(--lp-fg), 0.1)',
             borderRadius: '24px',
             padding: '50px 36px',
             textAlign: 'center',
@@ -324,7 +324,7 @@ export default function SeoLandingPage() {
               transform: 'translateX(-50%)',
               width: '320px',
               height: '180px',
-              background: 'radial-gradient(ellipse, rgba(14, 124, 134, 0.25) 0%, transparent 70%)',
+              background: 'radial-gradient(ellipse, rgba(0, 122, 255, 0.25) 0%, transparent 70%)',
               pointerEvents: 'none',
             }}
           />
@@ -335,11 +335,11 @@ export default function SeoLandingPage() {
               fontWeight: 700,
               letterSpacing: '0.16em',
               textTransform: 'uppercase',
-              color: '#5FD4E8',
+              color: '#5AC8FA',
               padding: '5px 14px',
               borderRadius: '999px',
-              background: 'rgba(95, 212, 232, 0.1)',
-              border: '1px solid rgba(95, 212, 232, 0.25)',
+              background: 'rgba(90, 200, 250, 0.1)',
+              border: '1px solid rgba(90, 200, 250, 0.25)',
               marginBottom: '14px',
               fontFamily: "'JetBrains Mono', monospace",
             }}
@@ -351,17 +351,17 @@ export default function SeoLandingPage() {
               fontFamily: "'Instrument Serif', Georgia, serif",
               fontSize: 'clamp(2rem, 4vw, 3rem)',
               fontWeight: 400,
-              color: '#FFFFFF',
+              color: 'var(--lp-heading)',
               letterSpacing: '-0.02em',
               marginBottom: '12px',
             }}
           >
-            Backtest, journal and coach in <span style={{ fontStyle: 'italic', color: '#E8732A' }}>one plan</span>
+            Backtest, journal and coach in <span style={{ fontStyle: 'italic', color: '#007AFF' }}>one plan</span>
           </h2>
           <p
             style={{
               fontSize: '15px',
-              color: 'rgba(237, 234, 227, 0.72)',
+              color: 'rgba(var(--lp-fg), 0.72)',
               maxWidth: '540px',
               margin: '0 auto 28px',
               lineHeight: 1.6,
@@ -384,11 +384,11 @@ export default function SeoLandingPage() {
                 fontWeight: 700,
                 letterSpacing: '0.16em',
                 textTransform: 'uppercase',
-                color: '#E8732A',
+                color: '#007AFF',
                 padding: '5px 14px',
                 borderRadius: '999px',
-                background: 'rgba(232, 115, 42, 0.1)',
-                border: '1px solid rgba(232, 115, 42, 0.25)',
+                background: 'rgba(0, 122, 255, 0.1)',
+                border: '1px solid rgba(0, 122, 255, 0.25)',
                 marginBottom: '12px',
                 fontFamily: "'JetBrains Mono', monospace",
               }}
@@ -400,19 +400,19 @@ export default function SeoLandingPage() {
                 fontFamily: "'Instrument Serif', Georgia, serif",
                 fontSize: 'clamp(2rem, 4vw, 3rem)',
                 fontWeight: 400,
-                color: '#FFFFFF',
+                color: 'var(--lp-heading)',
                 letterSpacing: '-0.02em',
               }}
             >
-              Frequently Asked <span style={{ fontStyle: 'italic', color: '#0E7C86' }}>Questions</span>
+              Frequently Asked <span style={{ fontStyle: 'italic', color: '#007AFF' }}>Questions</span>
             </h2>
           </div>
 
           <div
             className="landing-faq"
             style={{
-              background: 'rgba(15, 29, 28, 0.88)',
-              border: '1px solid rgba(255, 255, 255, 0.08)',
+              background: 'rgba(var(--lp-card), 0.88)',
+              border: '1px solid rgba(var(--lp-fg), 0.08)',
               borderRadius: '22px',
               overflow: 'hidden',
               boxShadow: '0 20px 40px rgba(0,0,0,0.35)',
@@ -422,22 +422,22 @@ export default function SeoLandingPage() {
               <details
                 key={f.q}
                 className="group px-6 py-5"
-                style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.06)' }}
+                style={{ borderBottom: '1px solid rgba(var(--lp-fg), 0.06)' }}
               >
                 <summary
                   className="flex cursor-pointer list-none items-center justify-between gap-4 font-semibold"
-                  style={{ color: '#EDEAE3', fontSize: '16px', cursor: 'pointer' }}
+                  style={{ color: 'var(--lp-text)', fontSize: '16px', cursor: 'pointer' }}
                 >
-                  <span style={{ color: '#EDEAE3', fontWeight: 600, fontSize: '15px' }}>{f.q}</span>
+                  <span style={{ color: 'var(--lp-text)', fontWeight: 600, fontSize: '15px' }}>{f.q}</span>
                   <ChevronRight
                     size={18}
                     className="shrink-0 transition-transform group-open:rotate-90"
-                    style={{ color: '#0E7C86' }}
+                    style={{ color: '#007AFF' }}
                   />
                 </summary>
                 <p
                   className="mt-3 text-sm leading-relaxed"
-                  style={{ color: 'rgba(237, 234, 227, 0.82)', fontSize: '14px', lineHeight: 1.7 }}
+                  style={{ color: 'rgba(var(--lp-fg), 0.82)', fontSize: '14px', lineHeight: 1.7 }}
                 >
                   {f.a}
                 </p>
@@ -456,7 +456,7 @@ export default function SeoLandingPage() {
                 fontWeight: 700,
                 letterSpacing: '0.14em',
                 textTransform: 'uppercase',
-                color: 'rgba(237, 234, 227, 0.55)',
+                color: 'rgba(var(--lp-fg), 0.55)',
                 marginBottom: '14px',
               }}
             >
@@ -472,21 +472,21 @@ export default function SeoLandingPage() {
                       style={{
                         padding: '8px 16px',
                         borderRadius: '999px',
-                        background: 'rgba(15, 29, 28, 0.7)',
-                        border: '1px solid rgba(255, 255, 255, 0.08)',
-                        color: '#EDEAE3',
+                        background: 'rgba(var(--lp-card), 0.7)',
+                        border: '1px solid rgba(var(--lp-fg), 0.08)',
+                        color: 'var(--lp-text)',
                         fontSize: '12px',
                         fontWeight: 600,
                         textDecoration: 'none',
                         transition: 'all 0.2s ease',
                       }}
                       onMouseEnter={(e) => {
-                        e.currentTarget.style.borderColor = 'rgba(95, 212, 232, 0.4)';
-                        e.currentTarget.style.color = '#5FD4E8';
+                        e.currentTarget.style.borderColor = 'rgba(90, 200, 250, 0.4)';
+                        e.currentTarget.style.color = '#5AC8FA';
                       }}
                       onMouseLeave={(e) => {
-                        e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.08)';
-                        e.currentTarget.style.color = '#EDEAE3';
+                        e.currentTarget.style.borderColor = 'rgba(var(--lp-fg), 0.08)';
+                        e.currentTarget.style.color = 'var(--lp-text)';
                       }}
                     >
                       {pageByPath[p].h1}
@@ -501,7 +501,7 @@ export default function SeoLandingPage() {
         <p
           style={{
             fontSize: '12px',
-            color: 'rgba(237, 234, 227, 0.4)',
+            color: 'rgba(var(--lp-fg), 0.4)',
             lineHeight: 1.7,
             maxWidth: '900px',
             marginTop: '32px',

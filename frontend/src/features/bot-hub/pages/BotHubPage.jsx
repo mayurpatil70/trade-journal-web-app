@@ -23,7 +23,7 @@ const INITIAL = {
 const Field = ({ label, ...props }) => (
   <label className="block text-xs text-gray-400">
     {label}
-    <input {...props} className="mt-1 w-full rounded-lg border border-white/10 bg-[#0a0a0a] px-3 py-2 text-sm text-white outline-none focus:border-emerald-500/50" />
+    <input {...props} className="mt-1 w-full rounded-lg border border-white/10 bg-[#0a0a0a] px-3 py-2 text-sm text-white outline-none focus:border-blue-500/50" />
   </label>
 );
 
@@ -109,7 +109,7 @@ export default function BotHubPage() {
               </p>
             </div>
             <div className="flex gap-2">
-              <button onClick={() => act(() => toggle(c.id, !c.is_active))} className={`rounded-lg px-3 py-1.5 text-xs font-semibold ${c.is_active ? "bg-amber-500/10 text-amber-400" : "bg-emerald-500/10 text-emerald-400"}`}>
+              <button onClick={() => act(() => toggle(c.id, !c.is_active))} className={`rounded-lg px-3 py-1.5 text-xs font-semibold ${c.is_active ? "bg-amber-500/10 text-amber-400" : "bg-blue-500/10 text-blue-400"}`}>
                 {c.is_active ? "Pause" : "Start"}
               </button>
               <button disabled={c.is_active} onClick={() => act(() => remove(c.id))} className="rounded-lg bg-white/5 px-3 py-1.5 text-xs text-gray-400 disabled:opacity-40">Delete</button>

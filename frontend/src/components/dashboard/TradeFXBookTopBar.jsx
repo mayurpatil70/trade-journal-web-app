@@ -133,7 +133,7 @@ export default function TradeFXBookTopBar({
       <div className="shrink-0">
         <h1 className="text-2xl font-bold text-neutral-900 dark:text-white tracking-tight">
           {getGreeting()},{" "}
-          <span className="text-emerald-500 font-semibold">
+          <span className="text-blue-500 font-semibold">
             {displayName}
           </span>
         </h1>
@@ -200,9 +200,9 @@ export default function TradeFXBookTopBar({
                   setIsQuickActionsOpen(false);
                   if (onOpenAddTradeModal) onOpenAddTradeModal();
                 }}
-                className="w-full px-3 py-2.5 rounded-xl text-xs font-semibold text-neutral-700 dark:text-neutral-200 hover:bg-emerald-500/10 hover:text-emerald-600 dark:hover:text-emerald-400 flex items-center gap-2.5 transition-colors cursor-pointer text-left"
+                className="w-full px-3 py-2.5 rounded-xl text-xs font-semibold text-neutral-700 dark:text-neutral-200 hover:bg-blue-500/10 hover:text-blue-600 dark:hover:text-blue-400 flex items-center gap-2.5 transition-colors cursor-pointer text-left"
               >
-                <Plus className="w-4 h-4 text-emerald-500" />
+                <Plus className="w-4 h-4 text-blue-500" />
                 <span>Add Manual Trade</span>
               </button>
 
@@ -212,7 +212,7 @@ export default function TradeFXBookTopBar({
                   setIsQuickActionsOpen(false);
                   navigate("/analytics");
                 }}
-                className="w-full px-3 py-2.5 rounded-xl text-xs font-semibold text-neutral-700 dark:text-neutral-200 hover:bg-emerald-500/10 hover:text-emerald-600 dark:hover:text-emerald-400 flex items-center gap-2.5 transition-colors cursor-pointer text-left"
+                className="w-full px-3 py-2.5 rounded-xl text-xs font-semibold text-neutral-700 dark:text-neutral-200 hover:bg-blue-500/10 hover:text-blue-600 dark:hover:text-blue-400 flex items-center gap-2.5 transition-colors cursor-pointer text-left"
               >
                 <BarChart2 className="w-4 h-4 text-neutral-400" />
                 <span>View Analytics</span>
@@ -229,7 +229,7 @@ export default function TradeFXBookTopBar({
 
         {/* 4. User Profile Badge */}
         <div
-          className="h-10 flex items-center gap-2 px-2 rounded-2xl bg-white/80 dark:bg-[#121622]/80 border border-black/[0.06] dark:border-white/[0.08] hover:border-emerald-500/30 transition-all shadow-sm select-none"
+          className="h-10 flex items-center gap-2 px-2 rounded-2xl bg-white/80 dark:bg-[#121622]/80 border border-black/[0.06] dark:border-white/[0.08] hover:border-blue-500/30 transition-all shadow-sm select-none"
         >
           {/* Avatar button opens transparent preview modal */}
           <div
@@ -244,10 +244,10 @@ export default function TradeFXBookTopBar({
               <img
                 src={userAvatar}
                 alt="avatar"
-                className="w-6 h-6 rounded-lg object-cover ring-1 ring-emerald-500/20 shadow-sm group-hover/avatar:scale-110 group-hover/avatar:ring-emerald-500 transition-all"
+                className="w-6 h-6 rounded-lg object-cover ring-1 ring-blue-500/20 shadow-sm group-hover/avatar:scale-110 group-hover/avatar:ring-blue-500 transition-all"
               />
             ) : (
-              <div className="w-6 h-6 rounded-lg bg-gradient-to-tr from-emerald-500 to-teal-500 text-white flex items-center justify-center font-bold text-[11px] shadow-sm group-hover/avatar:scale-110 transition-transform">
+              <div className="w-6 h-6 rounded-lg bg-gradient-to-tr from-blue-500 to-blue-500 text-white flex items-center justify-center font-bold text-[11px] shadow-sm group-hover/avatar:scale-110 transition-transform">
                 {(displayName || userEmail).charAt(0).toUpperCase()}
               </div>
             )}
@@ -261,7 +261,7 @@ export default function TradeFXBookTopBar({
             <span className="text-[11px] font-bold text-neutral-800 dark:text-neutral-200 truncate max-w-[95px]">
               {displayName}
             </span>
-            <span className="text-[8px] uppercase font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">
+            <span className="text-[8px] uppercase font-bold text-blue-600 dark:text-blue-400 mt-0.5">
               PRO
             </span>
           </div>

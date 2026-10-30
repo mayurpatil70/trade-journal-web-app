@@ -58,7 +58,7 @@ export default function TradingBotDashboard() {
               </p>
             </div>
             <div className="flex gap-2">
-              <button onClick={() => act(() => toggle(c.id, !c.is_active))} className={`rounded-lg px-3 py-1.5 text-xs font-semibold ${c.is_active ? "bg-amber-500/10 text-amber-400" : "bg-emerald-500/10 text-emerald-400"}`}>
+              <button onClick={() => act(() => toggle(c.id, !c.is_active))} className={`rounded-lg px-3 py-1.5 text-xs font-semibold ${c.is_active ? "bg-amber-500/10 text-amber-400" : "bg-blue-500/10 text-blue-400"}`}>
                 {c.is_active ? "Pause" : "Start"}
               </button>
               <button disabled={c.is_active} onClick={() => act(() => remove(c.id))} className="rounded-lg bg-white/5 px-3 py-1.5 text-xs text-gray-400 disabled:opacity-40">Delete</button>
@@ -70,7 +70,7 @@ export default function TradingBotDashboard() {
       <section className="space-y-2">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-semibold text-gray-300">Order history</h2>
-          <select value={symbolFilter} onChange={(e) => setSymbolFilter(e.target.value)} className="rounded-lg border border-white/10 bg-[#0a0a0a] px-2 py-1 text-xs text-gray-300 focus:outline-none focus:ring-1 focus:ring-emerald-500/50">
+          <select value={symbolFilter} onChange={(e) => setSymbolFilter(e.target.value)} className="rounded-lg border border-white/10 bg-[#0a0a0a] px-2 py-1 text-xs text-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500/50">
             <option className="bg-[#0a0a0a] text-gray-300" value="">All symbols</option>
             {symbols.map((s) => <option className="bg-[#0a0a0a] text-gray-300" key={s} value={s}>{s}</option>)}
           </select>

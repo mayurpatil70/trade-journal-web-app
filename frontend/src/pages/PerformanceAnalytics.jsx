@@ -1285,7 +1285,7 @@ export default function PerformanceAnalytics() {
       <div className="rounded-3xl bg-white dark:bg-[#12151e]/85 backdrop-blur-xl border border-black/[0.06] dark:border-white/[0.08] shadow-[0_4px_24px_rgba(0,0,0,0.03)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.35)] p-6 mb-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-6">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center font-bold">
+            <div className="w-9 h-9 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold">
               <Brain className="w-5 h-5" />
             </div>
             <div>
@@ -1298,7 +1298,7 @@ export default function PerformanceAnalytics() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+            <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
               Discipline: {metrics.mistakes.ruleAdherenceRate.toFixed(0)}%
             </span>
           </div>
@@ -1311,7 +1311,7 @@ export default function PerformanceAnalytics() {
             <div>
               <div className="flex items-center justify-between mb-3.5 pb-2.5 border-b border-black/[0.04] dark:border-white/[0.05]">
                 <span className="text-xs font-bold text-neutral-800 dark:text-neutral-200 flex items-center gap-1.5">
-                  <Target className="w-4 h-4 text-emerald-500" /> Strategy Edge
+                  <Target className="w-4 h-4 text-blue-500" /> Strategy Edge
                 </span>
                 <span className="text-[10px] font-medium text-neutral-400">
                   {metrics.setupInsights.length} Setups
@@ -1361,14 +1361,14 @@ export default function PerformanceAnalytics() {
             <div>
               <div className="flex items-center justify-between mb-3.5 pb-2.5 border-b border-black/[0.04] dark:border-white/[0.05]">
                 <span className="text-xs font-bold text-neutral-800 dark:text-neutral-200 flex items-center gap-1.5">
-                  <Brain className="w-4 h-4 text-purple-500" /> Psychology & Discipline
+                  <Brain className="w-4 h-4 text-blue-500" /> Psychology & Discipline
                 </span>
                 <span className="text-[10px] font-medium text-neutral-400">Rules vs Emotions</span>
               </div>
 
               {/* Side-by-Side: Followed vs Broken Rules */}
               <div className="grid grid-cols-2 gap-2 mb-3.5">
-                <div className="p-2.5 rounded-xl bg-emerald-500/[0.06] border border-emerald-500/20 text-center">
+                <div className="p-2.5 rounded-xl bg-blue-500/[0.06] border border-blue-500/20 text-center">
                   <p className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Rules Followed</p>
                   <p className="text-base font-extrabold text-emerald-600 dark:text-emerald-400 font-mono mt-0.5">
                     {formatCurrency(metrics.rulesFollowed?.pnl || 0)}
@@ -1421,7 +1421,7 @@ export default function PerformanceAnalytics() {
               <div className="space-y-2 text-xs mb-3.5">
                 <div className="flex items-center justify-between p-2 rounded-xl bg-white/70 dark:bg-white/[0.02] border border-black/[0.03] dark:border-white/[0.03]">
                   <span className="text-neutral-600 dark:text-neutral-400">Rule Adherence Rate</span>
-                  <span className="font-bold text-emerald-500 font-mono">
+                  <span className="font-bold text-blue-500 font-mono">
                     {metrics.mistakes.ruleAdherenceRate.toFixed(1)}%
                   </span>
                 </div>
@@ -1583,7 +1583,7 @@ function EquityCurveSVG({ points, mode, onHover }) {
             cx={c.x}
             cy={c.y}
             r="3"
-            className="fill-white dark:fill-[#12151e] stroke-emerald-500 hover:r-5 transition-all"
+            className="fill-white dark:fill-[#12151e] stroke-blue-500 hover:r-5 transition-all"
             strokeWidth="2"
           />
         ))}

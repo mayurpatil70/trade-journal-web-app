@@ -87,12 +87,12 @@ export default function SocialProofToast() {
       <div
         style={{
           width: 'clamp(280px, 86vw, 350px)',
-          background: 'rgba(14, 23, 38, 0.94)',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
-          borderLeft: '3.5px solid #10b981',
+          background: 'rgba(var(--lp-card), 0.94)',
+          border: '1px solid rgba(var(--lp-fg), 0.1)',
+          borderLeft: '3.5px solid #007AFF',
           borderRadius: '16px',
           padding: '13px 15px',
-          boxShadow: '0 18px 40px rgba(0, 0, 0, 0.55), 0 0 20px rgba(16, 185, 129, 0.12)',
+          boxShadow: '0 18px 40px rgba(0, 0, 0, 0.55), 0 0 20px rgba(0, 122, 255, 0.12)',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
           display: 'flex',
@@ -114,12 +114,12 @@ export default function SocialProofToast() {
             width: '38px',
             height: '38px',
             borderRadius: '11px',
-            background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(201, 169, 110, 0.2))',
-            border: '1.5px solid rgba(16, 185, 129, 0.45)',
+            background: 'linear-gradient(135deg, rgba(0, 122, 255, 0.25), rgba(201, 169, 110, 0.2))',
+            border: '1.5px solid rgba(0, 122, 255, 0.45)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            color: '#ffffff',
+            color: 'var(--lp-heading)',
             fontWeight: 800,
             fontSize: '1rem',
             flexShrink: 0,
@@ -134,21 +134,21 @@ export default function SocialProofToast() {
               width: '8px',
               height: '8px',
               borderRadius: '50%',
-              background: '#10b981',
-              border: '2px solid #0b131f',
-              boxShadow: '0 0 6px #10b981',
+              background: '#007AFF',
+              border: '2px solid var(--lp-bg)',
+              boxShadow: '0 0 6px #007AFF',
             }}
           />
         </div>
 
         {/* Content */}
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '2px', paddingRight: '16px' }}>
-          <div style={{ fontSize: '13px', fontWeight: 700, color: '#ffffff', lineHeight: 1.3 }}>
+          <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--lp-heading)', lineHeight: 1.3 }}>
             {current.name} <span style={{ fontWeight: 500, color: '#94a3b8', fontSize: '12px' }}>from {current.city}</span>
           </div>
 
-          <div style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.9)', lineHeight: 1.35 }}>
-            just bought <span style={{ fontWeight: 700, color: '#34d399' }}>{current.product}</span>
+          <div style={{ fontSize: '12px', color: 'rgba(var(--lp-fg), 0.9)', lineHeight: 1.35 }}>
+            just bought <span style={{ fontWeight: 700, color: '#409CFF' }}>{current.product}</span>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '3px', fontSize: '10px', fontFamily: "'JetBrains Mono', monospace", color: '#64748b' }}>
@@ -174,7 +174,7 @@ export default function SocialProofToast() {
             borderRadius: '50%',
             background: 'transparent',
             border: 'none',
-            color: 'rgba(255, 255, 255, 0.4)',
+            color: 'rgba(var(--lp-fg), 0.4)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -186,12 +186,12 @@ export default function SocialProofToast() {
         </button>
 
         {/* 4s Dwell Indicator */}
-        <div style={{ position: 'absolute', bottom: 0, left: 0, height: '2px', width: '100%', background: 'rgba(255, 255, 255, 0.08)' }}>
+        <div style={{ position: 'absolute', bottom: 0, left: 0, height: '2px', width: '100%', background: 'rgba(var(--lp-fg), 0.08)' }}>
           <div
             style={{
               height: '100%',
               width: isVisible ? '0%' : '100%',
-              background: 'linear-gradient(90deg, #10b981, #34d399)',
+              background: 'linear-gradient(90deg, #007AFF, #409CFF)',
               transition: isVisible ? 'width 4000ms linear' : 'none',
             }}
           />

@@ -307,7 +307,7 @@ export default function EconomicCalendar() {
       {/* ── Header ── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
-          <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 dark:bg-emerald-500/15 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 shadow-sm shadow-emerald-500/10">
+          <div className="w-12 h-12 rounded-2xl bg-blue-500/10 dark:bg-blue-500/15 border border-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0 shadow-sm shadow-blue-500/10">
             <Globe className="w-6 h-6" />
           </div>
           <div>
@@ -315,7 +315,7 @@ export default function EconomicCalendar() {
               <h1 className="font-serif text-2xl md:text-3xl font-bold text-neutral-900 dark:text-white">
                 Economic Calendar
               </h1>
-              <span className="text-[10px] font-mono font-bold bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/25 px-2 py-0.5 rounded-full">
+              <span className="text-[10px] font-mono font-bold bg-blue-500/15 text-blue-700 dark:text-blue-400 border border-blue-500/25 px-2 py-0.5 rounded-full">
                 IST (UTC+5:30)
               </span>
             </div>
@@ -332,7 +332,7 @@ export default function EconomicCalendar() {
               onClick={() => setActiveMode("forexfactory")}
               className={`px-3.5 py-1.5 rounded-xl font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
                 activeMode === "forexfactory"
-                  ? "bg-emerald-600 text-white shadow-sm"
+                  ? "bg-blue-600 text-white shadow-sm"
                   : "text-neutral-700 dark:text-neutral-300 hover:text-black dark:hover:text-white"
               }`}
             >
@@ -342,7 +342,7 @@ export default function EconomicCalendar() {
               onClick={() => setActiveMode("tradingview")}
               className={`px-3.5 py-1.5 rounded-xl font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
                 activeMode === "tradingview"
-                  ? "bg-emerald-600 text-white shadow-sm"
+                  ? "bg-blue-600 text-white shadow-sm"
                   : "text-neutral-700 dark:text-neutral-300 hover:text-black dark:hover:text-white"
               }`}
             >
@@ -373,7 +373,7 @@ export default function EconomicCalendar() {
                     onClick={() => setTimeRange("today")}
                     className={`px-3 py-1 rounded-lg font-bold transition-all cursor-pointer ${
                       timeRange === "today"
-                        ? "bg-emerald-600 text-white shadow-sm"
+                        ? "bg-blue-600 text-white shadow-sm"
                         : "text-neutral-700 dark:text-neutral-300 hover:text-black dark:hover:text-white"
                     }`}
                   >
@@ -383,7 +383,7 @@ export default function EconomicCalendar() {
                     onClick={() => setTimeRange("week")}
                     className={`px-3 py-1 rounded-lg font-bold transition-all cursor-pointer ${
                       timeRange === "week"
-                        ? "bg-emerald-600 text-white shadow-sm"
+                        ? "bg-blue-600 text-white shadow-sm"
                         : "text-neutral-700 dark:text-neutral-300 hover:text-black dark:hover:text-white"
                     }`}
                   >
@@ -444,7 +444,7 @@ export default function EconomicCalendar() {
                   placeholder="Search CPI, FOMC, Rate..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-8 pr-7 py-1.5 bg-black/[0.04] dark:bg-white/[0.06] border border-black/[0.08] dark:border-white/10 rounded-xl text-xs text-neutral-900 dark:text-white placeholder-neutral-500 outline-none focus:border-emerald-500/50 font-medium"
+                  className="w-full pl-8 pr-7 py-1.5 bg-black/[0.04] dark:bg-white/[0.06] border border-black/[0.08] dark:border-white/10 rounded-xl text-xs text-neutral-900 dark:text-white placeholder-neutral-500 outline-none focus:border-blue-500/50 font-medium"
                 />
                 {searchQuery && (
                   <button
@@ -468,7 +468,7 @@ export default function EconomicCalendar() {
                   onClick={() => setCurrencyFilter(cur)}
                   className={`px-2.5 py-1 rounded-lg font-bold shrink-0 transition-all cursor-pointer ${
                     currencyFilter === cur
-                      ? "bg-emerald-600 text-white shadow-sm"
+                      ? "bg-blue-600 text-white shadow-sm"
                       : "bg-black/[0.04] dark:bg-white/[0.05] text-neutral-700 dark:text-neutral-300 hover:bg-black/[0.08] dark:hover:bg-white/[0.09]"
                   }`}
                 >
@@ -495,7 +495,7 @@ export default function EconomicCalendar() {
                       setCurrencyFilter("all");
                       setSearchQuery("");
                     }}
-                    className="mt-3 px-4 py-1.5 text-xs font-bold bg-emerald-600 text-white rounded-xl hover:bg-emerald-500 transition-colors cursor-pointer"
+                    className="mt-3 px-4 py-1.5 text-xs font-bold bg-blue-600 text-white rounded-xl hover:bg-blue-500 transition-colors cursor-pointer"
                   >
                     Reset Filters
                   </button>
@@ -549,7 +549,7 @@ export default function EconomicCalendar() {
                                 onClick={() => setSelectedEvent(ev)}
                                 className={`transition-colors cursor-pointer ${
                                   isSelected || isDetailOpen
-                                    ? "bg-emerald-500/10 dark:bg-emerald-500/15"
+                                    ? "bg-blue-500/10 dark:bg-blue-500/15"
                                     : done
                                     ? "hover:bg-neutral-50 dark:hover:bg-white/[0.03] opacity-85 hover:opacity-100"
                                     : "hover:bg-neutral-50 dark:hover:bg-white/[0.04]"
@@ -668,7 +668,7 @@ export default function EconomicCalendar() {
 
                                         <div className="grid grid-cols-3 gap-2">
                                           <span className="font-bold text-neutral-600 dark:text-neutral-400">Usual Effect:</span>
-                                          <span className="col-span-2 text-emerald-700 dark:text-emerald-400 font-bold">{specs.usualEffect}</span>
+                                          <span className="col-span-2 text-blue-700 dark:text-blue-400 font-bold">{specs.usualEffect}</span>
                                         </div>
 
                                         <div className="grid grid-cols-3 gap-2">
@@ -690,7 +690,7 @@ export default function EconomicCalendar() {
                                       {/* Market Reaction & Pairs Column */}
                                       <div className="space-y-4 text-xs">
                                         <div className="flex items-center justify-between pb-2 border-b border-black/[0.06] dark:border-white/[0.08]">
-                                          <span className="font-extrabold uppercase tracking-wider text-[11px] text-emerald-600 dark:text-emerald-400">
+                                          <span className="font-extrabold uppercase tracking-wider text-[11px] text-blue-600 dark:text-blue-400">
                                             Market Reaction & Pairs
                                           </span>
                                           <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${impactData.badgeBg}`}>
@@ -723,7 +723,7 @@ export default function EconomicCalendar() {
                                             {specs.pairs?.map((pair) => (
                                               <span
                                                 key={pair}
-                                                className="px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-800 dark:text-emerald-300 font-mono font-bold text-xs border border-emerald-500/25"
+                                                className="px-2.5 py-1 rounded-lg bg-blue-500/10 text-blue-800 dark:text-blue-300 font-mono font-bold text-xs border border-blue-500/25"
                                               >
                                                 {pair}
                                               </span>
@@ -831,7 +831,7 @@ export default function EconomicCalendar() {
                               {specs.pairs.map((p) => (
                                 <span
                                   key={p}
-                                  className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-800 dark:text-emerald-300 font-mono font-bold text-[11px] border border-emerald-500/20"
+                                  className="px-2 py-0.5 rounded bg-blue-500/10 text-blue-800 dark:text-blue-300 font-mono font-bold text-[11px] border border-blue-500/20"
                                 >
                                   {p}
                                 </span>
@@ -872,7 +872,7 @@ export default function EconomicCalendar() {
                   href="https://www.forexfactory.com/calendar"
                   target="_blank"
                   rel="noreferrer"
-                  className="text-emerald-700 dark:text-emerald-400 hover:underline flex items-center gap-1 font-bold"
+                  className="text-blue-700 dark:text-blue-400 hover:underline flex items-center gap-1 font-bold"
                 >
                   ForexFactory.com <ExternalLink className="w-3.5 h-3.5" />
                 </a>

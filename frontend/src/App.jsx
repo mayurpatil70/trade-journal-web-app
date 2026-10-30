@@ -245,7 +245,7 @@ const AuthGuard = () => {
 const WorkspaceLoader = () => (
   <div className="min-h-screen bg-[#0a0a0a] flex flex-col items-center justify-center p-6">
     <div className="relative flex items-center justify-center mb-3">
-      <div className="w-10 h-10 rounded-full border-2 border-emerald-500/20 border-t-emerald-500 animate-spin" />
+      <div className="w-10 h-10 rounded-full border-2 border-blue-500/20 border-t-blue-500 animate-spin" />
       <img
         src="/logo3d.png"
         alt="Loading"
@@ -332,7 +332,7 @@ const AdminGuard = () => {
 const RouteTransitionFallback = () => (
   <div className="min-h-[70vh] flex flex-col items-center justify-center p-8 bg-[#0a0a0a]">
     <div className="relative flex items-center justify-center mb-3">
-      <div className="w-9 h-9 rounded-full border-2 border-emerald-500/20 border-t-emerald-500 animate-spin" />
+      <div className="w-9 h-9 rounded-full border-2 border-blue-500/20 border-t-blue-500 animate-spin" />
       <img
         src="/logo3d.png"
         alt="ForexNotes"

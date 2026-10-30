@@ -11,7 +11,7 @@ const DEFAULT_SLIDES = [
     title: 'Digital Trading Journal',
     sub: 'Account-Wise Real-Time Data Renders',
     badge: 'Live Dashboard',
-    color: '#10B981',
+    color: '#007AFF',
   },
   {
     src: '/screenshots/screenshot_2_multiaccount.png',
@@ -206,10 +206,10 @@ export default function LiquidGlassCarousel({ userImages = null }) {
         width: '100%',
         scrollMarginTop: '70px',
         padding: 'clamp(50px, 7vh, 80px) 0 clamp(40px, 5vh, 60px)',
-        background: '#060B10',
-        color: '#FFFFFF',
+        background: 'var(--lp-bg)',
+        color: 'var(--lp-heading)',
         overflow: 'hidden',
-        borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+        borderTop: '1px solid rgba(var(--lp-fg), 0.08)',
       }}
     >
       {/* Header Info */}
@@ -221,17 +221,17 @@ export default function LiquidGlassCarousel({ userImages = null }) {
             gap: '8px',
             padding: '5px 14px',
             borderRadius: '999px',
-            background: 'rgba(16, 185, 129, 0.1)',
-            border: '1px solid rgba(16, 185, 129, 0.25)',
+            background: 'rgba(0, 122, 255, 0.1)',
+            border: '1px solid rgba(0, 122, 255, 0.25)',
             fontSize: '10px',
-            color: '#10B981',
+            color: '#007AFF',
             fontWeight: 700,
             letterSpacing: '0.14em',
             textTransform: 'uppercase',
             marginBottom: '16px',
           }}
         >
-          <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#10B981', boxShadow: '0 0 8px #10B981', flexShrink: 0 }} />
+          <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#007AFF', boxShadow: '0 0 8px #007AFF', flexShrink: 0 }} />
           <span>Interactive Workspace Showcase</span>
         </div>
 
@@ -242,17 +242,17 @@ export default function LiquidGlassCarousel({ userImages = null }) {
             fontWeight: 700,
             letterSpacing: '-0.02em',
             lineHeight: 1.15,
-            color: '#FFFFFF',
+            color: 'var(--lp-heading)',
             marginBottom: '12px',
           }}
         >
-          Inside the <span style={{ color: '#10B981' }}>Forex Notes Workspace</span>
+          Inside the <span style={{ color: '#007AFF' }}>Forex Notes Workspace</span>
         </h2>
         <p
           style={{
             fontFamily: "'Space Mono', monospace",
             fontSize: '13px',
-            color: 'rgba(255, 255, 255, 0.6)',
+            color: 'rgba(var(--lp-fg), 0.6)',
             lineHeight: 1.6,
             maxWidth: '560px',
             margin: '0 auto',
@@ -280,7 +280,7 @@ export default function LiquidGlassCarousel({ userImages = null }) {
             fontWeight: 400,
             letterSpacing: '-0.01em',
             lineHeight: 1.2,
-            color: '#FFFFFF',
+            color: 'var(--lp-heading)',
             transition: 'opacity 0.25s ease',
           }}
         >
@@ -291,7 +291,7 @@ export default function LiquidGlassCarousel({ userImages = null }) {
             marginTop: '6px',
             fontFamily: "'JetBrains Mono', monospace",
             fontSize: 'clamp(11px, 1.2vw, 13px)',
-            color: activeSlide.color || '#0E7C86',
+            color: activeSlide.color || '#007AFF',
             letterSpacing: '0.14em',
             textTransform: 'uppercase',
             fontWeight: 700,
@@ -347,8 +347,8 @@ export default function LiquidGlassCarousel({ userImages = null }) {
                   flexShrink: 0,
                   width: `${cardWidth}px`,
                   borderRadius: '16px',
-                  background: '#0B121A',
-                  border: `1px solid ${isActive ? slide.color + '55' : 'rgba(255, 255, 255, 0.08)'}`,
+                  background: 'var(--lp-bg)',
+                  border: `1px solid ${isActive ? slide.color + '55' : 'rgba(var(--lp-fg), 0.08)'}`,
                   overflow: 'hidden',
                   transform: `scale(${isActive ? 1 : 0.92})`,
                   opacity: isActive ? 1 : 0.45,
@@ -371,8 +371,8 @@ export default function LiquidGlassCarousel({ userImages = null }) {
                     alignItems: 'center',
                     justifyContent: 'space-between',
                     padding: '10px 16px',
-                    background: '#0F1A24',
-                    borderBottom: '1px solid rgba(255, 255, 255, 0.06)',
+                    background: 'var(--lp-bg)',
+                    borderBottom: '1px solid rgba(var(--lp-fg), 0.06)',
                   }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -385,7 +385,7 @@ export default function LiquidGlassCarousel({ userImages = null }) {
                         fontFamily: "'JetBrains Mono', monospace",
                         fontSize: '11px',
                         fontWeight: 600,
-                        color: 'rgba(255, 255, 255, 0.65)',
+                        color: 'rgba(var(--lp-fg), 0.65)',
                         letterSpacing: '0.05em',
                       }}
                     >
@@ -420,7 +420,7 @@ export default function LiquidGlassCarousel({ userImages = null }) {
                     position: 'relative',
                     width: '100%',
                     aspectRatio: '1024 / 500',
-                    background: '#060B10',
+                    background: 'var(--lp-bg)',
                     overflow: 'hidden',
                   }}
                 >
@@ -455,11 +455,11 @@ export default function LiquidGlassCarousel({ userImages = null }) {
             width: '42px',
             height: '42px',
             borderRadius: '50%',
-            background: 'rgba(11, 18, 26, 0.88)',
-            border: '1px solid rgba(255, 255, 255, 0.2)',
+            background: 'rgba(var(--lp-card), 0.88)',
+            border: '1px solid rgba(var(--lp-fg), 0.2)',
             backdropFilter: 'blur(8px)',
             WebkitBackdropFilter: 'blur(8px)',
-            color: '#FFFFFF',
+            color: 'var(--lp-heading)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -484,11 +484,11 @@ export default function LiquidGlassCarousel({ userImages = null }) {
             width: '42px',
             height: '42px',
             borderRadius: '50%',
-            background: 'rgba(11, 18, 26, 0.88)',
-            border: '1px solid rgba(255, 255, 255, 0.2)',
+            background: 'rgba(var(--lp-card), 0.88)',
+            border: '1px solid rgba(var(--lp-fg), 0.2)',
             backdropFilter: 'blur(8px)',
             WebkitBackdropFilter: 'blur(8px)',
-            color: '#FFFFFF',
+            color: 'var(--lp-heading)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -524,7 +524,7 @@ export default function LiquidGlassCarousel({ userImages = null }) {
                 width: isSelected ? '28px' : '8px',
                 height: '8px',
                 borderRadius: '999px',
-                background: isSelected ? slide.color : 'rgba(255, 255, 255, 0.2)',
+                background: isSelected ? slide.color : 'rgba(var(--lp-fg), 0.2)',
                 border: 'none',
                 padding: 0,
                 cursor: 'pointer',
@@ -556,15 +556,15 @@ export default function LiquidGlassCarousel({ userImages = null }) {
           margin: '24px auto 0',
           padding: '12px 20px',
           borderRadius: '12px',
-          background: 'rgba(15, 29, 28, 0.85)',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
+          background: 'rgba(var(--lp-card), 0.85)',
+          border: '1px solid rgba(var(--lp-fg), 0.1)',
           textAlign: 'center',
           fontFamily: "'JetBrains Mono', monospace",
           fontSize: '11px',
-          color: 'rgba(237, 234, 227, 0.85)',
+          color: 'rgba(var(--lp-fg), 0.85)',
         }}
       >
-        <span style={{ display: 'inline-block', width: 6, height: 6, borderRadius: '50%', background: '#0E7C86', verticalAlign: '1px', marginRight: '8px' }} />
+        <span style={{ display: 'inline-block', width: 6, height: 6, borderRadius: '50%', background: '#007AFF', verticalAlign: '1px', marginRight: '8px' }} />
         <span>Live in-app screenshots active: Multi-account journal, TradingView charts, 10-year bar replay and drawdown calculator.</span>
       </div>
     </section>

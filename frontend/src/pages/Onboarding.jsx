@@ -169,15 +169,15 @@ export default function Onboarding() {
   const activeStepConfig = STEPS[currentStep - 1];
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] dark:bg-[#07090e] text-neutral-900 dark:text-white flex flex-col justify-between relative overflow-x-hidden selection:bg-emerald-500/30 selection:text-emerald-600 dark:selection:text-emerald-300 font-sans transition-colors duration-200">
+    <div className="min-h-screen bg-[#f8fafc] dark:bg-[#07090e] text-neutral-900 dark:text-white flex flex-col justify-between relative overflow-x-hidden selection:bg-blue-500/30 selection:text-blue-600 dark:selection:text-blue-300 font-sans transition-colors duration-200">
       {/* ── AMBIENT BACKGROUND GLOW (macOS / iOS frosted style) ── */}
-      <div className="fixed top-0 left-1/4 w-[600px] h-[400px] bg-emerald-500/[0.05] rounded-full blur-[140px] pointer-events-none" />
-      <div className="fixed bottom-0 right-1/4 w-[500px] h-[400px] bg-teal-500/[0.03] rounded-full blur-[140px] pointer-events-none" />
+      <div className="fixed top-0 left-1/4 w-[600px] h-[400px] bg-blue-500/[0.05] rounded-full blur-[140px] pointer-events-none" />
+      <div className="fixed bottom-0 right-1/4 w-[500px] h-[400px] bg-blue-500/[0.03] rounded-full blur-[140px] pointer-events-none" />
 
       {/* ── TOP PROGRESS BAR (Thin emerald line with animated glow) ── */}
       <div className="fixed top-0 left-0 right-0 h-[3px] bg-black/[0.06] dark:bg-white/[0.06] z-50">
         <div
-          className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 shadow-[0_0_12px_rgba(16,185,129,0.7)] transition-all duration-500 ease-out"
+          className="h-full bg-gradient-to-r from-blue-500 to-blue-400 shadow-[0_0_12px_rgba(0,122,255,0.7)] transition-all duration-500 ease-out"
           style={{ width: `${activeStepConfig.progress}%` }}
         />
       </div>
@@ -293,7 +293,7 @@ export default function Onboarding() {
             <button
               type="button"
               onClick={handleNext}
-              className="w-full sm:w-auto px-7 py-3 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-white text-xs font-black transition-all shadow-lg shadow-emerald-500/25 active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full sm:w-auto px-7 py-3 rounded-2xl bg-blue-500 hover:bg-blue-400 text-white text-xs font-black transition-all shadow-lg shadow-blue-500/25 active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
             >
               <span>Begin onboarding</span>
               <ArrowRight className="w-4 h-4 stroke-[2.5]" />
@@ -304,7 +304,7 @@ export default function Onboarding() {
             <button
               type="button"
               onClick={handleNext}
-              className="w-full sm:w-auto px-7 py-3 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-white text-xs font-black transition-all shadow-lg shadow-emerald-500/25 active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full sm:w-auto px-7 py-3 rounded-2xl bg-blue-500 hover:bg-blue-400 text-white text-xs font-black transition-all shadow-lg shadow-blue-500/25 active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
             >
               <span>Continue</span>
               <ArrowRight className="w-4 h-4 stroke-[2.5]" />

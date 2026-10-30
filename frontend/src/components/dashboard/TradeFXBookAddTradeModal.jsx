@@ -259,7 +259,7 @@ export default function TradeFXBookAddTradeModal({ isOpen, onClose, onTradeAdded
         {/* Modal Top Header (Screenshots 4 & 5) */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 dark:bg-emerald-500/15 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-2xl bg-blue-500/10 dark:bg-blue-500/15 border border-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center">
               <Plus className="w-5 h-5 stroke-[2.5]" />
             </div>
             <h2 className="text-xl font-bold text-neutral-900 dark:text-white">Add Trade</h2>
@@ -297,7 +297,7 @@ export default function TradeFXBookAddTradeModal({ isOpen, onClose, onTradeAdded
           <div className="p-3 rounded-2xl bg-neutral-50/80 dark:bg-white/[0.03] border border-black/[0.06] dark:border-white/[0.08] space-y-1.5">
             <div className="flex items-center justify-between">
               <label className="text-[11px] font-bold text-neutral-700 dark:text-neutral-300 flex items-center gap-1.5 uppercase tracking-wider">
-                <Briefcase className="w-3.5 h-3.5 text-emerald-500" />
+                <Briefcase className="w-3.5 h-3.5 text-blue-500" />
                 <span>Trading Account</span>
               </label>
               <span className="text-[10px] text-neutral-400 font-mono">Boundaries tracked per account</span>
@@ -350,7 +350,7 @@ export default function TradeFXBookAddTradeModal({ isOpen, onClose, onTradeAdded
                 value={symbol}
                 onChange={(e) => setSymbol(e.target.value.toUpperCase())}
                 placeholder="E.G. XAUUSD"
-                className="w-full h-11 px-3.5 rounded-xl border border-black/[0.08] dark:border-white/[0.12] bg-white/70 dark:bg-white/[0.04] text-neutral-900 dark:text-white text-sm font-medium placeholder-neutral-400 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all uppercase"
+                className="w-full h-11 px-3.5 rounded-xl border border-black/[0.08] dark:border-white/[0.12] bg-white/70 dark:bg-white/[0.04] text-neutral-900 dark:text-white text-sm font-medium placeholder-neutral-400 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all uppercase"
                 required
               />
             </div>
@@ -364,7 +364,7 @@ export default function TradeFXBookAddTradeModal({ isOpen, onClose, onTradeAdded
                 value={quantity}
                 onChange={(e) => setQuantity(e.target.value)}
                 placeholder="Lots"
-                className="w-full h-11 px-3.5 rounded-xl border border-black/[0.08] dark:border-white/[0.12] bg-white/70 dark:bg-white/[0.04] text-neutral-900 dark:text-white text-sm font-medium placeholder-neutral-400 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all"
+                className="w-full h-11 px-3.5 rounded-xl border border-black/[0.08] dark:border-white/[0.12] bg-white/70 dark:bg-white/[0.04] text-neutral-900 dark:text-white text-sm font-medium placeholder-neutral-400 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
               />
             </div>
           </div>
@@ -381,7 +381,7 @@ export default function TradeFXBookAddTradeModal({ isOpen, onClose, onTradeAdded
                 value={entryPrice}
                 onChange={(e) => setEntryPrice(e.target.value)}
                 placeholder="0.00"
-                className="w-full h-11 px-3.5 rounded-xl border border-black/[0.08] dark:border-white/[0.12] bg-white/70 dark:bg-white/[0.04] text-neutral-900 dark:text-white text-sm font-medium placeholder-neutral-400 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all font-mono"
+                className="w-full h-11 px-3.5 rounded-xl border border-black/[0.08] dark:border-white/[0.12] bg-white/70 dark:bg-white/[0.04] text-neutral-900 dark:text-white text-sm font-medium placeholder-neutral-400 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all font-mono"
                 required
               />
             </div>
@@ -395,7 +395,7 @@ export default function TradeFXBookAddTradeModal({ isOpen, onClose, onTradeAdded
                 value={exitPrice}
                 onChange={(e) => setExitPrice(e.target.value)}
                 placeholder="Optional"
-                className="w-full h-11 px-3.5 rounded-xl border border-black/[0.08] dark:border-white/[0.12] bg-white/70 dark:bg-white/[0.04] text-neutral-900 dark:text-white text-sm font-medium placeholder-neutral-400 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all font-mono"
+                className="w-full h-11 px-3.5 rounded-xl border border-black/[0.08] dark:border-white/[0.12] bg-white/70 dark:bg-white/[0.04] text-neutral-900 dark:text-white text-sm font-medium placeholder-neutral-400 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all font-mono"
               />
             </div>
           </div>
@@ -509,7 +509,7 @@ export default function TradeFXBookAddTradeModal({ isOpen, onClose, onTradeAdded
               <div className="flex items-center gap-2">
                 <ChevronRight
                   className={`w-4 h-4 text-neutral-400 transition-transform duration-200 ${
-                    isChecklistOpen ? "rotate-90 text-emerald-500" : ""
+                    isChecklistOpen ? "rotate-90 text-blue-500" : ""
                   }`}
                 />
                 <span>Pre-Trade Checklist (Optional)</span>
@@ -537,7 +537,7 @@ export default function TradeFXBookAddTradeModal({ isOpen, onClose, onTradeAdded
                       onChange={(e) =>
                         setChecklist((prev) => ({ ...prev, [item.key]: e.target.checked }))
                       }
-                      className="rounded border-neutral-300 text-emerald-600 focus:ring-emerald-500"
+                      className="rounded border-neutral-300 text-blue-600 focus:ring-blue-500"
                     />
                     <span>{item.label}</span>
                   </label>
@@ -579,7 +579,7 @@ export default function TradeFXBookAddTradeModal({ isOpen, onClose, onTradeAdded
                 </div>
 
                 {beforePreview ? (
-                  <div className="relative rounded-xl overflow-hidden border border-emerald-500/30 bg-black/5 aspect-[4/3] group">
+                  <div className="relative rounded-xl overflow-hidden border border-blue-500/30 bg-black/5 aspect-[4/3] group">
                     <img src={beforePreview} alt="Before Entry Preview" className="w-full h-full object-cover" />
                     <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                       <span className="text-[11px] font-bold text-white bg-black/60 px-2 py-1 rounded-md">
@@ -594,8 +594,8 @@ export default function TradeFXBookAddTradeModal({ isOpen, onClose, onTradeAdded
                     </div>
                   </div>
                 ) : (
-                  <label className="flex flex-col items-center justify-center p-3 rounded-xl border-2 border-dashed border-neutral-300 dark:border-white/10 hover:border-emerald-500 dark:hover:border-emerald-400/50 bg-white dark:bg-white/[0.02] cursor-pointer transition-colors text-center aspect-[4/3] group">
-                    <Upload className="w-5 h-5 text-neutral-400 group-hover:text-emerald-500 transition-colors mb-1" />
+                  <label className="flex flex-col items-center justify-center p-3 rounded-xl border-2 border-dashed border-neutral-300 dark:border-white/10 hover:border-blue-500 dark:hover:border-blue-400/50 bg-white dark:bg-white/[0.02] cursor-pointer transition-colors text-center aspect-[4/3] group">
+                    <Upload className="w-5 h-5 text-neutral-400 group-hover:text-blue-500 transition-colors mb-1" />
                     <span className="text-[11px] font-semibold text-neutral-700 dark:text-neutral-300">Upload Entry</span>
                     <span className="text-[9px] text-neutral-400 mt-0.5">PNG, JPG</span>
                     <input
@@ -631,7 +631,7 @@ export default function TradeFXBookAddTradeModal({ isOpen, onClose, onTradeAdded
                 </div>
 
                 {afterPreview ? (
-                  <div className="relative rounded-xl overflow-hidden border border-emerald-500/30 bg-black/5 aspect-[4/3] group">
+                  <div className="relative rounded-xl overflow-hidden border border-blue-500/30 bg-black/5 aspect-[4/3] group">
                     <img src={afterPreview} alt="After Exit Preview" className="w-full h-full object-cover" />
                     <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                       <span className="text-[11px] font-bold text-white bg-black/60 px-2 py-1 rounded-md">
@@ -646,8 +646,8 @@ export default function TradeFXBookAddTradeModal({ isOpen, onClose, onTradeAdded
                     </div>
                   </div>
                 ) : (
-                  <label className="flex flex-col items-center justify-center p-3 rounded-xl border-2 border-dashed border-neutral-300 dark:border-white/10 hover:border-emerald-500 dark:hover:border-emerald-400/50 bg-white dark:bg-white/[0.02] cursor-pointer transition-colors text-center aspect-[4/3] group">
-                    <Upload className="w-5 h-5 text-neutral-400 group-hover:text-emerald-500 transition-colors mb-1" />
+                  <label className="flex flex-col items-center justify-center p-3 rounded-xl border-2 border-dashed border-neutral-300 dark:border-white/10 hover:border-blue-500 dark:hover:border-blue-400/50 bg-white dark:bg-white/[0.02] cursor-pointer transition-colors text-center aspect-[4/3] group">
+                    <Upload className="w-5 h-5 text-neutral-400 group-hover:text-blue-500 transition-colors mb-1" />
                     <span className="text-[11px] font-semibold text-neutral-700 dark:text-neutral-300">Upload Exit</span>
                     <span className="text-[9px] text-neutral-400 mt-0.5">PNG, JPG</span>
                     <input
@@ -673,7 +673,7 @@ export default function TradeFXBookAddTradeModal({ isOpen, onClose, onTradeAdded
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Trade rationale, entry/exit notes..."
-              className="w-full px-3.5 py-2.5 rounded-xl border border-black/[0.08] dark:border-white/[0.12] bg-white/70 dark:bg-white/[0.04] text-neutral-900 dark:text-white text-sm placeholder-neutral-400 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all resize-none"
+              className="w-full px-3.5 py-2.5 rounded-xl border border-black/[0.08] dark:border-white/[0.12] bg-white/70 dark:bg-white/[0.04] text-neutral-900 dark:text-white text-sm placeholder-neutral-400 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all resize-none"
             />
           </div>
 
@@ -690,7 +690,7 @@ export default function TradeFXBookAddTradeModal({ isOpen, onClose, onTradeAdded
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-6 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-white text-xs font-bold rounded-xl transition-all shadow-md shadow-emerald-500/25 active:scale-95 flex items-center gap-2 cursor-pointer disabled:opacity-50"
+              className="px-6 py-2.5 bg-blue-500 hover:bg-blue-400 text-white text-xs font-bold rounded-xl transition-all shadow-md shadow-blue-500/25 active:scale-95 flex items-center gap-2 cursor-pointer disabled:opacity-50"
             >
               {isSubmitting ? (
                 <>

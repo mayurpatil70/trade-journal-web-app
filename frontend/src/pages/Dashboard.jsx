@@ -447,7 +447,7 @@ export default function Dashboard() {
           <div>
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-sm font-bold text-neutral-900 dark:text-white flex items-center gap-2">
-                <Clock className="w-4 h-4 text-emerald-500" />
+                <Clock className="w-4 h-4 text-blue-500" />
                 <span>Recent Activity</span>
               </h3>
               <span className="text-xs text-neutral-400 font-medium">
@@ -468,7 +468,7 @@ export default function Dashboard() {
                     <div
                       key={idx}
                       onClick={() => navigate("/trades")}
-                      className="p-3 rounded-2xl bg-neutral-50 dark:bg-white/[0.03] border border-black/[0.04] dark:border-white/[0.06] flex items-center justify-between hover:border-emerald-500/25 transition-all cursor-pointer"
+                      className="p-3 rounded-2xl bg-neutral-50 dark:bg-white/[0.03] border border-black/[0.04] dark:border-white/[0.06] flex items-center justify-between hover:border-blue-500/25 transition-all cursor-pointer"
                     >
                       <div className="flex items-center gap-3">
                         <div className="w-7 h-7 rounded-full bg-amber-500/20 text-amber-600 dark:text-amber-400 font-bold text-xs flex items-center justify-center">
@@ -508,7 +508,7 @@ export default function Dashboard() {
           </div>
           <button
             onClick={() => navigate("/trades")}
-            className="mt-4 pt-3 border-t border-black/[0.05] dark:border-white/[0.06] text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 flex items-center gap-1 group cursor-pointer"
+            className="mt-4 pt-3 border-t border-black/[0.05] dark:border-white/[0.06] text-xs font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 flex items-center gap-1 group cursor-pointer"
           >
             <span>View All Activity</span>
             <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
@@ -533,7 +533,7 @@ export default function Dashboard() {
       <div className="rounded-3xl bg-white dark:bg-[#12151e]/85 backdrop-blur-xl border border-black/[0.06] dark:border-white/[0.08] shadow-[0_4px_24px_rgba(0,0,0,0.03)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.35)] p-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center font-bold">
+            <div className="w-9 h-9 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold">
               <Brain className="w-5 h-5" />
             </div>
             <div>
@@ -549,7 +549,7 @@ export default function Dashboard() {
             <span className="text-[11px] text-neutral-500 dark:text-neutral-400 font-medium mr-1">
               {selectedAccount ? `Showing: ${selectedAccount}` : "All Accounts"}
             </span>
-            <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+            <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
               Discipline: {(performanceMetrics.mistakes?.ruleAdherenceRate || 100).toFixed(0)}%
             </span>
           </div>
@@ -560,12 +560,12 @@ export default function Dashboard() {
           {/* LAB 1: Strategy Edge */}
           <div
             onClick={() => navigate("/analysis/performance")}
-            className="p-5 rounded-2xl bg-neutral-50 dark:bg-white/[0.03] border border-black/[0.04] dark:border-white/[0.05] hover:border-emerald-500/30 cursor-pointer group transition-all flex flex-col justify-between"
+            className="p-5 rounded-2xl bg-neutral-50 dark:bg-white/[0.03] border border-black/[0.04] dark:border-white/[0.05] hover:border-blue-500/30 cursor-pointer group transition-all flex flex-col justify-between"
           >
             <div>
               <div className="flex items-center justify-between mb-3.5 pb-2.5 border-b border-black/[0.04] dark:border-white/[0.05]">
                 <span className="text-xs font-bold text-neutral-800 dark:text-neutral-200 flex items-center gap-1.5">
-                  <Target className="w-4 h-4 text-emerald-500" /> Strategy Edge
+                  <Target className="w-4 h-4 text-blue-500" /> Strategy Edge
                 </span>
                 <span className="text-[10px] font-medium text-neutral-400">
                   {performanceMetrics.setupInsights?.length || 0} Setups
@@ -626,7 +626,7 @@ export default function Dashboard() {
                 </div>
               )}
 
-              <div className="mt-4 pt-3 border-t border-black/[0.05] dark:border-white/5 text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold flex items-center justify-between">
+              <div className="mt-4 pt-3 border-t border-black/[0.05] dark:border-white/5 text-[11px] text-blue-600 dark:text-blue-400 font-semibold flex items-center justify-between">
                 <span>Full Strategy Analytics</span>
                 <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
               </div>
@@ -636,20 +636,20 @@ export default function Dashboard() {
           {/* LAB 2: Psychology & Discipline */}
           <div
             onClick={() => navigate("/analysis/performance")}
-            className="p-5 rounded-2xl bg-neutral-50 dark:bg-white/[0.03] border border-black/[0.04] dark:border-white/[0.05] hover:border-purple-500/30 cursor-pointer group transition-all flex flex-col justify-between"
+            className="p-5 rounded-2xl bg-neutral-50 dark:bg-white/[0.03] border border-black/[0.04] dark:border-white/[0.05] hover:border-blue-500/30 cursor-pointer group transition-all flex flex-col justify-between"
           >
             <div>
               <div className="flex items-center justify-between mb-3.5 pb-2.5 border-b border-black/[0.04] dark:border-white/[0.05]">
                 <span className="text-xs font-bold text-neutral-800 dark:text-neutral-200 flex items-center gap-1.5">
-                  <Brain className="w-4 h-4 text-purple-500" /> Psychology & Discipline
+                  <Brain className="w-4 h-4 text-blue-500" /> Psychology & Discipline
                 </span>
                 <span className="text-[10px] font-medium text-neutral-400">Rules vs Emotions</span>
               </div>
 
               {/* Side-by-Side: Followed vs Broken Rules */}
               <div className="grid grid-cols-2 gap-2 mb-3.5">
-                <div className="p-2.5 rounded-xl bg-emerald-500/[0.06] border border-emerald-500/20 text-center">
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+                <div className="p-2.5 rounded-xl bg-blue-500/[0.06] border border-blue-500/20 text-center">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">
                     Rules Followed
                   </p>
                   <p className="text-base font-extrabold text-emerald-600 dark:text-emerald-400 font-mono mt-0.5">
@@ -694,7 +694,7 @@ export default function Dashboard() {
               )}
             </div>
 
-            <div className="mt-4 pt-3 border-t border-black/[0.05] dark:border-white/5 text-[11px] text-purple-600 dark:text-purple-400 font-semibold flex items-center justify-between">
+            <div className="mt-4 pt-3 border-t border-black/[0.05] dark:border-white/5 text-[11px] text-blue-600 dark:text-blue-400 font-semibold flex items-center justify-between">
               <span>Full Psychology Lab</span>
               <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
             </div>
@@ -718,7 +718,7 @@ export default function Dashboard() {
               <div className="space-y-2 text-xs mb-3.5">
                 <div className="flex items-center justify-between p-2 rounded-xl bg-white/70 dark:bg-white/[0.02] border border-black/[0.03] dark:border-white/[0.03]">
                   <span className="text-neutral-600 dark:text-neutral-400">Rule Adherence Rate</span>
-                  <span className="font-bold text-emerald-500 font-mono">
+                  <span className="font-bold text-blue-500 font-mono">
                     {(performanceMetrics.mistakes?.ruleAdherenceRate || 100).toFixed(1)}%
                   </span>
                 </div>
@@ -764,8 +764,8 @@ export default function Dashboard() {
               )}
 
               {(!performanceMetrics.mistakes?.unforcedErrors || performanceMetrics.mistakes.unforcedErrors.length === 0) && (
-                <div className="p-3 rounded-xl bg-emerald-500/[0.04] border border-emerald-500/10 text-center">
-                  <p className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">Zero Unforced Errors</p>
+                <div className="p-3 rounded-xl bg-blue-500/[0.04] border border-blue-500/10 text-center">
+                  <p className="text-xs font-semibold text-blue-600 dark:text-blue-400">Zero Unforced Errors</p>
                   <p className="text-[10px] text-neutral-400 mt-0.5">100% disciplined rule execution</p>
                 </div>
               )}

@@ -72,7 +72,7 @@ export default function LandingHero() {
               marginBottom: '20px',
               letterSpacing: '0.02em',
             }}>
-              <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#10b981', display: 'inline-block', animation: 'pulse 2s infinite' }} />
+              <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#007AFF', display: 'inline-block', animation: 'pulse 2s infinite' }} />
               Backtest · Journal · AI Coach for Forex, Gold & Crypto
             </div>
 
@@ -86,7 +86,7 @@ export default function LandingHero() {
             }}>
               Backtest 10 Years of Markets.<br />
               <span style={{
-                background: 'linear-gradient(135deg, #10b981 0%, #059669 50%, #10b981 100%)',
+                background: 'linear-gradient(135deg, #007AFF 0%, #0066D6 50%, #007AFF 100%)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
                 backgroundClip: 'text',
@@ -137,22 +137,22 @@ export default function LandingHero() {
                   gap: '10px',
                   padding: '14px 32px',
                   borderRadius: '14px',
-                  background: 'linear-gradient(135deg, #10b981, #047857)',
+                  background: 'linear-gradient(135deg, #007AFF, #0052AD)',
                   color: 'white',
                   fontSize: '14px',
                   fontWeight: 800,
                   textDecoration: 'none',
-                  boxShadow: '0 8px 32px rgba(16,185,129,0.4), 0 0 0 1px rgba(16,185,129,0.3)',
+                  boxShadow: '0 8px 32px rgba(0,122,255,0.4), 0 0 0 1px rgba(0,122,255,0.3)',
                   transition: 'transform 0.2s, box-shadow 0.2s',
                   letterSpacing: '0.01em',
                 }}
                 onMouseEnter={e => {
                   e.currentTarget.style.transform = 'translateY(-2px)';
-                  e.currentTarget.style.boxShadow = '0 16px 40px rgba(16,185,129,0.5), 0 0 0 1px rgba(16,185,129,0.4)';
+                  e.currentTarget.style.boxShadow = '0 16px 40px rgba(0,122,255,0.5), 0 0 0 1px rgba(0,122,255,0.4)';
                 }}
                 onMouseLeave={e => {
                   e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = '0 8px 32px rgba(16,185,129,0.4), 0 0 0 1px rgba(16,185,129,0.3)';
+                  e.currentTarget.style.boxShadow = '0 8px 32px rgba(0,122,255,0.4), 0 0 0 1px rgba(0,122,255,0.3)';
                 }}
               >
                 <Zap size={16} />

@@ -475,7 +475,7 @@ export default function NotificationBell({ className }) {
                     </span>
                     <h3 className="text-sm font-bold text-neutral-900 dark:text-white tracking-tight flex items-center gap-2">
                       {expanded ? "Forex Factory Economic Calendar" : "Red Folder News"}
-                      <span className="text-[10px] font-bold bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/25 px-2 py-0.5 rounded-full font-mono">
+                      <span className="text-[10px] font-bold bg-blue-500/10 text-blue-700 dark:text-blue-400 border border-blue-500/25 px-2 py-0.5 rounded-full font-mono">
                         IST (UTC+5:30)
                       </span>
                     </h3>
@@ -524,7 +524,7 @@ export default function NotificationBell({ className }) {
                           setOpen(false);
                           navigate("/news");
                         }}
-                        className="text-[11px] text-emerald-700 dark:text-emerald-400 hover:underline flex items-center gap-1 cursor-pointer font-bold"
+                        className="text-[11px] text-blue-700 dark:text-blue-400 hover:underline flex items-center gap-1 cursor-pointer font-bold"
                       >
                         Calendar <ArrowRight className="w-3 h-3" />
                       </button>
@@ -575,7 +575,7 @@ export default function NotificationBell({ className }) {
                             onClick={() => setExpandedTimeRange("today")}
                             className={`px-3 py-1 rounded-lg font-bold transition-all cursor-pointer ${
                               expandedTimeRange === "today"
-                                ? "bg-emerald-600 text-white shadow-sm"
+                                ? "bg-blue-600 text-white shadow-sm"
                                 : "text-neutral-700 dark:text-neutral-300 hover:text-black dark:hover:text-white"
                             }`}
                           >
@@ -585,7 +585,7 @@ export default function NotificationBell({ className }) {
                             onClick={() => setExpandedTimeRange("week")}
                             className={`px-3 py-1 rounded-lg font-bold transition-all cursor-pointer ${
                               expandedTimeRange === "week"
-                                ? "bg-emerald-600 text-white shadow-sm"
+                                ? "bg-blue-600 text-white shadow-sm"
                                 : "text-neutral-700 dark:text-neutral-300 hover:text-black dark:hover:text-white"
                             }`}
                           >
@@ -646,7 +646,7 @@ export default function NotificationBell({ className }) {
                           placeholder="Search CPI, FOMC, Rate..."
                           value={searchQuery}
                           onChange={(e) => setSearchQuery(e.target.value)}
-                          className="w-full pl-8 pr-3 py-1.5 bg-black/[0.04] dark:bg-white/[0.06] border border-black/[0.08] dark:border-white/10 rounded-xl text-xs text-neutral-900 dark:text-white placeholder-neutral-500 outline-none focus:border-emerald-500/50 font-medium"
+                          className="w-full pl-8 pr-3 py-1.5 bg-black/[0.04] dark:bg-white/[0.06] border border-black/[0.08] dark:border-white/10 rounded-xl text-xs text-neutral-900 dark:text-white placeholder-neutral-500 outline-none focus:border-blue-500/50 font-medium"
                         />
                         {searchQuery && (
                           <button
@@ -670,7 +670,7 @@ export default function NotificationBell({ className }) {
                           onClick={() => setExpandedCurrency(cur)}
                           className={`px-2.5 py-1 rounded-lg font-bold shrink-0 transition-all cursor-pointer ${
                             expandedCurrency === cur
-                              ? "bg-emerald-600 text-white shadow-sm"
+                              ? "bg-blue-600 text-white shadow-sm"
                               : "bg-black/[0.04] dark:bg-white/[0.05] text-neutral-700 dark:text-neutral-300 hover:bg-black/[0.08] dark:hover:bg-white/[0.09]"
                           }`}
                         >
@@ -742,7 +742,7 @@ export default function NotificationBell({ className }) {
                                   </span>
                                 )}
                                 {e.actual && (
-                                  <span className="text-emerald-700 dark:text-emerald-400 font-bold">
+                                  <span className="text-blue-700 dark:text-blue-400 font-bold">
                                     A: {e.actual}
                                   </span>
                                 )}
@@ -762,7 +762,7 @@ export default function NotificationBell({ className }) {
 
                               {done ? (
                                 <span className="text-[9px] font-bold text-neutral-500 dark:text-neutral-400 flex items-center gap-1 mt-1 bg-black/5 dark:bg-white/5 px-1.5 py-0.5 rounded-full">
-                                  <CheckCircle2 className="w-2.5 h-2.5 text-emerald-500" /> Done
+                                  <CheckCircle2 className="w-2.5 h-2.5 text-blue-500" /> Done
                                 </span>
                               ) : diffMinutes <= 0 ? (
                                 <span className="text-[9px] font-bold text-rose-700 dark:text-rose-300 flex items-center gap-1 mt-1 bg-rose-500/15 px-1.5 py-0.5 rounded-full border border-rose-500/30">
@@ -802,7 +802,7 @@ export default function NotificationBell({ className }) {
                             setExpandedCurrency("all");
                             setSearchQuery("");
                           }}
-                          className="mt-3 px-4 py-1.5 text-xs font-bold bg-emerald-600 text-white rounded-xl hover:bg-emerald-500 transition-colors cursor-pointer"
+                          className="mt-3 px-4 py-1.5 text-xs font-bold bg-blue-600 text-white rounded-xl hover:bg-blue-500 transition-colors cursor-pointer"
                         >
                           Reset Filters
                         </button>
@@ -858,7 +858,7 @@ export default function NotificationBell({ className }) {
                                       }}
                                       className={`transition-colors cursor-pointer ${
                                         isSelected || isDetailOpen
-                                          ? "bg-emerald-500/10 dark:bg-emerald-500/15"
+                                          ? "bg-blue-500/10 dark:bg-blue-500/15"
                                           : done
                                           ? "hover:bg-neutral-50 dark:hover:bg-white/[0.03] opacity-85 hover:opacity-100"
                                           : "hover:bg-neutral-50 dark:hover:bg-white/[0.04]"
@@ -947,7 +947,7 @@ export default function NotificationBell({ className }) {
 
                                     {/* INLINE FOREX FACTORY DETAIL SPECIFICATIONS ACCORDION */}
                                     {isDetailOpen && (
-                                      <tr className="bg-neutral-100/90 dark:bg-[#121622]/95 border-b-2 border-emerald-500/30 animate-in fade-in duration-150">
+                                      <tr className="bg-neutral-100/90 dark:bg-[#121622]/95 border-b-2 border-blue-500/30 animate-in fade-in duration-150">
                                         <td colSpan={9} className="p-4 sm:p-6">
                                           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 bg-white dark:bg-[#171c28] p-5 rounded-2xl border border-black/[0.08] dark:border-white/[0.1] shadow-md">
                                             {/* Specs Column */}
@@ -973,7 +973,7 @@ export default function NotificationBell({ className }) {
 
                                               <div className="grid grid-cols-3 gap-2">
                                                 <span className="font-bold text-neutral-500 dark:text-neutral-400">Usual Effect:</span>
-                                                <span className="col-span-2 text-emerald-700 dark:text-emerald-400 font-bold">{specs.usualEffect}</span>
+                                                <span className="col-span-2 text-blue-700 dark:text-blue-400 font-bold">{specs.usualEffect}</span>
                                               </div>
 
                                               <div className="grid grid-cols-3 gap-2">
@@ -995,7 +995,7 @@ export default function NotificationBell({ className }) {
                                             {/* Market Reaction & Pairs Column */}
                                             <div className="space-y-4 text-xs">
                                               <div className="flex items-center justify-between pb-2 border-b border-black/[0.06] dark:border-white/[0.08]">
-                                                <span className="font-extrabold uppercase tracking-wider text-[11px] text-emerald-600 dark:text-emerald-400">
+                                                <span className="font-extrabold uppercase tracking-wider text-[11px] text-blue-600 dark:text-blue-400">
                                                   Market Reaction & Pairs
                                                 </span>
                                                 <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${impactData.badgeBg}`}>
@@ -1028,7 +1028,7 @@ export default function NotificationBell({ className }) {
                                                   {specs.pairs?.map((pair) => (
                                                     <span
                                                       key={pair}
-                                                      className="px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-800 dark:text-emerald-300 font-mono font-bold text-xs border border-emerald-500/25"
+                                                      className="px-2.5 py-1 rounded-lg bg-blue-500/10 text-blue-800 dark:text-blue-300 font-mono font-bold text-xs border border-blue-500/25"
                                                     >
                                                       {pair}
                                                     </span>
@@ -1134,7 +1134,7 @@ export default function NotificationBell({ className }) {
                                 </span>
                                 <div className="flex flex-wrap gap-1.5">
                                   {specs.pairs?.map((p) => (
-                                    <span key={p} className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-800 dark:text-emerald-300 font-mono font-bold text-xs border border-emerald-500/20">
+                                    <span key={p} className="px-2 py-0.5 rounded bg-blue-500/10 text-blue-800 dark:text-blue-300 font-mono font-bold text-xs border border-blue-500/20">
                                       {p}
                                     </span>
                                   ))}
@@ -1173,7 +1173,7 @@ export default function NotificationBell({ className }) {
                         href="https://www.forexfactory.com/calendar"
                         target="_blank"
                         rel="noreferrer"
-                        className="text-[11px] text-emerald-700 dark:text-emerald-400 hover:underline flex items-center gap-1 font-bold"
+                        className="text-[11px] text-blue-700 dark:text-blue-400 hover:underline flex items-center gap-1 font-bold"
                       >
                         ForexFactory.com <ExternalLink className="w-3 h-3" />
                       </a>
@@ -1190,7 +1190,7 @@ export default function NotificationBell({ className }) {
                   </span>
                   <button
                     onClick={() => setExpanded(true)}
-                    className="text-[11px] text-emerald-700 dark:text-emerald-400 hover:underline font-bold flex items-center gap-1 cursor-pointer"
+                    className="text-[11px] text-blue-700 dark:text-blue-400 hover:underline font-bold flex items-center gap-1 cursor-pointer"
                   >
                     Analyze impact <ChevronRight className="w-3 h-3" />
                   </button>
