@@ -107,13 +107,19 @@ export async function updateMyProfile(req, res) {
 export async function getTraderProfile(req, res) {
   try {
     const id = String(req.params.id);
-    const [summaries, counts, followRow, posts, stats] = await Promise.all([
+    const [summaries, counts, followRow, posts, postsCount, stats, targetFollowers, myFollowing] = await Promise.all([
       getUserSummaries([id]),
       getFollowCounts(id),
       supabase.from("trader_follows").select("id").eq("follower_id", req.userId).eq("following_id", id).maybeSingle(),
-      supabase.from("trader_posts").select("*").eq("user_id", id).is("parent_id", null).order("created_at", { ascending: false }).limit(10),
+      supabase.from("trader_posts").select("*").eq("user_id", id).is("parent_id", null).order("created_at", { ascending: false }).limit(30),
+      supabase.from("trader_posts").select("id", { count: "exact", head: true }).eq("user_id", id).is("parent_id", null),
       supabase.rpc("get_lounge_leaderboard", { p_since: null, p_funded_only: false, p_limit: 500 }),
+      getFollowerIds(id),
+      getFollowingIds(req.userId),
     ]);
+    const mineSet = new Set(myFollowing);
+    const mutualIds = id === req.userId ? [] : targetFollowers.filter((uid) => mineSet.has(uid));
+    const mutualSummaries = await getUserSummaries(mutualIds.slice(0, 3));
     const { data: followsMe } = await supabase
       .from("trader_follows").select("id").eq("follower_id", id).eq("following_id", req.userId).maybeSingle();
     const { data: profile } = await supabase.from("trader_profiles").select("bio").eq("user_id", id).maybeSingle();
@@ -124,6 +130,9 @@ export async function getTraderProfile(req, res) {
       ...summaries[id],
       bio: profile?.bio || "",
       ...counts,
+      postsCount: postsCount.count || 0,
+      mutualsCount: mutualIds.length,
+      followedBy: mutualIds.slice(0, 3).map((uid) => mutualSummaries[uid]),
       isFollowing: Boolean(followRow.data),
       followsYou: Boolean(followsMe),
       isMutual: Boolean(followRow.data && followsMe),

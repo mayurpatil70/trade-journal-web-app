@@ -1,6 +1,6 @@
 // frontend/src/pages/lounge/LoungeShell.jsx
-import { NavLink, Outlet } from "react-router-dom";
-import { Trophy, MessageSquareText, MessagesSquare, Gift, Users } from "lucide-react";
+import { Link, NavLink, Outlet } from "react-router-dom";
+import { Trophy, MessageSquareText, MessagesSquare, Gift, Users, UserRound } from "lucide-react";
 import { glass } from "../../components/lounge/LoungeUI";
 import { useOnlineSet } from "../../lib/socket";
 import TraderSearch from "../../components/lounge/TraderSearch";
@@ -30,7 +30,15 @@ export default function LoungeShell() {
             </p>
           </div>
         </div>
-        <TraderSearch />
+        <div className="flex items-center gap-2 w-full md:w-auto">
+          <TraderSearch />
+          <Link
+            to={`/lounge/trader/${localStorage.getItem("userId")}`}
+            className="shrink-0 inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-semibold bg-black/[0.04] dark:bg-white/[0.06] text-neutral-700 dark:text-neutral-200 hover:bg-black/[0.07] dark:hover:bg-white/[0.1]"
+          >
+            <UserRound className="w-4 h-4" /> My profile
+          </Link>
+        </div>
         </div>
 
         <div className="mt-5 flex flex-col-reverse md:flex-row md:items-center justify-between gap-3">
