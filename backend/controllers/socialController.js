@@ -6,6 +6,7 @@ import {
   getOrCreateDirectConversation,
   canAccessConversation,
   toMessageDto,
+  getReplyPreviews,
 } from "../services/loungeService.js";
 import { isOnline, getOnlineUserIds, emitToUser, broadcastDeal } from "../socket/index.js";
 
@@ -549,10 +550,13 @@ export async function getMessages(req, res) {
     if (error) throw error;
 
     const rows = (data || []).reverse();
-    const senders = await getUserSummaries(rows.map((m) => m.sender_id));
+    const [senders, replies] = await Promise.all([
+      getUserSummaries(rows.map((m) => m.sender_id)),
+      getReplyPreviews(rows.map((m) => m.reply_to_id)),
+    ]);
     const { data: peers } = await supabase.from("conversation_participants").select("user_id, last_read_at").eq("conversation_id", id);
     res.json({
-      messages: rows.map((m) => toMessageDto(m, senders[m.sender_id])),
+      messages: rows.map((m) => toMessageDto(m, senders[m.sender_id], replies[m.reply_to_id] || null)),
       readState: Object.fromEntries((peers || []).map((p) => [p.user_id, p.last_read_at])),
       hasMore: (data || []).length === MESSAGES_PAGE,
     });

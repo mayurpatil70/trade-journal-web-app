@@ -85,7 +85,7 @@ const NavItem = ({
         className={`group flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-[13px] font-semibold transition-all duration-300 border ${
           isActive
             ? "bg-[#0066FF] text-white border-[#0066FF] shadow-[0_4px_14px_rgba(0,102,255,0.35)]"
-            : "bg-[#0066FF]/[0.08] text-[#0066FF] dark:text-sky-400 border-[#0066FF]/20 hover:bg-[#0066FF]/[0.14]"
+            : "bg-blue-500/[0.08] text-[#0066FF] dark:text-sky-400 border-blue-500/20 hover:bg-blue-500/[0.14]"
         }`}
       >
         <Icon className="w-[18px] h-[18px] ml-1" strokeWidth={2.3} />

@@ -136,33 +136,85 @@ export async function getUserSummaries(userIds) {
   return byId;
 }
 
-export function toMessageDto(row, sender) {
+export function getConversationMeta(conversationId) {
+  return getConversation(conversationId);
+}
+
+export function toMessageDto(row, sender, replyTo = null) {
+  const deleted = Boolean(row.deleted_at);
   return {
     id: row.id,
     conversationId: row.conversation_id,
     senderId: row.sender_id,
     sender,
-    content: row.content,
-    mediaUrl: row.media_url,
-    isTradeShare: row.is_trade_share,
-    sharedTrade: row.shared_trade_data,
+    content: deleted ? "" : row.content,
+    mediaUrl: deleted ? null : row.media_url,
+    isTradeShare: deleted ? false : row.is_trade_share,
+    sharedTrade: deleted ? null : row.shared_trade_data,
     createdAt: row.created_at,
+    editedAt: row.edited_at || null,
+    deletedAt: row.deleted_at || null,
+    isForwarded: Boolean(row.is_forwarded),
+    mentions: deleted ? [] : row.mentions || [],
+    replyTo,
   };
 }
 
-export async function saveMessage({ conversationId, senderId, content, mediaUrl, sharedTrade }) {
-  const { data, error } = await supabase
-    .from("lounge_messages")
-    .insert({
-      conversation_id: conversationId,
-      sender_id: senderId,
-      content: content || "",
-      media_url: mediaUrl || null,
-      is_trade_share: Boolean(sharedTrade),
-      shared_trade_data: sharedTrade || null,
-    })
-    .select()
-    .single();
+// Quoted previews for replies, keyed by the replied-to message id.
+export async function getReplyPreviews(ids) {
+  const unique = [...new Set(ids.filter(Boolean))];
+  if (!unique.length) return {};
+  const { data } = await supabase.from("lounge_messages").select("*").in("id", unique);
+  const senders = await getUserSummaries((data || []).map((m) => m.sender_id));
+  return Object.fromEntries(
+    (data || []).map((m) => [
+      m.id,
+      {
+        id: m.id,
+        senderId: m.sender_id,
+        senderName: senders[m.sender_id]?.displayName || "Trader",
+        content: m.deleted_at ? "" : String(m.content || "").slice(0, 140),
+        hasMedia: !m.deleted_at && Boolean(m.media_url || m.is_trade_share),
+        deleted: Boolean(m.deleted_at),
+      },
+    ]),
+  );
+}
+
+const MENTION_RE = /(?:^|[^a-zA-Z0-9_])@([a-zA-Z0-9_]{2,30})/g;
+
+// Maps @handles in the text to user ids (lounge handle first, then account username).
+export async function resolveMentions(content) {
+  const handles = [...new Set([...String(content || "").matchAll(MENTION_RE)].map((m) => m[1].toLowerCase()))].slice(0, 20);
+  if (!handles.length) return [];
+  const [{ data: byHandle }, byUsername] = await Promise.all([
+    supabase.from("trader_profiles").select("user_id, handle").in("handle", handles),
+    supabase.from("users").select("id, username").in("username", handles),
+  ]);
+  const found = new Map();
+  for (const u of byUsername.data || []) if (u.username) found.set(u.username.toLowerCase(), String(u.id));
+  for (const p of byHandle || []) if (p.handle) found.set(p.handle.toLowerCase(), String(p.user_id));
+  return handles.filter((h) => found.has(h)).map((h) => ({ handle: h, id: found.get(h) }));
+}
+
+export async function saveMessage({ conversationId, senderId, content, mediaUrl, sharedTrade, replyToId, forwarded, mentions = [] }) {
+  const row = {
+    conversation_id: conversationId,
+    sender_id: senderId,
+    content: content || "",
+    media_url: mediaUrl || null,
+    is_trade_share: Boolean(sharedTrade),
+    shared_trade_data: sharedTrade || null,
+  };
+  // Columns from migration 015; only sent when used so chat keeps working before it runs.
+  const extras = {};
+  if (replyToId) extras.reply_to_id = replyToId;
+  if (forwarded) extras.is_forwarded = true;
+  if (mentions.length) extras.mentions = mentions;
+  let { data, error } = await supabase.from("lounge_messages").insert({ ...row, ...extras }).select().single();
+  if (error && Object.keys(extras).length) {
+    ({ data, error } = await supabase.from("lounge_messages").insert(row).select().single());
+  }
   if (error) throw error;
 
   const now = new Date().toISOString();
@@ -175,11 +227,25 @@ export async function saveMessage({ conversationId, senderId, content, mediaUrl,
       .eq("user_id", senderId),
   ]);
 
-  const [summaries, participantIds] = await Promise.all([
+  const [summaries, participantIds, replies] = await Promise.all([
     getUserSummaries([senderId]),
     isPublicChannel(conversationId).then((pub) => (pub ? [] : getParticipantIds(conversationId))),
+    getReplyPreviews([data.reply_to_id]),
   ]);
-  return { ...toMessageDto(data, summaries[senderId]), participantIds };
+  return { ...toMessageDto(data, summaries[senderId], replies[data.reply_to_id] || null), participantIds };
+}
+
+export async function getMessageRow(messageId) {
+  const { data, error } = await supabase.from("lounge_messages").select("*").eq("id", messageId).maybeSingle();
+  if (error) throw error;
+  return data;
+}
+
+export async function updateMessageRow(messageId, patch) {
+  const { data, error } = await supabase.from("lounge_messages").update(patch).eq("id", messageId).select().single();
+  if (error) throw error;
+  const [summaries, replies] = await Promise.all([getUserSummaries([data.sender_id]), getReplyPreviews([data.reply_to_id])]);
+  return toMessageDto(data, summaries[data.sender_id], replies[data.reply_to_id] || null);
 }
 
 export async function markConversationRead(conversationId, userId) {

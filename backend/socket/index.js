@@ -8,6 +8,12 @@ import {
   saveMessage,
   markConversationRead,
   getOrCreateDirectConversation,
+  getConversationMeta,
+  getServerRole,
+  getParticipantIds,
+  getMessageRow,
+  updateMessageRow,
+  resolveMentions,
 } from "../services/loungeService.js";
 import { sendPushToUser } from "../services/pushService.js";
 
@@ -93,6 +99,42 @@ function notifyOfflineRecipient(recipientId, message) {
   }).catch((err) => console.warn("[Push] DM notification failed:", err.message));
 }
 
+function notifyMentions(message, conversationId) {
+  for (const { id } of message.mentions || []) {
+    if (id === message.senderId) continue;
+    canAccessConversation(conversationId, id)
+      .then((ok) => {
+        if (!ok) return;
+        emitToUser(id, "message:mention", message);
+        if (!isOnline(id)) {
+          sendPushToUser(id, {
+            title: `${message.sender?.displayName || "Someone"} mentioned you`,
+            body: String(message.content || "").slice(0, 140),
+            url: "/community",
+            tag: `mention-${message.id}`,
+          }).catch(() => {});
+        }
+      })
+      .catch(() => {});
+  }
+}
+
+async function emitMessageUpdate(message) {
+  const conversationId = message.conversationId;
+  io.to(convRoom(conversationId)).emit("message:updated", message);
+  if (await isPublicChannel(conversationId)) return;
+  for (const participantId of await getParticipantIds(conversationId)) {
+    io.to(userRoom(participantId)).except(convRoom(conversationId)).emit("message:updated", message);
+  }
+}
+
+async function canModerate(conversationId, userId) {
+  const conversation = await getConversationMeta(conversationId);
+  if (!conversation?.server_id) return false;
+  const role = await getServerRole(conversation.server_id, userId);
+  return role === "owner" || role === "admin";
+}
+
 function ack(cb, payload) {
   if (typeof cb === "function") cb(payload);
 }
@@ -127,12 +169,21 @@ function registerHandlers(socket) {
         return ack(cb, { ok: false, error: "FORBIDDEN" });
       }
 
+      let replyToId = null;
+      if (payload.replyToId) {
+        const original = await getMessageRow(String(payload.replyToId)).catch(() => null);
+        if (original?.conversation_id === conversationId) replyToId = original.id;
+      }
+
       const message = await saveMessage({
         conversationId,
         senderId: userId,
         content,
         mediaUrl: chartUrl,
         sharedTrade: payload.sharedTrade,
+        replyToId,
+        forwarded: Boolean(payload.forwarded),
+        mentions: await resolveMentions(content).catch(() => []),
       });
 
       io.to(convRoom(conversationId)).emit("message:received", message);
@@ -142,10 +193,54 @@ function registerHandlers(socket) {
           if (String(participantId) !== userId && !isOnline(participantId)) notifyOfflineRecipient(participantId, message);
         }
       }
+      notifyMentions(message, conversationId);
       ack(cb, { ok: true, message });
     } catch (err) {
       console.error("[Socket] message:send failed:", err.message);
       ack(cb, { ok: false, error: "SEND_FAILED" });
+    }
+  });
+
+  socket.on("message:edit", async ({ messageId, content } = {}, cb) => {
+    try {
+      const text = String(content || "").trim().slice(0, MAX_MESSAGE_LENGTH);
+      const row = messageId ? await getMessageRow(String(messageId)) : null;
+      if (!row || row.sender_id !== userId || row.deleted_at) return ack(cb, { ok: false, error: "FORBIDDEN" });
+      if (!text && !row.media_url && !row.is_trade_share) return ack(cb, { ok: false, error: "EMPTY" });
+      const message = await updateMessageRow(row.id, {
+        content: text,
+        edited_at: new Date().toISOString(),
+        mentions: await resolveMentions(text).catch(() => []),
+      });
+      await emitMessageUpdate(message);
+      ack(cb, { ok: true, message });
+    } catch (err) {
+      console.error("[Socket] message:edit failed:", err.message);
+      ack(cb, { ok: false, error: "EDIT_FAILED" });
+    }
+  });
+
+  // Unsend for everyone: the sender, or a server owner/admin moderating their channel.
+  socket.on("message:delete", async ({ messageId } = {}, cb) => {
+    try {
+      const row = messageId ? await getMessageRow(String(messageId)) : null;
+      if (!row) return ack(cb, { ok: false, error: "NOT_FOUND" });
+      if (row.sender_id !== userId && !(await canModerate(row.conversation_id, userId))) {
+        return ack(cb, { ok: false, error: "FORBIDDEN" });
+      }
+      const message = await updateMessageRow(row.id, {
+        deleted_at: new Date().toISOString(),
+        content: "",
+        media_url: null,
+        is_trade_share: false,
+        shared_trade_data: null,
+        mentions: [],
+      });
+      await emitMessageUpdate(message);
+      ack(cb, { ok: true, message });
+    } catch (err) {
+      console.error("[Socket] message:delete failed:", err.message);
+      ack(cb, { ok: false, error: "DELETE_FAILED" });
     }
   });
 

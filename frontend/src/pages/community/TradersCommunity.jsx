@@ -375,7 +375,7 @@ function ServerView({ serverId, channelId, me, onServersChange }) {
                 onClick={() => navigate(`/community/s/${server.id}/${c.id}`)}
                 className={`w-full flex items-center gap-2 px-2.5 py-2 rounded-xl text-left text-[14px] transition-colors ${
                   c.id === channelId
-                    ? "bg-[#0066FF]/10 text-neutral-900 dark:text-white font-semibold"
+                    ? "bg-blue-500/10 text-neutral-900 dark:text-white font-semibold"
                     : "text-neutral-600 dark:text-neutral-400 hover:bg-black/[0.04] dark:hover:bg-white/[0.05] hover:text-neutral-900 dark:hover:text-white"
                 }`}
               >
@@ -408,7 +408,7 @@ function ServerView({ serverId, channelId, me, onServersChange }) {
 
       <div className={`flex-1 min-w-0 min-h-0 ${active ? "flex" : "hidden md:flex"} flex-col`}>
         {active && isMember ? (
-          <ChatThread key={active.id} conversation={active} me={me} backMobileOnly onBack={() => navigate(`/community/s/${server.id}`)} />
+          <ChatThread key={active.id} conversation={active} me={me} canModerate={manage} backMobileOnly onBack={() => navigate(`/community/s/${server.id}`)} />
         ) : active ? (
           <div className="m-auto">
             <EmptyState
