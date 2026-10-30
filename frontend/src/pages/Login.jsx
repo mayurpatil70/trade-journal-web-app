@@ -535,7 +535,7 @@ export default function Login() {
   return (
     <div
       className="relative min-h-screen overflow-hidden bg-[#f5f5f7] dark:bg-[#0a0c10] flex items-center justify-center px-4 py-10"
-      style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', sans-serif" }}
+      style={{ fontFamily: "var(--font-sans)" }}
     >
       <div className="pointer-events-none absolute -top-40 -left-32 w-[520px] h-[520px] rounded-full bg-blue-400/20 dark:bg-blue-500/10 blur-3xl" />
       <div className="pointer-events-none absolute -bottom-40 -right-32 w-[480px] h-[480px] rounded-full bg-sky-400/15 dark:bg-red-500/[0.06] blur-3xl" />

@@ -144,7 +144,7 @@ export default function LotSizeCalculator() {
   return (
     <div
       className="w-full max-w-7xl mx-auto font-sans pb-16 px-4 md:px-8 mt-4 md:mt-6 box-border"
-      style={{ fontFamily: "'Inter', sans-serif" }}
+      style={{ fontFamily: "var(--font-sans)" }}
     >
       {/* Back to Tools Button */}
       <div className="mb-4">

@@ -68,7 +68,7 @@ export function OdometerPrice({ value, height = 40 }) {
         height: `${height}px`,
         overflow: 'hidden',
         lineHeight: `${height}px`,
-        fontFamily: "'JetBrains Mono', monospace",
+        fontFamily: "var(--font-mono)",
         fontWeight: 800,
         verticalAlign: 'baseline',
       }}
