@@ -15,6 +15,11 @@ export const isPushSupported = () =>
 
 export function registerServiceWorker() {
   if (typeof window === "undefined" || isNative()) return;
+  // index.html captures the prompt before the bundle loads, since Chrome can fire it early.
+  if (window.__fnInstallPrompt) {
+    deferredInstallPrompt = window.__fnInstallPrompt;
+    window.__fnInstallPrompt = null;
+  }
 
   window.addEventListener("beforeinstallprompt", (event) => {
     event.preventDefault();

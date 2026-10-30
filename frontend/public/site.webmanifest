@@ -21,7 +21,7 @@
   "shortcuts": [
     { "name": "Add trade", "url": "/add-trade?source=pwa", "icons": [{ "src": "/logo-192.png", "sizes": "192x192" }] },
     { "name": "Dashboard", "url": "/dashboard?source=pwa", "icons": [{ "src": "/logo-192.png", "sizes": "192x192" }] },
-    { "name": "Messages", "url": "/lounge/chat?source=pwa", "icons": [{ "src": "/logo-192.png", "sizes": "192x192" }] }
+    { "name": "Traders Community", "url": "/community?source=pwa", "icons": [{ "src": "/logo-192.png", "sizes": "192x192" }] }
   ],
   "screenshots": [
     { "src": "/screenshots/screenshot_1_dashboard.png", "sizes": "1024x501", "type": "image/png", "form_factor": "wide", "label": "Trading dashboard" },
