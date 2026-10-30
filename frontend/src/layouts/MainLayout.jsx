@@ -444,7 +444,6 @@ export default function MainLayout() {
         { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
         { to: "/add-trade", icon: PlusCircle, label: "Add Trade" },
         { to: "/trades", icon: List, label: "Past Trades" },
-        { to: "/news", icon: CalendarIcon, label: "Calendar" },
       ],
     },
     {
@@ -487,7 +486,7 @@ export default function MainLayout() {
     if (p.includes("dashboard")) return "Dashboard";
     if (p.includes("add-trade")) return "Add Trade";
     if (p.includes("trades")) return "Past Trades";
-    if (p.includes("calendar")) return "Calendar";
+    if (p.includes("calendar")) return "Economic Calendar";
     if (p.includes("analysis/performance")) return "Performance Analytics";
     if (p.includes("analysis/trades")) return "Trade Analysis";
     if (p.includes("analysis")) return "Performance Analytics";
@@ -555,9 +554,9 @@ export default function MainLayout() {
         },
         {
           to: "/news",
-          label: "Calendar",
+          label: "Economic Calendar",
           sub: "Economic Calendar of high-impact news & market events",
-          icon: CalendarIcon,
+          icon: Globe,
           keywords: ["calendar", "news", "economic", "events", "forex factory", "schedule"],
         },
       ],
