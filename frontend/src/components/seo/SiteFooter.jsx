@@ -51,6 +51,7 @@ const FOOTER_LINKS = [
 export default function SiteFooter({ copyright = true }) {
   return (
     <footer
+      className="ios-landing"
       style={{
         borderTop: '1px solid rgba(var(--lp-fg), 0.08)',
         background: 'var(--lp-bg)',

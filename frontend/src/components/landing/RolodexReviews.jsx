@@ -219,7 +219,7 @@ export default function RolodexReviews() {
           }}
         >
           Real Funded Traders.<br />
-          <span style={{ fontStyle: 'italic', color: '#c9a96e' }}>Zero Filter.</span>
+          <span style={{ fontStyle: 'italic', color: '#5AC8FA' }}>Zero Filter.</span>
         </h2>
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>

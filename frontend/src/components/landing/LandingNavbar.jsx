@@ -50,7 +50,7 @@ export default function LandingNavbar({ isFixed = true }) {
   return (
     <>
       <header
-        className="glossy-navbar"
+        className="glossy-navbar ios-landing"
         style={{
           position: isFixed ? 'fixed' : 'sticky',
           top: 0,

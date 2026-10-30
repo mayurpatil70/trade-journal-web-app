@@ -55,6 +55,7 @@ const FOOTER_LINKS = [
 export default function ParticleCloakFooter() {
   return (
     <footer
+      className="ios-landing"
       style={{
         position: 'relative',
         background: 'var(--lp-bg)',
@@ -151,7 +152,7 @@ export default function ParticleCloakFooter() {
         style={{
           textAlign: 'center',
           fontFamily: "'Instrument Serif', Georgia, serif",
-          fontSize: 'clamp(80px, 16vw, 240px)',
+          fontSize: 'clamp(56px, 12vw, 180px)',
           lineHeight: 0.8,
           fontWeight: 400,
           color: 'rgba(var(--lp-fg), 0.03)',
