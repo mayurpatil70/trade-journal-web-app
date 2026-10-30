@@ -7,39 +7,74 @@ import IridescentButton from './IridescentButton';
 
 const DEFAULT_SLIDES = [
   {
-    src: '/screenshots/screenshot_1_dashboard.png',
+    src: '/screenshots/app/dashboard.webp',
     title: 'Digital Trading Journal',
-    sub: 'Account-Wise Real-Time Data Renders',
+    sub: 'PnL, Win Rate, RRR & Monthly Calendar at a Glance',
     badge: 'Live Dashboard',
     color: '#007AFF',
   },
   {
-    src: '/screenshots/screenshot_2_multiaccount.png',
-    title: 'Multi-Account Trade Logging',
-    sub: 'Made for Prop Firm Traders',
+    src: '/screenshots/app/log-trade.webp',
+    title: 'Guided Trade Logging',
+    sub: 'Market, Execution, Setup, Psychology & Evidence',
     badge: 'Trade Logger',
-    color: '#3B82F6',
+    color: '#5AC8FA',
   },
   {
-    src: '/screenshots/screenshot_3_livecharts.png',
+    src: '/screenshots/app/past-trades.webp',
+    title: 'Multi-Account Trade History',
+    sub: 'Filter by Account, Result, Direction & Period',
+    badge: 'Trade History',
+    color: '#007AFF',
+  },
+  {
+    src: '/screenshots/app/performance.webp',
+    title: 'Performance Analytics',
+    sub: 'Equity Curve, Expectancy & Win/Loss Distribution',
+    badge: 'Analytics',
+    color: '#34C759',
+  },
+  {
+    src: '/screenshots/app/trade-analysis.webp',
+    title: 'Trade-by-Trade Review',
+    sub: 'Price Levels, Rule Adherence & Execution Charts',
+    badge: 'Trade Analysis',
+    color: '#5AC8FA',
+  },
+  {
+    src: '/screenshots/app/live-charts.webp',
     title: 'Real-Time TradingView Charts',
     sub: 'Live Charts of All Assets',
     badge: 'Live Market',
-    color: '#EC4899',
+    color: '#007AFF',
   },
   {
-    src: '/screenshots/screenshot_4_barreplay.png',
+    src: '/screenshots/app/backtesting.webp',
     title: '10-Year Candlestick Bar Replay',
     sub: 'Tick-by-Tick Multi-Timeframe Simulator',
     badge: 'Backtesting',
-    color: '#F59E0B',
+    color: '#FF9500',
   },
   {
-    src: '/screenshots/screenshot_5_calculator.png',
-    title: 'Lot Size & Prop Guardian',
-    sub: 'Precision Pip Sizing & Drawdown Protection',
+    src: '/screenshots/app/economic-calendar.webp',
+    title: 'Economic Calendar',
+    sub: 'Forex Factory Impact Ratings & Pair Reaction Analysis',
+    badge: 'News',
+    color: '#FF3B30',
+  },
+  {
+    src: '/screenshots/app/lounge-chat.webp',
+    title: 'Traders Lounge',
+    sub: 'Channels, Direct Messages & Verified Leaderboard',
+    badge: 'Community',
+    color: '#007AFF',
+  },
+  {
+    src: '/screenshots/app/tools.webp',
+    title: 'Prop Firm & Risk Tools',
+    sub: 'Position Size, Prop Challenge & Market Hours',
     badge: 'Risk Engine',
-    color: '#8B5CF6',
+    color: '#5AC8FA',
   },
 ];
 
@@ -545,7 +580,7 @@ export default function LiquidGlassCarousel({ userImages = null }) {
         }}
       >
         <IridescentButton to="/login" size="md">
-          EXPLORE ALL 5 WORKSPACES
+          EXPLORE ALL {n} WORKSPACES
         </IridescentButton>
       </div>
 
