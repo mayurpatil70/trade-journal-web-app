@@ -1601,3 +1601,15 @@ button.btn-primary-blue *,
 .winpro-partnership-card span {
   text-shadow: none;
 }
+
+
+/* Morning Trading Quote Modal Fullscreen Isolation */
+body.fn-morning-modal-open [class*="coach"],
+body.fn-morning-modal-open [class*="widget"],
+body.fn-morning-modal-open [id*="chat"],
+body.fn-morning-modal-open iframe:not([class*="modal"]) {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+  transition: opacity 0.2s ease-out;
+}
