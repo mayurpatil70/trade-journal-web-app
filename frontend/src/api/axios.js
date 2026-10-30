@@ -72,16 +72,21 @@ export async function logoutSession() {
   }
 }
 
-/**
- * Checks if a session exists.
- * Persistent caching: Keeps the user logged in across days without arbitrary daily wipes.
- * Revocation & Subscription expiry are enforced server-side.
- */
+const SESSION_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000;
+
+// A browser session stays signed in for 30 days from sign-in; revocation and subscription expiry are enforced server-side.
 export function isSessionValid() {
   if (typeof window === "undefined") return false;
   const token = localStorage.getItem("token");
   const userId = localStorage.getItem("userId") || localStorage.getItem("userEmail");
-  return Boolean(token && userId);
+  if (!token || !userId) return false;
+
+  const createdAt = Number(localStorage.getItem("sessionCreatedAt"));
+  if (!createdAt) {
+    localStorage.setItem("sessionCreatedAt", String(Date.now()));
+    return true;
+  }
+  return Date.now() - createdAt < SESSION_MAX_AGE_MS;
 }
 
 // ── Request interceptor: attach Bearer token and Device ID ───────────────────
