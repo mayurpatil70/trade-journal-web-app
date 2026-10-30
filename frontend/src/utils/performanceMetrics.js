@@ -109,11 +109,11 @@ export const filterTradesByTimePeriod = (trades, period) => {
     if (period === "Today") {
       return tradeTime >= startOfDay;
     }
-    if (period === "7 Days") {
+    if (period === "7 Days" || period === "This Week") {
       const cutoff = now.getTime() - 7 * 24 * 60 * 60 * 1000;
       return tradeTime >= cutoff;
     }
-    if (period === "30 Days") {
+    if (period === "30 Days" || period === "This Month") {
       const cutoff = now.getTime() - 30 * 24 * 60 * 60 * 1000;
       return tradeTime >= cutoff;
     }
@@ -121,7 +121,7 @@ export const filterTradesByTimePeriod = (trades, period) => {
       const cutoff = now.getTime() - 90 * 24 * 60 * 60 * 1000;
       return tradeTime >= cutoff;
     }
-    if (period === "1 Year") {
+    if (period === "1 Year" || period === "This Year") {
       const cutoff = now.getTime() - 365 * 24 * 60 * 60 * 1000;
       return tradeTime >= cutoff;
     }
@@ -129,7 +129,7 @@ export const filterTradesByTimePeriod = (trades, period) => {
   });
 };
 
-// Filter trades by outcome filter ("All Trades", "Winners", "Losers")
+// Filter trades by outcome filter ("All Trades", "Winners", "Losers", "Break Even")
 export const filterTradesByOutcome = (trades, outcome) => {
   if (!Array.isArray(trades)) return [];
   if (outcome === "Winners") {
@@ -137,6 +137,9 @@ export const filterTradesByOutcome = (trades, outcome) => {
   }
   if (outcome === "Losers") {
     return trades.filter((t) => isTradeLoss(t));
+  }
+  if (outcome === "Break Even" || outcome === "BE" || outcome === "Breakeven") {
+    return trades.filter((t) => isTradeBE(t));
   }
   return trades;
 };

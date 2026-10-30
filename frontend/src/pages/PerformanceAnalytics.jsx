@@ -18,6 +18,8 @@ import {
   Calendar as CalendarIcon,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
+  Filter,
   Check,
   X,
   Award,
@@ -55,6 +57,47 @@ export default function PerformanceAnalytics() {
   const [timePeriod, setTimePeriod] = useState("30 Days"); // "Today", "7 Days", "30 Days", "3 Months", "1 Year", "All Time"
   const [outcomeFilter, setOutcomeFilter] = useState("All Trades"); // "All Trades", "Winners", "Losers"
   const [selectedAccount, setSelectedAccount] = useState(""); // "" = All Accounts (matches /dashboard)
+
+  // Dedicated "Your Stats" Card Interactive Filters
+  const [cardPeriod, setCardPeriod] = useState("All Time"); // "All Time", "Today", "This Week", "This Month", "3 Months", "This Year"
+  const [cardOutcome, setCardOutcome] = useState("All Trades"); // "All Trades", "Winners", "Losers", "Break Even"
+  const [cardAccount, setCardAccount] = useState("All Accounts");
+  const [cardPeriodOpen, setCardPeriodOpen] = useState(false);
+  const cardPeriodRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (cardPeriodRef.current && !cardPeriodRef.current.contains(e.target)) {
+        setCardPeriodOpen(false);
+      }
+    };
+    if (cardPeriodOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [cardPeriodOpen]);
+
+  const availableCardAccounts = useMemo(() => {
+    const set = new Set();
+    allTrades.forEach((t) => {
+      if (t.account_name && t.account_name.trim()) set.add(t.account_name.trim());
+    });
+    return ["All Accounts", ...Array.from(set)];
+  }, [allTrades]);
+
+  const cardFilteredTrades = useMemo(() => {
+    let list = allTrades;
+    if (cardAccount && cardAccount !== "All Accounts") {
+      list = list.filter((t) => (t.account_name || "Main") === cardAccount);
+    }
+    list = filterTradesByTimePeriod(list, cardPeriod);
+    list = filterTradesByOutcome(list, cardOutcome);
+    return list;
+  }, [allTrades, cardAccount, cardPeriod, cardOutcome]);
+
+  const cardMetrics = useMemo(() => {
+    return calculatePerformanceMetrics(cardFilteredTrades, "$");
+  }, [cardFilteredTrades]);
 
   // Chart Toggle
   const [chartMode, setChartMode] = useState("equity"); // "equity" | "drawdown"
@@ -228,7 +271,7 @@ export default function PerformanceAnalytics() {
     }
     return {
       label: "Exceptional",
-      icon: Sparkles,
+      icon: null,
       className: "text-emerald-400 bg-emerald-500/20 border-emerald-500/30",
     };
   }, [metrics.profitFactor]);
@@ -372,7 +415,7 @@ export default function PerformanceAnalytics() {
             </h2>
           </div>
           <div className="mt-4 flex items-center gap-1.5 text-xs">
-            <pfBadge.icon className="w-3.5 h-3.5" />
+            {pfBadge.icon && <pfBadge.icon className="w-3.5 h-3.5" />}
             <span className="font-semibold">{pfBadge.label}</span>
           </div>
         </div>
@@ -969,115 +1012,269 @@ export default function PerformanceAnalytics() {
         </div>
       </div>
 
-      {/* ── ROW 6: Your Stats Institutional Table (Matches Screenshot 3 & 4) ── */}
+      {/* ── ROW 6: Your Stats Institutional Interactive Bento (Matches Screenshot 2 with Dynamic Filters) ── */}
       <div className="rounded-3xl bg-white dark:bg-[#12151e]/85 backdrop-blur-xl border border-black/[0.06] dark:border-white/[0.08] shadow-[0_4px_24px_rgba(0,0,0,0.03)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.35)] p-6 mb-6">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-2">
-            <FileText className="w-4 h-4 text-blue-500" />
-            <h3 className="text-sm font-bold text-neutral-900 dark:text-white">
-              Your Stats
-            </h3>
+        {/* Card Header with macOS / iOS Interactive Filter Bar */}
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="flex items-center gap-2">
+              <FileText className="w-4 h-4 text-[#0066FF] dark:text-[#38BDF8]" />
+              <h3 className="text-sm font-bold text-neutral-900 dark:text-white">
+                Your Stats
+              </h3>
+              <span className="text-[11px] font-medium text-neutral-400 dark:text-neutral-500 font-mono">
+                ({cardFilteredTrades.length} trades)
+              </span>
+            </div>
+
+            {/* Trade Outcome Segmented Control Pills (All Trades, Winners, Losers, Break Even) */}
+            <div className="flex items-center p-0.5 rounded-xl bg-black/[0.04] dark:bg-white/[0.06] border border-black/[0.04] dark:border-white/[0.06]">
+              {["All Trades", "Winners", "Losers", "Break Even"].map((outcome) => {
+                const isActive = cardOutcome === outcome;
+                return (
+                  <button
+                    key={outcome}
+                    type="button"
+                    onClick={() => setCardOutcome(outcome)}
+                    className={`px-2.5 py-1 text-[11px] font-semibold rounded-lg transition-all duration-150 cursor-pointer ${
+                      isActive
+                        ? "bg-white dark:bg-[#1e2330] text-neutral-900 dark:text-white shadow-sm font-bold"
+                        : "text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
+                    }`}
+                  >
+                    {outcome}
+                  </button>
+                );
+              })}
+            </div>
           </div>
-          <span className="px-3 py-1 rounded-xl bg-neutral-100 dark:bg-white/[0.05] border border-black/[0.04] dark:border-white/[0.08] text-[10px] font-bold uppercase tracking-wider text-neutral-600 dark:text-neutral-400">
-            {timePeriod}
-          </span>
+
+          {/* Right Action Controls: Account Selector + Screenshot 2 "ALL TIME" Period Popover */}
+          <div className="flex items-center gap-2.5 self-start lg:self-auto">
+            {availableCardAccounts.length > 2 && (
+              <select
+                value={cardAccount}
+                onChange={(e) => setCardAccount(e.target.value)}
+                className="px-2.5 py-1 text-xs rounded-xl bg-neutral-100 dark:bg-white/[0.06] border border-black/[0.05] dark:border-white/[0.08] text-neutral-700 dark:text-neutral-300 font-medium focus:outline-none cursor-pointer"
+              >
+                {availableCardAccounts.map((acc) => (
+                  <option key={acc} value={acc} className="dark:bg-[#12151e]">
+                    {acc}
+                  </option>
+                ))}
+              </select>
+            )}
+
+            {/* Period Popover (Matches Screenshot 2: "ALL TIME" Pill Button) */}
+            <div className="relative" ref={cardPeriodRef}>
+              <button
+                type="button"
+                onClick={() => setCardPeriodOpen((prev) => !prev)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-neutral-100 dark:bg-white/[0.06] hover:bg-neutral-200 dark:hover:bg-white/[0.1] border border-black/[0.05] dark:border-white/[0.08] text-[10px] font-bold uppercase tracking-wider text-neutral-700 dark:text-neutral-300 transition-colors cursor-pointer shadow-sm"
+              >
+                <span>{cardPeriod.toUpperCase()}</span>
+                <ChevronDown
+                  className="w-3 h-3 text-neutral-400 transition-transform duration-200"
+                  style={{ transform: cardPeriodOpen ? "rotate(180deg)" : "none" }}
+                />
+              </button>
+
+              {cardPeriodOpen && (
+                <div className="absolute right-0 mt-1.5 w-44 rounded-2xl bg-white dark:bg-[#161a23] backdrop-blur-2xl border border-black/[0.08] dark:border-white/[0.12] shadow-2xl p-1.5 z-30 animate-in fade-in zoom-in-95 duration-150">
+                  <div className="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 border-b border-black/[0.04] dark:border-white/[0.06] mb-1">
+                    Select Period
+                  </div>
+                  {["All Time", "Today", "This Week", "This Month", "3 Months", "This Year"].map((p) => {
+                    const isSelected = cardPeriod === p;
+                    return (
+                      <button
+                        key={p}
+                        type="button"
+                        onClick={() => {
+                          setCardPeriod(p);
+                          setCardPeriodOpen(false);
+                        }}
+                        className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-xl text-xs font-medium transition-colors cursor-pointer text-left ${
+                          isSelected
+                            ? "bg-[#0066FF]/10 text-[#0066FF] dark:text-[#38BDF8] font-bold"
+                            : "text-neutral-700 dark:text-neutral-300 hover:bg-black/[0.04] dark:hover:bg-white/[0.06]"
+                        }`}
+                      >
+                        <span>{p}</span>
+                        {isSelected && <Check className="w-3.5 h-3.5" />}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
         </div>
 
-        {/* 3 Highlight Banners */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pb-6 border-b border-black/[0.05] dark:border-white/[0.06] mb-6">
-          <div>
+        {/* 3 Highlight Banners (Matches Screenshot 2: Best Month, Worst Month, Average per Month) */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pb-6 border-b border-black/[0.05] dark:border-white/[0.06] mb-6">
+          <div className="p-4 rounded-2xl bg-neutral-50/70 dark:bg-white/[0.02] border border-black/[0.03] dark:border-white/[0.05]">
             <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-500 dark:text-neutral-400 block mb-1">
               Best Month
             </span>
             <span className="text-lg font-bold text-neutral-900 dark:text-white">
-              {metrics.bestMonth || "—"}
+              {cardMetrics.bestMonth || "—"}
             </span>
             <p className="text-[11px] text-neutral-400 mt-0.5">
-              {metrics.bestMonth ? "Top performing month" : "No data"}
+              {cardMetrics.bestMonth ? "Top performing month" : "No data"}
             </p>
           </div>
 
-          <div>
+          <div className="p-4 rounded-2xl bg-neutral-50/70 dark:bg-white/[0.02] border border-black/[0.03] dark:border-white/[0.05]">
             <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-500 dark:text-neutral-400 block mb-1">
               Worst Month
             </span>
             <span className="text-lg font-bold text-neutral-900 dark:text-white">
-              {metrics.worstMonth || "—"}
+              {cardMetrics.worstMonth || "—"}
             </span>
             <p className="text-[11px] text-neutral-400 mt-0.5">
-              {metrics.worstMonth ? "Lowest performing month" : "No data"}
+              {cardMetrics.worstMonth ? "Lowest performing month" : "No data"}
             </p>
           </div>
 
-          <div>
+          <div className="p-4 rounded-2xl bg-neutral-50/70 dark:bg-white/[0.02] border border-black/[0.03] dark:border-white/[0.05]">
             <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-500 dark:text-neutral-400 block mb-1">
               Average
             </span>
             <span className="text-lg font-bold text-neutral-900 dark:text-white">
-              {formatCurrency(metrics.avgPerMonth)}
+              {formatCurrency(cardMetrics.avgPerMonth)}
             </span>
             <p className="text-[11px] text-neutral-400 mt-0.5">per Month</p>
           </div>
         </div>
 
-        {/* 2-Column Institutional Stats Table (All 32 Statistics from Screenshot 3 & 4) */}
+        {/* 2-Column Institutional Stats Table (All 32 Statistics from Screenshot 2) */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 divide-y md:divide-y-0 divide-black/[0.05] dark:divide-white/[0.06]">
           {/* Column 1 */}
-          <div className="space-y-3">
+          <div className="space-y-1">
             {[
-              { label: "Total P&L", val: formatCurrency(metrics.totalPnL) },
-              { label: "Average daily volume", val: metrics.averageDailyVolume.toFixed(2) },
-              { label: "Average winning trade", val: formatCurrency(metrics.avgWinner) },
-              { label: "Average losing trade", val: formatCurrency(metrics.avgLoser) },
-              { label: "Total number of trades", val: metrics.closedTradesCount },
-              { label: "Number of winning trades", val: metrics.winCount },
-              { label: "Number of losing trades", val: metrics.lossCount },
-              { label: "Number of break even trades", val: metrics.beCount },
-              { label: "Max consecutive wins", val: metrics.maxWinStreak },
-              { label: "Max consecutive losses", val: metrics.maxLossStreak },
-              { label: "Total commissions", val: formatCurrency(metrics.totalCommissions) },
-              { label: "Total swap", val: formatCurrency(metrics.totalSwap) },
-              { label: "Largest profit", val: formatCurrency(metrics.largestProfit) },
-              { label: "Largest loss", val: formatCurrency(metrics.largestLoss) },
-              { label: "Avg hold time (All)", val: formatHoldDuration(metrics.avgHoldTimeAll) },
-              { label: "Avg hold time (Winners)", val: formatHoldDuration(metrics.avgHoldTimeWins) },
-              { label: "Avg hold time (Losers)", val: formatHoldDuration(metrics.avgHoldTimeLosses) },
+              {
+                label: "Total P&L",
+                val: formatCurrency(cardMetrics.totalPnL),
+                color:
+                  cardMetrics.totalPnL > 0
+                    ? "text-emerald-500 dark:text-emerald-400"
+                    : cardMetrics.totalPnL < 0
+                    ? "text-rose-500 dark:text-rose-400"
+                    : "",
+              },
+              {
+                label: "Average daily volume",
+                val: cardMetrics.averageDailyVolume.toFixed(2),
+              },
+              {
+                label: "Average winning trade",
+                val: formatCurrency(cardMetrics.avgWinner),
+                color: cardMetrics.avgWinner > 0 ? "text-emerald-500 dark:text-emerald-400" : "",
+              },
+              {
+                label: "Average losing trade",
+                val: formatCurrency(cardMetrics.avgLoser),
+                color: cardMetrics.avgLoser < 0 ? "text-rose-500 dark:text-rose-400" : "",
+              },
+              { label: "Total number of trades", val: cardMetrics.closedTradesCount },
+              { label: "Number of winning trades", val: cardMetrics.winCount },
+              { label: "Number of losing trades", val: cardMetrics.lossCount },
+              { label: "Number of break even trades", val: cardMetrics.beCount },
+              { label: "Max consecutive wins", val: cardMetrics.maxWinStreak },
+              { label: "Max consecutive losses", val: cardMetrics.maxLossStreak },
+              { label: "Total commissions", val: formatCurrency(cardMetrics.totalCommissions) },
+              { label: "Total swap", val: formatCurrency(cardMetrics.totalSwap) },
+              {
+                label: "Largest profit",
+                val: formatCurrency(cardMetrics.largestProfit),
+                color: cardMetrics.largestProfit > 0 ? "text-emerald-500 dark:text-emerald-400" : "",
+              },
+              {
+                label: "Largest loss",
+                val: formatCurrency(cardMetrics.largestLoss),
+                color: cardMetrics.largestLoss < 0 ? "text-rose-500 dark:text-rose-400" : "",
+              },
+              { label: "Avg hold time (All)", val: formatHoldDuration(cardMetrics.avgHoldTimeAll) },
+              { label: "Avg hold time (Winners)", val: formatHoldDuration(cardMetrics.avgHoldTimeWins) },
+              { label: "Avg hold time (Losers)", val: formatHoldDuration(cardMetrics.avgHoldTimeLosses) },
             ].map((row, i) => (
               <div
                 key={i}
-                className="flex items-center justify-between py-1.5 text-xs border-b border-black/[0.03] dark:border-white/[0.04]"
+                className="flex items-center justify-between py-2 px-2.5 rounded-lg text-xs hover:bg-black/[0.02] dark:hover:bg-white/[0.03] transition-colors border-b border-black/[0.03] dark:border-white/[0.04] last:border-b-0"
               >
-                <span className="text-neutral-600 dark:text-neutral-400">{row.label}</span>
-                <span className="font-bold text-neutral-900 dark:text-white font-mono">{row.val}</span>
+                <span className="text-neutral-600 dark:text-neutral-400 font-medium">{row.label}</span>
+                <span className={`font-bold font-mono ${row.color || "text-neutral-900 dark:text-white"}`}>
+                  {row.val}
+                </span>
               </div>
             ))}
           </div>
 
           {/* Column 2 */}
-          <div className="space-y-3 pt-3 md:pt-0">
+          <div className="space-y-1 pt-3 md:pt-0">
             {[
-              { label: "Open trades", val: metrics.openTradesCount },
-              { label: "Total trading days", val: metrics.totalTradingDays },
-              { label: "Winning days", val: metrics.winningDaysCount },
-              { label: "Losing days", val: metrics.losingDaysCount },
-              { label: "Breakeven days", val: metrics.breakevenDaysCount },
-              { label: "Max consecutive winning days", val: metrics.maxConsecutiveWinningDays },
-              { label: "Max consecutive losing days", val: metrics.maxConsecutiveLosingDays },
-              { label: "Average daily P&L", val: formatCurrency(metrics.avgDailyPnL) },
-              { label: "Average winning day P&L", val: formatCurrency(metrics.avgWinningDayPnL) },
-              { label: "Average losing day P&L", val: formatCurrency(metrics.avgLosingDayPnL) },
-              { label: "Largest profitable day", val: formatCurrency(metrics.largestProfitableDay) },
-              { label: "Largest losing day", val: formatCurrency(metrics.largestLosingDay) },
-              { label: "Trade expectancy", val: formatCurrency(metrics.expectancy) },
-              { label: "Max drawdown", val: formatCurrency(metrics.maxDrawdown) },
-              { label: "Max drawdown %", val: `${metrics.maxDrawdownPct.toFixed(1)}%` },
+              { label: "Open trades", val: cardMetrics.openTradesCount },
+              { label: "Total trading days", val: cardMetrics.totalTradingDays },
+              { label: "Winning days", val: cardMetrics.winningDaysCount },
+              { label: "Losing days", val: cardMetrics.losingDaysCount },
+              { label: "Breakeven days", val: cardMetrics.breakevenDaysCount },
+              { label: "Max consecutive winning days", val: cardMetrics.maxConsecutiveWinningDays },
+              { label: "Max consecutive losing days", val: cardMetrics.maxConsecutiveLosingDays },
+              {
+                label: "Average daily P&L",
+                val: formatCurrency(cardMetrics.avgDailyPnL),
+                color:
+                  cardMetrics.avgDailyPnL > 0
+                    ? "text-emerald-500 dark:text-emerald-400"
+                    : cardMetrics.avgDailyPnL < 0
+                    ? "text-rose-500 dark:text-rose-400"
+                    : "",
+              },
+              {
+                label: "Average winning day P&L",
+                val: formatCurrency(cardMetrics.avgWinningDayPnL),
+                color: cardMetrics.avgWinningDayPnL > 0 ? "text-emerald-500 dark:text-emerald-400" : "",
+              },
+              {
+                label: "Average losing day P&L",
+                val: formatCurrency(cardMetrics.avgLosingDayPnL),
+                color: cardMetrics.avgLosingDayPnL < 0 ? "text-rose-500 dark:text-rose-400" : "",
+              },
+              {
+                label: "Largest profitable day",
+                val: formatCurrency(cardMetrics.largestProfitableDay),
+                color:
+                  cardMetrics.largestProfitableDay > 0
+                    ? "text-emerald-500 dark:text-emerald-400"
+                    : "",
+              },
+              {
+                label: "Largest losing day",
+                val: formatCurrency(cardMetrics.largestLosingDay),
+                color: cardMetrics.largestLosingDay < 0 ? "text-rose-500 dark:text-rose-400" : "",
+              },
+              {
+                label: "Trade expectancy",
+                val: formatCurrency(cardMetrics.expectancy),
+                color:
+                  cardMetrics.expectancy > 0
+                    ? "text-emerald-500 dark:text-emerald-400"
+                    : cardMetrics.expectancy < 0
+                    ? "text-rose-500 dark:text-rose-400"
+                    : "",
+              },
+              { label: "Max drawdown", val: formatCurrency(cardMetrics.maxDrawdown) },
+              { label: "Max drawdown %", val: `${cardMetrics.maxDrawdownPct.toFixed(1)}%` },
             ].map((row, i) => (
               <div
                 key={i}
-                className="flex items-center justify-between py-1.5 text-xs border-b border-black/[0.03] dark:border-white/[0.04]"
+                className="flex items-center justify-between py-2 px-2.5 rounded-lg text-xs hover:bg-black/[0.02] dark:hover:bg-white/[0.03] transition-colors border-b border-black/[0.03] dark:border-white/[0.04] last:border-b-0"
               >
-                <span className="text-neutral-600 dark:text-neutral-400">{row.label}</span>
-                <span className="font-bold text-neutral-900 dark:text-white font-mono">{row.val}</span>
+                <span className="text-neutral-600 dark:text-neutral-400 font-medium">{row.label}</span>
+                <span className={`font-bold font-mono ${row.color || "text-neutral-900 dark:text-white"}`}>
+                  {row.val}
+                </span>
               </div>
             ))}
           </div>
