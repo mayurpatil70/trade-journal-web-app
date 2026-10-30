@@ -38,14 +38,7 @@ export function getPlanBadge(profile) {
   const isSubActive = subEnds ? subEnds > now : false;
   const isTrialActive = trialEnds ? trialEnds > now : false;
 
-  // Admin email detection
-  const adminEmails = [
-    "noballondesk@gmail.com",
-    "akpatil51340@gmail.com",
-    "noballondesk@gamil.com",
-  ];
-  const userEmail = (profile.email || localStorage.getItem("userEmail") || "").toLowerCase().trim();
-  const isAdmin = profile.isAdmin || adminEmails.includes(userEmail);
+  const isAdmin = profile.isAdmin === true;
 
   // 1. 1 YEAR PRO PLAN
   if (

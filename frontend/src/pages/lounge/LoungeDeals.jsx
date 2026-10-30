@@ -2,10 +2,10 @@
 import { useCallback, useEffect, useState } from "react";
 import { Gift, Copy, Check, Lock, ExternalLink, Sparkles, Plus, Trash2 } from "lucide-react";
 import api from "../../api/axios";
+import { useIsAdmin } from "../../hooks/useIsAdmin";
 import { glass, pill, EmptyState } from "../../components/lounge/LoungeUI";
 import { useSocketEvent } from "../../lib/socket";
 
-const ADMIN_EMAILS = ["noballondesk@gmail.com", "akpatil51340@gmail.com"];
 const field =
   "w-full rounded-xl bg-black/[0.03] dark:bg-white/[0.05] border border-black/[0.06] dark:border-white/[0.08] px-3 py-2 text-sm text-neutral-900 dark:text-white outline-none focus:ring-2 focus:ring-[#0066FF]/40";
 
@@ -174,8 +174,7 @@ function DealsAdmin({ onChanged }) {
 export default function LoungeDeals() {
   const [state, setState] = useState({ deals: [], myRank: null });
   const [loading, setLoading] = useState(true);
-  const email = (localStorage.getItem("userEmail") || localStorage.getItem("userId") || "").toLowerCase().trim();
-  const isAdmin = ADMIN_EMAILS.includes(email);
+  const isAdmin = useIsAdmin() === true;
 
   const load = useCallback(() => {
     api

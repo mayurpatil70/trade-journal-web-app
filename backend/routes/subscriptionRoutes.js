@@ -3,6 +3,8 @@ import express from "express";
 import { requireAuth } from "../middlewares/requireAuth.js";
 import { requireAdmin } from "../middlewares/requireAdmin.js";
 import { supabase } from "../config/supabase.js";
+import { isAdminEmail } from "../config/admin.js";
+import { verifyAuthToken } from "../utils/authToken.js";
 import { sendRevenueAlert } from "../utils/discordWebhook.js";
 
 // FIX: Point to the new chain verifier utility
@@ -39,43 +41,25 @@ router.get("/config", (req, res) => {
 });
 
 // 2. Check User Subscription Status (Used by PaywallGuard & client cache)
+// Signature check only: unpaid users must reach this without the session subscription gate
 router.get("/status/:userId", async (req, res) => {
+  const header = req.headers.authorization || "";
+  const userId = verifyAuthToken(header.startsWith("Bearer ") ? header.slice(7) : "");
+  if (!userId) return res.status(401).json({ error: "Please log in again." });
+
   try {
-    const rawParam = String(req.params.userId || "").trim();
-    const isEmail = rawParam.includes("@");
+    const { data: user } = await supabase
+      .from("users")
+      .select("id, email, discord_verified")
+      .eq("id", userId)
+      .maybeSingle();
 
-    let user = null;
-    if (isEmail) {
-      const { data } = await supabase
-        .from("users")
-        .select("id, email, discord_verified")
-        .ilike("email", rawParam)
-        .maybeSingle();
-      user = data;
-    } else {
-      const { data } = await supabase
-        .from("users")
-        .select("id, email, discord_verified")
-        .eq("id", rawParam)
-        .maybeSingle();
-      user = data;
-    }
-
-    const adminEmails = [
-      ...(process.env.ADMIN_EMAIL || "").split(","),
-      "noballondesk@gmail.com",
-      "noballondesk@gamil.com",
-      "akpatil51340@gmail.com",
-    ]
-      .map((e) => e.trim().toLowerCase())
-      .filter(Boolean);
-
-    const userEmail = (user?.email || (isEmail ? rawParam : "")).trim().toLowerCase();
-    if (userEmail && adminEmails.includes(userEmail)) {
+    const userEmail = (user?.email || "").trim().toLowerCase();
+    if (isAdminEmail(userEmail)) {
       return res.json({ success: true, hasPaid: true, discordVerified: true, isAdmin: true });
     }
 
-    // Lookup profile by user.id or by email or rawParam
+    // Lookup profile by user.id or by email or userId
     let profile = null;
     if (user?.id) {
       const { data } = await supabase
@@ -93,18 +77,18 @@ router.get("/status/:userId", async (req, res) => {
         .maybeSingle();
       profile = data;
     }
-    if (!profile && !isEmail) {
+    if (!profile) {
       const { data } = await supabase
         .from("profiles")
         .select("trial_ends_at, subscription_ends_at, account_status")
-        .eq("id", rawParam)
+        .eq("id", userId)
         .maybeSingle();
       profile = data;
     }
 
     // Also check journal_subscriptions
     let hasJournalSub = false;
-    const targetUserId = user?.id || (!isEmail ? rawParam : null);
+    const targetUserId = user?.id || userId;
     if (targetUserId) {
       const { data: sub } = await supabase
         .from("journal_subscriptions")

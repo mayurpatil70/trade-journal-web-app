@@ -3,6 +3,7 @@
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useIsAdmin } from "../hooks/useIsAdmin";
 import {
   Wrench,
   Calculator,
@@ -22,15 +23,7 @@ export default function Tools() {
   const navigate = useNavigate();
   const [lockedModalItem, setLockedModalItem] = useState(null);
 
-  const userId = (
-    localStorage.getItem("userId") ||
-    localStorage.getItem("userEmail") ||
-    ""
-  )
-    .toLowerCase()
-    .trim();
-  const isAdmin =
-    userId === "noballondesk@gmail.com" || userId === "akpatil51340@gmail.com";
+  const isAdmin = useIsAdmin() === true;
 
   // Institutional Tools matching TradeFXBook Tools arrangement
   const tools = [

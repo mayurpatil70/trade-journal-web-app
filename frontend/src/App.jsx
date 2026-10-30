@@ -17,6 +17,7 @@ import {
 import { markInAppNavigation } from "./utils/navigationState";
 import { isOnboardingCompleted } from "./lib/authFlow";
 import { safeLazy, registerRoutePrefetch } from "./utils/routePrefetch";
+import { useIsAdmin } from "./hooks/useIsAdmin";
 import NavigationProgressBar from "./components/NavigationProgressBar";
 
 // CRITICAL: ErrorBoundary MUST be eagerly imported — it cannot be lazy-loaded
@@ -319,18 +320,12 @@ const OnboardingGuard = () => {
 };
 
 // GUARD 4: Admin Only
+// Verified by the server; nothing renders until /api/admin/me confirms
 const AdminGuard = () => {
-  const id = (localStorage.getItem("userId") || "").toLowerCase().trim();
-  const email = (localStorage.getItem("userEmail") || "").toLowerCase().trim();
-  const adminEmails = [
-    "noballondesk@gmail.com",
-    "noballondesk@gamil.com",
-    "akpatil51340@gmail.com",
-  ];
-  if (adminEmails.includes(id) || adminEmails.includes(email)) {
-    return <Outlet />;
-  }
-  return <Navigate to="/dashboard" replace />;
+  const isAdmin = useIsAdmin();
+  if (isAdmin === null) return <WorkspaceLoader />;
+  if (!isAdmin) return <Navigate to="/dashboard" replace />;
+  return <Outlet />;
 };
 
 // Fast route transition loader that doesn't freeze browser or re-mount 3D canvas

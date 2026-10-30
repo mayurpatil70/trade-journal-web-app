@@ -1,6 +1,7 @@
 import { Resend } from "resend";
 import crypto from "crypto";
 import { signAuthToken } from "../utils/authToken.js";
+import { isAdminEmail } from "../config/admin.js";
 import { supabase } from "../config/supabase.js";
 import { uploadToCloudinary } from "../utils/cloudinary.js";
 import {
@@ -16,18 +17,9 @@ import { hashPassword, verifyPassword } from "../utils/password.js";
 const resend = new Resend(process.env.RESEND_API_KEY);
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-const ADMIN_EMAILS = [
-  ...(process.env.ADMIN_EMAIL || "").split(","),
-  "noballondesk@gmail.com",
-  "noballondesk@gamil.com",
-  "akpatil51340@gmail.com",
-]
-  .map((e) => e.trim().toLowerCase())
-  .filter(Boolean);
-
 async function respondWithSession(req, res, user, message) {
   const userEmail = String(user.email || "").trim().toLowerCase();
-  const isAdmin = ADMIN_EMAILS.includes(userEmail);
+  const isAdmin = isAdminEmail(userEmail);
 
   const { data: profile } = await supabase
     .from("profiles")
@@ -340,8 +332,7 @@ export const uploadAvatar = async (req, res) => {
     }
 
     const avatarUrl = await uploadToCloudinary(req.file.buffer, "user_avatars");
-    const userId = req.body?.userId || req.headers["x-user-id"];
-    const email = req.body?.email;
+    const userId = req.userId;
 
     // Persist avatar URL into profiles & users tables in Supabase
     if (userId) {
@@ -361,15 +352,6 @@ export const uploadAvatar = async (req, res) => {
       } catch (userErr) {
         console.warn("[Auth] Avatar update users table notice:", userErr.message);
       }
-    } else if (email) {
-      try {
-        await supabase
-          .from("users")
-          .update({ avatar_url: avatarUrl })
-          .eq("email", email);
-      } catch (userErr) {
-        console.warn("[Auth] Avatar update user by email notice:", userErr.message);
-      }
     }
 
     res.json({ success: true, avatarUrl });
@@ -382,8 +364,6 @@ export const uploadAvatar = async (req, res) => {
 export const saveOnboardingProfile = async (req, res) => {
   try {
     const {
-      userId,
-      email,
       displayName,
       username,
       bio,
@@ -399,32 +379,13 @@ export const saveOnboardingProfile = async (req, res) => {
       favoritePairs,
     } = req.body;
 
-    if (!userId && !email) {
-      return res.status(400).json({ success: false, error: "userId or email required" });
-    }
-
-    const isUuid = (val) =>
-      typeof val === "string" &&
-      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(val);
-
-    let targetUuid = isUuid(userId) ? userId : null;
-    let targetEmail = email || (userId && userId.includes("@") ? userId : null);
-
-    // Look up user row in public.users
-    if (!targetUuid && targetEmail) {
-      try {
-        const { data: u } = await supabase
-          .from("users")
-          .select("id, email")
-          .eq("email", targetEmail)
-          .maybeSingle();
-        if (u) {
-          targetUuid = u.id;
-          targetEmail = u.email;
-        }
-      } catch (e) {
-        console.warn("[Auth] Lookup user for onboarding notice:", e.message);
-      }
+    const targetUuid = req.userId;
+    let targetEmail = null;
+    try {
+      const { data: u } = await supabase.from("users").select("email").eq("id", targetUuid).maybeSingle();
+      targetEmail = u?.email || null;
+    } catch (e) {
+      console.warn("[Auth] Lookup user for onboarding notice:", e.message);
     }
 
     const disciplineRulesPayload = {
@@ -443,7 +404,7 @@ export const saveOnboardingProfile = async (req, res) => {
         await supabase.from("profiles").upsert(
           {
             id: targetUuid,
-            email: targetEmail,
+            ...(targetEmail ? { email: targetEmail } : {}),
             display_name: displayName,
             username: username?.replace(/^@/, ""),
             bio: bio || "",
@@ -470,11 +431,7 @@ export const saveOnboardingProfile = async (req, res) => {
         rules_onboarded: true,
         onboarding_completed: true,
       };
-      if (targetUuid) {
-        await supabase.from("users").update(userUpdate).eq("id", targetUuid);
-      } else if (targetEmail) {
-        await supabase.from("users").update(userUpdate).eq("email", targetEmail);
-      }
+      await supabase.from("users").update(userUpdate).eq("id", targetUuid);
     } catch (userErr) {
       console.warn("[Auth] Save onboarding users table notice:", userErr.message);
     }
@@ -488,19 +445,15 @@ export const saveOnboardingProfile = async (req, res) => {
 
 export const getProfile = async (req, res) => {
   try {
-    const rawUserId = req.query?.userId || req.headers["x-user-id"] || req.user?.id;
-    const email = req.query?.email;
+    const rawUserId = req.userId;
+    const email = null;
 
     if (!rawUserId && !email) {
       return res.status(400).json({ success: false, error: "Missing userId or email" });
     }
 
-    const isUuid = (val) =>
-      typeof val === "string" &&
-      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(val);
-
-    let targetUuid = isUuid(rawUserId) ? rawUserId : null;
-    let targetEmail = email || (rawUserId && rawUserId.includes("@") ? rawUserId : null);
+    let targetUuid = rawUserId;
+    let targetEmail = email;
 
     // Look up user in users table if needed to bridge UUID and email
     let userRowData = null;
@@ -604,15 +557,7 @@ export const getProfile = async (req, res) => {
       }
 
       // Check admin status
-      const adminEmails = [
-        ...(process.env.ADMIN_EMAIL || "").split(","),
-        "noballondesk@gmail.com",
-        "noballondesk@gamil.com",
-        "akpatil51340@gmail.com",
-      ].map((e) => e.trim().toLowerCase()).filter(Boolean);
-
-      const userEmail = (profileData.email || targetEmail || "").trim().toLowerCase();
-      if (userEmail && adminEmails.includes(userEmail)) {
+      if (isAdminEmail(userRowData?.email || profileData.email)) {
         profileData.isAdmin = true;
       }
     }
@@ -630,8 +575,6 @@ export const getProfile = async (req, res) => {
 export const updateProfile = async (req, res) => {
   try {
     const {
-      userId,
-      email,
       displayName,
       username,
       bio,
@@ -641,36 +584,10 @@ export const updateProfile = async (req, res) => {
       disciplineRules,
       rulesOnboarded,
       preTradeChecklist,
-      currentPlan,
     } = req.body;
 
-    const rawId = userId || req.headers["x-user-id"] || req.user?.id;
-    const isUuid = (val) =>
-      typeof val === "string" &&
-      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(val);
-
-    let targetUuid = isUuid(rawId) ? rawId : null;
-    let targetEmail = email || (rawId && rawId.includes("@") ? rawId : null);
-
-    if (!targetUuid && targetEmail) {
-      try {
-        const { data: u } = await supabase
-          .from("users")
-          .select("id, email")
-          .eq("email", targetEmail)
-          .maybeSingle();
-        if (u) {
-          targetUuid = u.id;
-          targetEmail = u.email;
-        }
-      } catch (e) {
-        console.warn("[Auth] updateProfile user lookup notice:", e.message);
-      }
-    }
-
-    if (!targetUuid && !targetEmail) {
-      return res.status(400).json({ success: false, error: "Missing userId or email" });
-    }
+    const targetUuid = req.userId;
+    const targetEmail = null;
 
     const updatePayload = {
       updated_at: new Date().toISOString(),
@@ -688,7 +605,6 @@ export const updateProfile = async (req, res) => {
     }
     if (rulesOnboarded !== undefined) updatePayload.rules_onboarded = Boolean(rulesOnboarded);
     if (preTradeChecklist !== undefined) updatePayload.pre_trade_checklist = preTradeChecklist;
-    if (currentPlan !== undefined) updatePayload.current_plan = currentPlan;
 
     // 1. Persist to profiles table
     if (targetUuid) {
@@ -739,8 +655,8 @@ export const updateProfile = async (req, res) => {
 
 export const updateChecklist = async (req, res) => {
   try {
-    const { userId, checklist } = req.body;
-    const targetId = userId || req.headers["x-user-id"] || req.user?.id;
+    const { checklist } = req.body;
+    const targetId = req.userId;
 
     if (!targetId) {
       return res.status(400).json({ success: false, error: "Missing userId" });
