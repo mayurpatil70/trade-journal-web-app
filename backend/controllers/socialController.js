@@ -26,6 +26,45 @@ async function getFollowCounts(userId) {
   return { followers: followers.count || 0, following: following.count || 0 };
 }
 
+const LEADERBOARD_TTL_MS = 60_000;
+let leaderboardCache = { at: 0, rows: null };
+
+async function getFullLeaderboard() {
+  if (leaderboardCache.rows && Date.now() - leaderboardCache.at < LEADERBOARD_TTL_MS) return leaderboardCache.rows;
+  const { data, error } = await supabase.rpc("get_lounge_leaderboard", { p_since: null, p_funded_only: false, p_limit: 500 });
+  if (error) throw error;
+  leaderboardCache = { at: Date.now(), rows: data || [] };
+  return leaderboardCache.rows;
+}
+
+const MAX_LINKS = 100;
+
+function cleanLinks(links) {
+  if (!Array.isArray(links)) return [];
+  return links
+    .slice(0, MAX_LINKS)
+    .map((l) => {
+      let url = String(l?.url || "").trim().slice(0, 300);
+      if (url && !/^https?:\/\//i.test(url)) url = `https://${url}`;
+      try {
+        const parsed = new URL(url);
+        if (!/^https?:$/.test(parsed.protocol) || !parsed.hostname.includes(".")) return null;
+      } catch {
+        return null;
+      }
+      return { title: String(l?.title || "").trim().slice(0, 40), url };
+    })
+    .filter(Boolean);
+}
+
+// links comes from migration 014; fall back if it has not run yet.
+async function getProfileRow(userId) {
+  const { data, error } = await supabase.from("trader_profiles").select("bio, is_public, links").eq("user_id", userId).maybeSingle();
+  if (!error) return data;
+  const { data: legacy } = await supabase.from("trader_profiles").select("bio, is_public").eq("user_id", userId).maybeSingle();
+  return legacy;
+}
+
 async function getFollowingIds(userId) {
   const { data } = await supabase.from("trader_follows").select("following_id").eq("follower_id", userId);
   return (data || []).map((r) => r.following_id);
@@ -73,9 +112,18 @@ async function hydratePosts(rows, viewerId) {
 
 export async function getMyProfile(req, res) {
   try {
-    const [summaries, counts] = await Promise.all([getUserSummaries([req.userId]), getFollowCounts(req.userId)]);
-    const { data: profile } = await supabase.from("trader_profiles").select("*").eq("user_id", req.userId).maybeSingle();
-    res.json({ ...summaries[req.userId], bio: profile?.bio || "", isPublic: Boolean(profile?.is_public), ...counts });
+    const [summaries, counts, profile] = await Promise.all([
+      getUserSummaries([req.userId]),
+      getFollowCounts(req.userId),
+      getProfileRow(req.userId),
+    ]);
+    res.json({
+      ...summaries[req.userId],
+      bio: profile?.bio || "",
+      links: profile?.links || [],
+      isPublic: Boolean(profile?.is_public),
+      ...counts,
+    });
   } catch (err) {
     fail(res, err);
   }
@@ -83,7 +131,7 @@ export async function getMyProfile(req, res) {
 
 export async function updateMyProfile(req, res) {
   try {
-    const { handle, bio, primaryStrategy, propBadges, isPublic } = req.body || {};
+    const { handle, bio, primaryStrategy, propBadges, isPublic, links } = req.body || {};
     const row = { user_id: req.userId, updated_at: new Date().toISOString() };
     if (handle !== undefined) {
       const clean = String(handle).toLowerCase().replace(/[^a-z0-9_]/g, "").slice(0, 30);
@@ -94,8 +142,13 @@ export async function updateMyProfile(req, res) {
     if (primaryStrategy !== undefined) row.primary_strategy = String(primaryStrategy).slice(0, 40) || null;
     if (Array.isArray(propBadges)) row.prop_badges = propBadges.map((b) => String(b).slice(0, 30)).slice(0, 6);
     if (isPublic !== undefined) row.is_public = Boolean(isPublic);
+    if (links !== undefined) row.links = cleanLinks(links);
 
-    const { data, error } = await supabase.from("trader_profiles").upsert(row).select().single();
+    let { data, error } = await supabase.from("trader_profiles").upsert(row).select().single();
+    if (error && row.links && /links/.test(error.message || "")) {
+      delete row.links;
+      ({ data, error } = await supabase.from("trader_profiles").upsert(row).select().single());
+    }
     if (error?.code === "23505") return fail(res, "That handle is taken.", 409);
     if (error) throw error;
     res.json(data);
@@ -107,39 +160,77 @@ export async function updateMyProfile(req, res) {
 export async function getTraderProfile(req, res) {
   try {
     const id = String(req.params.id);
-    const [summaries, counts, followRow, posts, postsCount, stats, targetFollowers, myFollowing] = await Promise.all([
+    const isSelf = id === req.userId;
+    const [summaries, counts, followRow, followsMe, profile, posts, postsCount, targetFollowers, myFollowing] = await Promise.all([
       getUserSummaries([id]),
       getFollowCounts(id),
       supabase.from("trader_follows").select("id").eq("follower_id", req.userId).eq("following_id", id).maybeSingle(),
+      supabase.from("trader_follows").select("id").eq("follower_id", id).eq("following_id", req.userId).maybeSingle(),
+      getProfileRow(id),
       supabase.from("trader_posts").select("*").eq("user_id", id).is("parent_id", null).order("created_at", { ascending: false }).limit(30),
       supabase.from("trader_posts").select("id", { count: "exact", head: true }).eq("user_id", id).is("parent_id", null),
-      supabase.rpc("get_lounge_leaderboard", { p_since: null, p_funded_only: false, p_limit: 500 }),
-      getFollowerIds(id),
-      getFollowingIds(req.userId),
+      isSelf ? [] : getFollowerIds(id),
+      isSelf ? [] : getFollowingIds(req.userId),
     ]);
     const mineSet = new Set(myFollowing);
-    const mutualIds = id === req.userId ? [] : targetFollowers.filter((uid) => mineSet.has(uid));
-    const mutualSummaries = await getUserSummaries(mutualIds.slice(0, 3));
-    const { data: followsMe } = await supabase
-      .from("trader_follows").select("id").eq("follower_id", id).eq("following_id", req.userId).maybeSingle();
-    const { data: profile } = await supabase.from("trader_profiles").select("bio").eq("user_id", id).maybeSingle();
-    const board = stats.data || [];
-    const rankIndex = board.findIndex((r) => r.user_id === id);
+    const mutualIds = targetFollowers.filter((uid) => mineSet.has(uid));
+    const [mutualSummaries, hydrated] = await Promise.all([
+      getUserSummaries(mutualIds.slice(0, 3)),
+      hydratePosts(posts.data || [], req.userId),
+    ]);
 
     res.json({
       ...summaries[id],
       bio: profile?.bio || "",
+      links: profile?.links || [],
       ...counts,
       postsCount: postsCount.count || 0,
       mutualsCount: mutualIds.length,
       followedBy: mutualIds.slice(0, 3).map((uid) => mutualSummaries[uid]),
       isFollowing: Boolean(followRow.data),
-      followsYou: Boolean(followsMe),
-      isMutual: Boolean(followRow.data && followsMe),
+      followsYou: Boolean(followsMe.data),
+      isMutual: Boolean(followRow.data && followsMe.data),
       isOnline: isOnline(id),
-      rank: rankIndex >= 0 ? rankIndex + 1 : null,
-      stats: rankIndex >= 0 ? board[rankIndex] : null,
-      posts: await hydratePosts(posts.data || [], req.userId),
+      posts: hydrated,
+    });
+  } catch (err) {
+    fail(res, err);
+  }
+}
+
+// Leaderboard rank and stats load separately so the profile header is not held up by the aggregate query.
+export async function getTraderStats(req, res) {
+  try {
+    const id = String(req.params.id);
+    const board = await getFullLeaderboard();
+    const rankIndex = board.findIndex((r) => r.user_id === id);
+    res.json({ rank: rankIndex >= 0 ? rankIndex + 1 : null, stats: rankIndex >= 0 ? board[rankIndex] : null });
+  } catch (err) {
+    fail(res, err);
+  }
+}
+
+// Lightweight payload for the hover card in chat.
+export async function getTraderCard(req, res) {
+  try {
+    const id = String(req.params.id);
+    const [summaries, counts, followRow, followsMe, profile, postsCount] = await Promise.all([
+      getUserSummaries([id]),
+      getFollowCounts(id),
+      supabase.from("trader_follows").select("id").eq("follower_id", req.userId).eq("following_id", id).maybeSingle(),
+      supabase.from("trader_follows").select("id").eq("follower_id", id).eq("following_id", req.userId).maybeSingle(),
+      getProfileRow(id),
+      supabase.from("trader_posts").select("id", { count: "exact", head: true }).eq("user_id", id).is("parent_id", null),
+    ]);
+    res.json({
+      ...summaries[id],
+      bio: profile?.bio || "",
+      links: profile?.links || [],
+      ...counts,
+      postsCount: postsCount.count || 0,
+      isFollowing: Boolean(followRow.data),
+      followsYou: Boolean(followsMe.data),
+      isOnline: isOnline(id),
     });
   } catch (err) {
     fail(res, err);
@@ -506,7 +597,7 @@ export function getPresence(req, res) {
 export async function listDeals(req, res) {
   try {
     const nowIso = new Date().toISOString();
-    const [{ data, error }, board] = await Promise.all([
+    const [{ data, error }, boardRows] = await Promise.all([
       supabase
         .from("partnership_deals")
         .select("*")
@@ -514,10 +605,10 @@ export async function listDeals(req, res) {
         .or(`expires_at.is.null,expires_at.gt.${nowIso}`)
         .order("is_featured", { ascending: false })
         .order("created_at", { ascending: false }),
-      supabase.rpc("get_lounge_leaderboard", { p_since: null, p_funded_only: false, p_limit: 500 }),
+      getFullLeaderboard().catch(() => []),
     ]);
     if (error) throw error;
-    const idx = (board.data || []).findIndex((r) => r.user_id === req.userId);
+    const idx = boardRows.findIndex((r) => r.user_id === req.userId);
     const myRank = idx >= 0 ? idx + 1 : null;
 
     res.json({

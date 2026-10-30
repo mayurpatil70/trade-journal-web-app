@@ -4,6 +4,9 @@ import { ArrowLeft, Hash, Send, Search, CheckCheck, Check, Loader2, LineChart, X
 import api from "../../api/axios";
 import { getSocket, useSocketEvent, useOnlineSet, emitWithAck } from "../../lib/socket";
 import { Avatar, TraderName, RichText, timeAgo, formatMoney } from "./LoungeUI";
+import UserHover from "./UserHoverCard";
+
+export const channelTitle = (c) => (c?.title?.startsWith("#") || !c?.server_id ? c?.title : `# ${c.title}`);
 
 export function useConversations() {
   const [data, setData] = useState({ direct: [], channels: [] });
@@ -183,7 +186,7 @@ export function ConversationList({ direct, channels, activeId, onSelect, onStart
   );
 }
 
-export function ChatThread({ conversation, me, onBack, pendingTrade, onTradeSent, onRead }) {
+export function ChatThread({ conversation, me, onBack, backMobileOnly = false, pendingTrade, onTradeSent, onRead }) {
   const [messages, setMessages] = useState([]);
   const [readState, setReadState] = useState({});
   const [loading, setLoading] = useState(true);
@@ -198,7 +201,7 @@ export function ChatThread({ conversation, me, onBack, pendingTrade, onTradeSent
   const stickToBottom = useRef(true);
   const lastTypingEmit = useRef(0);
   const convId = conversation.id;
-  const isChannel = conversation.is_public;
+  const isChannel = Boolean(conversation.is_public || conversation.is_group);
 
   const onReadRef = useRef(onRead);
   useLayoutEffect(() => {
@@ -325,7 +328,7 @@ export function ChatThread({ conversation, me, onBack, pendingTrade, onTradeSent
     <div className="flex flex-col h-full min-h-0">
       <div className="flex items-center gap-3 px-3 py-2.5 border-b border-black/[0.05] dark:border-white/[0.06] bg-white/60 dark:bg-white/[0.02] backdrop-blur-xl">
         {onBack && (
-          <button onClick={onBack} className="p-1.5 rounded-full hover:bg-black/[0.05] dark:hover:bg-white/[0.08]" aria-label="Back">
+          <button onClick={onBack} className={`p-1.5 rounded-full hover:bg-black/[0.05] dark:hover:bg-white/[0.08] ${backMobileOnly ? "md:hidden" : ""}`} aria-label="Back">
             <ArrowLeft className="w-4 h-4 text-neutral-600 dark:text-neutral-300" />
           </button>
         )}
@@ -334,13 +337,17 @@ export function ChatThread({ conversation, me, onBack, pendingTrade, onTradeSent
             <Hash className="w-4 h-4" />
           </span>
         ) : (
-          <Avatar user={peer} size={36} online={peer ? online.has(peer.id) : undefined} />
+          <UserHover user={peer}>
+            <Avatar user={peer} size={36} online={peer ? online.has(peer.id) : undefined} />
+          </UserHover>
         )}
         <div className="min-w-0">
           {isChannel ? (
-            <p className="text-sm font-semibold text-neutral-900 dark:text-white truncate">{conversation.title}</p>
+            <p className="text-sm font-semibold text-neutral-900 dark:text-white truncate">{channelTitle(conversation)}</p>
           ) : (
-            <TraderName user={peer} className="text-sm" />
+            <UserHover user={peer}>
+              <TraderName user={peer} link={false} className="text-sm hover:underline" />
+            </UserHover>
           )}
           <p className="text-[11px] text-neutral-500 dark:text-neutral-400 truncate">
             {isChannel ? conversation.description : peer && online.has(peer.id) ? "Active now" : "Offline"}
@@ -372,10 +379,20 @@ export function ChatThread({ conversation, me, onBack, pendingTrade, onTradeSent
           const grouped = prev && prev.senderId === m.senderId && new Date(m.createdAt) - new Date(prev.createdAt) < 120000;
           return (
             <div key={m.id} className={`flex gap-2 ${mine ? "justify-end" : "justify-start"} ${grouped ? "" : "pt-2"}`}>
-              {!mine && isChannel && (grouped ? <span className="w-7 shrink-0" /> : <Avatar user={m.sender} size={28} />)}
+              {!mine &&
+                (grouped ? (
+                  <span className="w-8 shrink-0" />
+                ) : (
+                  <UserHover user={m.sender || { id: m.senderId }} className="shrink-0 self-start">
+                    <Avatar user={m.sender} size={32} className="hover:opacity-85 transition-opacity" />
+                  </UserHover>
+                ))}
               <div className={`max-w-[78%] flex flex-col ${mine ? "items-end" : "items-start"}`}>
                 {!mine && isChannel && !grouped && (
-                  <span className="text-[11px] font-semibold text-neutral-500 mb-0.5 ml-1">{m.sender?.displayName}</span>
+                  <UserHover user={m.sender || { id: m.senderId }} className="mb-0.5 ml-1">
+                    <span className="text-[12px] font-semibold text-neutral-700 dark:text-neutral-200 hover:underline">{m.sender?.displayName}</span>
+                    <span className="ml-1.5 text-[10px] text-neutral-400">{timeAgo(m.createdAt)}</span>
+                  </UserHover>
                 )}
                 <div
                   className={`px-3.5 py-2 text-[14px] leading-snug rounded-[20px] ${
@@ -461,7 +478,7 @@ export function ChatThread({ conversation, me, onBack, pendingTrade, onTradeSent
         <input
           value={text}
           onChange={(e) => onType(e.target.value)}
-          placeholder={isChannel ? `Message ${conversation.title}` : "Message…"}
+          placeholder={isChannel ? `Message ${channelTitle(conversation)}` : "Message…"}
           maxLength={4000}
           className="flex-1 rounded-full bg-black/[0.04] dark:bg-white/[0.06] border border-black/[0.06] dark:border-white/[0.08] px-4 py-2 text-sm text-neutral-900 dark:text-white placeholder:text-neutral-400 outline-none focus:ring-2 focus:ring-[#0066FF]/30"
         />

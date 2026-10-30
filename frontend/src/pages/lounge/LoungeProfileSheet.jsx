@@ -4,6 +4,7 @@ import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import api from "../../api/axios";
 import { pill } from "../../components/lounge/LoungeUI";
+import { LinksEditor, tidyLinks } from "../../components/lounge/ProfileLinks";
 
 const BADGES = ["FTMO", "MFF", "Funded Engineer", "FundingPips", "The5ers", "Apex"];
 const field =
@@ -16,6 +17,7 @@ export default function LoungeProfileSheet({ me, onClose, onSaved }) {
     primaryStrategy: me?.primaryStrategy || "",
     propBadges: me?.propBadges || [],
     isPublic: Boolean(me?.isPublic),
+    links: me?.links || [],
   });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -25,8 +27,9 @@ export default function LoungeProfileSheet({ me, onClose, onSaved }) {
     setSaving(true);
     setError("");
     try {
-      await api.put("/api/social/me", form);
-      onSaved?.(form);
+      const payload = { ...form, links: tidyLinks(form.links) };
+      await api.put("/api/social/me", payload);
+      onSaved?.(payload);
       onClose();
     } catch (err) {
       setError(err.response?.data?.error || "Could not save your profile.");
@@ -84,6 +87,10 @@ export default function LoungeProfileSheet({ me, onClose, onSaved }) {
             value={form.primaryStrategy}
             onChange={(e) => set("primaryStrategy", e.target.value)}
           />
+        </div>
+        <div className="space-y-1.5">
+          <span className="text-xs font-semibold text-neutral-500">Links</span>
+          <LinksEditor links={form.links} onChange={(links) => set("links", links)} />
         </div>
         <div className="space-y-1.5">
           <span className="text-xs font-semibold text-neutral-500">Funded with</span>

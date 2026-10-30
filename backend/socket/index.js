@@ -88,7 +88,7 @@ function notifyOfflineRecipient(recipientId, message) {
   sendPushToUser(recipientId, {
     title: message.sender?.displayName || "New message",
     body: preview || "Sent you a message",
-    url: "/lounge/chat",
+    url: "/community",
     tag: `conv-${message.conversationId}`,
   }).catch((err) => console.warn("[Push] DM notification failed:", err.message));
 }

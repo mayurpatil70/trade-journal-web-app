@@ -5,14 +5,27 @@ const conversationCache = new Map();
 
 async function getConversation(conversationId) {
   if (conversationCache.has(conversationId)) return conversationCache.get(conversationId);
-  const { data, error } = await supabase
-    .from("conversations")
-    .select("id, is_group, is_public, slug, title")
-    .eq("id", conversationId)
-    .maybeSingle();
+  const query = (cols) => supabase.from("conversations").select(cols).eq("id", conversationId).maybeSingle();
+  // server_id comes from migration 014; fall back if it has not run yet.
+  let { data, error } = await query("id, is_group, is_public, slug, title, server_id");
+  if (error) ({ data, error } = await query("id, is_group, is_public, slug, title"));
   if (error) throw error;
   if (data) conversationCache.set(conversationId, data);
   return data;
+}
+
+export function forgetConversation(conversationId) {
+  conversationCache.delete(conversationId);
+}
+
+export async function getServerRole(serverId, userId) {
+  const { data } = await supabase
+    .from("community_server_members")
+    .select("role")
+    .eq("server_id", serverId)
+    .eq("user_id", userId)
+    .maybeSingle();
+  return data?.role || null;
 }
 
 export async function isPublicChannel(conversationId) {
@@ -33,6 +46,7 @@ export async function canAccessConversation(conversationId, userId) {
   const conversation = await getConversation(conversationId);
   if (!conversation) return false;
   if (conversation.is_public) return true;
+  if (conversation.server_id) return Boolean(await getServerRole(conversation.server_id, userId));
   const { data } = await supabase
     .from("conversation_participants")
     .select("user_id")
