@@ -312,7 +312,7 @@ export default function EconomicCalendar() {
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="font-serif text-2xl md:text-3xl font-bold text-neutral-900 dark:text-white">
+              <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-neutral-900 dark:text-white">
                 Economic Calendar
               </h1>
               <span className="text-[10px] font-mono font-bold bg-blue-500/15 text-blue-700 dark:text-blue-400 border border-blue-500/25 px-2 py-0.5 rounded-full">

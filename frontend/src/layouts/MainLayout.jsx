@@ -780,7 +780,7 @@ export default function MainLayout() {
   return (
     <div
       className="flex h-screen w-full bg-[#f8f9fc] dark:bg-[#0a0c10] text-neutral-900 dark:text-neutral-100 transition-colors duration-300 overflow-hidden font-sans relative"
-      style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif" }}
+      style={{ fontFamily: "var(--font-sans)" }}
     >
       {/* ── Ambient Background Canvas ── */}
       <div className="pointer-events-none absolute inset-0 z-0 select-none bg-gradient-to-br from-transparent via-transparent to-blue-500/[0.02]" />
