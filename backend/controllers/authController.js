@@ -108,6 +108,33 @@ function passwordProblem(password) {
   return null;
 }
 
+const EMAIL_FONT = "-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue',Helvetica,Arial,sans-serif";
+
+// Table layout keeps the iOS-style card intact in Gmail and Outlook.
+function magicLinkEmailHtml(magicLink, clientUrl) {
+  return `<!doctype html><html><body style="margin:0;padding:0;background:#f2f2f7">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f2f2f7;padding:40px 16px;font-family:${EMAIL_FONT}">
+<tr><td align="center">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:440px">
+    <tr><td align="center" style="padding-bottom:20px">
+      <img src="${clientUrl}/logo-192.png" width="44" height="44" alt="" style="display:inline-block;vertical-align:middle;border:0;border-radius:10px">
+      <span style="display:inline-block;vertical-align:middle;margin-left:8px;font-size:20px;font-weight:700;letter-spacing:-0.02em;color:#1c1c1e">Forex<span style="color:#007aff">Notes</span></span>
+    </td></tr>
+    <tr><td style="background:#ffffff;border-radius:20px;padding:32px 28px;border:1px solid rgba(0,0,0,0.06)">
+      <h1 style="margin:0 0 8px;font-size:22px;font-weight:700;letter-spacing:-0.02em;color:#1c1c1e;text-align:center">Sign in to ForexNotes</h1>
+      <p style="margin:0 0 24px;font-size:15px;line-height:1.5;color:#6e6e73;text-align:center">Tap the button below to open your journal. This link expires in 15 minutes.</p>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td align="center">
+        <a href="${magicLink}" style="display:inline-block;background:#007aff;color:#ffffff;padding:14px 36px;border-radius:999px;text-decoration:none;font-size:16px;font-weight:600">Sign in</a>
+      </td></tr></table>
+      <p style="margin:24px 0 0;font-size:12px;line-height:1.5;color:#8e8e93;text-align:center">Button not working? Copy this link into your browser:<br><a href="${magicLink}" style="color:#007aff;word-break:break-all">${magicLink}</a></p>
+    </td></tr>
+    <tr><td style="padding:20px 8px 0;font-size:12px;line-height:1.5;color:#8e8e93;text-align:center">If you didn't request this email, you can safely ignore it.<br>&copy; ForexNotes &middot; forexnotes.in</td></tr>
+  </table>
+</td></tr>
+</table>
+</body></html>`;
+}
+
 async function findUserByEmail(email) {
   const { data, error } = await supabase
     .from("users")
@@ -261,12 +288,7 @@ export const requestLogin = async (req, res) => {
         to: email,
         subject: "ForexNotes - Secure Login",
         text: `Sign in to ForexNotes: ${magicLink}\n\nThis link expires in 15 minutes. If you didn't request it, ignore this email.`,
-        html: `<div style="font-family:Arial,sans-serif;max-width:480px;margin:auto;padding:24px">
-        <h2 style="margin:0 0 12px">Sign in to ForexNotes</h2>
-        <p>Click the button below to access your Setup Backtesting & Digital Trading journal. This link expires in 15 minutes.</p>
-        <p><a href="${magicLink}" style="display:inline-block;background:#10b981;color:#000;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:bold">Sign in</a></p>
-        <p style="color:#666;font-size:12px">If you didn't request this email, you can safely ignore it.</p>
-      </div>`,
+        html: magicLinkEmailHtml(magicLink, clientUrl),
       })
       .catch((emailError) => {
         // Log email failure but don't crash — the DB already has the token
