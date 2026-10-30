@@ -264,6 +264,15 @@ export default function MainLayout() {
   };
   const userCardRef = useRef(null);
   const location = useLocation();
+  const [pastDashboardTopBar, setPastDashboardTopBar] = useState(false);
+
+  useEffect(() => {
+    if (location.pathname !== "/dashboard") return;
+    const onScroll = () => setPastDashboardTopBar(window.scrollY > 90);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [location.pathname]);
   const navigate = useNavigate();
 
   // Support / feedback event listeners & query param sync
@@ -801,8 +810,8 @@ export default function MainLayout() {
           document.body
         )}
 
-      {/* ── Desktop Top-Right Action Cluster (Always Visible across pages, hidden on /dashboard to avoid duplicate overlap) ── */}
-      {location.pathname !== "/dashboard" && (
+      {/* ── Desktop Top-Right Action Cluster (on /dashboard it appears once the top bar scrolls away) ── */}
+      {(location.pathname !== "/dashboard" || pastDashboardTopBar) && (
         <div className="max-md:hidden flex fixed top-3.5 right-6 z-50 items-center gap-2 p-1 rounded-2xl bg-white/75 dark:bg-[#10131b]/75 backdrop-blur-2xl border border-black/[0.08] dark:border-white/[0.12] shadow-[0_4px_20px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.5)] transition-all">
           <button
             type="button"

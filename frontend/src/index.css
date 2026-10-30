@@ -209,11 +209,12 @@ LEDGER THEME: light (default) and dark tokens
   --loss: #ff3b30;
   --glass-shadow: 0 4px 20px -4px rgb(0 0 0 / 0.07);
 
-  --lp-bg: #f5f5f7;
-  --lp-fg: 0, 0, 0;
-  --lp-card: 255, 255, 255;
-  --lp-text: #3a3a3c;
-  --lp-heading: #1c1c1e;
+  /* Landing and SEO pages always use the dark look */
+  --lp-bg: #05090e;
+  --lp-fg: 255, 255, 255;
+  --lp-card: 18, 21, 30;
+  --lp-text: #edeae3;
+  --lp-heading: #ffffff;
 }
 
 /* =========================================================
@@ -274,12 +275,6 @@ DARK MODE
   --gain: #30d158;
   --loss: #ff453a;
   --glass-shadow: 0 4px 20px -4px rgb(0 0 0 / 0.35);
-
-  --lp-bg: #05090e;
-  --lp-fg: 255, 255, 255;
-  --lp-card: 18, 21, 30;
-  --lp-text: #edeae3;
-  --lp-heading: #ffffff;
 }
 
 /* =========================================================

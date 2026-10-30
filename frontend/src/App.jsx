@@ -24,6 +24,7 @@ import NavigationProgressBar from "./components/NavigationProgressBar";
 import ErrorBoundary from "./components/ErrorBoundary.jsx";
 import Logo3DLoader from "./components/Logo3DLoader.jsx";
 import CookieConsent from "./components/CookieConsent.jsx";
+import FloatingThemeToggle from "./components/FloatingThemeToggle.jsx";
 
 // Public Pages (eagerly loaded for SEO/LCP)
 import LandingPage from "./pages/LandingPage.jsx";
@@ -365,6 +366,13 @@ const ScrollToTop = () => {
   return null;
 };
 
+const AUTH_FLOW_PATHS = ["/login", "/verify", "/paywall", "/link-discord", "/discord/callback"];
+
+const AuthFlowThemeToggle = () => {
+  const { pathname } = useLocation();
+  return AUTH_FLOW_PATHS.includes(pathname) ? <FloatingThemeToggle /> : null;
+};
+
 // Paywall Route: Accessible by new visitors & subscribed users managing plans
 const PaywallRoute = () => {
   return <Paywall />;
@@ -538,6 +546,7 @@ function App() {
           </Routes>
         </ErrorBoundary>
       </Suspense>
+      <AuthFlowThemeToggle />
       <CookieConsent />
     </BrowserRouter>
   );

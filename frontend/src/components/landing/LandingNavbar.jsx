@@ -3,7 +3,6 @@ import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, ArrowRight, BarChart2, Shield, BookOpen, Calculator, Layers, Zap } from 'lucide-react';
 import BrandLogo from '../BrandLogo';
 import IridescentButton from './IridescentButton';
-import ThemeToggle from '../ThemeToggle';
 
 const NAV_LINKS = [
   { label: 'Markets', to: '/markets/four-asset-classes', icon: Layers },
@@ -152,8 +151,6 @@ export default function LandingNavbar({ isFixed = true }) {
           <IridescentButton to="/login" size="sm">
             START FREE TRIAL
           </IridescentButton>
-
-          <ThemeToggle />
 
           {/* Three-Line Menu Toggle Button (Visible on all screens) */}
           <button
