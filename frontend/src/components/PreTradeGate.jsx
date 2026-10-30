@@ -63,6 +63,11 @@ export default function PreTradeGate() {
     scrollToBottom();
   }, [chatHistory, isOpen]);
 
+  useEffect(() => {
+    document.body.classList.toggle("fn-coach-open", isOpen);
+    return () => document.body.classList.remove("fn-coach-open");
+  }, [isOpen]);
+
   // CRITICAL FIX: All hooks must be before this early return
   const hiddenRoutes = ['/', '/login', '/verify', '/paywall', '/discord-gate', '/discord-callback', '/add-trade', '/register'];
   if (hiddenRoutes.includes(location.pathname)) return null;

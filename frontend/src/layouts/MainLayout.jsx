@@ -125,18 +125,13 @@ const NavItem = ({
 
 // Expandable Nav Item for Nested Route Groups (Matches TradeFXBook Analysis Menu)
 const ExpandableNavItem = ({ item, currentPath, closeMenu }) => {
-  const isChildActive = item.children?.some(
-    (c) => currentPath === c.to || currentPath.startsWith(c.to + "/")
-  );
-  const [isOpen, setIsOpen] = useState(
-    isChildActive || currentPath.startsWith("/analysis")
-  );
+  const inSection = item.matchPrefixes.some((p) => currentPath.startsWith(p));
+  const isChildActive = inSection;
+  const [isOpen, setIsOpen] = useState(inSection);
 
   useEffect(() => {
-    if (isChildActive || currentPath.startsWith("/analysis")) {
-      setIsOpen(true);
-    }
-  }, [currentPath, isChildActive]);
+    if (inSection) setIsOpen(true);
+  }, [inSection]);
 
   const Icon = item.icon;
 
@@ -170,7 +165,7 @@ const ExpandableNavItem = ({ item, currentPath, closeMenu }) => {
             setIsOpen((prev) => !prev);
           }}
           className="w-6 h-6 rounded-lg flex items-center justify-center bg-blue-500/10 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 transition-colors hover:bg-blue-500/20"
-          aria-label="Toggle analysis menu"
+          aria-label={`Toggle ${item.label} menu`}
         >
           {isOpen ? (
             <ChevronUp className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" strokeWidth={2.5} />
@@ -185,7 +180,9 @@ const ExpandableNavItem = ({ item, currentPath, closeMenu }) => {
         <div className="pl-3 space-y-1 pt-0.5">
           {item.children.map((sub) => {
             const isSubActive =
-              currentPath === sub.to || currentPath.startsWith(sub.to + "/");
+              currentPath === sub.to ||
+              (!sub.end && currentPath.startsWith(sub.to + "/")) ||
+              sub.alsoActive?.some((p) => currentPath.startsWith(p));
             const SubIcon = sub.icon;
             return (
               <Link
@@ -469,6 +466,7 @@ export default function MainLayout() {
           to: "/analysis/performance",
           icon: BarChart2,
           isExpandable: true,
+          matchPrefixes: ["/analysis"],
           children: [
             { to: "/analysis/performance", icon: TrendingUp, label: "Performance" },
             { to: "/analysis/trades", icon: FileText, label: "Trade Analysis" },
@@ -477,12 +475,21 @@ export default function MainLayout() {
       ],
     },
     {
-      label: "Traders Lounge",
+      label: "Community",
       items: [
-        { to: "/lounge", icon: Trophy, label: "Leaderboard", end: true },
-        { to: "/lounge/feed", icon: MessageSquareText, label: "Thought Stream" },
-        { to: "/messages", icon: MessagesSquare, label: "Messages" },
-        { to: "/lounge/deals", icon: Gift, label: "Partner Deals" },
+        {
+          label: "Traders Lounge",
+          to: "/lounge",
+          icon: Users,
+          isExpandable: true,
+          matchPrefixes: ["/lounge", "/messages"],
+          children: [
+            { to: "/lounge", icon: Trophy, label: "Leaderboard", end: true, alsoActive: ["/lounge/trader"] },
+            { to: "/lounge/feed", icon: MessageSquareText, label: "Thought Stream" },
+            { to: "/messages", icon: MessagesSquare, label: "Messages", alsoActive: ["/lounge/chat"] },
+            { to: "/lounge/deals", icon: Gift, label: "Partner Deals" },
+          ],
+        },
       ],
     },
     {

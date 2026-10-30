@@ -1760,3 +1760,8 @@ html.light body:not(.terminal) .share-modal-btn-primary *,
   fill: #ffffff !important;
   stroke: #ffffff !important;
 }
+
+/* The coach panel and the Messages launcher share the bottom-right corner */
+body.fn-coach-open .fn-messenger-launcher {
+  display: none;
+}
