@@ -55,8 +55,8 @@ export default function Verify() {
 
   return (
     <div
-      className="min-h-screen bg-[#f2f2f7] dark:bg-[#020202] text-neutral-900 dark:text-white flex items-center justify-center p-6"
-      style={{ fontFamily: "'Inter', sans-serif" }}
+      className="min-h-screen bg-white dark:bg-black text-neutral-900 dark:text-white flex items-center justify-center p-6"
+      style={{ fontFamily: "var(--font-sans)" }}
     >
       <div className="w-full max-w-md bg-white/80 dark:bg-[#121418] backdrop-blur-xl border border-black/[0.08] dark:border-white/5 rounded-2xl p-8 sm:p-10 shadow-2xl flex flex-col items-center text-center">
 

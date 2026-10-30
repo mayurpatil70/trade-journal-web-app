@@ -22,7 +22,7 @@ export default function BrandLogo({ className = "", showText = true, size = "md"
           className={`font-black tracking-tight leading-none flex items-center ${
             isSm ? "text-sm" : isLg ? "text-xl" : "text-[17px] sm:text-[19px]"
           }`}
-          style={{ fontFamily: "'Inter', system-ui, -apple-system, sans-serif" }}
+          style={{ fontFamily: "var(--font-sans)" }}
         >
           <span className="text-[#0F172A] dark:text-white">Forex</span>
           <span className="text-[#0066FF]">Notes</span>

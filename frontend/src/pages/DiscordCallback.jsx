@@ -50,7 +50,7 @@ export default function DiscordCallback() {
   }, [searchParams, navigate]);
 
   return (
-    <div className="min-h-screen bg-[#f2f2f7] dark:bg-[#020202] text-neutral-900 dark:text-white flex items-center justify-center p-6">
+    <div className="min-h-screen bg-white dark:bg-black text-neutral-900 dark:text-white flex items-center justify-center p-6">
       <div className="w-full max-w-md bg-white/80 dark:bg-[#121418] backdrop-blur-xl border border-black/[0.08] dark:border-white/5 rounded-2xl p-8 text-center shadow-2xl">
         {status === "verifying" && (
           <>
