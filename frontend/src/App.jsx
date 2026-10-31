@@ -98,6 +98,7 @@ const MarketHours = safeLazy(
   "market-hours",
 );
 const Tools = safeLazy(() => import("./pages/Tools.jsx"), "tools");
+const AICoach = safeLazy(() => import("./pages/AICoach.jsx"), "ai-coach");
 const LoungeShell = safeLazy(() => import("./pages/lounge/LoungeShell.jsx"), "lounge");
 const LoungeLeaderboard = safeLazy(() => import("./pages/lounge/LoungeLeaderboard.jsx"), "lounge-leaderboard");
 const LoungeFeed = safeLazy(() => import("./pages/lounge/LoungeFeed.jsx"), "lounge-feed");
@@ -530,6 +531,7 @@ function App() {
                   <Route path="bot-hub/mt5" element={<Mt5BotPage />} />
 
                   <Route path="tools" element={<Tools />} />
+                  <Route path="tools/ai-coach" element={<AICoach />} />
 
                   {/* Completely Separated Calculator & Prop Firm Routes */}
                   <Route path="calculator" element={<Navigate to="/calculator/lot-size" replace />} />

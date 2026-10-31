@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { useIsAdmin } from "../hooks/useIsAdmin";
 import {
   Wrench,
+  Bot,
   Calculator,
   ShieldAlert,
   Clock,
@@ -27,6 +28,17 @@ export default function Tools() {
 
   // Institutional Tools matching TradeFXBook Tools arrangement
   const tools = [
+    {
+      id: "ai-coach",
+      title: "AI Trading Coach",
+      description:
+        "Talk through your emotional state and setup before every trade, or share a chart for a second opinion.",
+      icon: Bot,
+      badge: "AI",
+      isAvailable: true,
+      path: "/tools/ai-coach",
+      category: "coach",
+    },
     {
       id: "lot-size",
       title: "Position Size Calculator",
