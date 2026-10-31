@@ -233,11 +233,12 @@ export function ChatThread({ conversation, me, onBack, backMobileOnly = false, c
       .get(`/api/social/conversations/${convId}/messages`)
       .then(({ data }) => {
         if (cancelled) return;
-        setMessages(data.messages);
-        setReadState(data.readState || {});
-        setHasMore(data.hasMore);
+        const list = Array.isArray(data?.messages) ? data.messages : [];
+        setMessages(list);
+        setReadState(data?.readState || {});
+        setHasMore(Boolean(data?.hasMore));
         stickToBottom.current = true;
-        if (data.messages.length) markRead(data.messages[data.messages.length - 1].id);
+        if (list.length) markRead(list[list.length - 1].id);
       })
       .catch(() => {})
       .finally(() => !cancelled && setLoading(false));
