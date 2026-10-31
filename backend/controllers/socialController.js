@@ -6,6 +6,7 @@ import {
   getOrCreateDirectConversation,
   canAccessConversation,
   toMessageDto,
+  resolveMentions,
   getReplyPreviews,
 } from "../services/loungeService.js";
 import { isOnline, getOnlineUserIds, emitToUser, broadcastDeal } from "../socket/index.js";
@@ -24,6 +25,7 @@ async function getFollowCounts(userId) {
     supabase.from("trader_follows").select("id", { count: "exact", head: true }).eq("following_id", userId),
     supabase.from("trader_follows").select("id", { count: "exact", head: true }).eq("follower_id", userId),
   ]);
+  if (followers.error || following.error) throw followers.error || following.error;
   return { followers: followers.count || 0, following: following.count || 0 };
 }
 
@@ -58,12 +60,26 @@ function cleanLinks(links) {
     .filter(Boolean);
 }
 
-// links comes from migration 014; fall back if it has not run yet.
+function cleanBrokers(brokers) {
+  if (!Array.isArray(brokers)) return [];
+  return brokers
+    .slice(0, 10)
+    .map((b) => {
+      const name = String(b?.name || "").trim().slice(0, 40);
+      if (!name) return null;
+      const [link] = cleanLinks([{ url: b?.url }]);
+      return { name, url: link?.url || "" };
+    })
+    .filter(Boolean);
+}
+
+// links (migration 014) and brokers (migration 016) fall back if those have not run yet.
 async function getProfileRow(userId) {
-  const { data, error } = await supabase.from("trader_profiles").select("bio, is_public, links").eq("user_id", userId).maybeSingle();
-  if (!error) return data;
-  const { data: legacy } = await supabase.from("trader_profiles").select("bio, is_public").eq("user_id", userId).maybeSingle();
-  return legacy;
+  for (const cols of ["bio, is_public, links, brokers", "bio, is_public, links", "bio, is_public"]) {
+    const { data, error } = await supabase.from("trader_profiles").select(cols).eq("user_id", userId).maybeSingle();
+    if (!error) return data;
+  }
+  return null;
 }
 
 async function getFollowingIds(userId) {
@@ -122,6 +138,7 @@ export async function getMyProfile(req, res) {
       ...summaries[req.userId],
       bio: profile?.bio || "",
       links: profile?.links || [],
+      brokers: profile?.brokers || [],
       isPublic: Boolean(profile?.is_public),
       ...counts,
     });
@@ -132,7 +149,7 @@ export async function getMyProfile(req, res) {
 
 export async function updateMyProfile(req, res) {
   try {
-    const { handle, bio, primaryStrategy, propBadges, isPublic, links } = req.body || {};
+    const { handle, bio, primaryStrategy, propBadges, isPublic, links, brokers } = req.body || {};
     const row = { user_id: req.userId, updated_at: new Date().toISOString() };
     if (handle !== undefined) {
       const clean = String(handle).toLowerCase().replace(/[^a-z0-9_]/g, "").slice(0, 30);
@@ -144,8 +161,13 @@ export async function updateMyProfile(req, res) {
     if (Array.isArray(propBadges)) row.prop_badges = propBadges.map((b) => String(b).slice(0, 30)).slice(0, 6);
     if (isPublic !== undefined) row.is_public = Boolean(isPublic);
     if (links !== undefined) row.links = cleanLinks(links);
+    if (brokers !== undefined) row.brokers = cleanBrokers(brokers);
 
     let { data, error } = await supabase.from("trader_profiles").upsert(row).select().single();
+    if (error && row.brokers && /brokers/.test(error.message || "")) {
+      delete row.brokers;
+      ({ data, error } = await supabase.from("trader_profiles").upsert(row).select().single());
+    }
     if (error && row.links && /links/.test(error.message || "")) {
       delete row.links;
       ({ data, error } = await supabase.from("trader_profiles").upsert(row).select().single());
@@ -184,6 +206,7 @@ export async function getTraderProfile(req, res) {
       ...summaries[id],
       bio: profile?.bio || "",
       links: profile?.links || [],
+      brokers: profile?.brokers || [],
       ...counts,
       postsCount: postsCount.count || 0,
       mutualsCount: mutualIds.length,
@@ -227,6 +250,7 @@ export async function getTraderCard(req, res) {
       ...summaries[id],
       bio: profile?.bio || "",
       links: profile?.links || [],
+      brokers: profile?.brokers || [],
       ...counts,
       postsCount: postsCount.count || 0,
       isFollowing: Boolean(followRow.data),
@@ -476,13 +500,10 @@ export async function toggleReaction(req, res) {
 
 export async function listConversations(req, res) {
   try {
-    const [{ data: parts }, { data: channels }] = await Promise.all([
-      supabase
-        .from("conversation_participants")
-        .select("conversation_id, last_read_at, conversations!inner(id, is_group, is_public, title, slug, description, updated_at)")
-        .eq("user_id", req.userId),
-      supabase.from("conversations").select("id, is_group, is_public, title, slug, description, updated_at").eq("is_public", true),
-    ]);
+    const { data: parts } = await supabase
+      .from("conversation_participants")
+      .select("conversation_id, last_read_at, conversations!inner(id, is_group, is_public, title, slug, description, updated_at)")
+      .eq("user_id", req.userId);
 
     const direct = (parts || []).filter((p) => !p.conversations.is_public);
     const ids = direct.map((p) => p.conversation_id);
@@ -519,10 +540,8 @@ export async function listConversations(req, res) {
         return withLast({ ...p.conversations, peer: peer && { ...peer, isOnline: isOnline(peer.id) } }, p.last_read_at);
       }),
     );
-    const rooms = await Promise.all((channels || []).map((c) => withLast(c, null)));
-
     dms.sort((a, b) => new Date(b.lastMessage?.created_at || b.updated_at) - new Date(a.lastMessage?.created_at || a.updated_at));
-    res.json({ direct: dms, channels: rooms });
+    res.json({ direct: dms, channels: [] });
   } catch (err) {
     fail(res, err);
   }
@@ -555,8 +574,11 @@ export async function getMessages(req, res) {
       getReplyPreviews(rows.map((m) => m.reply_to_id)),
     ]);
     const { data: peers } = await supabase.from("conversation_participants").select("user_id, last_read_at").eq("conversation_id", id);
+    const mentionsByRow = await Promise.all(
+      rows.map((m) => (m.mentions?.length || !m.content?.includes("@") ? m.mentions || [] : resolveMentions(m.content).catch(() => []))),
+    );
     res.json({
-      messages: rows.map((m) => toMessageDto(m, senders[m.sender_id], replies[m.reply_to_id] || null)),
+      messages: rows.map((m, i) => toMessageDto({ ...m, mentions: mentionsByRow[i] }, senders[m.sender_id], replies[m.reply_to_id] || null)),
       readState: Object.fromEntries((peers || []).map((p) => [p.user_id, p.last_read_at])),
       hasMore: (data || []).length === MESSAGES_PAGE,
     });

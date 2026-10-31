@@ -5,6 +5,7 @@ import api from "../../api/axios";
 import { getSocket, useSocketEvent, useOnlineSet, emitWithAck } from "../../lib/socket";
 import { Avatar, TraderName, RichText, timeAgo, formatMoney } from "./LoungeUI";
 import UserHover from "./UserHoverCard";
+import EmojiPicker from "./EmojiPicker";
 import { MessageMenu, ReplyQuote, useMentions, MentionList, ForwardSheet } from "./MessageActions";
 
 export const channelTitle = (c) => (c?.title?.startsWith("#") || !c?.server_id ? c?.title : `# ${c.title}`);
@@ -163,16 +164,20 @@ export function ConversationList({ direct, channels, activeId, onSelect, onStart
             ))}
           </>
         )}
-        <p className="px-3 pt-2 pb-1 text-[10px] font-bold uppercase tracking-wider text-neutral-400">Channels</p>
-        {channels.map((c) =>
-          row(
-            c,
-            <span className="w-[42px] h-[42px] rounded-full bg-gradient-to-br from-[#0066FF] to-sky-400 text-white flex items-center justify-center shrink-0">
-              <Hash className="w-5 h-5" />
-            </span>,
-          ),
+        {channels.length > 0 && (
+          <>
+            <p className="px-3 pt-2 pb-1 text-[10px] font-bold uppercase tracking-wider text-neutral-400">Channels</p>
+            {channels.map((c) =>
+              row(
+                c,
+                <span className="w-[42px] h-[42px] rounded-full bg-gradient-to-br from-[#0066FF] to-sky-400 text-white flex items-center justify-center shrink-0">
+                  <Hash className="w-5 h-5" />
+                </span>,
+              ),
+            )}
+          </>
         )}
-        <p className="px-3 pt-3 pb-1 text-[10px] font-bold uppercase tracking-wider text-neutral-400">Direct messages</p>
+        <p className="px-3 pt-2 pb-1 text-[10px] font-bold uppercase tracking-wider text-neutral-400">Direct messages</p>
         {loading ? (
           <div className="py-6 flex justify-center">
             <Loader2 className="w-4 h-4 animate-spin text-neutral-400" />
@@ -232,11 +237,12 @@ export function ChatThread({ conversation, me, onBack, backMobileOnly = false, c
       .get(`/api/social/conversations/${convId}/messages`)
       .then(({ data }) => {
         if (cancelled) return;
-        setMessages(data.messages);
-        setReadState(data.readState || {});
-        setHasMore(data.hasMore);
+        const list = Array.isArray(data?.messages) ? data.messages : [];
+        setMessages(list);
+        setReadState(data?.readState || {});
+        setHasMore(Boolean(data?.hasMore));
         stickToBottom.current = true;
-        if (data.messages.length) markRead(data.messages[data.messages.length - 1].id);
+        if (list.length) markRead(list[list.length - 1].id);
       })
       .catch(() => {})
       .finally(() => !cancelled && setLoading(false));
@@ -600,6 +606,20 @@ export function ChatThread({ conversation, me, onBack, backMobileOnly = false, c
         >
           {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <ImagePlus className="w-4 h-4" />}
         </button>
+        <EmojiPicker
+          disabled={sending}
+          onPick={(emoji) => {
+            const el = inputRef.current;
+            const start = el?.selectionStart ?? text.length;
+            const end = el?.selectionEnd ?? text.length;
+            const next = text.slice(0, start) + emoji + text.slice(end);
+            onType(next);
+            requestAnimationFrame(() => {
+              el?.focus();
+              el?.setSelectionRange(start + emoji.length, start + emoji.length);
+            });
+          }}
+        />
         <input
           ref={inputRef}
           value={text}

@@ -233,7 +233,7 @@ export default function Profile({ defaultTab }) {
     }
     return {
       displayName: cached.displayName || localStorage.getItem("userName") || (userEmail ? userEmail.split("@")[0] : "Trader"),
-      username: cached.username || (userEmail ? userEmail.split("@")[0].toLowerCase().replace(/[^a-z0-9_]/g, "") : "trader"),
+      username: cached.username || (userEmail ? userEmail.split("@")[0].toLowerCase().replace(/[^a-z0-9_.]/g, "") : "trader"),
       bio: cached.bio || "Forex & Commodities trend trader. Focused on high-probability setups and disciplined risk.",
       avatarUrl: cached.avatarUrl || localStorage.getItem(`user_avatar_${userId}`) || localStorage.getItem("userAvatar") || "",
       plan: cached.plan || "FREE",
@@ -292,6 +292,7 @@ export default function Profile({ defaultTab }) {
 
   // Modal States
   const [isPhotoModalOpen, setIsPhotoModalOpen] = useState(false);
+  const [profileSaveError, setProfileSaveError] = useState("");
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
   const [isEditRulesOpen, setIsEditRulesOpen] = useState(false);
   const [isEditPreferencesOpen, setIsEditPreferencesOpen] = useState(false);
@@ -833,6 +834,24 @@ export default function Profile({ defaultTab }) {
   // Save Edit Profile Modal
   const handleSaveProfile = async (e) => {
     e.preventDefault();
+    setProfileSaveError("");
+    try {
+      await api.put("/api/auth/profile", {
+        userId,
+        email: userEmail,
+        displayName: editProfileForm.displayName,
+        username: editProfileForm.username,
+        bio: editProfileForm.bio,
+        avatarUrl: editProfileForm.avatarUrl,
+      });
+    } catch (err) {
+      if (err.response?.data?.field === "username") {
+        setProfileSaveError(err.response.data.error);
+        return;
+      }
+      console.warn("[Profile] Profile save notice:", err.message);
+    }
+    if (editProfileForm.username) localStorage.setItem("fn_username", editProfileForm.username);
     setProfile(editProfileForm);
     localStorage.setItem(`trader_profile_${userId}`, JSON.stringify(editProfileForm));
     if (editProfileForm.displayName) {
@@ -848,19 +867,6 @@ export default function Profile({ defaultTab }) {
       })
     );
     setIsEditProfileOpen(false);
-
-    try {
-      await api.put("/api/auth/profile", {
-        userId,
-        email: userEmail,
-        displayName: editProfileForm.displayName,
-        username: editProfileForm.username,
-        bio: editProfileForm.bio,
-        avatarUrl: editProfileForm.avatarUrl,
-      });
-    } catch (err) {
-      console.warn("[Profile] Profile save notice:", err.message);
-    }
 
     const links = tidyLinks(editProfileForm.links);
     try {
@@ -2222,13 +2228,16 @@ export default function Profile({ defaultTab }) {
                       onChange={(e) =>
                         setEditProfileForm({
                           ...editProfileForm,
-                          username: e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ""),
+                          username: e.target.value.toLowerCase().replace(/[^a-z0-9_.]/g, ""),
                         })
                       }
                       className="w-full pl-7 pr-3.5 py-2 rounded-xl bg-neutral-100 dark:bg-white/[0.05] border border-black/[0.08] dark:border-white/[0.1] text-xs font-semibold text-neutral-900 dark:text-white focus:outline-none focus:border-blue-500"
                       required
+                      minLength={3}
+                      maxLength={20}
                     />
                   </div>
+                  {profileSaveError && <p className="mt-1 text-xs text-red-500">{profileSaveError}</p>}
                 </div>
 
                 <div>

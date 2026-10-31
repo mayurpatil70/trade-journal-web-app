@@ -156,7 +156,7 @@ LEDGER THEME: light (default) and dark tokens
 :root {
   --radius: 0.75rem;
 
-  --background: #f2f2f7;
+  --background: #ffffff;
   --foreground: #14161a;
 
   --card: rgb(255 255 255 / 0.7);
@@ -198,7 +198,7 @@ LEDGER THEME: light (default) and dark tokens
   --sidebar-border: rgb(0 0 0 / 0.08);
   --sidebar-ring: #007aff;
 
-  --paper: #f2f2f7;
+  --paper: #ffffff;
   --surface: rgb(255 255 255 / 0.72);
   --surface-solid: #ffffff;
   --surface-raised: rgb(255 255 255 / 0.9);
@@ -223,7 +223,7 @@ DARK MODE
 ========================================================= */
 
 .dark {
-  --background: #0c0e12;
+  --background: #000000;
   --foreground: #f4f5f7;
 
   --card: rgb(18 21 27 / 0.6);
@@ -265,7 +265,7 @@ DARK MODE
   --sidebar-border: rgb(255 255 255 / 0.08);
   --sidebar-ring: #0a84ff;
 
-  --paper: #0c0e12;
+  --paper: #000000;
   --surface: rgb(15 23 42 / 0.6);
   --surface-solid: #12151b;
   --surface-raised: rgb(23 26 33 / 0.9);

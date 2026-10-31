@@ -87,7 +87,7 @@ export function timeAgo(iso) {
 export const formatMoney = (n) =>
   `${n < 0 ? "-" : "+"}$${Math.abs(Number(n) || 0).toLocaleString(undefined, { maximumFractionDigits: 2 })}`;
 
-const TOKEN_RE = /(@[a-zA-Z0-9_]{2,30}|\$[A-Za-z]{3,10}|\*\*[^*]+\*\*|https?:\/\/\S+)/g;
+const TOKEN_RE = /(@[a-zA-Z0-9_]+(?:\.[a-zA-Z0-9_]+)*|\$[A-Za-z]{3,10}|\*\*[^*]+\*\*|https?:\/\/\S+)/g;
 
 export function RichText({ text = "", className = "", mentions }) {
   const mentionIds = Object.fromEntries((mentions || []).map((m) => [m.handle.toLowerCase(), m.id]));

@@ -18,6 +18,8 @@ const BINANCE_HOSTS = ["https://data-api.binance.vision", "https://api.binance.c
 const YAHOO_HOSTS = ["query1.finance.yahoo.com", "query2.finance.yahoo.com"];
 const BINANCE_PAGE = 1000;
 const MAX_CANDLES = 5000;
+const LIVE_TAIL = 50;
+const LIVE_TTL_MS = 8_000;
 const TTL_MS = { "1m": 30_000, "5m": 60_000, "15m": 120_000, "30m": 180_000, "1h": 300_000, "4h": 600_000, "1d": 900_000 };
 
 const cache = new Map();
@@ -147,7 +149,7 @@ export async function getCandles(entry, tf, { limit = 1000, to } = {}, http = ax
           ? await fetchBinanceCandles(entry.symbol, tf, count, toSec, http)
           : await fetchYahooCandles(entry.yahoo, tf, toSec, http);
       const candles = raw.slice(-count);
-      cache.set(key, { candles, expires: Date.now() + (toSec ? 3_600_000 : TTL_MS[tf]) });
+      cache.set(key, { candles, expires: Date.now() + (toSec ? 3_600_000 : count <= LIVE_TAIL ? LIVE_TTL_MS : TTL_MS[tf]) });
       return candles;
     } catch (err) {
       if (hit) return hit.candles;

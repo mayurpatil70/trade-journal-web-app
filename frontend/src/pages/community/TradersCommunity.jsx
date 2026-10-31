@@ -42,7 +42,7 @@ function useMyServers() {
   const refresh = useCallback(() => {
     api
       .get("/api/social/servers")
-      .then(({ data }) => setServers(data))
+      .then(({ data }) => setServers(Array.isArray(data) ? data : []))
       .catch(() => setServers((s) => s || []));
   }, []);
   useEffect(refresh, [refresh]);
@@ -153,7 +153,7 @@ function HomeView({ me, onChatChange }) {
           <ChatThread key={active.id} conversation={active} me={me} backMobileOnly onBack={() => setActive(null)} onRead={(id) => convos.markUnread(id, 0)} />
         ) : (
           <div className="m-auto">
-            <EmptyState icon={MessagesSquare} title="Pick a conversation" body="Chat 1-on-1 with traders, jump into a public channel, or open a server on the left." />
+            <EmptyState icon={MessagesSquare} title="Pick a conversation" body="Chat 1-on-1 with traders, or open a server you joined or created." />
           </div>
         )}
       </div>
@@ -171,7 +171,7 @@ function MembersPanel({ serverId }) {
     setMembers(null);
     api
       .get(`/api/social/servers/${serverId}/members`)
-      .then(({ data }) => setMembers(data))
+      .then(({ data }) => setMembers(Array.isArray(data) ? data : []))
       .catch(() => setMembers([]));
   }, [serverId]);
 
@@ -478,7 +478,7 @@ function DiscoverView({ onServersChange }) {
     const t = setTimeout(() => {
       api
         .get("/api/social/servers/discover", { params: { q } })
-        .then(({ data }) => setList(data))
+        .then(({ data }) => setList(Array.isArray(data) ? data : []))
         .catch(() => setList([]));
     }, 250);
     return () => clearTimeout(t);

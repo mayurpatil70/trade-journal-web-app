@@ -38,6 +38,8 @@ export default function PreTradeGate() {
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
   const [expanded, setExpanded] = useState(false);
+  const [hiddenOnPath, setHiddenOnPath] = useState(null);
+  const launcherHidden = hiddenOnPath === location.pathname;
   const [hideLabel, setHideLabel] = useState(() => {
     try { return sessionStorage.getItem("coachLabelHidden") === "1"; } catch { return false; }
   });
@@ -62,6 +64,15 @@ export default function PreTradeGate() {
   useEffect(() => {
     scrollToBottom();
   }, [chatHistory, isOpen]);
+
+  useEffect(() => {
+    const openCoach = () => {
+      setIsOpen(true);
+      setExpanded(true);
+    };
+    window.addEventListener("fn:open-coach", openCoach);
+    return () => window.removeEventListener("fn:open-coach", openCoach);
+  }, []);
 
   useEffect(() => {
     document.body.classList.toggle("fn-coach-open", isOpen);
@@ -313,7 +324,7 @@ export default function PreTradeGate() {
       )}
 
       {/* ── Floating Trigger Button ──────────────────────────────────────── */}
-      {!isOpen && (
+      {!isOpen && !launcherHidden && (
         <div
           className="relative flex flex-col items-center cursor-pointer group"
           onClick={() => setIsOpen(true)}
@@ -343,6 +354,17 @@ export default function PreTradeGate() {
               className="w-full h-full object-cover"
             />
           </div>
+          <button
+            type="button"
+            aria-label="Hide coach"
+            onClick={(e) => {
+              e.stopPropagation();
+              setHiddenOnPath(location.pathname);
+            }}
+            className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-white dark:bg-[#1a1d24] border border-black/10 dark:border-white/15 shadow flex items-center justify-center text-neutral-500 hover:text-neutral-900 dark:hover:text-white"
+          >
+            <X className="w-3 h-3" />
+          </button>
         </div>
       )}
     </div>

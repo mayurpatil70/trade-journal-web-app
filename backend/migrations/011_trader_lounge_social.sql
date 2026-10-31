@@ -144,12 +144,7 @@ CREATE TABLE IF NOT EXISTS partnership_deals (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-INSERT INTO conversations (is_group, is_public, slug, title, description) VALUES
-  (TRUE, TRUE, 'gold-scalpers', '#gold-scalpers', 'XAUUSD intraday scalps, levels and live calls'),
-  (TRUE, TRUE, 'funded-traders', '#funded-traders', 'Passed a challenge? Share payouts, rules and risk plans'),
-  (TRUE, TRUE, 'ict-mentorship', '#ict-mentorship', 'Liquidity, FVGs, killzones and model reviews'),
-  (TRUE, TRUE, 'general', '#general', 'Open floor for every ForexNotes trader')
-ON CONFLICT (slug) DO NOTHING;
+-- No default public channels are seeded; people only see servers they join or create.
 
 -- Verified leaderboard: aggregates journal trades of traders who opted in (is_public).
 CREATE OR REPLACE FUNCTION get_lounge_leaderboard(
