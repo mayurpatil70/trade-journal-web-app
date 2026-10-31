@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import { X, Camera, Loader2, Copy, Check, Share2, RefreshCw, Globe, Lock, Hash } from "lucide-react";
@@ -32,6 +32,12 @@ export function ServerIcon({ server, size = 48, rounded = "rounded-[16px]", clas
 }
 
 export function Sheet({ title, onClose, children }) {
+  useEffect(() => {
+    const onKey = (e) => e.key === "Escape" && onClose();
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
   return createPortal(
     <div className="fixed inset-0 z-[9500] flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-sm" onClick={onClose}>
       <div
