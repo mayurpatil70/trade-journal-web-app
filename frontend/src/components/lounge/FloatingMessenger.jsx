@@ -11,6 +11,13 @@ const HIDDEN_ON = ["/community"];
 
 export default function FloatingMessenger() {
   const [open, setOpen] = useState(false);
+  const [hidden, setHidden] = useState(() => {
+    try {
+      return sessionStorage.getItem("messengerLauncherHidden") === "1";
+    } catch {
+      return false;
+    }
+  });
   const [active, setActive] = useState(null);
   const [pendingTrade, setPendingTrade] = useState(null);
   const [me, setMe] = useState(null);
@@ -68,7 +75,8 @@ export default function FloatingMessenger() {
 
   return createPortal(
     <>
-      {!open && (
+      {!open && !hidden && (
+        <div className="fn-messenger-launcher fixed z-[60] bottom-[60px] right-[76px] md:bottom-[76px] md:right-[100px]">
         <button
           onClick={() => setOpen(true)}
           className="fn-messenger-launcher fixed z-[60] bottom-[60px] right-[76px] md:bottom-[76px] md:right-[100px] inline-flex items-center gap-2 pl-3.5 pr-4 py-2.5 rounded-full bg-white/80 dark:bg-[#161a24]/85 backdrop-blur-2xl border border-black/[0.08] dark:border-white/[0.1] shadow-[0_12px_40px_rgba(0,0,0,0.15)] text-sm font-semibold text-neutral-900 dark:text-white hover:scale-[1.03] active:scale-95 transition-transform"
@@ -83,6 +91,22 @@ export default function FloatingMessenger() {
           </span>
           Messages
         </button>
+        <button
+          type="button"
+          aria-label="Hide messages button"
+          onClick={() => {
+            setHidden(true);
+            try {
+              sessionStorage.setItem("messengerLauncherHidden", "1");
+            } catch {
+              /* storage unavailable */
+            }
+          }}
+          className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-white dark:bg-[#1a1d24] border border-black/10 dark:border-white/15 shadow flex items-center justify-center text-neutral-500 hover:text-neutral-900 dark:hover:text-white"
+        >
+          <X className="w-3 h-3" />
+        </button>
+        </div>
       )}
 
       {open && (
