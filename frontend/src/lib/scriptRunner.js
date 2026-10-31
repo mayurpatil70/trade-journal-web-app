@@ -46,32 +46,3 @@ export function runScript(code, candles, timeoutMs = 4000) {
     worker.postMessage({ code, candles });
   });
 }
-
-export const SCRIPT_TEMPLATES = {
-  'EMA cross': `// data.close, data.high, data.low, data.open, data.time
-const fast = ta.ema(data.close, 9);
-const slow = ta.ema(data.close, 21);
-plot('EMA 9', fast, '#0a84ff');
-plot('EMA 21', slow, '#ff9f0a');
-const up = ta.crossover(fast, slow);
-const down = ta.crossunder(fast, slow);
-data.close.forEach((_, i) => {
-  if (up[i]) signal(i, 'buy', 'EMA cross up');
-  if (down[i]) signal(i, 'sell', 'EMA cross down');
-});`,
-  'RSI reversal': `const rsi = ta.rsi(data.close, 14);
-data.close.forEach((_, i) => {
-  if (rsi[i] == null || rsi[i - 1] == null) return;
-  if (rsi[i - 1] < 30 && rsi[i] >= 30) signal(i, 'buy', 'RSI back above 30');
-  if (rsi[i - 1] > 70 && rsi[i] <= 70) signal(i, 'sell', 'RSI back below 70');
-});`,
-  'Breakout': `const hi = ta.highest(data.high, 20);
-const lo = ta.lowest(data.low, 20);
-plot('High 20', hi, '#30d158');
-plot('Low 20', lo, '#ff453a');
-data.close.forEach((c, i) => {
-  if (i < 20) return;
-  if (c > hi[i - 1]) signal(i, 'buy', 'Breakout');
-  if (c < lo[i - 1]) signal(i, 'sell', 'Breakdown');
-});`,
-};

@@ -38,6 +38,13 @@ export default function PreTradeGate() {
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
   const [expanded, setExpanded] = useState(false);
+  const [hideLauncher, setHideLauncher] = useState(() => {
+    try {
+      return sessionStorage.getItem("coachLauncherHidden") === "1";
+    } catch {
+      return false;
+    }
+  });
   const [hideLabel, setHideLabel] = useState(() => {
     try { return sessionStorage.getItem("coachLabelHidden") === "1"; } catch { return false; }
   });
@@ -313,7 +320,7 @@ export default function PreTradeGate() {
       )}
 
       {/* ── Floating Trigger Button ──────────────────────────────────────── */}
-      {!isOpen && (
+      {!isOpen && !hideLauncher && (
         <div
           className="relative flex flex-col items-center cursor-pointer group"
           onClick={() => setIsOpen(true)}
@@ -343,6 +350,18 @@ export default function PreTradeGate() {
               className="w-full h-full object-cover"
             />
           </div>
+          <button
+            type="button"
+            aria-label="Hide coach"
+            onClick={(e) => {
+              e.stopPropagation();
+              setHideLauncher(true);
+              try { sessionStorage.setItem("coachLauncherHidden", "1"); } catch { /* ignore */ }
+            }}
+            className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-white dark:bg-[#1a1d24] border border-black/10 dark:border-white/15 shadow flex items-center justify-center text-neutral-500 hover:text-neutral-900 dark:hover:text-white"
+          >
+            <X className="w-3 h-3" />
+          </button>
         </div>
       )}
     </div>
