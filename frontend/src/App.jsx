@@ -111,6 +111,22 @@ const LoungeDeals = safeLazy(() => import("./pages/lounge/LoungeDeals.jsx"), "lo
 const TraderProfile = safeLazy(() => import("./pages/lounge/TraderProfile.jsx"), "lounge-trader");
 
 // Heavy / Secondary Pages (Prefetched on hover and idle)
+const TradingViewAlgo = safeLazy(
+  () => import("./pages/TradingViewAlgo.jsx"),
+  "tradingview-algo",
+);
+const AlgoWhitelistingTest = safeLazy(
+  () => import("./pages/admin-tools/AlgoWhitelistingTest.jsx"),
+  "algo-whitelisting",
+);
+const InAppAlgoTerminal = safeLazy(
+  () => import("./pages/admin-tools/InAppAlgoTerminal.jsx"),
+  "in-app-terminal",
+);
+const AlgoEngineLab = safeLazy(
+  () => import("./pages/admin-tools/AlgoEngineLab.jsx"),
+  "algo-engine-lab",
+);
 const Charts = safeLazy(() => import("./pages/Charts.jsx"), "charts");
 const Sessions = safeLazy(() => import("./pages/Sessions.jsx"), "sessions");
 const Backtest = safeLazy(() => import("./pages/Backtest.jsx"), "backtest");
@@ -173,6 +189,7 @@ registerRoutePrefetch(
   () => import("./pages/TradeAnalysis.jsx"),
 );
 registerRoutePrefetch("/onboarding", () => import("./pages/Onboarding.jsx"));
+registerRoutePrefetch("/tradingview-algo", () => import("./pages/TradingViewAlgo.jsx"));
 registerRoutePrefetch("/charts", () => import("./pages/Charts.jsx"));
 registerRoutePrefetch("/sessions", () => import("./pages/Sessions.jsx"));
 registerRoutePrefetch("/backtest", () => import("./pages/Backtest.jsx"));
@@ -419,6 +436,7 @@ const RouteWatcher = () => {
       "/profile",
       "/support",
       "/affiliate",
+      "/tradingview-algo",
       "/charts",
       "/sessions",
       "/tools",
@@ -510,6 +528,10 @@ function App() {
                   <Route path="profile" element={<Profile />} />
                   <Route path="support" element={<Support />} />
                   <Route path="affiliate" element={<AffiliateDashboard />} />
+                  <Route path="tradingview-algo" element={<TradingViewAlgo />} />
+                  <Route path="tools/algo-whitelisting" element={<AlgoWhitelistingTest />} />
+                  <Route path="tools/in-app-terminal" element={<InAppAlgoTerminal />} />
+                  <Route path="tools/algo-engine-lab" element={<AlgoEngineLab />} />
                   <Route path="charts" element={<Charts />} />
                   <Route path="sessions" element={<Sessions />} />
 
@@ -521,6 +543,9 @@ function App() {
                       element={<TradingBotDashboard />}
                     />
                     <Route path="admin/setup" element={<BotSetupPage />} />
+
+
+
                   </Route>
 
                   <Route path="bot-hub" element={<BotHubPage />} />

@@ -15,9 +15,11 @@ import {
   Cpu,
   Key,
   Zap,
+  Sparkles,
   ArrowRight,
   Lock,
   X,
+  Layers,
 } from "lucide-react";
 
 export default function Tools() {
@@ -84,6 +86,17 @@ export default function Tools() {
       category: "utility",
     },
     {
+      id: "tradingview-algo",
+      title: "Forexnotes Trading View Algo 🔥",
+      description:
+        "Institutional Invite-Only algorithmic indicator with Hull MA trend color flips, auto ATR targets, and order block detection.",
+      icon: Cpu,
+      badge: "VIP",
+      isAvailable: true,
+      path: "/tradingview-algo",
+      category: "algo",
+    },
+    {
       id: "live-charts",
       title: "Live Trading Charts",
       description:
@@ -141,6 +154,44 @@ export default function Tools() {
       path: "/bot-hub/mt5",
       category: "bot",
     },
+    // Admin Only Experimental Testing Suite (Architecture B, C & $0/mo Engine)
+    ...(isAdmin
+      ? [
+          {
+            id: "algo-whitelisting",
+            title: "Whitelisting Microservice (Arch B)",
+            description:
+              "Automated headless worker test suite: Simulates instant TradingView invite-only script provisioning upon payment.",
+            icon: Bot,
+            badge: "TEST (ARCH B)",
+            isAvailable: true,
+            path: "/tools/algo-whitelisting",
+            category: "admin-test",
+          },
+          {
+            id: "in-app-terminal",
+            title: "In-App Algo Terminal (Arch C)",
+            description:
+              "Proprietary in-app charting engine: Server computes indicators & signals in Node.js with 0% Pine Script code delivered to client.",
+            icon: Layers,
+            badge: "TEST (ARCH C)",
+            isAvailable: true,
+            path: "/tools/in-app-terminal",
+            category: "admin-test",
+          },
+          {
+            id: "algo-engine-lab",
+            title: "In-House Engine Lab ($0.00/mo)",
+            description:
+              "Zero-Cost Calculation Bench: Test parameter calibration, payload sizes, and sub-50ms execution latency.",
+            icon: Sparkles,
+            badge: "TEST ($0/MO)",
+            isAvailable: true,
+            path: "/tools/algo-engine-lab",
+            category: "admin-test",
+          },
+        ]
+      : []),
   ];
 
   const availableCount = tools.filter((t) => t.isAvailable).length;
@@ -175,7 +226,8 @@ export default function Tools() {
                 Trading Tools
               </h1>
               <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 mt-0.5">
-                Professional calculators and utilities to enhance your trading workflow
+                Professional calculators and utilities to enhance your trading
+                workflow
               </p>
             </div>
           </div>

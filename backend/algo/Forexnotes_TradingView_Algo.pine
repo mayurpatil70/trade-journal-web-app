@@ -1,0 +1,554 @@
+// ============================================================
+// FOREXNOTES TRADING VIEW ALGO 🔥 — Pine Script v6
+// Institutional Multi-Timeframe Algo with Order Blocks, Scalp Mode & AI Prediction
+// Exclusive Property of ForexNotes (https://forexnotes.in)
+// ============================================================
+//@version=6
+indicator("Forexnotes trading view algo 🔥", shorttitle="Forexnotes Algo", overlay=true,
+     max_lines_count=50, max_labels_count=500, max_boxes_count=100)
+
+// ╔══════════════════════════════════════════════════════════╗
+// ║                        INPUTS                           ║
+// ╚══════════════════════════════════════════════════════════╝
+
+// ── Hull MA ──────────────────────────────────────────────────
+g_hma = "━━━  Hull Moving Average  ━━━"
+i_hma_len   = input.int(20,    "HMA Length (lower = faster)",  minval=1,  group=g_hma)
+i_hma_bull  = input.color(#00c853, "HMA Color (Bull)",                    group=g_hma)
+i_hma_bear  = input.color(#e3001b, "HMA Color (Bear)",                    group=g_hma)
+
+// ── Signals ───────────────────────────────────────────────────
+g_sig = "━━━  Signal Settings  ━━━"
+i_src        = input.source(close,  "Source",                             group=g_sig)
+i_fast       = input.int(5,         "Fast EMA",            minval=1,      group=g_sig)
+i_slow       = input.int(13,        "Slow EMA",            minval=1,      group=g_sig)
+i_htf_filter = input.bool(true,     "HTF Confirmation Filter",            group=g_sig,
+     tooltip="ON = needs higher-TF agreement. OFF = raw EMA cross fires freely")
+i_htf_strict = input.bool(false,    "Strict HTF (ALL must align)",        group=g_sig,
+     tooltip="OFF = only immediate HTF needed. ON = Daily+HTF both must agree (fewer signals)")
+i_hma_filter = input.bool(false,    "HMA Direction Filter",               group=g_sig,
+     tooltip="OFF = more signals. ON = signal blocked if HMA disagrees")
+i_rsi_filter = input.bool(true,     "RSI Momentum Filter",                group=g_sig,
+     tooltip="BUY only when RSI > 45 | SELL only when RSI < 55")
+i_rsi_len    = input.int(10,        "RSI Length",          minval=2,      group=g_sig)
+i_vol_boost  = input.bool(true,     "Volume Spike Boost",                 group=g_sig,
+     tooltip="Lowers filter threshold when volume is above average")
+i_atr_len    = input.int(14,        "ATR Length",          minval=1,      group=g_sig)
+i_atr_mult   = input.float(1.2,     "ATR Mult (SL)",       step=0.1,      group=g_sig)
+i_tp1        = input.float(1.0,     "TP1 R:R",             step=0.1,      group=g_sig)
+i_tp2        = input.float(2.0,     "TP2 R:R",             step=0.1,      group=g_sig)
+
+// ── ★ Scalp Mode (1/3/5min Signal Boost) ───────────────────────
+g_scalp = "━━━  Scalp Mode (1/3/5min Signal Boost)  ━━━"
+i_scalp_mode       = input.bool(true,  "Enable Scalp Mode on 1/3/5min",     group=g_scalp,
+     tooltip="When the chart timeframe is 1, 3, or 5 minutes, auto-relaxes EMA speed, HTF filter, RSI thresholds and cooldown below — so you get noticeably more entries on fast charts without changing behavior on higher timeframes.")
+i_scalp_fast       = input.int(3,   "Scalp Fast EMA",                minval=1, group=g_scalp)
+i_scalp_slow       = input.int(8,   "Scalp Slow EMA",                minval=1, group=g_scalp)
+i_scalp_bypass_htf = input.bool(true,  "Bypass HTF Filter in Scalp Mode",  group=g_scalp,
+     tooltip="ON = ignore higher-timeframe confirmation entirely while scalping (raw EMA cross fires)")
+i_scalp_rsi_buy    = input.int(35,  "Scalp RSI Buy Min",             minval=1, maxval=100, group=g_scalp)
+i_scalp_rsi_sell   = input.int(65,  "Scalp RSI Sell Max",            minval=1, maxval=100, group=g_scalp)
+i_scalp_min_bars   = input.int(1,   "Scalp Min Bars Between Signals",minval=1, group=g_scalp,
+     tooltip="Cooldown bars while in Scalp Mode — set to 1 for fastest re-entries")
+
+// ── Re-entry Settings ─────────────────────────────────────────
+g_reentry = "━━━  Re-Entry Settings  ━━━"
+i_allow_reentry = input.bool(true,  "Allow Re-Entry While Active",        group=g_reentry,
+     tooltip="ON = new signal fires even if a trade is already running")
+i_min_bars      = input.int(3,      "Min Bars Between Signals",  minval=1, group=g_reentry,
+     tooltip="Cooldown bars to avoid signal spam (used when Scalp Mode is off / not on 1-3-5min)")
+
+// ── Display ───────────────────────────────────────────────────
+g_disp = "━━━  Display  ━━━"
+i_show_lines = input.bool(true,  "Show Entry/SL/TP Lines",               group=g_disp)
+i_show_mini  = input.bool(true,  "Show Mini Recap Box",                  group=g_disp)
+i_tbl_pos    = input.string("Top Right", "Table Position",
+     options=["Top Right","Top Left","Bottom Right","Bottom Left"],       group=g_disp)
+
+// ── ★ Order Block Settings ────────────────────────────────────
+g_ob = "━━━  Order Blocks  ━━━"
+i_ob_enable  = input.bool(true,   "Show Order Blocks",                   group=g_ob)
+i_ob_len     = input.int(3,       "OB Swing Lookback",      minval=1,    group=g_ob,
+     tooltip="How many bars back to look for the origin candle")
+i_ob_bull_col = input.color(color.new(#00c853, 75), "Bullish OB Color",  group=g_ob)
+i_ob_bear_col = input.color(color.new(#e53935, 75), "Bearish OB Color",  group=g_ob)
+i_ob_extend  = input.bool(true,   "Extend OB Box to Right",              group=g_ob)
+i_ob_max     = input.int(5,       "Max OBs to Show",        minval=1, maxval=20, group=g_ob)
+
+// ── ★ Next Candle Prediction ──────────────────────────────────
+g_pred = "━━━  Next Candle Prediction  ━━━"
+i_pred_enable = input.bool(true,  "Show Next Candle Prediction",         group=g_pred)
+
+// ╔══════════════════════════════════════════════════════════╗
+// ║                  HULL MOVING AVERAGE                    ║
+// ╚══════════════════════════════════════════════════════════╝
+hma(src, len) =>
+    ta.wma(2 * ta.wma(src, math.floor(len / 2)) - ta.wma(src, len), math.floor(math.sqrt(len)))
+
+hma_val    = hma(close, i_hma_len)
+hma_rising = hma_val > hma_val[1]
+hma_clr    = hma_rising ? i_hma_bull : i_hma_bear
+
+plot(hma_val, "HMA", color=hma_clr, linewidth=2, force_overlay=true)
+
+// ╔══════════════════════════════════════════════════════════╗
+// ║             MULTI-TIMEFRAME TREND ENGINE                ║
+// ╚══════════════════════════════════════════════════════════╝
+tf_bull(tf) =>
+    f = request.security(syminfo.tickerid, tf, ta.ema(close, i_fast), lookahead=barmerge.lookahead_off)
+    s = request.security(syminfo.tickerid, tf, ta.ema(close, i_slow), lookahead=barmerge.lookahead_off)
+    f >= s
+
+bull_1D  = tf_bull("D")
+bull_4H  = tf_bull("240")
+bull_12H = tf_bull("720")
+bull_1H  = tf_bull("60")
+bull_30M = tf_bull("30")
+bull_15M = tf_bull("15")
+bull_5M  = tf_bull("5")
+bull_1M  = tf_bull("1")
+
+// ╔══════════════════════════════════════════════════════════╗
+// ║              ★ SCALP MODE DETECTION ★                   ║
+// ╚══════════════════════════════════════════════════════════╝
+is_low_tf     = timeframe.period == "1" or timeframe.period == "3" or timeframe.period == "5"
+scalp_active  = i_scalp_mode and is_low_tf
+
+// ╔══════════════════════════════════════════════════════════╗
+// ║         RSI MOMENTUM + VOLUME SPIKE HELPERS             ║
+// ╚══════════════════════════════════════════════════════════╝
+rsi_val    = ta.rsi(close, i_rsi_len)
+vol_avg    = ta.sma(volume, 20)
+vol_spike  = volume > vol_avg * 1.3
+
+rsi_buy_ok  = i_rsi_filter ?
+     (scalp_active ? rsi_val > i_scalp_rsi_buy  : (vol_spike ? rsi_val > 40 : rsi_val > 45)) : true
+rsi_sell_ok = i_rsi_filter ?
+     (scalp_active ? rsi_val < i_scalp_rsi_sell : (vol_spike ? rsi_val < 60 : rsi_val < 55)) : true
+
+// ╔══════════════════════════════════════════════════════════╗
+// ║     BUY / SELL SIGNAL — ALL TIMEFRAMES ADAPTIVE         ║
+// ╚══════════════════════════════════════════════════════════╝
+eff_fast = scalp_active ? i_scalp_fast : i_fast
+eff_slow = scalp_active ? i_scalp_slow : i_slow
+
+fast_ema = ta.ema(i_src, eff_fast)
+slow_ema = ta.ema(i_src, eff_slow)
+
+cross_up   = ta.crossover(fast_ema,  slow_ema)
+cross_down = ta.crossunder(fast_ema, slow_ema)
+
+confirm_tf =
+     timeframe.period == "1"   ? "5"   :
+     timeframe.period == "2"   ? "10"  :
+     timeframe.period == "3"   ? "15"  :
+     timeframe.period == "5"   ? "15"  :
+     timeframe.period == "10"  ? "30"  :
+     timeframe.period == "15"  ? "60"  :
+     timeframe.period == "30"  ? "60"  :
+     timeframe.period == "45"  ? "120" :
+     timeframe.period == "60"  ? "240" :
+     timeframe.period == "120" ? "240" :
+     timeframe.period == "180" ? "240" :
+     timeframe.period == "240" ? "D"   :
+     timeframe.period == "D"   ? "W"   :
+     timeframe.period == "W"   ? "M"   :
+     ""
+
+htf_bull = confirm_tf != "" ?
+     request.security(syminfo.tickerid, confirm_tf,
+          ta.ema(close, i_fast) >= ta.ema(close, i_slow),
+          lookahead=barmerge.lookahead_off) :
+     true
+
+htf_buy_ok  = scalp_active and i_scalp_bypass_htf ? true :
+              not i_htf_filter ? true :
+              i_htf_strict     ? (htf_bull and bull_1D) :
+              htf_bull
+
+htf_sell_ok = scalp_active and i_scalp_bypass_htf ? true :
+              not i_htf_filter ? true :
+              i_htf_strict     ? (not htf_bull and not bull_1D) :
+              not htf_bull
+
+hma_buy_ok  = i_hma_filter ? hma_rising      : true
+hma_sell_ok = i_hma_filter ? not hma_rising  : true
+
+eff_min_bars = scalp_active ? i_scalp_min_bars : i_min_bars
+
+var int last_signal_bar = 0
+cooldown_ok = (bar_index - last_signal_bar) >= eff_min_bars
+
+hp_up = cross_up   and htf_buy_ok  and hma_buy_ok  and rsi_buy_ok  and cooldown_ok
+sc_up = cross_down and htf_sell_ok and hma_sell_ok and rsi_sell_ok and cooldown_ok
+
+if hp_up or sc_up
+    last_signal_bar := bar_index
+
+// ╔══════════════════════════════════════════════════════════╗
+// ║            ENTRY  /  STOP LOSS  /  TP LEVELS            ║
+// ╚══════════════════════════════════════════════════════════╝
+var float v_entry = na
+var float v_sl    = na
+var float v_tp1   = na
+var float v_tp2   = na
+var bool  active  = false
+var bool  is_long = true
+
+atr = ta.atr(i_atr_len)
+
+if hp_up and (not active or i_allow_reentry)
+    v_entry := close
+    v_sl    := close - atr * i_atr_mult
+    v_tp1   := close + (close - v_sl) * i_tp1
+    v_tp2   := close + (close - v_sl) * i_tp2
+    active  := true
+    is_long := true
+
+if sc_up and (not active or i_allow_reentry)
+    v_entry := close
+    v_sl    := close + atr * i_atr_mult
+    v_tp1   := close - (v_sl - close) * i_tp1
+    v_tp2   := close - (v_sl - close) * i_tp2
+    active  := true
+    is_long := false
+
+if active
+    if is_long and (low <= v_sl or high >= v_tp2)
+        active := false
+    if not is_long and (high >= v_sl or low <= v_tp2)
+        active := false
+
+// ╔══════════════════════════════════════════════════════════╗
+// ║                  CHART SIGNAL LABELS                    ║
+// ╚══════════════════════════════════════════════════════════╝
+if hp_up
+    label.new(bar_index, low,
+         vol_spike ? "▲ BUY 🔥" : "▲ BUY",
+         yloc=yloc.belowbar,
+         style=label.style_label_up,
+         color=vol_spike ? color.new(#00e676, 0) : color.new(#00c853, 0),
+         textcolor=color.white,
+         size=size.small)
+
+if sc_up
+    label.new(bar_index, high,
+         vol_spike ? "▼ SELL 🔥" : "▼ SELL",
+         yloc=yloc.abovebar,
+         style=label.style_label_down,
+         color=vol_spike ? color.new(#ff1744, 0) : color.new(#f44336, 0),
+         textcolor=color.white,
+         size=size.small)
+
+// ╔══════════════════════════════════════════════════════════╗
+// ║                   LEVEL LINES ON CHART                  ║
+// ╚══════════════════════════════════════════════════════════╝
+var line ln_entry = na
+var line ln_sl    = na
+var line ln_tp1   = na
+var line ln_tp2   = na
+
+if i_show_lines and active and barstate.islast
+    line.delete(ln_entry)
+    line.delete(ln_sl)
+    line.delete(ln_tp1)
+    line.delete(ln_tp2)
+    ln_entry := line.new(bar_index - 30, v_entry, bar_index + 8, v_entry,
+         color=color.orange, width=1, style=line.style_dashed, extend=extend.none)
+    ln_sl := line.new(bar_index - 30, v_sl, bar_index + 8, v_sl,
+         color=#e53935, width=1, style=line.style_dashed, extend=extend.none)
+    ln_tp1 := line.new(bar_index - 30, v_tp1, bar_index + 8, v_tp1,
+         color=#00897b, width=1, style=line.style_dashed, extend=extend.none)
+    ln_tp2 := line.new(bar_index - 30, v_tp2, bar_index + 8, v_tp2,
+         color=#00c853, width=1, style=line.style_dashed, extend=extend.none)
+
+// ╔══════════════════════════════════════════════════════════╗
+// ║           ★ ORDER BLOCK DETECTION ENGINE ★              ║
+// ╚══════════════════════════════════════════════════════════╝
+avg_body = ta.sma(math.abs(close - open), 20)
+body_now = math.abs(close - open)
+is_bull_bar = close > open
+is_bear_bar = close < open
+
+bull_impulse = is_bull_bar and body_now > avg_body * 1.2 and close[1] < open[1]
+bear_impulse = is_bear_bar and body_now > avg_body * 1.2 and close[1] > open[1]
+
+var box[] ob_boxes = array.new_box()
+var bool[] ob_is_bull = array.new_bool()
+var label[] ob_labels = array.new_label()
+
+if i_ob_enable and bull_impulse
+    if array.size(ob_boxes) >= i_ob_max
+        box.delete(array.shift(ob_boxes))
+        label.delete(array.shift(ob_labels))
+        array.shift(ob_is_bull)
+
+    ob_top = math.max(open[1], close[1])
+    ob_bottom = math.min(open[1], close[1])
+    new_box = box.new(bar_index - 1, ob_top, bar_index, ob_bottom,
+         border_color=color.new(#00c853, 20),
+         border_width=1,
+         bgcolor=i_ob_bull_col,
+         extend=i_ob_extend ? extend.right : extend.none)
+    new_lbl = label.new(bar_index - 1, ob_top, "🟩 Bull OB",
+         yloc=yloc.price,
+         style=label.style_label_right,
+         color=color.new(#00c853, 20),
+         textcolor=color.white,
+         size=size.tiny)
+    array.push(ob_boxes, new_box)
+    array.push(ob_is_bull, true)
+    array.push(ob_labels, new_lbl)
+
+if i_ob_enable and bear_impulse
+    if array.size(ob_boxes) >= i_ob_max
+        box.delete(array.shift(ob_boxes))
+        label.delete(array.shift(ob_labels))
+        array.shift(ob_is_bull)
+
+    ob_top = math.max(open[1], close[1])
+    ob_bottom = math.min(open[1], close[1])
+    new_box = box.new(bar_index - 1, ob_top, bar_index, ob_bottom,
+         border_color=color.new(#e53935, 20),
+         border_width=1,
+         bgcolor=i_ob_bear_col,
+         extend=i_ob_extend ? extend.right : extend.none)
+    new_lbl = label.new(bar_index - 1, ob_bottom, "🟥 Bear OB",
+         yloc=yloc.price,
+         style=label.style_label_right,
+         color=color.new(#e53935, 20),
+         textcolor=color.white,
+         size=size.tiny)
+    array.push(ob_boxes, new_box)
+    array.push(ob_is_bull, false)
+    array.push(ob_labels, new_lbl)
+
+if i_ob_enable and array.size(ob_boxes) > 0
+    for i = array.size(ob_boxes) - 1 to 0
+        b = array.get(ob_boxes, i)
+        is_b = array.get(ob_is_bull, i)
+        b_top = box.get_top(b)
+        b_bot = box.get_bottom(b)
+        if (is_b and close < b_bot) or (not is_b and close > b_top)
+            box.delete(b)
+            label.delete(array.get(ob_labels, i))
+            array.remove(ob_boxes, i)
+            array.remove(ob_is_bull, i)
+            array.remove(ob_labels, i)
+
+// ╔══════════════════════════════════════════════════════════╗
+// ║        ★ NEXT CANDLE PREDICTION ENGINE ★                ║
+// ╚══════════════════════════════════════════════════════════╝
+bull_streak = close > open and close[1] > open[1]
+bear_streak = close < open and close[1] < open[1]
+
+pred_score =
+     (close > open ? 1 : -1) +
+     (rsi_val > rsi_val[1] ? 1 : -1) +
+     (rsi_val > 55 ? 1 : rsi_val < 45 ? -1 : 0) +
+     (volume > vol_avg ? (close > open ? 1 : -1) : 0) +
+     (hma_rising ? 1 : -1) +
+     (fast_ema > slow_ema ? 1 : -1) +
+     (bull_streak ? 1 : bear_streak ? -1 : 0) +
+     (body_now > avg_body * 1.3 ? (close > open ? 1 : -1) : 0)
+
+pred_bull = pred_score >= 3
+pred_bear = pred_score <= -3
+
+pred_str = pred_bull ? "▲ Bullish (" + str.tostring(pred_score) + ")" : pred_bear ? "▼ Bearish (" + str.tostring(pred_score) + ")" : "● Neutral (" + str.tostring(pred_score) + ")"
+pred_bg = pred_bull ? color.new(#00897b, 20) : pred_bear ? color.new(#b71c1c, 20) : color.new(#37474f, 30)
+pred_tc = pred_bull ? color.new(#80cbc4, 0) : pred_bear ? color.new(#ef9a9a, 0) : color.new(#b0bec5, 0)
+
+// ╔══════════════════════════════════════════════════════════╗
+// ║                    MOON PHASE ENGINE                    ║
+// ╚══════════════════════════════════════════════════════════╝
+LUNAR_DAYS = 29.53058867
+REF_NM_DAYS = 947182440000.0 / 86400000.0
+
+time_days = float(time) / 86400000.0
+elapsed = time_days - REF_NM_DAYS
+moon_age_day = elapsed - LUNAR_DAYS * math.floor(elapsed / LUNAR_DAYS)
+moon_age_day := moon_age_day < 0.0 ? moon_age_day + LUNAR_DAYS : moon_age_day
+
+moon_str =
+     moon_age_day < 1.85 ? "🌑 New Moon" :
+     moon_age_day < 7.38 ? "🌒 Waxing Crescent" :
+     moon_age_day < 9.22 ? "🌓 First Quarter" :
+     moon_age_day < 14.76 ? "🌔 Waxing Gibbous" :
+     moon_age_day < 16.61 ? "🌕 Full Moon Phase" :
+     moon_age_day < 22.15 ? "🌖 Waning Gibbous" :
+     moon_age_day < 23.99 ? "🌗 Last Quarter" :
+     "🌘 Waning Crescent"
+
+is_full_moon = moon_age_day >= 14.76 and moon_age_day < 16.61
+moon_bg_col = is_full_moon ? color.new(#f9a825, 10) : color.new(#1a237e, 30)
+
+// ╔══════════════════════════════════════════════════════════╗
+// ║                   HELPER FUNCTIONS                      ║
+// ╚══════════════════════════════════════════════════════════╝
+t_str(bull) => bull ? "Bullish" : "Bearish"
+t_bg(bull) => bull ? color.new(#00897b, 20) : color.new(#b71c1c, 20)
+t_tc(bull) => bull ? color.new(#80cbc4, 0) : color.new(#ef9a9a, 0)
+
+fmt(v) => str.tostring(math.round(v * 100) / 100)
+pts(a, b) => str.tostring(math.round(math.abs(a - b) * 100) / 100)
+
+entry_s = active ? fmt(v_entry) : "—"
+sl_s = active ? fmt(v_sl) + "  (" + pts(v_entry, v_sl) + "pts)" : "—"
+tp1_s = active ? fmt(v_tp1) + "  (" + pts(v_entry, v_tp1) + "pts)" : "—"
+tp2_s = active ? fmt(v_tp2) + "  (" + pts(v_entry, v_tp2) + "pts)" : "—"
+sig_s = active ? (is_long ? "BUY Active" : "SELL Active") : "No Signal"
+sig_bg = active ? (is_long ? color.new(#00897b, 20) : color.new(#e65100, 20)) : color.new(#37474f, 40)
+sig_tc = active ? color.white : color.new(color.silver, 20)
+rsi_s = str.tostring(math.round(rsi_val * 10) / 10)
+scalp_s = scalp_active ? "ON (" + timeframe.period + "m)" : "OFF"
+
+// ╔══════════════════════════════════════════════════════════╗
+// ║               MAIN DASHBOARD TABLE                      ║
+// ╚══════════════════════════════════════════════════════════╝
+tbl_pos_val = switch i_tbl_pos
+    "Top Right" => position.top_right
+    "Top Left" => position.top_left
+    "Bottom Right" => position.bottom_right
+    => position.bottom_left
+
+var table tbl = table.new(tbl_pos_val, 2, 22,
+     bgcolor=color.new(#0d0d0d, 15),
+     border_width=1,
+     border_color=color.new(#424242, 30),
+     frame_width=2,
+     frame_color=color.new(#616161, 20))
+
+row(r, lbl, val, vbg, vtc) =>
+    table.cell(tbl, 0, r, lbl,
+         text_color=color.new(#b0bec5, 0),
+         text_size=size.tiny,
+         bgcolor=color.new(#1c1c1e, 20),
+         text_halign=text.align_left)
+    table.cell(tbl, 1, r, val,
+         text_color=vtc,
+         text_size=size.tiny,
+         bgcolor=vbg,
+         text_halign=text.align_center)
+
+ob_status_str = bull_impulse ? "🟩 Bull OB Formed" : bear_impulse ? "🟥 Bear OB Formed" : str.tostring(array.size(ob_boxes)) + " OBs Active"
+ob_status_bg = bull_impulse ? color.new(#00897b, 20) : bear_impulse ? color.new(#b71c1c, 20) : color.new(#1c1c1e, 20)
+ob_status_tc = bull_impulse ? color.new(#80cbc4, 0) : bear_impulse ? color.new(#ef9a9a, 0) : color.new(#607d8b, 0)
+
+if barstate.islast
+    table.cell(tbl, 0, 0, "Forexnotes trading view algo 🔥",
+         text_color=color.new(#ff8f00, 0),
+         text_size=size.small,
+         bgcolor=color.new(#1a1a2e, 10),
+         text_halign=text.align_left)
+    table.cell(tbl, 1, 0, "Active",
+         text_color=color.new(#00e5ff, 0),
+         text_size=size.small,
+         bgcolor=color.new(#1a1a2e, 10),
+         text_halign=text.align_center)
+    row(1, "Daily Trend", t_str(bull_1D), t_bg(bull_1D), t_tc(bull_1D))
+    row(2, "4H Trend", t_str(bull_4H), t_bg(bull_4H), t_tc(bull_4H))
+    row(3, "12H Trend", t_str(bull_12H), t_bg(bull_12H), t_tc(bull_12H))
+    row(4, "1H Trend", t_str(bull_1H), t_bg(bull_1H), t_tc(bull_1H))
+    row(5, "30M Trend", t_str(bull_30M), t_bg(bull_30M), t_tc(bull_30M))
+    row(6, "15M Trend", t_str(bull_15M), t_bg(bull_15M), t_tc(bull_15M))
+    row(7, "5M Trend", t_str(bull_5M), t_bg(bull_5M), t_tc(bull_5M))
+    row(8, "1M Trend", t_str(bull_1M), t_bg(bull_1M), t_tc(bull_1M))
+    row(9, "Moon Phase", moon_str, moon_bg_col, color.white)
+    row(10, "RSI (" + str.tostring(i_rsi_len) + ")", rsi_s,
+            rsi_val > 55 ? color.new(#00897b, 30) : rsi_val < 45 ? color.new(#b71c1c, 30) : color.new(#37474f, 30),
+            rsi_val > 55 ? color.new(#80cbc4, 0) : rsi_val < 45 ? color.new(#ef9a9a, 0) : color.white)
+    row(11, "Vol Spike", vol_spike ? "YES 🔥" : "Normal",
+            vol_spike ? color.new(#e65100, 20) : color.new(#1c1c1e, 20),
+            vol_spike ? color.new(#ffcc02, 0) : color.new(#607d8b, 0))
+    row(12, "Signal Status", sig_s, sig_bg, sig_tc)
+    row(13, "Entry Price", entry_s, color.new(#1c1c1e, 20), color.new(#ff8f00, 0))
+    row(14, "Stop Loss", sl_s, color.new(#b71c1c, 40), color.white)
+    row(15, "TP1 (1:1)", tp1_s, color.new(#00897b, 40), color.white)
+    row(16, "TP2 (1:2)", tp2_s, color.new(#00695c, 40), color.white)
+    row(17, "Active PL [1M]", "None", color.new(#1c1c1e, 20), color.new(#607d8b, 0))
+    row(18, "Order Block", ob_status_str, ob_status_bg, ob_status_tc)
+    row(19, "Next Candle", i_pred_enable ? pred_str : "Disabled", pred_bg, pred_tc)
+    row(20, "Scalp Mode", scalp_s,
+            scalp_active ? color.new(#e65100, 20) : color.new(#1c1c1e, 20),
+            scalp_active ? color.new(#ffcc02, 0) : color.new(#607d8b, 0))
+    table.cell(tbl, 0, 21, "", bgcolor=color.new(#0d0d0d, 30))
+    table.cell(tbl, 1, 21, "", bgcolor=color.new(#0d0d0d, 30))
+
+// ╔══════════════════════════════════════════════════════════╗
+// ║              MINI INSET BOX (Bottom-Right)              ║
+// ╚══════════════════════════════════════════════════════════╝
+var table mini = table.new(position.bottom_right, 2, 10,
+     bgcolor=color.new(#0d0d0d, 20),
+     border_width=1,
+     border_color=color.new(#424242, 40),
+     frame_width=1,
+     frame_color=color.new(#616161, 30))
+
+mini_row(r, lbl, val, vc, vbg) =>
+    table.cell(mini, 0, r, lbl,
+         text_color=color.new(#90a4ae, 0),
+         text_size=size.tiny,
+         bgcolor=color.new(#111111, 20),
+         text_halign=text.align_left)
+    table.cell(mini, 1, r, val,
+         text_color=vc,
+         text_size=size.tiny,
+         bgcolor=vbg,
+         text_halign=text.align_center)
+
+if i_show_mini and barstate.islast
+    mini_row(0, "Signal", sig_s, sig_tc, sig_bg)
+    mini_row(1, "Entry", entry_s, color.new(#ff8f00, 0), color.new(#1c1c1e, 20))
+    mini_row(2, "SL", sl_s, color.white, color.new(#b71c1c, 40))
+    mini_row(3, "TP1", tp1_s, color.white, color.new(#00897b, 40))
+    mini_row(4, "TP2", tp2_s, color.white, color.new(#00695c, 40))
+    mini_row(5, "RSI", rsi_s, color.white, color.new(#1c1c1e, 30))
+    mini_row(6, "Moon", moon_str, color.white, moon_bg_col)
+    mini_row(7, "OB", ob_status_str, ob_status_tc, ob_status_bg)
+    mini_row(8, "Next Candle", i_pred_enable ? pred_str : "—", pred_tc, pred_bg)
+    mini_row(9, "Scalp", scalp_s, scalp_active ? color.new(#ffcc02, 0) : color.white,
+              scalp_active ? color.new(#e65100, 20) : color.new(#1c1c1e, 20))
+
+// ╔══════════════════════════════════════════════════════════╗
+// ║                     ALERT CONDITIONS                    ║
+// ╚══════════════════════════════════════════════════════════╝
+alertcondition(hp_up,
+     "Forexnotes — BUY Signal",
+     "Forexnotes trading view algo: BUY Signal on {{ticker}} [{{interval}}] @ {{close}}")
+
+alertcondition(sc_up,
+     "Forexnotes — SELL Signal",
+     "Forexnotes trading view algo: SELL Signal on {{ticker}} [{{interval}}] @ {{close}}")
+
+alertcondition(hp_up and vol_spike,
+     "Forexnotes — BUY + Volume Spike 🔥",
+     "Forexnotes: HIGH CONFIDENCE BUY — Volume Spike on {{ticker}} @ {{close}}")
+
+alertcondition(sc_up and vol_spike,
+     "Forexnotes — SELL + Volume Spike 🔥",
+     "Forexnotes: HIGH CONFIDENCE SELL — Volume Spike on {{ticker}} @ {{close}}")
+
+alertcondition(hp_up and bull_1D and bull_4H,
+     "Forexnotes — BUY Trend Confirmed",
+     "Forexnotes: BUY confirmed — Daily & 4H both Bullish on {{ticker}} @ {{close}}")
+
+alertcondition(is_full_moon,
+     "Forexnotes — Full Moon Phase",
+     "Forexnotes: Full Moon Phase active — heightened volatility possible on {{ticker}}")
+
+alertcondition(bull_impulse,
+     "Forexnotes — Bullish Order Block Formed 🟩",
+     "Forexnotes: Bullish Order Block detected on {{ticker}} [{{interval}}] @ {{close}}")
+
+alertcondition(bear_impulse,
+     "Forexnotes — Bearish Order Block Formed 🟥",
+     "Forexnotes: Bearish Order Block detected on {{ticker}} [{{interval}}] @ {{close}}")
+
+alertcondition(i_pred_enable and pred_bull,
+     "Forexnotes — Next Candle: Bullish Prediction",
+     "Forexnotes: Next candle predicted BULLISH on {{ticker}} [{{interval}}]")
+
+alertcondition(i_pred_enable and pred_bear,
+     "Forexnotes — Next Candle: Bearish Prediction",
+     "Forexnotes: Next candle predicted BEARISH on {{ticker}} [{{interval}}]")

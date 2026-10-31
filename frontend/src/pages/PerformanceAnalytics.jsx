@@ -1052,17 +1052,13 @@ export default function PerformanceAnalytics() {
           {/* Right Action Controls: Account Selector + Screenshot 2 "ALL TIME" Period Popover */}
           <div className="flex items-center gap-2.5 self-start lg:self-auto">
             {availableCardAccounts.length > 2 && (
-              <select
+              <AppleSelect
+                compact={true}
                 value={cardAccount}
-                onChange={(e) => setCardAccount(e.target.value)}
-                className="px-2.5 py-1 text-xs rounded-xl bg-neutral-100 dark:bg-white/[0.06] border border-black/[0.05] dark:border-white/[0.08] text-neutral-700 dark:text-neutral-300 font-medium focus:outline-none cursor-pointer"
-              >
-                {availableCardAccounts.map((acc) => (
-                  <option key={acc} value={acc} className="dark:bg-[#12151e]">
-                    {acc}
-                  </option>
-                ))}
-              </select>
+                onChange={(val) => setCardAccount(typeof val === 'object' && val !== null ? val.target?.value || val.value : val)}
+                options={availableCardAccounts}
+                className="w-36"
+              />
             )}
 
             {/* Period Popover (Matches Screenshot 2: "ALL TIME" Pill Button) */}

@@ -5,7 +5,7 @@
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
-import { ChevronDown, Check } from "lucide-react";
+import { ChevronDown, Check, Search } from "lucide-react";
 
 export default function AppleSelect({
   value,
@@ -14,14 +14,21 @@ export default function AppleSelect({
   placeholder = "Select an option",
   error = false,
   className = "",
+  triggerClassName = "",
   name,
   disabled = false,
   icon: Icon = null,
   compact = false,
+  searchable = false,
+  customTrigger = null,
+  minMenuWidth = 0,
+  renderOption = null,
 }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
   const triggerRef = useRef(null);
   const menuRef = useRef(null);
+  const searchInputRef = useRef(null);
   const [coords, setCoords] = useState({
     top: 0,
     left: 0,
@@ -35,7 +42,7 @@ export default function AppleSelect({
       ? (value.target?.value ?? value.value ?? "")
       : value;
 
-  // Normalize options: supports string[] or { value, label }[]
+  // Normalize options: supports string[] or { value, label, ...extra }[]
   const normalizedOptions = options.map((opt) =>
     typeof opt === "object" && opt !== null
       ? opt
@@ -51,27 +58,40 @@ export default function AppleSelect({
     ) || { value: rawValue, label: String(rawValue) };
   }
 
+  // Filter options if search is enabled
+  const filteredOptions = searchTerm.trim()
+    ? normalizedOptions.filter((opt) =>
+        opt.label.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        String(opt.value).toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    : normalizedOptions;
+
   // Measure and position dropdown
   const updatePosition = useCallback(() => {
     if (!triggerRef.current) return;
     const rect = triggerRef.current.getBoundingClientRect();
     const spaceBelow = window.innerHeight - rect.bottom;
-    const estimatedHeight = Math.min(normalizedOptions.length * 40 + 20, 260);
+    const estimatedHeight = Math.min(normalizedOptions.length * 40 + (searchable ? 50 : 20), 280);
     const placeAbove =
       spaceBelow < estimatedHeight && rect.top > estimatedHeight;
 
+    const width = Math.max(rect.width, minMenuWidth || 0);
+    const left = Math.max(12, Math.min(rect.left, window.innerWidth - width - 12));
+
     setCoords({
       top: placeAbove ? rect.top - 8 : rect.bottom + 8,
-      left: rect.left,
-      width: rect.width,
+      left,
+      width,
       placeAbove,
     });
-  }, [normalizedOptions.length]);
+  }, [normalizedOptions.length, minMenuWidth, searchable]);
 
   const toggleOpen = () => {
     if (disabled) return;
     if (!isOpen) {
+      setSearchTerm("");
       updatePosition();
+      setTimeout(() => searchInputRef.current?.focus(), 60);
     }
     setIsOpen((prev) => !prev);
   };
@@ -126,47 +146,57 @@ export default function AppleSelect({
   };
 
   return (
-    <div className={`relative w-full ${className}`}>
-      {/* Trigger Button (iOS Squircle Frosted Glass) */}
-      <button
-        ref={triggerRef}
-        type="button"
-        disabled={disabled}
-        onClick={toggleOpen}
-        className={`w-full flex items-center justify-between ${
-          compact ? "px-3 py-2 rounded-xl text-xs" : "px-4 py-3 rounded-2xl text-[14px]"
-        } font-medium transition-all duration-200 cursor-pointer text-left backdrop-blur-xl ${
-          error
-            ? "border border-rose-500/80 ring-1 ring-rose-500/50 bg-rose-500/[0.04]"
-            : isOpen
-              ? "border border-blue-500/60 ring-2 ring-blue-500/20 bg-white/95 dark:bg-white/[0.09]"
-              : "border border-black/[0.08] dark:border-white/10 bg-white/70 dark:bg-white/[0.05] hover:bg-white/90 dark:hover:bg-white/[0.08] hover:border-black/[0.15] dark:hover:border-white/20"
-        } text-neutral-900 dark:text-white shadow-sm disabled:opacity-50 disabled:cursor-not-allowed`}
-      >
-        <div className="flex items-center min-w-0 pr-2">
-          {Icon && (
-            <Icon
-              className={`w-3.5 h-3.5 text-neutral-400 dark:text-neutral-500 mr-2 shrink-0 ${
-                isOpen ? "text-blue-500 dark:text-blue-400" : ""
+    <div className={`relative ${customTrigger ? "inline-block" : "w-full"} ${className}`}>
+      {/* Trigger Button (iOS Squircle Frosted Glass or Custom Trigger) */}
+      {customTrigger ? (
+        customTrigger({
+          isOpen,
+          toggleOpen,
+          triggerRef,
+          selectedOption,
+          disabled,
+        })
+      ) : (
+        <button
+          ref={triggerRef}
+          type="button"
+          disabled={disabled}
+          onClick={toggleOpen}
+          className={`w-full flex items-center justify-between ${
+            compact ? "px-3 py-2 rounded-xl text-xs" : "px-4 py-3 rounded-2xl text-[14px]"
+          } font-medium transition-all duration-200 cursor-pointer text-left backdrop-blur-xl ${
+            error
+              ? "border border-rose-500/80 ring-1 ring-rose-500/50 bg-rose-500/[0.04]"
+              : isOpen
+                ? "border border-blue-500/60 ring-2 ring-blue-500/20 bg-white/95 dark:bg-white/[0.09]"
+                : "border border-black/[0.08] dark:border-white/10 bg-white/70 dark:bg-white/[0.05] hover:bg-white/90 dark:hover:bg-white/[0.08] hover:border-black/[0.15] dark:hover:border-white/20"
+          } text-neutral-900 dark:text-white shadow-sm disabled:opacity-50 disabled:cursor-not-allowed ${triggerClassName}`}
+        >
+          <div className="flex items-center min-w-0 pr-2">
+            {Icon && (
+              <Icon
+                className={`w-3.5 h-3.5 text-neutral-400 dark:text-neutral-500 mr-2 shrink-0 ${
+                  isOpen ? "text-blue-500 dark:text-blue-400" : ""
+                }`}
+              />
+            )}
+            <span
+              className={`truncate ${
+                selectedOption
+                  ? "text-neutral-900 dark:text-white font-medium"
+                  : "text-neutral-400 dark:text-neutral-500"
               }`}
-            />
-          )}
-          <span
-            className={`truncate ${
-              selectedOption
-                ? "text-neutral-900 dark:text-white font-medium"
-                : "text-neutral-400 dark:text-neutral-500"
+            >
+              {selectedOption ? selectedOption.label : placeholder}
+            </span>
+          </div>
+          <ChevronDown
+            className={`w-3.5 h-3.5 text-neutral-400 dark:text-neutral-500 transition-transform duration-300 shrink-0 ml-1.5 ${
+              isOpen ? "rotate-180 text-blue-500" : ""
             }`}
-          >
-            {selectedOption ? selectedOption.label : placeholder}
-          </span>
-        </div>
-        <ChevronDown
-          className={`w-3.5 h-3.5 text-neutral-400 dark:text-neutral-500 transition-transform duration-300 shrink-0 ml-1.5 ${
-            isOpen ? "rotate-180 text-blue-500" : ""
-          }`}
-        />
-      </button>
+          />
+        </button>
+      )}
 
       {/* iOS / macOS Frosted Glass Popover Menu (Portaled into document.body to prevent clipping) */}
       {isOpen &&
@@ -183,30 +213,58 @@ export default function AppleSelect({
               width: coords.width,
               zIndex: 99999,
             }}
-            className="bg-white/95 dark:bg-[#121622]/95 border border-black/[0.08] dark:border-white/[0.12] rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] dark:shadow-[0_25px_60px_rgba(0,0,0,0.7)] backdrop-blur-2xl p-1.5 max-h-64 overflow-y-auto animate-in fade-in zoom-in-95 duration-150"
+            className="bg-white/95 dark:bg-[#121622]/95 border border-black/[0.08] dark:border-white/[0.12] rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] dark:shadow-[0_25px_60px_rgba(0,0,0,0.7)] backdrop-blur-2xl p-1.5 max-h-72 overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-150"
           >
-            <div className="space-y-0.5">
-              {normalizedOptions.map((opt) => {
-                const isSelected =
-                  String(opt.value).toLowerCase() === String(rawValue || "").toLowerCase();
-                return (
-                  <button
-                    key={String(opt.value)}
-                    type="button"
-                    onClick={() => handleSelect(opt.value)}
-                    className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm transition-all text-left cursor-pointer ${
-                      isSelected
-                        ? "bg-blue-500/10 dark:bg-blue-500/15 text-blue-600 dark:text-blue-400 font-bold border border-blue-500/20"
-                        : "text-neutral-700 dark:text-neutral-200 hover:bg-black/[0.04] dark:hover:bg-white/[0.08]"
-                    }`}
-                  >
-                    <span className="truncate">{opt.label}</span>
-                    {isSelected && (
-                      <Check className="w-4 h-4 text-blue-500 shrink-0 ml-2" />
-                    )}
-                  </button>
-                );
-              })}
+            {/* Optional search input */}
+            {searchable && (
+              <div className="p-1 border-b border-black/[0.05] dark:border-white/[0.08] mb-1 shrink-0">
+                <div className="relative flex items-center">
+                  <Search className="w-3.5 h-3.5 absolute left-2.5 text-neutral-400 pointer-events-none" />
+                  <input
+                    ref={searchInputRef}
+                    type="text"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    placeholder="Search..."
+                    className="w-full h-8 pl-8 pr-2.5 rounded-xl bg-black/[0.04] dark:bg-white/[0.06] border border-black/[0.06] dark:border-white/10 text-xs text-neutral-900 dark:text-white placeholder:text-neutral-400 outline-none focus:border-blue-500/60 transition-colors"
+                    onClick={(e) => e.stopPropagation()}
+                  />
+                </div>
+              </div>
+            )}
+
+            <div className="space-y-0.5 overflow-y-auto flex-1">
+              {filteredOptions.length === 0 ? (
+                <div className="px-3 py-4 text-center text-xs text-neutral-400 dark:text-neutral-500">
+                  No matching options
+                </div>
+              ) : (
+                filteredOptions.map((opt) => {
+                  const isSelected =
+                    String(opt.value).toLowerCase() === String(rawValue || "").toLowerCase();
+                  return (
+                    <button
+                      key={String(opt.value)}
+                      type="button"
+                      onClick={() => handleSelect(opt.value)}
+                      className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm transition-all text-left cursor-pointer ${
+                        isSelected
+                          ? "bg-blue-500/10 dark:bg-blue-500/15 text-blue-600 dark:text-blue-400 font-bold border border-blue-500/20"
+                          : "text-neutral-700 dark:text-neutral-200 hover:bg-black/[0.04] dark:hover:bg-white/[0.08]"
+                      }`}
+                    >
+                      <div className="flex items-center min-w-0 truncate">
+                        {renderOption ? renderOption(opt, isSelected) : (
+                          <span className="truncate">{opt.label}</span>
+                        )}
+                      </div>
+                      {isSelected && (
+                        <Check className="w-4 h-4 text-blue-500 shrink-0 ml-2" />
+                      )}
+                    </button>
+                  );
+                })
+              )}
             </div>
           </div>,
           document.body,

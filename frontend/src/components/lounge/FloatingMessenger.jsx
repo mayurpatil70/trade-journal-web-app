@@ -70,31 +70,33 @@ export default function FloatingMessenger() {
   return createPortal(
     <>
       {!open && hiddenOnPath !== location.pathname && (
-        <div className="fn-messenger-launcher fixed z-[60] bottom-[60px] right-[76px] md:bottom-[76px] md:right-[100px]">
-        <button
-          onClick={() => setOpen(true)}
-          className="fn-messenger-launcher fixed z-[60] bottom-[60px] right-[76px] md:bottom-[76px] md:right-[100px] inline-flex items-center gap-2 pl-3.5 pr-4 py-2.5 rounded-full bg-white/80 dark:bg-[#161a24]/85 backdrop-blur-2xl border border-black/[0.08] dark:border-white/[0.1] shadow-[0_12px_40px_rgba(0,0,0,0.15)] text-sm font-semibold text-neutral-900 dark:text-white hover:scale-[1.03] active:scale-95 transition-transform"
-        >
-          <span className="relative">
-            <MessageCircle className="w-5 h-5 text-[#0066FF]" />
-            {unread > 0 && (
-              <span className="absolute -top-2 -right-2.5 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center ring-2 ring-white dark:ring-[#161a24]">
-                {unread > 99 ? "99+" : unread}
-              </span>
-            )}
-          </span>
-          Messages
-        </button>
-        <button
-          type="button"
-          aria-label="Hide messages button"
-          onClick={() => {
-            setHiddenOnPath(location.pathname);
-          }}
-          className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-white dark:bg-[#1a1d24] border border-black/10 dark:border-white/15 shadow flex items-center justify-center text-neutral-500 hover:text-neutral-900 dark:hover:text-white"
-        >
-          <X className="w-3 h-3" />
-        </button>
+        <div className="fn-messenger-launcher fixed z-[60] bottom-[58px] right-[72px] md:bottom-[75px] md:right-[96px] inline-flex items-center group relative">
+          <button
+            type="button"
+            onClick={() => setOpen(true)}
+            className="inline-flex items-center gap-2 pl-3.5 pr-4 py-2.5 rounded-full bg-white/80 dark:bg-[#161a24]/85 backdrop-blur-2xl border border-black/[0.08] dark:border-white/[0.1] shadow-[0_12px_40px_rgba(0,0,0,0.15)] text-sm font-semibold text-neutral-900 dark:text-white hover:scale-[1.03] active:scale-95 transition-transform cursor-pointer"
+          >
+            <span className="relative">
+              <MessageCircle className="w-5 h-5 text-[#0066FF]" />
+              {unread > 0 && (
+                <span className="absolute -top-2 -right-2.5 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center ring-2 ring-white dark:ring-[#161a24]">
+                  {unread > 99 ? "99+" : unread}
+                </span>
+              )}
+            </span>
+            Messages
+          </button>
+          <button
+            type="button"
+            aria-label="Hide messages button"
+            onClick={(e) => {
+              e.stopPropagation();
+              setHiddenOnPath(location.pathname);
+            }}
+            className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-white dark:bg-[#1a1d24] border border-black/10 dark:border-white/15 shadow flex items-center justify-center text-neutral-500 hover:text-neutral-900 dark:hover:text-white transition-colors cursor-pointer z-10"
+          >
+            <X className="w-3 h-3" />
+          </button>
         </div>
       )}
 

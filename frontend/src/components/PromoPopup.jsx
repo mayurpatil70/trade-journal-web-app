@@ -3,6 +3,7 @@
 // The new-user dashboard intro (pages/Dashboard.jsx) shows it in sequence.
 
 import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import WinProPartnershipCard from "./partnership/WinProPartnershipCard";
 
 export default function PromoPopup() {
@@ -31,16 +32,21 @@ export default function PromoPopup() {
 }
 
 export function WinProPromoModal({ onClose }) {
-  return (
+  return createPortal(
     <div
       role="dialog"
       aria-modal="true"
-      className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-black/60 dark:bg-black/80 backdrop-blur-md animate-in fade-in duration-200"
-      onClick={onClose}
+      aria-label="WinProFX IB Partnership"
+      className="fixed inset-0 z-[9999] flex items-center justify-center p-4 select-none animate-in fade-in duration-200"
     >
-      <div onClick={(e) => e.stopPropagation()}>
+      <div
+        className="absolute inset-0 bg-neutral-950/60 dark:bg-black/75 backdrop-blur-md"
+        onClick={onClose}
+      />
+      <div className="relative z-10" onClick={(e) => e.stopPropagation()}>
         <WinProPartnershipCard onClose={onClose} isEmbedded={false} />
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

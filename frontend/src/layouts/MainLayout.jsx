@@ -45,6 +45,7 @@ import {
   Calculator as CalculatorIcon,
   Search,
   Sparkles,
+  Cpu,
   Wrench,
   HelpCircle,
   PenSquare,
@@ -526,6 +527,7 @@ export default function MainLayout() {
       label: "Tools",
       items: [
         { to: "/tools", icon: Wrench, label: "Tools" },
+        { to: "/tradingview-algo", icon: Cpu, label: "Forexnotes Algo", highlight: true, badge: "VIP" },
         { to: "/charts", icon: Activity, label: "Live Charts" },
         { to: "/sessions", icon: Zap, label: "Setup Backtesting" },
         { to: "/news", icon: Globe, label: "Economic Calendar" },
@@ -560,6 +562,7 @@ export default function MainLayout() {
     if (p.includes("mistakes")) return "Mistake Lab";
     if (p.includes("tools")) return "Trading Tools";
     if (p.includes("market-hours")) return "Forex Market Hours";
+    if (p.includes("tradingview-algo")) return "TradingView VIP Algo";
     if (p.includes("charts")) return "Live Charts";
     if (p.includes("sessions")) return "Setup Backtesting";
     if (p.includes("news")) return "Economic Calendar";
@@ -689,6 +692,13 @@ export default function MainLayout() {
           sub: "Track London, New York, Asian, Sydney sessions & ICT killzones",
           icon: Clock,
           keywords: ["market", "hours", "forex", "session", "london", "new york", "killzone", "sydney", "tokyo", "asian", "clock"],
+        },
+        {
+          to: "/tradingview-algo",
+          label: "TradingView VIP Algo",
+          sub: "Closed-source invite-only indicator with Hull MA & ATR targets",
+          icon: Cpu,
+          keywords: ["algo", "tradingview", "indicator", "signals", "hull", "pine", "script"],
         },
         {
           to: "/charts",

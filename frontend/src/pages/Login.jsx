@@ -1,10 +1,11 @@
-﻿// frontend/src/pages/Login.jsx
+// frontend/src/pages/Login.jsx
 import { useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import BrandLogo from "../components/BrandLogo";
 import api, { getDeviceId } from "../api/axios";
 import { completeSignIn } from "../lib/authFlow";
 import { COUNTRIES, guessCountryIso } from "../data/countries";
+import AppleSelect from "../components/ui/AppleSelect";
 import {
   ArrowRight,
   Loader2,
@@ -105,26 +106,31 @@ function PhoneInput({ iso, onIsoChange, number, onNumberChange, disabled, invali
   const country = COUNTRIES.find((c) => c.iso === iso);
   return (
     <div className={`flex rounded-xl border bg-black/[0.04] dark:bg-white/[0.06] transition-all focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-500/15 ${invalid ? "border-red-500/70" : "border-black/[0.08] dark:border-white/10"}`}>
-      <div className="relative shrink-0 border-r border-black/[0.08] dark:border-white/10">
-        <div className="h-12 pl-3 pr-7 flex items-center gap-1.5 text-[15px] text-gray-900 dark:text-white pointer-events-none">
-          <span>{country?.flag}</span>
-          <span>+{country?.dial}</span>
-        </div>
-        <ChevronDown className="w-3.5 h-3.5 absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-        <select
-          value={iso}
-          onChange={(e) => onIsoChange(e.target.value)}
-          disabled={disabled}
-          className="absolute inset-0 opacity-0 cursor-pointer"
-          aria-label="Country code"
-        >
-          {COUNTRIES.map((c) => (
-            <option key={c.iso} value={c.iso}>
-              {c.flag} {c.name} (+{c.dial})
-            </option>
-          ))}
-        </select>
-      </div>
+      <AppleSelect
+        value={iso}
+        onChange={(val) => onIsoChange(typeof val === "object" && val !== null ? val.target?.value || val.value : val)}
+        disabled={disabled}
+        searchable={true}
+        minMenuWidth={280}
+        options={COUNTRIES.map((c) => ({
+          value: c.iso,
+          label: `${c.flag} ${c.name} (+${c.dial})`,
+        }))}
+        customTrigger={({ toggleOpen, triggerRef, isOpen }) => (
+          <button
+            ref={triggerRef}
+            type="button"
+            onClick={toggleOpen}
+            disabled={disabled}
+            className="h-12 pl-3 pr-2.5 flex items-center gap-1.5 text-[15px] text-gray-900 dark:text-white border-r border-black/[0.08] dark:border-white/10 hover:bg-black/[0.02] dark:hover:bg-white/[0.04] transition-colors cursor-pointer select-none rounded-l-xl shrink-0"
+            aria-label="Country code"
+          >
+            <span>{country?.flag}</span>
+            <span>+{country?.dial}</span>
+            <ChevronDown className={`w-3.5 h-3.5 text-gray-400 transition-transform duration-200 ml-0.5 ${isOpen ? "rotate-180 text-blue-500" : ""}`} />
+          </button>
+        )}
+      />
       <input
         type="tel"
         inputMode="tel"
@@ -392,23 +398,19 @@ function RegisterCard({ onSignedIn, defaultIso }) {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Field label="Country" error={errors.country}>
-          <div className="relative">
-            <select
-              value={form.countryIso}
-              onChange={(e) => set("countryIso")(e.target.value)}
-              className={`${inputCls} appearance-none pr-9 cursor-pointer`}
-              autoComplete="country"
-              disabled={loading}
-              required
-            >
-              {COUNTRIES.map((c) => (
-                <option key={c.iso} value={c.iso}>
-                  {c.flag} {c.name}
-                </option>
-              ))}
-            </select>
-            <ChevronDown className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-          </div>
+          <AppleSelect
+            value={form.countryIso}
+            onChange={(val) => set("countryIso")(typeof val === "object" && val !== null ? val.target?.value || val.value : val)}
+            options={COUNTRIES.map((c) => ({
+              value: c.iso,
+              label: `${c.flag} ${c.name}`,
+            }))}
+            searchable={true}
+            placeholder="Select country"
+            disabled={loading}
+            error={Boolean(errors.country)}
+            triggerClassName="!h-12 !px-4 !rounded-xl !text-[15px] !bg-black/[0.04] dark:!bg-white/[0.06] !border-black/[0.08] dark:!border-white/10"
+          />
         </Field>
 
         <Field label="City" error={errors.city}>

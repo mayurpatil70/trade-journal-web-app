@@ -24,6 +24,7 @@ import botHubRoutes from "./bot-hub/routes.js";
 import marketRoutes from "./market/routes.js";
 import socialRoutes from "./routes/socialRoutes.js";
 import pushRoutes from "./routes/pushRoutes.js";
+import algoRoutes from "./routes/algoRoutes.js";
 import { initSocket } from "./socket/index.js";
 
 const app = express();
@@ -110,6 +111,7 @@ app.use("/api/bot-hub", botHubRoutes);
 app.use("/api/market", marketRoutes);
 app.use("/api/social", socialRoutes);
 app.use("/api/push", pushRoutes);
+app.use("/api/algo", algoRoutes);
 
 app.use((err, req, res, next) => {
   if (res.headersSent) return next(err);
