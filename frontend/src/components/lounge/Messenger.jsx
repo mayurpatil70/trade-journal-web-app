@@ -164,16 +164,20 @@ export function ConversationList({ direct, channels, activeId, onSelect, onStart
             ))}
           </>
         )}
-        <p className="px-3 pt-2 pb-1 text-[10px] font-bold uppercase tracking-wider text-neutral-400">Channels</p>
-        {channels.map((c) =>
-          row(
-            c,
-            <span className="w-[42px] h-[42px] rounded-full bg-gradient-to-br from-[#0066FF] to-sky-400 text-white flex items-center justify-center shrink-0">
-              <Hash className="w-5 h-5" />
-            </span>,
-          ),
+        {channels.length > 0 && (
+          <>
+            <p className="px-3 pt-2 pb-1 text-[10px] font-bold uppercase tracking-wider text-neutral-400">Channels</p>
+            {channels.map((c) =>
+              row(
+                c,
+                <span className="w-[42px] h-[42px] rounded-full bg-gradient-to-br from-[#0066FF] to-sky-400 text-white flex items-center justify-center shrink-0">
+                  <Hash className="w-5 h-5" />
+                </span>,
+              ),
+            )}
+          </>
         )}
-        <p className="px-3 pt-3 pb-1 text-[10px] font-bold uppercase tracking-wider text-neutral-400">Direct messages</p>
+        <p className="px-3 pt-2 pb-1 text-[10px] font-bold uppercase tracking-wider text-neutral-400">Direct messages</p>
         {loading ? (
           <div className="py-6 flex justify-center">
             <Loader2 className="w-4 h-4 animate-spin text-neutral-400" />

@@ -182,7 +182,7 @@ export async function getReplyPreviews(ids) {
   );
 }
 
-const MENTION_RE = /(?:^|[^a-zA-Z0-9_])@([a-zA-Z0-9_]{2,30})/g;
+const MENTION_RE = /(?:^|[^a-zA-Z0-9_])@([a-zA-Z0-9_]+(?:\.[a-zA-Z0-9_]+)*)/g;
 
 // Maps @handles in the text to user ids (lounge handle first, then account username).
 export async function resolveMentions(content) {
@@ -233,7 +233,7 @@ export async function saveMessage({ conversationId, senderId, content, mediaUrl,
     isPublicChannel(conversationId).then((pub) => (pub ? [] : getParticipantIds(conversationId))),
     getReplyPreviews([data.reply_to_id]),
   ]);
-  return { ...toMessageDto(data, summaries[senderId], replies[data.reply_to_id] || null), participantIds };
+  return { ...toMessageDto({ ...data, mentions: data.mentions?.length ? data.mentions : mentions }, summaries[senderId], replies[data.reply_to_id] || null), participantIds };
 }
 
 export async function getMessageRow(messageId) {
@@ -247,6 +247,33 @@ export async function updateMessageRow(messageId, patch) {
   if (error) throw error;
   const [summaries, replies] = await Promise.all([getUserSummaries([data.sender_id]), getReplyPreviews([data.reply_to_id])]);
   return toMessageDto(data, summaries[data.sender_id], replies[data.reply_to_id] || null);
+}
+
+// Falls back for databases where migration 015 has not run yet.
+export async function unsendMessageRow(row) {
+  try {
+    return await updateMessageRow(row.id, {
+      deleted_at: new Date().toISOString(),
+      content: "",
+      media_url: null,
+      is_trade_share: false,
+      shared_trade_data: null,
+      mentions: [],
+    });
+  } catch {
+    const { error } = await supabase.from("lounge_messages").delete().eq("id", row.id);
+    if (error) throw error;
+    const summaries = await getUserSummaries([row.sender_id]);
+    return toMessageDto({ ...row, deleted_at: new Date().toISOString() }, summaries[row.sender_id]);
+  }
+}
+
+export async function editMessageRow(row, content, mentions) {
+  try {
+    return await updateMessageRow(row.id, { content, edited_at: new Date().toISOString(), mentions });
+  } catch {
+    return updateMessageRow(row.id, { content });
+  }
 }
 
 export async function markConversationRead(conversationId, userId) {
