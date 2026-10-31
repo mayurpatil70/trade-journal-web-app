@@ -11,6 +11,7 @@ import SystemAnnouncementBanner from "../components/SystemAnnouncementBanner.jsx
 import ProfilePhotoModal from "../components/ui/ProfilePhotoModal.jsx";
 import SupportFeedbackModal from "../components/support/SupportFeedbackModal.jsx";
 import FloatingMessenger from "../components/lounge/FloatingMessenger.jsx";
+import UsernameGate from "../components/UsernameGate.jsx";
 import InstallAppButton from "../components/InstallAppButton.jsx";
 import { prefetchRoute, prefetchAllSecondaryRoutes } from "../utils/routePrefetch";
 import api, { logoutSession } from "../api/axios";
@@ -1140,6 +1141,7 @@ export default function MainLayout() {
       </main>
 
       <FloatingMessenger />
+      <UsernameGate />
 
       {/* ── REACT PORTAL: TradeFXBook Spotlight Command Palette ── */}
       {isSearchOpen &&

@@ -24,6 +24,7 @@ async function getFollowCounts(userId) {
     supabase.from("trader_follows").select("id", { count: "exact", head: true }).eq("following_id", userId),
     supabase.from("trader_follows").select("id", { count: "exact", head: true }).eq("follower_id", userId),
   ]);
+  if (followers.error || following.error) throw followers.error || following.error;
   return { followers: followers.count || 0, following: following.count || 0 };
 }
 
@@ -58,12 +59,26 @@ function cleanLinks(links) {
     .filter(Boolean);
 }
 
-// links comes from migration 014; fall back if it has not run yet.
+function cleanBrokers(brokers) {
+  if (!Array.isArray(brokers)) return [];
+  return brokers
+    .slice(0, 10)
+    .map((b) => {
+      const name = String(b?.name || "").trim().slice(0, 40);
+      if (!name) return null;
+      const [link] = cleanLinks([{ url: b?.url }]);
+      return { name, url: link?.url || "" };
+    })
+    .filter(Boolean);
+}
+
+// links (migration 014) and brokers (migration 016) fall back if those have not run yet.
 async function getProfileRow(userId) {
-  const { data, error } = await supabase.from("trader_profiles").select("bio, is_public, links").eq("user_id", userId).maybeSingle();
-  if (!error) return data;
-  const { data: legacy } = await supabase.from("trader_profiles").select("bio, is_public").eq("user_id", userId).maybeSingle();
-  return legacy;
+  for (const cols of ["bio, is_public, links, brokers", "bio, is_public, links", "bio, is_public"]) {
+    const { data, error } = await supabase.from("trader_profiles").select(cols).eq("user_id", userId).maybeSingle();
+    if (!error) return data;
+  }
+  return null;
 }
 
 async function getFollowingIds(userId) {
@@ -122,6 +137,7 @@ export async function getMyProfile(req, res) {
       ...summaries[req.userId],
       bio: profile?.bio || "",
       links: profile?.links || [],
+      brokers: profile?.brokers || [],
       isPublic: Boolean(profile?.is_public),
       ...counts,
     });
@@ -132,7 +148,7 @@ export async function getMyProfile(req, res) {
 
 export async function updateMyProfile(req, res) {
   try {
-    const { handle, bio, primaryStrategy, propBadges, isPublic, links } = req.body || {};
+    const { handle, bio, primaryStrategy, propBadges, isPublic, links, brokers } = req.body || {};
     const row = { user_id: req.userId, updated_at: new Date().toISOString() };
     if (handle !== undefined) {
       const clean = String(handle).toLowerCase().replace(/[^a-z0-9_]/g, "").slice(0, 30);
@@ -144,8 +160,13 @@ export async function updateMyProfile(req, res) {
     if (Array.isArray(propBadges)) row.prop_badges = propBadges.map((b) => String(b).slice(0, 30)).slice(0, 6);
     if (isPublic !== undefined) row.is_public = Boolean(isPublic);
     if (links !== undefined) row.links = cleanLinks(links);
+    if (brokers !== undefined) row.brokers = cleanBrokers(brokers);
 
     let { data, error } = await supabase.from("trader_profiles").upsert(row).select().single();
+    if (error && row.brokers && /brokers/.test(error.message || "")) {
+      delete row.brokers;
+      ({ data, error } = await supabase.from("trader_profiles").upsert(row).select().single());
+    }
     if (error && row.links && /links/.test(error.message || "")) {
       delete row.links;
       ({ data, error } = await supabase.from("trader_profiles").upsert(row).select().single());
@@ -184,6 +205,7 @@ export async function getTraderProfile(req, res) {
       ...summaries[id],
       bio: profile?.bio || "",
       links: profile?.links || [],
+      brokers: profile?.brokers || [],
       ...counts,
       postsCount: postsCount.count || 0,
       mutualsCount: mutualIds.length,
@@ -227,6 +249,7 @@ export async function getTraderCard(req, res) {
       ...summaries[id],
       bio: profile?.bio || "",
       links: profile?.links || [],
+      brokers: profile?.brokers || [],
       ...counts,
       postsCount: postsCount.count || 0,
       isFollowing: Boolean(followRow.data),

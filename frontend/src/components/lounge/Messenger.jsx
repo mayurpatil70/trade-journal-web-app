@@ -5,6 +5,7 @@ import api from "../../api/axios";
 import { getSocket, useSocketEvent, useOnlineSet, emitWithAck } from "../../lib/socket";
 import { Avatar, TraderName, RichText, timeAgo, formatMoney } from "./LoungeUI";
 import UserHover from "./UserHoverCard";
+import EmojiPicker from "./EmojiPicker";
 import { MessageMenu, ReplyQuote, useMentions, MentionList, ForwardSheet } from "./MessageActions";
 
 export const channelTitle = (c) => (c?.title?.startsWith("#") || !c?.server_id ? c?.title : `# ${c.title}`);
@@ -600,6 +601,20 @@ export function ChatThread({ conversation, me, onBack, backMobileOnly = false, c
         >
           {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <ImagePlus className="w-4 h-4" />}
         </button>
+        <EmojiPicker
+          disabled={sending}
+          onPick={(emoji) => {
+            const el = inputRef.current;
+            const start = el?.selectionStart ?? text.length;
+            const end = el?.selectionEnd ?? text.length;
+            const next = text.slice(0, start) + emoji + text.slice(end);
+            onType(next);
+            requestAnimationFrame(() => {
+              el?.focus();
+              el?.setSelectionRange(start + emoji.length, start + emoji.length);
+            });
+          }}
+        />
         <input
           ref={inputRef}
           value={text}

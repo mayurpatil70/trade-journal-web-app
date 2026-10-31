@@ -254,7 +254,7 @@ export default function TraderProfile() {
 
           <div className="flex-1 min-w-0 space-y-4">
             <div className="flex flex-wrap items-center gap-3">
-              <h1 className="text-xl font-semibold text-neutral-900 dark:text-white truncate">{profile.handle}</h1>
+              <h1 className="text-xl font-semibold text-neutral-900 dark:text-white truncate">@{profile.handle}</h1>
               {profile.isVerified && <BadgeCheck className="w-5 h-5 text-[#0066FF] dark:text-sky-400" />}
               {isMe ? (
                 <button onClick={() => setEditing(true)} className={`${pill} px-4 py-2 text-sm bg-black/[0.05] dark:bg-white/[0.08] text-neutral-800 dark:text-neutral-100 hover:bg-black/[0.08] dark:hover:bg-white/[0.12]`}>
@@ -305,6 +305,28 @@ export default function TraderProfile() {
               {profile.bio && <p className="text-sm text-neutral-700 dark:text-neutral-300 whitespace-pre-line max-w-xl">{profile.bio}</p>}
               <ProfileLinks links={profile.links} />
               <PropBadges badges={profile.propBadges} />
+              {profile.brokers?.length > 0 && (
+                <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                  <span className="text-[11px] text-neutral-500">Trades with</span>
+                  {profile.brokers.map((b, i) =>
+                    b.url ? (
+                      <a
+                        key={`${b.name}-${i}`}
+                        href={b.url}
+                        target="_blank"
+                        rel="noopener noreferrer nofollow sponsored"
+                        className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 hover:bg-blue-500/20"
+                      >
+                        {b.name}
+                      </a>
+                    ) : (
+                      <span key={`${b.name}-${i}`} className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
+                        {b.name}
+                      </span>
+                    ),
+                  )}
+                </div>
+              )}
               {profile.followedBy?.length > 0 && (
                 <button onClick={() => setListKind("mutuals")} className="flex items-center gap-2 pt-1 text-xs text-neutral-500 hover:opacity-80 text-left">
                   <span className="flex -space-x-2">
