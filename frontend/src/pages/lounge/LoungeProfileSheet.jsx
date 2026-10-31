@@ -1,7 +1,7 @@
 // frontend/src/pages/lounge/LoungeProfileSheet.jsx
 import { useState } from "react";
 import { createPortal } from "react-dom";
-import { X } from "lucide-react";
+import { X, Plus } from "lucide-react";
 import api from "../../api/axios";
 import { pill } from "../../components/lounge/LoungeUI";
 import { LinksEditor, tidyLinks } from "../../components/lounge/ProfileLinks";
@@ -12,16 +12,31 @@ const field =
 
 export default function LoungeProfileSheet({ me, onClose, onSaved }) {
   const [form, setForm] = useState({
-    handle: me?.handle || "",
     bio: me?.bio || "",
     primaryStrategy: me?.primaryStrategy || "",
     propBadges: me?.propBadges || [],
     isPublic: Boolean(me?.isPublic),
     links: me?.links || [],
+    brokers: me?.brokers || [],
   });
+  const [customFirm, setCustomFirm] = useState("");
+  const [broker, setBroker] = useState({ name: "", url: "" });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
+
+  const addFirm = () => {
+    const name = customFirm.trim().slice(0, 30);
+    if (name && !form.propBadges.some((b) => b.toLowerCase() === name.toLowerCase()) && form.propBadges.length < 6) set("propBadges", [...form.propBadges, name]);
+    setCustomFirm("");
+  };
+
+  const addBroker = () => {
+    const name = broker.name.trim();
+    if (!name || form.brokers.length >= 10) return;
+    set("brokers", [...form.brokers, { name, url: broker.url.trim() }]);
+    setBroker({ name: "", url: "" });
+  };
 
   const save = async () => {
     setSaving(true);
@@ -67,13 +82,9 @@ export default function LoungeProfileSheet({ me, onClose, onSaved }) {
           </button>
         </label>
 
-        <div className="space-y-1">
-          <span className="text-xs font-semibold text-neutral-500">Handle</span>
-          <div className="relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-neutral-400">@</span>
-            <input className={`${field} pl-7`} value={form.handle} maxLength={30} onChange={(e) => set("handle", e.target.value)} />
-          </div>
-        </div>
+        <p className="text-xs text-neutral-500">
+          Shown as <span className="font-semibold text-neutral-700 dark:text-neutral-200">@{me?.handle}</span>. Change your username in Profile settings.
+        </p>
         <div className="space-y-1">
           <span className="text-xs font-semibold text-neutral-500">Bio</span>
           <textarea className={`${field} resize-none`} rows={3} maxLength={280} value={form.bio} onChange={(e) => set("bio", e.target.value)} />
@@ -95,7 +106,7 @@ export default function LoungeProfileSheet({ me, onClose, onSaved }) {
         <div className="space-y-1.5">
           <span className="text-xs font-semibold text-neutral-500">Funded with</span>
           <div className="flex flex-wrap gap-1.5">
-            {BADGES.map((b) => {
+            {[...BADGES, ...form.propBadges.filter((b) => !BADGES.includes(b))].map((b) => {
               const on = form.propBadges.includes(b);
               return (
                 <button
@@ -110,6 +121,41 @@ export default function LoungeProfileSheet({ me, onClose, onSaved }) {
                 </button>
               );
             })}
+          </div>
+          <div className="flex gap-2">
+            <input
+              className={field}
+              placeholder="Add another prop firm"
+              maxLength={30}
+              value={customFirm}
+              onChange={(e) => setCustomFirm(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addFirm())}
+            />
+            <button type="button" onClick={addFirm} className={`${pill} shrink-0 bg-black/[0.05] dark:bg-white/[0.08] text-neutral-700 dark:text-neutral-200`} aria-label="Add prop firm">
+              <Plus className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+
+        <div className="space-y-1.5">
+          <span className="text-xs font-semibold text-neutral-500">Brokers you trade with</span>
+          <div className="flex flex-wrap gap-1.5">
+            {form.brokers.map((b, i) => (
+              <span key={`${b.name}-${i}`} className={`${pill} border border-blue-500/25 bg-blue-500/10 text-blue-600 dark:text-blue-400`}>
+                {b.name}
+                {b.url && <span className="opacity-70">· IB link</span>}
+                <button type="button" onClick={() => set("brokers", form.brokers.filter((_, n) => n !== i))} aria-label={`Remove ${b.name}`}>
+                  <X className="w-3 h-3" />
+                </button>
+              </span>
+            ))}
+          </div>
+          <input className={field} placeholder="Broker name" maxLength={40} value={broker.name} onChange={(e) => setBroker((b) => ({ ...b, name: e.target.value }))} />
+          <div className="flex gap-2">
+            <input className={field} placeholder="IB / referral link (optional)" maxLength={300} value={broker.url} onChange={(e) => setBroker((b) => ({ ...b, url: e.target.value }))} />
+            <button type="button" onClick={addBroker} className={`${pill} shrink-0 bg-black/[0.05] dark:bg-white/[0.08] text-neutral-700 dark:text-neutral-200`} aria-label="Add broker">
+              <Plus className="w-4 h-4" />
+            </button>
           </div>
         </div>
 

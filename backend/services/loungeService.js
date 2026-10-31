@@ -117,12 +117,13 @@ export async function getUserSummaries(userIds) {
       displayName: u.display_name || fallback,
       avatarUrl: u.avatar_url || null,
       handle: u.username || fallback.toLowerCase().replace(/[^a-z0-9_]/g, ""),
+      hasUsername: Boolean(u.username),
     };
   }
   for (const p of profiles || []) {
     byId[p.user_id] = {
       ...byId[p.user_id],
-      ...(p.handle && { handle: p.handle }),
+      ...(p.handle && !byId[p.user_id].hasUsername && { handle: p.handle }),
       primaryStrategy: p.primary_strategy,
       propBadges: p.prop_badges || [],
       isVerified: Boolean(p.is_verified),

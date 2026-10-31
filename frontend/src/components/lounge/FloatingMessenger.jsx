@@ -25,6 +25,10 @@ export default function FloatingMessenger() {
 
   useEffect(() => {
     const onOpenChat = async (e) => {
+      if (HIDDEN_ON.some((p) => window.location.pathname.startsWith(p))) {
+        navigate(`/community?with=${e.detail.peer.id}`);
+        return;
+      }
       setOpen(true);
       try {
         setActive(await openDirect(e.detail.peer.id));
@@ -44,7 +48,7 @@ export default function FloatingMessenger() {
       window.removeEventListener("lounge:open-chat", onOpenChat);
       window.removeEventListener("lounge:share-trade", onShareTrade);
     };
-  }, [refresh]);
+  }, [refresh, navigate]);
 
   useSocketEvent("message:received", (msg) => {
     if (msg.senderId === me?.id || msg.conversationId === active?.id) return;

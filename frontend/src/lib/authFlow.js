@@ -44,6 +44,7 @@ export function completeSignIn(data, { email, deviceId, isNewAccount = false }) 
     deviceId: data.deviceId || deviceId,
   });
   if (data.username) localStorage.setItem("fn_username", data.username);
+  else localStorage.removeItem("fn_username");
 
   if (!isNewAccount && data.onboarded) markOnboarded(userId);
   const onboardingCompleted = !isNewAccount && isOnboardingCompleted(userId);

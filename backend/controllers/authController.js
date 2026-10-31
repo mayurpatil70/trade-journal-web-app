@@ -83,6 +83,21 @@ async function respondWithSession(req, res, user, message) {
 
 const USERNAME_RE = /^[a-z0-9_.]{3,20}$/;
 const escapeLike = (v) => v.replace(/[\\%_]/g, (c) => `\\${c}`);
+
+async function checkUsername(userId, raw) {
+  const value = String(raw || "").trim().replace(/^@/, "").toLowerCase();
+  if (!USERNAME_RE.test(value)) {
+    return { status: 400, error: "3-20 characters: letters, numbers, dot or underscore." };
+  }
+  const { data: taken } = await supabase
+    .from("users")
+    .select("id")
+    .ilike("username", escapeLike(value))
+    .neq("id", userId)
+    .limit(1);
+  if (taken?.length) return { status: 409, error: "This username is already taken." };
+  return { value };
+}
 const cleanText = (v, max) => String(v || "").trim().replace(/\s+/g, " ").slice(0, max);
 
 function normalizePhone(dialCode, number) {
@@ -388,6 +403,11 @@ export const saveOnboardingProfile = async (req, res) => {
       console.warn("[Auth] Lookup user for onboarding notice:", e.message);
     }
 
+    let cleanUsername;
+    if (username) {
+      cleanUsername = (await checkUsername(targetUuid, username)).value;
+    }
+
     const disciplineRulesPayload = {
       maxRiskPerTrade: maxRiskPerTrade || "2%",
       dailyLossCap: dailyLossCap || "5%",
@@ -406,7 +426,7 @@ export const saveOnboardingProfile = async (req, res) => {
             id: targetUuid,
             ...(targetEmail ? { email: targetEmail } : {}),
             display_name: displayName,
-            username: username?.replace(/^@/, ""),
+            username: cleanUsername,
             bio: bio || "",
             avatar_url: avatarUrl || null,
             currency: currency || "USD",
@@ -430,8 +450,13 @@ export const saveOnboardingProfile = async (req, res) => {
         discipline_rules: disciplineRulesPayload,
         rules_onboarded: true,
         onboarding_completed: true,
+        ...(cleanUsername ? { username: cleanUsername } : {}),
       };
-      await supabase.from("users").update(userUpdate).eq("id", targetUuid);
+      const { error: userUpdErr } = await supabase.from("users").update(userUpdate).eq("id", targetUuid);
+      if (userUpdErr?.code === "23505" && cleanUsername) {
+        delete userUpdate.username;
+        await supabase.from("users").update(userUpdate).eq("id", targetUuid);
+      }
     } catch (userErr) {
       console.warn("[Auth] Save onboarding users table notice:", userErr.message);
     }
@@ -458,7 +483,7 @@ export const getProfile = async (req, res) => {
     // Look up user in users table if needed to bridge UUID and email
     let userRowData = null;
     try {
-      let query = supabase.from("users").select("id, email, display_name, avatar_url, created_at, discipline_rules, rules_onboarded");
+      let query = supabase.from("users").select("id, email, display_name, avatar_url, created_at, discipline_rules, rules_onboarded, username");
       if (targetUuid) {
         query = query.eq("id", targetUuid);
       } else if (targetEmail) {
@@ -556,6 +581,8 @@ export const getProfile = async (req, res) => {
         }
       }
 
+      if (userRowData?.username) profileData.username = userRowData.username;
+
       // Check admin status
       if (isAdminEmail(userRowData?.email || profileData.email)) {
         profileData.isAdmin = true;
@@ -589,12 +616,19 @@ export const updateProfile = async (req, res) => {
     const targetUuid = req.userId;
     const targetEmail = null;
 
+    let cleanUsername;
+    if (username !== undefined) {
+      const check = await checkUsername(targetUuid, username);
+      if (!check.value) return res.status(check.status).json({ success: false, field: "username", error: check.error });
+      cleanUsername = check.value;
+    }
+
     const updatePayload = {
       updated_at: new Date().toISOString(),
     };
 
     if (displayName !== undefined) updatePayload.display_name = displayName;
-    if (username !== undefined) updatePayload.username = username?.replace(/^@/, "");
+    if (cleanUsername !== undefined) updatePayload.username = cleanUsername;
     if (bio !== undefined) updatePayload.bio = bio;
     if (avatarUrl !== undefined) updatePayload.avatar_url = avatarUrl;
     if (currency !== undefined) updatePayload.currency = currency;
@@ -624,6 +658,7 @@ export const updateProfile = async (req, res) => {
       const userSync = {};
       if (displayName !== undefined) userSync.display_name = displayName;
       if (avatarUrl !== undefined) userSync.avatar_url = avatarUrl;
+      if (cleanUsername !== undefined) userSync.username = cleanUsername;
       if (disciplineRules !== undefined) {
         userSync.discipline_rules = disciplineRules;
         userSync.rules_onboarded = true;
@@ -633,7 +668,10 @@ export const updateProfile = async (req, res) => {
 
       if (Object.keys(userSync).length > 0) {
         if (targetUuid) {
-          await supabase.from("users").update(userSync).eq("id", targetUuid);
+          const { error: syncErr } = await supabase.from("users").update(userSync).eq("id", targetUuid);
+          if (syncErr?.code === "23505") {
+            return res.status(409).json({ success: false, field: "username", error: "This username is already taken." });
+          }
         } else if (targetEmail) {
           await supabase.from("users").update(userSync).eq("email", targetEmail);
         }
