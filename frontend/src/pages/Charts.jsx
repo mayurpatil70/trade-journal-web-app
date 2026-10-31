@@ -1,10 +1,13 @@
-import React from 'react';
+import React, { Suspense, lazy, useState } from 'react';
 import { AdvancedRealTimeChart } from 'react-ts-tradingview-widgets';
 import { useTheme } from '../components/theme-provider';
-import { Activity } from 'lucide-react';
+import { Activity, Code2 } from 'lucide-react';
+
+const ScriptPanel = lazy(() => import('../components/charts/ScriptPanel'));
 
 export default function Charts() {
   const { theme } = useTheme();
+  const [showScript, setShowScript] = useState(false);
   const surface = theme === 'dark' ? 'bg-[#131722]' : 'bg-white';
 
   return (
@@ -26,12 +29,26 @@ export default function Charts() {
           </div>
         </div>
 
+        <button
+          onClick={() => setShowScript((v) => !v)}
+          className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-colors ${showScript ? 'bg-[#007aff] text-white border-[#007aff]' : 'text-neutral-700 dark:text-neutral-200 border-black/[0.08] dark:border-white/[0.12] hover:bg-black/[0.04] dark:hover:bg-white/[0.06]'}`}
+        >
+          <Code2 className="w-4 h-4" /> Scripts
+        </button>
+
         {/* Clearance spacer reserving space for desktop top-right action buttons (PenSquare, NotificationBell, ThemeToggle) */}
         <div className="w-44 h-8 pointer-events-none" aria-hidden="true" />
       </div>
 
       {/* ── TradingView Chart Container ── */}
-      <div className={`flex-1 ${surface} relative overflow-hidden`}>
+      <div className="flex flex-1 min-h-0 relative">
+      <button
+        onClick={() => setShowScript(true)}
+        className="md:hidden absolute z-10 right-3 top-3 flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#007aff] text-white text-xs font-semibold"
+      >
+        <Code2 className="w-4 h-4" /> Scripts
+      </button>
+      <div className={`flex-1 min-w-0 ${surface} relative overflow-hidden`}>
         <div className="absolute top-0 left-0 right-0 h-[calc(100%+42px)]">
           <AdvancedRealTimeChart 
              theme={theme} 
@@ -52,6 +69,14 @@ export default function Charts() {
              studies={[]}
           />
         </div>
+      </div>
+      {showScript && (
+        <div className="max-md:absolute max-md:inset-0 max-md:z-20 md:contents">
+          <Suspense fallback={null}>
+            <ScriptPanel onClose={() => setShowScript(false)} />
+          </Suspense>
+        </div>
+      )}
       </div>
     </div>
   );
