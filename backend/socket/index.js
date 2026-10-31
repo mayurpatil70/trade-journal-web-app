@@ -12,7 +12,8 @@ import {
   getServerRole,
   getParticipantIds,
   getMessageRow,
-  updateMessageRow,
+  editMessageRow,
+  unsendMessageRow,
   resolveMentions,
 } from "../services/loungeService.js";
 import { sendPushToUser } from "../services/pushService.js";
@@ -207,11 +208,7 @@ function registerHandlers(socket) {
       const row = messageId ? await getMessageRow(String(messageId)) : null;
       if (!row || row.sender_id !== userId || row.deleted_at) return ack(cb, { ok: false, error: "FORBIDDEN" });
       if (!text && !row.media_url && !row.is_trade_share) return ack(cb, { ok: false, error: "EMPTY" });
-      const message = await updateMessageRow(row.id, {
-        content: text,
-        edited_at: new Date().toISOString(),
-        mentions: await resolveMentions(text).catch(() => []),
-      });
+      const message = await editMessageRow(row, text, await resolveMentions(text).catch(() => []));
       await emitMessageUpdate(message);
       ack(cb, { ok: true, message });
     } catch (err) {
@@ -228,14 +225,7 @@ function registerHandlers(socket) {
       if (row.sender_id !== userId && !(await canModerate(row.conversation_id, userId))) {
         return ack(cb, { ok: false, error: "FORBIDDEN" });
       }
-      const message = await updateMessageRow(row.id, {
-        deleted_at: new Date().toISOString(),
-        content: "",
-        media_url: null,
-        is_trade_share: false,
-        shared_trade_data: null,
-        mentions: [],
-      });
+      const message = await unsendMessageRow(row);
       await emitMessageUpdate(message);
       ack(cb, { ok: true, message });
     } catch (err) {

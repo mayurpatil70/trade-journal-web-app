@@ -153,7 +153,7 @@ function HomeView({ me, onChatChange }) {
           <ChatThread key={active.id} conversation={active} me={me} backMobileOnly onBack={() => setActive(null)} onRead={(id) => convos.markUnread(id, 0)} />
         ) : (
           <div className="m-auto">
-            <EmptyState icon={MessagesSquare} title="Pick a conversation" body="Chat 1-on-1 with traders, jump into a public channel, or open a server on the left." />
+            <EmptyState icon={MessagesSquare} title="Pick a conversation" body="Chat 1-on-1 with traders, or open a server you joined or created." />
           </div>
         )}
       </div>

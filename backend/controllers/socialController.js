@@ -6,6 +6,7 @@ import {
   getOrCreateDirectConversation,
   canAccessConversation,
   toMessageDto,
+  resolveMentions,
   getReplyPreviews,
 } from "../services/loungeService.js";
 import { isOnline, getOnlineUserIds, emitToUser, broadcastDeal } from "../socket/index.js";
@@ -499,13 +500,10 @@ export async function toggleReaction(req, res) {
 
 export async function listConversations(req, res) {
   try {
-    const [{ data: parts }, { data: channels }] = await Promise.all([
-      supabase
-        .from("conversation_participants")
-        .select("conversation_id, last_read_at, conversations!inner(id, is_group, is_public, title, slug, description, updated_at)")
-        .eq("user_id", req.userId),
-      supabase.from("conversations").select("id, is_group, is_public, title, slug, description, updated_at").eq("is_public", true),
-    ]);
+    const { data: parts } = await supabase
+      .from("conversation_participants")
+      .select("conversation_id, last_read_at, conversations!inner(id, is_group, is_public, title, slug, description, updated_at)")
+      .eq("user_id", req.userId);
 
     const direct = (parts || []).filter((p) => !p.conversations.is_public);
     const ids = direct.map((p) => p.conversation_id);
@@ -542,10 +540,8 @@ export async function listConversations(req, res) {
         return withLast({ ...p.conversations, peer: peer && { ...peer, isOnline: isOnline(peer.id) } }, p.last_read_at);
       }),
     );
-    const rooms = await Promise.all((channels || []).map((c) => withLast(c, null)));
-
     dms.sort((a, b) => new Date(b.lastMessage?.created_at || b.updated_at) - new Date(a.lastMessage?.created_at || a.updated_at));
-    res.json({ direct: dms, channels: rooms });
+    res.json({ direct: dms, channels: [] });
   } catch (err) {
     fail(res, err);
   }
@@ -578,8 +574,11 @@ export async function getMessages(req, res) {
       getReplyPreviews(rows.map((m) => m.reply_to_id)),
     ]);
     const { data: peers } = await supabase.from("conversation_participants").select("user_id, last_read_at").eq("conversation_id", id);
+    const mentionsByRow = await Promise.all(
+      rows.map((m) => (m.mentions?.length || !m.content?.includes("@") ? m.mentions || [] : resolveMentions(m.content).catch(() => []))),
+    );
     res.json({
-      messages: rows.map((m) => toMessageDto(m, senders[m.sender_id], replies[m.reply_to_id] || null)),
+      messages: rows.map((m, i) => toMessageDto({ ...m, mentions: mentionsByRow[i] }, senders[m.sender_id], replies[m.reply_to_id] || null)),
       readState: Object.fromEntries((peers || []).map((p) => [p.user_id, p.last_read_at])),
       hasMore: (data || []).length === MESSAGES_PAGE,
     });

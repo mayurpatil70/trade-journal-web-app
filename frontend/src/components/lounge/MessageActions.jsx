@@ -122,7 +122,7 @@ export function ReplyQuote({ reply, mine, onClick }) {
   );
 }
 
-const MENTION_AT_CARET = /(^|\s)@([a-zA-Z0-9_]{0,30})$/;
+const MENTION_AT_CARET = /(^|\s)@([a-zA-Z0-9_.]{0,30})$/;
 
 export function useMentions({ text, setText, inputRef, localUsers, meId }) {
   const [query, setQuery] = useState(null);
@@ -160,7 +160,7 @@ export function useMentions({ text, setText, inputRef, localUsers, meId }) {
   const pick = (user) => {
     const el = inputRef.current;
     const caret = el?.selectionStart ?? text.length;
-    const before = text.slice(0, caret).replace(/@([a-zA-Z0-9_]{0,30})$/, `@${user.handle} `);
+    const before = text.slice(0, caret).replace(/@([a-zA-Z0-9_.]{0,30})$/, `@${user.handle} `);
     const next = before + text.slice(caret);
     setText(next);
     setQuery(null);
