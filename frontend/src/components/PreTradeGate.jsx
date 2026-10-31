@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { X, Send, ChevronRight, Loader2, ImagePlus, XCircle, Maximize2, Minimize2 } from "lucide-react";
 import api from "../api/axios";
+import { isLauncherHidden, hideLauncher } from "../lib/hiddenLauncher";
 
 // ── Simple inline markdown renderer ──────────────────────────────────────────
 // Converts **bold**, newlines, and numbered lines to readable JSX.
@@ -38,13 +39,7 @@ export default function PreTradeGate() {
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
   const [expanded, setExpanded] = useState(false);
-  const [hideLauncher, setHideLauncher] = useState(() => {
-    try {
-      return sessionStorage.getItem("coachLauncherHidden") === "1";
-    } catch {
-      return false;
-    }
-  });
+  const [launcherHidden, setLauncherHidden] = useState(() => isLauncherHidden("coachLauncherHidden"));
   const [hideLabel, setHideLabel] = useState(() => {
     try { return sessionStorage.getItem("coachLabelHidden") === "1"; } catch { return false; }
   });
@@ -320,7 +315,7 @@ export default function PreTradeGate() {
       )}
 
       {/* ── Floating Trigger Button ──────────────────────────────────────── */}
-      {!isOpen && !hideLauncher && (
+      {!isOpen && !launcherHidden && (
         <div
           className="relative flex flex-col items-center cursor-pointer group"
           onClick={() => setIsOpen(true)}
@@ -355,8 +350,8 @@ export default function PreTradeGate() {
             aria-label="Hide coach"
             onClick={(e) => {
               e.stopPropagation();
-              setHideLauncher(true);
-              try { sessionStorage.setItem("coachLauncherHidden", "1"); } catch { /* ignore */ }
+              setLauncherHidden(true);
+              hideLauncher("coachLauncherHidden");
             }}
             className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-white dark:bg-[#1a1d24] border border-black/10 dark:border-white/15 shadow flex items-center justify-center text-neutral-500 hover:text-neutral-900 dark:hover:text-white"
           >

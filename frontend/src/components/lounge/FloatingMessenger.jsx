@@ -6,18 +6,13 @@ import { MessageCircle, X, Maximize2 } from "lucide-react";
 import api from "../../api/axios";
 import { ChatThread, ConversationList, useConversations, openDirect } from "./Messenger";
 import { useSocketEvent } from "../../lib/socket";
+import { isLauncherHidden, hideLauncher } from "../../lib/hiddenLauncher";
 
 const HIDDEN_ON = ["/community"];
 
 export default function FloatingMessenger() {
   const [open, setOpen] = useState(false);
-  const [hidden, setHidden] = useState(() => {
-    try {
-      return sessionStorage.getItem("messengerLauncherHidden") === "1";
-    } catch {
-      return false;
-    }
-  });
+  const [hidden, setHidden] = useState(() => isLauncherHidden("messengerLauncherHidden"));
   const [active, setActive] = useState(null);
   const [pendingTrade, setPendingTrade] = useState(null);
   const [me, setMe] = useState(null);
@@ -96,11 +91,7 @@ export default function FloatingMessenger() {
           aria-label="Hide messages button"
           onClick={() => {
             setHidden(true);
-            try {
-              sessionStorage.setItem("messengerLauncherHidden", "1");
-            } catch {
-              /* storage unavailable */
-            }
+            hideLauncher("messengerLauncherHidden");
           }}
           className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-white dark:bg-[#1a1d24] border border-black/10 dark:border-white/15 shadow flex items-center justify-center text-neutral-500 hover:text-neutral-900 dark:hover:text-white"
         >
